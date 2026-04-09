@@ -1,0 +1,8 @@
+psycopg2-binary
+pandas
+sqlalchemy
+python-dotenv
+requests
+pyyaml
+python-slugify
+boto3
