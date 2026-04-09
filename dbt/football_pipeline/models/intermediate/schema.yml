@@ -1,0 +1,117 @@
+version: 2
+
+models:
+  - name: dim_teams
+    description: "Conformed teams (INT layer). Standardizes team names and preserves both warehouse and API keys."
+    config:
+      schema: int
+      materialized: table
+    columns:
+      - name: team_id
+        description: "Warehouse/team surrogate key."
+        tests:
+          - not_null
+          - unique
+
+      - name: api_team_id
+        description: "Natural/business key from the API; used for mapping from staging/raw."
+        tests:
+          - not_null
+          - unique
+
+      - name: team_name
+        description: "Standardized team name (initcap)."
+        tests:
+          - not_null
+
+  - name: int_fixtures
+    description: "Conformed fixtures enriched with league/season context and Warehouse team ids using join o
+                  the raw_fixtures api_league_id and the int_league_context api_league_id, also on the."
+    config:
+      schema: int
+      materialized: table
+    columns:
+      - name: fixture_id
+        description: "Warehouse fixture identifier."
+        tests: [not_null, unique]
+
+      - name: league_season_id
+        description: "FK to int_league_context.league_season_id."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_league_context')
+              field: league_season_id
+
+      - name: league_name
+        description: "League display name from league context."
+        tests: [not_null]
+
+      - name: season
+        description: "Season label used in joins (e.g., 2024)."
+        tests: [not_null]
+
+      - name: kickoff_utc
+        description: "Fixture start time in UTC."
+        tests: [not_null]
+
+      - name: home_team_id
+        description: "Home team Warehouse id (natural key)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_teams')      # your INT teams model (schema=int)
+              field: api_team_id
+
+      - name: away_team_id
+        description: "Away team Warehouse id (natural key)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_teams')
+              field: api_team_id
+
+      - name: is_played
+        description: "True when the fixture has been completed."
+        tests: [not_null]
+
+      - name: updated_at
+        description: "Source update timestamp used for incremental loads."
+        tests: [not_null]
+
+      - name: fixture_status
+        description: "Raw status from API (e.g., NS, FT, PST)."
+
+      - name: is_current
+        description: "True if the joined league season is current."
+        tests: [not_null]
+  
+  # -----------------------------------------------------------------------------
+# fact_team_fixtures schema + tests
+# -----------------------------------------------------------------------------
+
+
+  - name: fact_team_info
+    description: "Latest fixture-based team snapshot with standings and next fixture pointers."
+    config:
+      schema: int
+      materialized: table
+    columns:
+      - name: team_id
+        tests: [not_null, unique]
+      - name: team_name
+        tests: [not_null]
+      - name: team_slug
+        tests: [not_null]
+      - name: league_season_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('int_league_context')
+              field: league_season_id
+      - name: next_fixture_id
+        description: "Upcoming fixture id (null if no future fixture)."
+      - name: next_kickoff_utc
+        description: "Kickoff time for the upcoming fixture."
+   
+      

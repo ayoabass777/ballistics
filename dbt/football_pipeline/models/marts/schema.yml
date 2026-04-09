@@ -1,0 +1,268 @@
+version: 2
+
+models:
+  - name: mart_top_team_streaks
+    description: "Current (most recent) team streaks per event with length > 2 for the current season."
+    columns:
+      - name: streak_id
+        description: "Display-only row number; not stable across runs."
+      - name: team_id
+        tests: [not_null]
+      - name: league_name
+        tests: [not_null]
+      - name: team_name
+        tests: [not_null]
+      - name: next_opponent_name
+        description: "Opponent faced in the upcoming fixture."
+        tests: [not_null]
+      - name: event_name
+        tests: [not_null]
+      - name: streak_type
+        tests:
+          - accepted_values:
+              values: ['goal_streaks','result_streaks','special_streaks']
+      - name: current_streak_length
+        tests: [not_null]
+      - name: next_fixture_id
+        description: "Fixture identifier for the team's upcoming match."
+
+  - name: mart_teams_fixture_streaks
+    description: "Latest streak snapshot per team and opponent, joining team streaks with opponent streaks via next_fixture_id."
+    columns:
+      - name: team_id
+        tests: [not_null]
+      - name: team_name
+        tests: [not_null]
+      - name: opponent_id
+        tests: [not_null]
+      - name: team_event_name
+        tests: [not_null]
+      - name: team_streak_type
+        tests:
+          - accepted_values:
+              values: ['goal_streaks','result_streaks','special_streaks']
+      - name: team_streak_length
+        tests: [not_null]
+
+  - name: mart_team_stats
+    description: "Aggregated team performance metrics (games, win/draw/loss rates, goal averages, recent form)."
+    columns:
+      - name: team_id
+        tests: [not_null]
+      - name: league_season_id
+        tests: [not_null]
+      - name: games_played
+        tests: [not_null]
+      - name: wins
+        tests: [not_null]
+      - name: draws
+        tests: [not_null]
+      - name: losses
+        tests: [not_null]
+      - name: win_rate
+        description: "Wins / games_played."
+      - name: draw_rate
+        description: "Draws / games_played."
+      - name: loss_rate
+        description: "Losses / games_played."
+      - name: avg_goals_for
+        description: "Average goals scored per game."
+      - name: avg_goals_against
+        description: "Average goals conceded per game."
+
+  - name: mart_teams_fixture_stats
+    description: "Per-team stats joined with opponent stats via next_fixture_id."
+    columns:
+      - name: team_id
+        tests: [not_null]
+      - name: team_name
+        tests: [not_null]
+      - name: next_fixture_id
+        tests: [not_null]
+      - name: next_opponent_id
+        tests: [not_null]
+
+  - name: mart_nav_leagues
+    description: "Navigation-ready league metadata with country names, logos, and season identifiers."
+    columns:
+      - name: league_season_id
+        description: "Unique league-season surrogate key."
+        tests:
+          - not_null
+          - unique
+      - name: league_name
+        description: "League display name."
+        tests: [not_null]
+      - name: country_name
+        description: "Country display name."
+        tests: [not_null]
+      - name: league_logo_file_id
+        description: "UUID for the league logo asset."
+      - name: country_logo_file_id
+        description: "UUID for the country/flag logo asset."
+
+  - name: mart_league_info
+    description: "League season info with slug, season label, and country."
+    columns:
+      - name: league_season_id
+        tests:
+          - not_null
+          - unique
+      - name: league_name
+        tests: [not_null]
+      - name: league_slug
+        tests: [not_null]
+      - name: season_label
+        tests: [not_null]
+      - name: country_name
+        tests: [not_null]
+
+  - name: mart_league_teams
+    description: "Teams per league-season with rank/form for navigation contexts."
+    columns:
+      - name: league_season_id
+        tests: [not_null]
+      - name: team_id
+        tests:
+          - not_null
+          - unique
+      - name: team_slug
+        tests: [not_null]
+      - name: team_rank
+        tests: [not_null]
+
+  - name: mart_team_page_context
+    description: "Single-team page payload combining team info, league info, and peer list."
+    columns:
+      - name: team_id
+        tests:
+          - not_null
+          - unique
+      - name: team_slug
+        tests: [not_null]
+      - name: league_season_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('mart_league_info')
+              field: league_season_id
+      - name: league_teams_json
+        description: "JSON array of peer teams in the same league-season (excluding current team)."
+      - name: streaks_json
+        description: "JSON array of the team's active streaks ordered by length."
+  
+  - name: mart_team_info
+    description: "Team standings snapshot with identifiers and form, sourced from int.dim_teams."
+    columns:
+      - name: team_id
+        tests: [not_null]
+      - name: team_name
+        tests: [not_null]
+      - name: league_season_id
+        tests: [not_null]
+
+  - name: mart_team_fixture
+    description: "Last 5 fixtures per team and context (overall/home/away) with JSON payload."
+    columns:
+      - name: team_id
+        tests: [not_null]
+      - name: team_name
+        tests: [not_null]
+      - name: context_scope
+        description: "Context scope for the fixtures list (overall/home/away)."
+      - name: fixtures_json
+        description: "JSON array of last 5 fixtures with date/opponent/score/result/isHome."
+
+  - name: mart_fixture_info
+    description: "Fixture-level payload with team info JSON per fixture."
+    columns:
+      - name: fixture_id
+        tests: [not_null]
+      - name: team_pair_key
+        description: "Direction-agnostic team pair key for the fixture."
+      - name: home_team_id
+        description: "Home team id for the fixture."
+      - name: away_team_id
+        description: "Away team id for the fixture."
+      - name: fixture_slug
+        tests: [not_null]
+      - name: fixture_info_json
+        description: "JSON object with fixture_id, fixture_slug, and team_info object (home/away)."
+
+  - name: mart_fixture_streaks
+    description: "Eligible streaks aligned to upcoming fixtures."
+    columns:
+      - name: fixture_id
+        description: "Fixture id for the upcoming match."
+        tests: [not_null]
+      - name: fixture_slug
+        description: "Fixture slug from mart_fixture_info."
+      - name: team_pair_key
+        description: "Direction-agnostic team pair key for the fixture."
+      - name: home_team_id
+        description: "Home team id for the fixture."
+      - name: away_team_id
+        description: "Away team id for the fixture."
+      - name: team_id
+        tests: [not_null]
+      - name: opponent_id
+        tests: [not_null]
+      - name: event_name
+        tests: [not_null]
+      - name: streak_type
+        tests: [not_null]
+      - name: fixture_streak_json
+        description: "JSON object for FixtureStreak (event_name, count, total, scope, polarity)."
+
+  - name: mart_head_to_head_streaks
+    description: "Latest head-to-head streaks grouped by team_pair_key with JSON payload."
+    columns:
+      - name: team_pair_key
+        tests: [not_null]
+      - name: h2h_streaks_json
+        description: "JSON array of H2HStreak payloads per team_pair_key."
+      - name: updated_at
+        description: "Latest update timestamp across the aggregated streaks."
+
+  - name: mart_fixture_page_context
+    description: "Context bundle for a single fixture page (parameterized by var('fixture_id'))."
+    columns:
+      - name: fixture_id
+        tests: [not_null]
+      - name: fixture_slug
+      - name: team_pair_key
+      - name: home_team_id
+      - name: away_team_id
+      - name: fixture_info_json
+      - name: fixture_streaks_json
+      - name: h2h_info_json
+      - name: h2h_streaks_json
+      - name: h2h_matches_json
+      - name: h2h_context_scopes_json
+      - name: team_fixtures_json
+
+  - name: mart_head_to_head_matches
+    description: "Head-to-head match list per current fixture (team_pair_key) with JSON payload."
+    columns:
+      - name: team_pair_key
+        tests: [not_null]
+      - name: current_fixture_id
+        tests: [not_null]
+      - name: h2h_matches_json
+        description: "JSON array of H2HMatch objects (date, home, away, result, isHomeTeamHome)."
+      - name: h2h_context_scopes_json
+        description: "JSON array of context scopes from fact_head_to_head aligned with match order."
+
+  - name: mart_head_to_head_info
+    description: "H2H summary info per current fixture with combined H2H payloads."
+    columns:
+      - name: team_pair_key
+        tests: [not_null]
+      - name: current_fixture_id
+        tests: [not_null]
+      - name: h2h_info_json
+        description: "JSON object with totalMatches, homeWins, draws, awayWins."
+      - name: h2h_streaks_json
+      - name: h2h_matches_json
+      - name: h2h_context_scopes_json
+        

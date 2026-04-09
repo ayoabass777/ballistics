@@ -1,0 +1,3 @@
+-- This file intentionally left empty.
+-- Using dbt default generate_schema_name behavior:
+--   {target.schema}_{custom_schema_name} → raw_stg, raw_int, raw_mart

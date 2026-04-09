@@ -1,0 +1,197 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    loaded_at_field: updated_at
+    tables:
+      - name: raw_fixtures
+        description: "Current raw fixtures data loaded into the warehouse"
+        columns:
+          - name: fixture_id
+            description: "Warehouse fixture surrogate key (generated in raw.raw_fixtures)."
+            tests:
+              - not_null
+              - unique
+          - name: api_fixture_id
+            description: "External fixture identifier"
+            tests:
+              - not_null
+              - unique
+          - name: api_league_id
+            description: "External league identifier"
+            tests:
+              - not_null
+          - name: season
+            description: "Season starting year (e.g., 2025)"
+            tests:
+              - not_null
+          - name: kickoff_utc
+            description: "UTC timestamp of fixture kickoff"
+            tests:
+              - not_null
+          - name: fixture_status
+            description: "Fixture status code (e.g., NS, FT, Postp)"
+            tests:
+              - not_null
+          - name: home_team_id
+            description: "API identifier for the home team"
+            tests:
+              - not_null
+          - name: home_team_name
+            description: "Name of the home team"
+            tests:
+              - not_null
+          - name: away_team_id
+            description: "API identifier for the away team"
+            tests:
+              - not_null
+          - name: away_team_name
+            description: "Name of the away team"
+            tests:
+              - not_null
+          - name: home_team_halftime_goal
+            description: "Halftime goals scored by the home team"
+          - name: away_team_halftime_goal
+            description: "Halftime goals scored by the away team"
+          - name: home_team_fulltime_goal
+            description: "Fulltime goals scored by the home team"
+          - name: away_team_fulltime_goal
+            description: "Fulltime goals scored by the away team"
+          - name: home_fulltime_result
+            description: "Fulltime result for home team"
+            tests:
+              - accepted_values:
+                  values: ['win', 'draw', 'loss', null]
+          - name: away_fulltime_result
+            description: "Fulltime result for away team"
+            tests:
+              - accepted_values:
+                  values: ['win', 'draw', 'loss', null]
+          - name: home_halftime_result
+            description: "Halftime result for home team"
+            tests:
+              - accepted_values:
+                  values: ['win', 'draw', 'loss', null]
+          - name: away_halftime_result
+            description: "Halftime result for away team"
+            tests:
+              - accepted_values:
+                  values: ['win', 'draw', 'loss', null]
+          - name: created_at
+            description: "Timestamp when the raw record was created"
+            tests:
+              - not_null
+          - name: updated_at
+            description: "Timestamp when the raw record was last updated"
+            tests:
+              - not_null
+
+      - name: raw_league_standings
+        description: "Raw league standings loaded from API"
+        columns:
+          - name: league_season_id
+            tests:
+              - not_null
+          - name: api_league_id
+            tests:
+              - not_null
+          - name: season
+            tests:
+              - not_null
+          - name: api_team_id
+            tests:
+              - not_null
+          - name: rank
+          - name: points
+          - name: games_played
+          - name: wins
+          - name: draws
+          - name: losses
+          - name: goals_for
+          - name: goals_against
+          - name: goal_diff
+          - name: form
+          - name: created_at
+          - name: updated_at
+
+  - name: etl
+    schema: dim
+    tables:
+      - name: dim_teams
+        description: "Teams dimension loaded by ELT pipeline"
+        columns:
+          - name: team_id
+            description: "Surrogate key for the team"
+            tests:
+              - not_null
+              - unique
+          - name: api_team_id
+            description: "External API team identifier"
+            tests:
+              - not_null
+              - unique
+          - name: team_name
+            description: "Canonical team name"
+            tests:
+              - not_null
+
+      - name: dim_leagues
+        description: "Leagues dimension table populated by ELT pipeline"
+        columns:
+          - name: league_id
+            description: "Surrogate key for the league"
+            tests:
+              - not_null
+              - unique
+          - name: api_league_id
+            description: "External API league identifier"
+            tests:
+              - not_null
+              - unique
+          - name: league_name
+            description: "Canonical league name"
+            tests:
+              - not_null
+          - name: tier
+            description: "Competitive tier bucket (1=top flight)."
+          - name: country_id
+            description: "Foreign key to dim_countries"
+            tests:
+              - not_null
+              
+      - name: dim_league_seasons
+        description: "League seasons dimension table populated by ELT pipeline"
+        columns:
+          - name: league_season_id
+            description: "Surrogate key for the league season"
+          - name: league_id
+            description: "Surrogate key for the league"
+          - name: api_league_id
+            description: "External API league identifier"
+          - name: season
+            description: "Season starting year"
+          - name: season_label
+            description: "Season label (e.g., '2024/25')"
+          - name: start_date
+            description: "Season start date"
+          - name: end_date
+            description: "Season end date"
+          - name: is_current
+            description: "Flag indicating if today is within the season"
+
+      - name: dim_countries
+        description: "Countries dimension table populated by ELT pipeline"
+        columns:
+          - name: country_id
+            description: "Surrogate key for the country"
+            tests:
+              - not_null
+              - unique
+          - name: country_name
+            description: "Country name"
+            tests:
+              - not_null

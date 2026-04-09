@@ -1,0 +1,101 @@
+version: 2
+
+models:
+  # ── stg_raw_fixtures (incremental) ──────────────────────────────────
+  - name: stg_raw_fixtures
+    description: "Staged fixtures with is_played flag derived from fixture_status. Incremental on updated_at."
+    columns:
+      - name: fixture_id
+        tests: [not_null, unique]
+      - name: api_fixture_id
+        tests: [not_null, unique]
+      - name: api_league_id
+        tests: [not_null]
+      - name: season
+        tests: [not_null]
+      - name: kickoff_utc
+        tests: [not_null]
+      - name: fixture_status
+        tests: [not_null]
+      - name: home_team_id
+        tests: [not_null]
+      - name: away_team_id
+        tests: [not_null]
+      - name: is_played
+        description: "True when fixture_status = 'FT'."
+        tests: [not_null]
+      - name: updated_at
+        tests: [not_null]
+
+  # ── stg_dim_teams ───────────────────────────────────────────────────
+  - name: stg_dim_teams
+    description: "Staged teams dimension from ETL pipeline."
+    columns:
+      - name: team_id
+        tests: [not_null, unique]
+      - name: api_team_id
+        tests: [not_null, unique]
+      - name: team_name
+        tests: [not_null]
+
+  # ── stg_dim_leagues ─────────────────────────────────────────────────
+  - name: stg_dim_leagues
+    description: "Staged leagues dimension from ETL pipeline."
+    columns:
+      - name: league_id
+        tests: [not_null, unique]
+      - name: api_league_id
+        tests: [not_null, unique]
+      - name: league_name
+        tests: [not_null]
+      - name: country_id
+        tests: [not_null]
+
+  # ── stg_dim_league_seasons ──────────────────────────────────────────
+  - name: stg_dim_league_seasons
+    description: "Staged league seasons with computed is_current flag."
+    columns:
+      - name: league_season_id
+        tests: [not_null, unique]
+      - name: league_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_dim_leagues')
+              field: league_id
+      - name: season
+        tests: [not_null]
+      - name: start_date
+        tests: [not_null]
+      - name: end_date
+        tests: [not_null]
+      - name: is_current
+        tests: [not_null]
+
+  # ── stg_dim_countries ───────────────────────────────────────────────
+  - name: stg_dim_countries
+    description: "Staged countries dimension from ETL pipeline."
+    columns:
+      - name: country_id
+        tests: [not_null, unique]
+      - name: country_name
+        tests: [not_null]
+
+  # ── stg_raw_league_standings ────────────────────────────────────────
+  - name: stg_raw_league_standings
+    description: "Staged league standings with team rank, form, and goal stats."
+    columns:
+      - name: league_season_id
+        tests: [not_null]
+      - name: api_team_id
+        tests: [not_null]
+      - name: rank
+        tests: [not_null]
+      - name: games_played
+        tests: [not_null]
+      - name: wins
+        tests: [not_null]
+      - name: draws
+        tests: [not_null]
+      - name: losses
+        tests: [not_null]

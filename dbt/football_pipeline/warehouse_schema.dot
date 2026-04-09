@@ -1,0 +1,140 @@
+digraph FootballWarehouse {
+  rankdir=LR;
+  graph [splines=true, nodesep=0.6, ranksep=0.7];
+  node  [shape=record, fontsize=10];
+
+  // -------------------- RAW --------------------
+  subgraph cluster_raw {
+    label="RAW";
+    style=filled; color="#f3f3f3";
+
+    raw_fixtures [label="{raw_fixtures|
+      + fixture_id PK|
+      api_fixture_id|api_league_id|season|kickoff_utc|fixture_status|
+      home_team_id|home_team_name|away_team_id|away_team_name|
+      home_team_halftime_goal|away_team_halftime_goal|
+      home_team_fulltime_goal|away_team_fulltime_goal|
+      home_halftime_result|away_halftime_result|
+      home_fulltime_result|away_fulltime_result|
+      created_at|updated_at
+    }"];
+  }
+
+  // -------------------- STAGING --------------------
+  subgraph cluster_stg {
+    label="STAGING (stg_*)";
+    style=filled; color="#eef5ff";
+
+    stg_dim_countries [label="{stg_dim_countries|+ country_id PK|country_name}"];
+    stg_dim_leagues   [label="{stg_dim_leagues|+ league_id PK|league_name|api_league_id|country_id FK}"];
+    stg_dim_ls        [label="{stg_dim_league_seasons|+ league_season_id PK|league_id FK|season|season_label|start_date|end_date|is_current}"];
+    stg_dim_teams     [label="{stg_dim_teams|+ team_id PK|api_team_id|team_name}"];
+    stg_raw_fixtures  [label="{stg_raw_fixtures|+ fixture_id PK|api_fixture_id|api_league_id|season|kickoff_utc|fixture_status|
+      home_team_id|home_team_name|away_team_id|away_team_name|
+      home_team_halftime_goal|away_team_halftime_goal|
+      home_team_fulltime_goal|away_team_fulltime_goal|
+      home_halftime_result|away_halftime_result|
+      home_fulltime_result|away_fulltime_result|
+      is_played|created_at|updated_at}"];
+  }
+
+  // -------------------- DIMENSIONS --------------------
+  subgraph cluster_dim {
+    label="DIMENSIONS (dim_*)";
+    style=filled; color="#f7fff0";
+
+    dim_countries [label="{dim_countries|+ country_id PK|country_name|created_at}"];
+    dim_leagues   [label="{dim_leagues|+ league_id PK|league_name|api_league_id|country_id FK|created_at|updated_at}"];
+    dim_ls        [label="{dim_league_seasons|+ league_season_id PK|league_id FK|season_label|start_date|end_date|created_at|updated_at}"];
+    dim_teams     [label="{dim_teams|+ team_id PK|api_team_id|team_name|country_id FK|team_code|created_at|updated_at}"];
+  }
+
+  // -------------------- INTERMEDIATE --------------------
+  subgraph cluster_int {
+    label="INTERMEDIATE (int_*)";
+    style=filled; color="#fff8e6";
+
+    int_fixtures [label="{int_fixtures|
+      + fixture_id (logical PK)|
+      league_season_id FK|league_name|season|kickoff_utc|
+      home_team_id (API)|away_team_id (API)|
+      home_team_name|away_team_name|
+      home_team_fulltime_goal|away_team_fulltime_goal|
+      home_team_halftime_goal|away_team_halftime_goal|
+      home_fulltime_result|away_fulltime_result|
+      home_halftime_result|away_halftime_result|
+      is_played|fixture_status|updated_at|is_current
+    }"];
+  }
+
+  // -------------------- FACTS --------------------
+  subgraph cluster_fact {
+    label="FACTS (fact_*)";
+    style=filled; color="#ffeef0";
+
+    fact_team_fixtures [label="{fact_team_fixtures|
+      + (fixture_id, team_id) PK|
+      league_season_id FK|league_name|season|
+      team_id FK|team_name|opponent_id FK|opponent_name|
+      is_home|kickoff_utc|
+      goals_for|goals_against|halftime_goals_for|halftime_goals_against|
+      fulltime_result|halftime_result|
+      next_opponent_id|next_kickoff_utc|
+      is_played|is_current
+    }"];
+
+    fact_team_events [label="{fact_team_events|
+      + (fixture_id, team_id, event_name) PK|
+      league_season_id FK|league_name|season|
+      fixture_id FK|team_id FK|team_name|
+      kickoff_utc|event_name|event_flag|streak_type|
+      is_home|is_current|is_played
+    }"];
+  }
+
+  // -------------------- MARTS --------------------
+  subgraph cluster_mart {
+    label="MARTS (mart_*)";
+    style=filled; color="#f2ecff";
+
+    mart_top_team_streaks [label="{mart_top_team_streaks|
+      streak_id (display)|league_name|team_name|
+      event_name|streak_type|current_streak_length
+    }"];
+  }
+
+  // ==================== RELATIONSHIPS ====================
+
+  // Staging FKs
+  stg_dim_leagues   -> stg_dim_countries [label="country_id"];
+  stg_dim_ls        -> stg_dim_leagues   [label="league_id"];
+
+  // Dim FKs
+  dim_leagues       -> dim_countries     [label="country_id"];
+  dim_ls            -> dim_leagues       [label="league_id"];
+  dim_teams         -> dim_countries     [label="country_id"];
+
+  // int_fixtures to dims
+  int_fixtures      -> dim_ls            [label="league_season_id"];
+  // Note: home/away IDs in int_fixtures are API ids mapping to dim_teams.api_team_id
+  int_fixtures      -> dim_teams         [label="home_team_id → api_team_id", style=dashed];
+  int_fixtures      -> dim_teams         [label="away_team_id → api_team_id",  style=dashed];
+
+  // fact_team_fixtures references
+  fact_team_fixtures -> int_fixtures     [label="fixture_id"];
+  fact_team_fixtures -> dim_ls           [label="league_season_id"];
+  fact_team_fixtures -> dim_teams        [label="team_id"];
+  fact_team_fixtures -> dim_teams        [label="opponent_id"];
+
+  // fact_team_events references
+  fact_team_events   -> dim_ls           [label="league_season_id"];
+  fact_team_events   -> int_fixtures     [label="fixture_id"];
+  fact_team_events   -> dim_teams        [label="team_id"];
+
+  // marts derived from facts
+  mart_top_team_streaks -> fact_team_events [label="derived from", style=dotted];
+
+  // Optional: lineage hints
+  stg_raw_fixtures -> int_fixtures [label="enrich/resolve", style=dotted];
+  raw_fixtures     -> stg_raw_fixtures [label="ETL", style=dotted];
+}
