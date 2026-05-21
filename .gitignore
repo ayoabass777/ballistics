@@ -19,3 +19,6 @@ dbt/football_pipeline/logs/
 .DS_Store
 node_modules/
 CLAUDE.md
+
+AGENTS.md
+blog-draft.md
