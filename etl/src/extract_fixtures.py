@@ -22,11 +22,8 @@ except ImportError:
 
 
 # API connection parameters loaded from config.py.
-API_KEY = config.API['key']
 API_URL = config.API['url']
-HEADERS = {
-    'x-apisports-key': API_KEY
-}
+HEADERS = config.API_HEADERS
 
 # Parameterized API endpoint names
 FIXTURES_ENDPOINT = "fixtures"

@@ -10,7 +10,7 @@ the mtime change → full bootstrap chain executes automatically.
 Task graph:
 
   sensor ──► metadata_schema ──► extract_metadata ──┐
-                                                     ├──► extract_fixtures ──► load_fixtures
+                                                     ├──► extract_fixtures ──► load_fixtures ──► mark_metadata_processed
   sensor ──► raw_fixtures_schema ───────────────────┘
 
 Failed extractions are written to a DLQ prefix in S3 (dlq/{league_id}/{season}/{ds}/).
@@ -24,6 +24,11 @@ from typing import List
 from airflow.decorators import dag, task
 from airflow.models import Variable
 from airflow.sensors.base import BaseSensorOperator
+from etl.src.data_detector import (
+    pipeline_run_failed,
+    pipeline_run_started,
+    pipeline_run_succeeded,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -55,7 +60,7 @@ class MetadataChangeSensor(BaseSensorOperator):
                 current_mtime,
                 last_mtime,
             )
-            Variable.set("metadata_last_mtime", str(current_mtime))
+            context["ti"].xcom_push(key="metadata_mtime", value=current_mtime)
             return True
 
         self.log.info("metadata.yaml unchanged (mtime %.0f). Skipping.", current_mtime)
@@ -77,6 +82,9 @@ default_args = {
     "start_date": datetime(2025, 4, 20),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
+    "on_execute_callback": pipeline_run_started,
+    "on_success_callback": pipeline_run_succeeded,
+    "on_failure_callback": pipeline_run_failed,
 }
 
 
@@ -152,6 +160,10 @@ def bootstrap_dag():
         from etl.src.s3_landing import write_fixtures_to_s3, write_to_dlq
         from etl.src.logger import get_logger
         from etl.src.config import EXTRACT_FIXTURES_LOG
+        from etl.src.data_detector import (
+            fixture_kickoff_watermark,
+            record_data_movement_from_context,
+        )
 
         logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
 
@@ -184,6 +196,28 @@ def bootstrap_dag():
 
                     s3_key = write_fixtures_to_s3(extracted, api_league_id, season_year, ds)
                     s3_keys.append(s3_key)
+                    watermark_column, watermark_min, watermark_max = fixture_kickoff_watermark(extracted)
+                    record_data_movement_from_context(
+                        context,
+                        movement_type="api_to_s3",
+                        source_system="api_sports",
+                        source_name=f"fixtures:{api_league_id}:{season_year}",
+                        source_s3_key=s3_key,
+                        row_count=len(extracted),
+                        inserted_count=len(extracted),
+                        failed_count=0,
+                        watermark_column=watermark_column,
+                        watermark_min=watermark_min,
+                        watermark_max=watermark_max,
+                        status="success",
+                        details={
+                            "api_league_id": api_league_id,
+                            "season_year": season_year,
+                            "country_name": country_name,
+                            "league_name": league_name,
+                            "league_season_id": league_season_id,
+                        },
+                    )
 
                     logger.info(
                         "Extracted %d fixtures for %s (%s) → s3://%s",
@@ -202,6 +236,22 @@ def bootstrap_dag():
                         error=exc,
                         league_name=league_name,
                     )
+                    record_data_movement_from_context(
+                        context,
+                        movement_type="api_to_s3",
+                        source_system="api_sports",
+                        source_name=f"fixtures:{api_league_id}:{season_year}",
+                        row_count=0,
+                        failed_count=1,
+                        status="failed",
+                        details={
+                            "api_league_id": api_league_id,
+                            "season_year": season_year,
+                            "country_name": country_name,
+                            "league_name": league_name,
+                            "error": str(exc),
+                        },
+                    )
                     continue
 
             return s3_keys
@@ -210,12 +260,27 @@ def bootstrap_dag():
             cur.close()
             conn.close()
 
+    @task
+    def mark_metadata_processed(**context):
+        """
+        Persist metadata.yaml's mtime only after the bootstrap path succeeds.
+        This keeps failed bootstraps retryable without touching metadata.yaml again.
+        """
+        metadata_mtime = context["ti"].xcom_pull(
+            task_ids="wait_for_metadata_change",
+            key="metadata_mtime",
+        )
+        if metadata_mtime is None:
+            metadata_mtime = os.path.getmtime(METADATA_PATH)
+
+        Variable.set("metadata_last_mtime", str(metadata_mtime))
+
     # ------------------------------------------------------------------
     # Load from S3 → Postgres
     # ------------------------------------------------------------------
 
     @task
-    def load_fixtures(s3_keys: List[str]):
+    def load_fixtures(s3_keys: List[str], **context):
         """
         Read extracted fixtures from S3 and COPY into raw.raw_fixtures.
         Marks league-seasons as bootstrapped after successful load.
@@ -223,9 +288,15 @@ def bootstrap_dag():
         from etl.src.extract_fixtures import mark_fixtures_bootstrap_done
         from etl.src.extract_metadata import get_db_connection
         from etl.src.schema_checks import ensure_raw_fixtures_bootstrap_ready
-        from etl.src.s3_landing import load_fixtures_from_s3
+        from etl.src.s3_landing import load_fixtures_from_s3, read_fixtures_from_s3, write_to_dlq
         from etl.src.logger import get_logger
         from etl.src.config import EXTRACT_FIXTURES_LOG
+        from etl.src.data_detector import (
+            fixture_kickoff_watermark,
+            record_data_movement_from_context,
+            record_data_quality_event_from_context,
+            record_table_snapshot_from_context,
+        )
 
         logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
 
@@ -236,21 +307,28 @@ def bootstrap_dag():
         conn = get_db_connection()
         cur = conn.cursor()
         total_loaded = 0
+        failed_keys = []
 
         try:
             ensure_raw_fixtures_bootstrap_ready(cur)
 
             for s3_key in s3_keys:
-                try:
-                    count = load_fixtures_from_s3(s3_key, conn)
+                parts = s3_key.split("/")
+                api_league_id = int(parts[1])
+                season_year = int(parts[2])
+                ds = parts[3]
+                league_name = ""
+                watermark_column = "kickoff_utc"
+                watermark_min = None
+                watermark_max = None
 
-                    parts = s3_key.split("/")
-                    api_league_id = int(parts[1])
-                    season_year = int(parts[2])
+                try:
+                    fixtures = read_fixtures_from_s3(s3_key)
+                    watermark_column, watermark_min, watermark_max = fixture_kickoff_watermark(fixtures)
 
                     cur.execute(
                         """
-                        SELECT ls.league_season_id
+                        SELECT ls.league_season_id, l.league_name
                         FROM dim.dim_league_seasons ls
                         JOIN dim.dim_leagues l ON ls.league_id = l.league_id
                         WHERE l.api_league_id = %s AND ls.season = %s
@@ -259,16 +337,111 @@ def bootstrap_dag():
                     )
                     row = cur.fetchone()
                     if row:
+                        league_name = row[1] or ""
+
+                    count = load_fixtures_from_s3(s3_key, conn)
+
+                    if row:
                         mark_fixtures_bootstrap_done(cur, row[0])
 
                     conn.commit()
                     total_loaded += count
+                    record_data_movement_from_context(
+                        context,
+                        movement_type="s3_to_raw",
+                        source_system="s3",
+                        source_s3_key=s3_key,
+                        target_schema="raw",
+                        target_table="raw_fixtures",
+                        row_count=count,
+                        inserted_count=count,
+                        failed_count=0,
+                        watermark_column=watermark_column,
+                        watermark_min=watermark_min,
+                        watermark_max=watermark_max,
+                        status="success",
+                        details={
+                            "api_league_id": api_league_id,
+                            "season_year": season_year,
+                            "league_name": league_name,
+                        },
+                    )
+                    record_table_snapshot_from_context(
+                        context,
+                        table_schema="raw",
+                        table_name="raw_fixtures",
+                        details={
+                            "movement_type": "s3_to_raw",
+                            "source_s3_key": s3_key,
+                            "api_league_id": api_league_id,
+                            "season_year": season_year,
+                        },
+                    )
                     logger.info("Loaded %d fixtures from %s", count, s3_key)
 
                 except Exception as exc:
                     conn.rollback()
                     logger.error("Failed loading from %s: %s", s3_key, exc, exc_info=True)
+                    record_data_movement_from_context(
+                        context,
+                        movement_type="s3_to_raw",
+                        source_system="s3",
+                        source_s3_key=s3_key,
+                        target_schema="raw",
+                        target_table="raw_fixtures",
+                        row_count=0,
+                        inserted_count=0,
+                        failed_count=1,
+                        watermark_column=watermark_column,
+                        watermark_min=watermark_min,
+                        watermark_max=watermark_max,
+                        status="failed",
+                        details={
+                            "api_league_id": api_league_id,
+                            "season_year": season_year,
+                            "league_name": league_name,
+                            "error": str(exc),
+                        },
+                    )
+                    record_data_quality_event_from_context(
+                        context,
+                        severity="error",
+                        check_name="s3_load_failed",
+                        table_schema="raw",
+                        table_name="raw_fixtures",
+                        source_s3_key=s3_key,
+                        status="open",
+                        details={
+                            "api_league_id": api_league_id,
+                            "season_year": season_year,
+                            "league_name": league_name,
+                        },
+                        error_message=str(exc),
+                    )
+                    try:
+                        write_to_dlq(
+                            api_league_id=api_league_id,
+                            season_year=season_year,
+                            ds=ds,
+                            error=exc,
+                            league_name=league_name,
+                            source_s3_key=s3_key,
+                            failure_stage="load",
+                        )
+                    except Exception as dlq_exc:
+                        logger.error(
+                            "Failed writing load failure for %s to DLQ: %s",
+                            s3_key,
+                            dlq_exc,
+                            exc_info=True,
+                        )
+                    failed_keys.append(s3_key)
                     continue
+
+            if failed_keys:
+                raise RuntimeError(
+                    "Failed loading fixtures from S3 keys: " + ", ".join(failed_keys)
+                )
 
             logger.info("Total fixtures loaded: %d from %d S3 keys", total_loaded, len(s3_keys))
 
@@ -285,13 +458,15 @@ def bootstrap_dag():
     raw_schema = bootstrap_raw_fixtures_schema()
     fixtures_extracted = extract_fixtures()
     fixtures_loaded = load_fixtures(fixtures_extracted)
+    metadata_processed = mark_metadata_processed()
 
     #   sensor ──► metadata_schema ──► extract_metadata ──┐
-    #                                                      ├──► extract ──► load
+    #                                                      ├──► extract ──► load ──► mark_metadata_processed
     #   sensor ──► raw_fixtures_schema ───────────────────┘
 
     wait_for_metadata_change >> metadata_schema >> metadata_extract >> fixtures_extracted
     wait_for_metadata_change >> raw_schema >> fixtures_extracted
+    fixtures_loaded >> metadata_processed
 
 
 bootstrap_dag()

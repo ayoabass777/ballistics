@@ -150,14 +150,9 @@ def process_country(
         process_league(cur, country, country_id, league_data, missing_league_ids)
 
 
-# Load API configuration from config.py
-API_KEY = config.API['key']
-API_HOST = config.API['host']
+# Load API-Sports configuration from config.py
 API_URL = config.API['url']
-HEADERS = {
-    'x-rapidapi-key': API_KEY,
-    'x-rapidapi-host': API_HOST
-}
+HEADERS = config.API_HEADERS
 
 
 def load_yaml(file_path: str) -> Dict[str, Any]:

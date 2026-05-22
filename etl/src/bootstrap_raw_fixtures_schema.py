@@ -18,6 +18,7 @@ from etl.src.config import EXTRACT_FIXTURES_LOG
 from etl.src.extract_metadata import get_db_connection
 from etl.src.logger import get_logger
 from etl.src.schema_checks import ensure_raw_fixtures_bootstrap_ready
+from etl.src.schema_checks import ensure_data_detector_ready
 
 logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
 
@@ -35,7 +36,8 @@ def bootstrap_raw_fixtures_schema() -> None:
         cur.execute(ddl_sql)
         conn.commit()
         ensure_raw_fixtures_bootstrap_ready(cur)
-        logger.info("Bootstrap complete: raw.raw_fixtures is ready for fixture ETL.")
+        ensure_data_detector_ready(cur)
+        logger.info("Bootstrap complete: raw.raw_fixtures and data_detector are ready for fixture ETL.")
 
 
 if __name__ == "__main__":

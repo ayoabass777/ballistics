@@ -13,14 +13,14 @@ models:
       - name: team_name
         tests: [not_null]
       - name: next_opponent_name
-        description: "Opponent faced in the upcoming fixture."
-        tests: [not_null]
+        description: "Opponent faced in the upcoming fixture. Null when no next fixture is known."
       - name: event_name
         tests: [not_null]
       - name: streak_type
         tests:
           - accepted_values:
-              values: ['goal_streaks','result_streaks','special_streaks']
+              arguments:
+                values: ['goal','result','special']
       - name: current_streak_length
         tests: [not_null]
       - name: next_fixture_id
@@ -40,7 +40,8 @@ models:
       - name: team_streak_type
         tests:
           - accepted_values:
-              values: ['goal_streaks','result_streaks','special_streaks']
+              arguments:
+                values: ['goal','result','special']
       - name: team_streak_length
         tests: [not_null]
 

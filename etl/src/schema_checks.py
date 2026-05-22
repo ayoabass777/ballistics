@@ -92,6 +92,28 @@ def ensure_raw_fixtures_bootstrap_ready(cur: psycopg2.extensions.cursor) -> None
     assert_raw_fixtures_fixture_id_contract(cur)
 
 
+def ensure_data_detector_ready(cur: psycopg2.extensions.cursor) -> None:
+    """
+    Validate the detector tables used to audit pipeline data flow.
+    """
+    required_tables = [
+        "pipeline_runs",
+        "data_movements",
+        "table_snapshots",
+        "data_quality_events",
+    ]
+    for table_name in required_tables:
+        table_exists = _fetch_one_value(
+            cur,
+            "select to_regclass(%s) is not null",
+            (f"data_detector.{table_name}",),
+        )
+        if not table_exists:
+            raise RuntimeError(
+                f"Missing table data_detector.{table_name}. Run raw fixture bootstrap DDL first."
+            )
+
+
 def _assert_table_has_columns(
     cur: psycopg2.extensions.cursor,
     schema_name: str,

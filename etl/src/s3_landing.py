@@ -20,7 +20,7 @@ import os
 import traceback
 from datetime import datetime, timezone
 from io import StringIO
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
 import psycopg2
@@ -163,6 +163,8 @@ def write_to_dlq(
     ds: str,
     error: Exception,
     league_name: str = "",
+    source_s3_key: str | None = None,
+    failure_stage: str = "extract",
     bucket: str = S3_BUCKET,
 ) -> str:
     """
@@ -177,6 +179,8 @@ def write_to_dlq(
         "season_year": season_year,
         "league_name": league_name,
         "ds": ds,
+        "failure_stage": failure_stage,
+        "source_s3_key": source_s3_key,
         "error": str(error),
         "traceback": traceback.format_exc(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -220,60 +224,3 @@ def list_dlq_entries(bucket: str = S3_BUCKET) -> List[Dict[str, Any]]:
 
     logger.info("Found %d DLQ entries in s3://%s/dlq/", len(entries), bucket)
     return entries
-
-
-def replay_from_dlq(
-    entry: Dict[str, Any],
-    conn: psycopg2.extensions.connection,
-    bucket: str = S3_BUCKET,
-) -> bool:
-    """
-    Replay a single DLQ entry by re-extracting from the API and loading to Postgres.
-    On success, writes to landing zone, cleans up DLQ entry, returns True.
-    On failure, returns False (entry stays in DLQ for next attempt).
-    """
-    api_league_id = entry["api_league_id"]
-    season_year = entry["season_year"]
-    ds = entry["ds"]
-
-    from etl.src.extract_fixtures import (
-        FIXTURES_ENDPOINT,
-        extract_fixtures_field,
-        fetch_fixtures,
-    )
-
-    logger.info("Replaying DLQ entry: league %s, season %s", api_league_id, season_year)
-    raw = fetch_fixtures(FIXTURES_ENDPOINT, params={"league": api_league_id, "season": season_year})
-    fixtures = extract_fixtures_field(raw)
-
-    if not fixtures:
-        logger.warning("No fixtures from API for league %s season %s. Replay failed.", api_league_id, season_year)
-        return False
-
-    # Write to landing zone
-    landing_key = write_fixtures_to_s3(fixtures, api_league_id, season_year, ds, bucket)
-
-    # Load into Postgres
-    count = load_fixtures_from_s3(landing_key, conn, bucket)
-    if count == 0:
-        return False
-
-    # Clean up DLQ
-    _cleanup_dlq_entry(api_league_id, season_year, ds, bucket)
-    logger.info("Replayed %d fixtures for league %s season %s. DLQ cleaned up.", count, api_league_id, season_year)
-    return True
-
-
-def _cleanup_dlq_entry(
-    api_league_id: int,
-    season_year: int,
-    ds: str,
-    bucket: str = S3_BUCKET,
-) -> None:
-    """Remove DLQ error.json for a given entry."""
-    s3 = boto3.client("s3")
-    key = f"dlq/{api_league_id}/{season_year}/{ds}/error.json"
-    try:
-        s3.delete_object(Bucket=bucket, Key=key)
-    except Exception:
-        pass

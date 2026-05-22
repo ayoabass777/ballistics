@@ -14,6 +14,8 @@ from etl.src.logger import get_logger
 
 logger = get_logger(__name__, log_path=UPDATE_FIXTURES_LOG)
 
+FIXTURE_CORRECTION_BOUND = 11
+
 
 def _normalize_kickoff(dt_value: Any) -> Optional[datetime]:
     """
@@ -142,7 +144,7 @@ def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return updated
 
 
-def correct_missed_fixtures(no_of_fixtures: int = 11) -> List[Dict[str, Any]]:
+def correct_missed_fixtures(no_of_fixtures: int = FIXTURE_CORRECTION_BOUND) -> List[Dict[str, Any]]:
     """
     Check recently played fixtures (last N) for kickoff mismatches and update DB.
     """
@@ -166,7 +168,7 @@ def correct_missed_fixtures(no_of_fixtures: int = 11) -> List[Dict[str, Any]]:
     return updated_fixtures
 
 
-def correct_changed_fixtures(no_of_fixtures: int = 11) -> List[Dict[str, Any]]:
+def correct_changed_fixtures(no_of_fixtures: int = FIXTURE_CORRECTION_BOUND) -> List[Dict[str, Any]]:
     """
     Check upcoming fixtures (next N) for kickoff mismatches and update DB.
     """

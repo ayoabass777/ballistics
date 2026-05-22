@@ -9,7 +9,7 @@ Built as a portfolio project to demonstrate data engineering patterns — not a 
 ```
                          ┌──────────────┐
                          │ Football API │
-                         │  (RapidAPI)  │
+                         │ (API-Sports) │
                          └──────┬───────┘
                                 │
                       ┌─────────▼──────────┐
@@ -33,6 +33,11 @@ Built as a portfolio project to demonstrate data engineering patterns — not a 
               └─────────────┘    │  stg   │ │   int    │ │  mart   │
                                  │ views  │ │  tables  │ │ tables  │
                                  └────────┘ └──────────┘ └─────────┘
+                                      │
+                              ┌───────▼────────┐
+                              │ data_detector  │
+                              │ flow telemetry │
+                              └────────────────┘
 ```
 
 ## Pipeline Layers
@@ -41,9 +46,11 @@ Built as a portfolio project to demonstrate data engineering patterns — not a 
 
 The bootstrap DAG uses parallel branches — metadata schema and raw fixtures schema run concurrently before converging at the extract step. S3 keys are passed between extract and load tasks via XCom (lightweight URI strings, not full payloads).
 
-**Incremental (daily):** Picks up played fixtures missing fulltime scores, fetches updates by fixture ID, writes to S3 (`incremental/{ds}/fixtures.json`), upserts into Postgres, corrects any rescheduled kickoff times, refreshes league standings, then triggers dbt.
+**Incremental (daily):** Picks up played fixtures missing fulltime scores, fetches updates by fixture ID, writes to S3 (`incremental/{ds}/fixtures.json`), upserts into Postgres, corrects any rescheduled kickoff times, refreshes league standings, loads dbt seeds, then triggers dbt models.
 
 **Replay (daily, independent):** Scans the S3 dead letter queue (`dlq/`) for failed extractions, re-fetches from the API, loads into Postgres, and cleans up successful entries. Remaining failures are logged — in production this would trigger a Slack or email alert.
+
+**Data Flow Detector:** Airflow callbacks and ETL tasks write operational telemetry to the `data_detector` schema. It tracks task lifecycle rows, data movements, raw table snapshots, and data quality events such as stale fixtures, stale standings, failed S3 loads, and remaining DLQ entries. See `docs/data_flow_detector.md` for the contract details.
 
 **dbt transforms:** Staging views clean raw data. Intermediate tables enrich fixtures with league context and team dimensions, compute streaks (win runs, clean sheet runs, scoring runs) and relevance scores. Mart tables assemble API-ready payloads — team pages, fixture pages, head-to-head breakdowns, homepage streak rankings.
 
@@ -74,6 +81,7 @@ ballistics/
 │       ├── update_fixtures.py        # Incremental fixture updates
 │       ├── update_fixtures_main.py   # Upsert logic for raw.raw_fixtures
 │       ├── update_standings.py       # League standings refresh
+│       ├── data_detector/            # Data flow telemetry producers
 │       └── fixture_correction/       # Kickoff time mismatch corrections
 ├── dbt/football_pipeline/
 │   ├── models/
@@ -82,6 +90,9 @@ ballistics/
 │   │   └── marts/                    # API-ready payloads (team, fixture, h2h)
 │   ├── seeds/                        # Streak scoring weights
 │   └── tests/                        # Singular data quality tests
+├── docs/                             # Data flow detector contracts/context
+├── scripts/quality_check.sh          # Local unit + compile quality gate
+├── tests/                            # Python unit tests
 ├── docker-compose.yml
 ├── .env.example
 └── data/metadata.yaml                # League config (countries + tiers)
@@ -92,14 +103,16 @@ ballistics/
 ### Prerequisites
 - Docker & Docker Compose
 - AWS account with S3 bucket + IAM credentials
-- RapidAPI key for [API-Football](https://www.api-football.com/)
+- API-Sports key for [API-Football](https://www.api-football.com/)
 
 ### Setup
 
 ```bash
 # Clone and configure
 cp .env.example .env
-# Edit .env with your credentials
+cp .dbt/profiles.example.yml .dbt/profiles.yml
+# Edit .env with your credentials and set PROJECT_ROOT to this repo path:
+# PROJECT_ROOT=$(pwd)
 
 # Start the stack
 docker compose up -d
@@ -115,11 +128,27 @@ docker compose up -d
 
 ### dbt
 
-dbt runs automatically as the final task in the daily DAG via `DockerOperator`. To run manually:
+dbt seeds and models run automatically as the final tasks in the daily DAG via `DockerOperator`. To run manually:
 
 ```bash
+cp .dbt/profiles.example.yml .dbt/profiles.yml  # first time only
+docker compose run --rm dbt dbt seed
 docker compose run --rm dbt dbt run
 docker compose run --rm dbt dbt test
+```
+
+### Local Quality Gate
+
+Run the Python detector and DAG compile gate before committing pipeline wiring changes:
+
+```bash
+scripts/quality_check.sh
+```
+
+To verify the detector schema exists after bootstrap/schema setup:
+
+```bash
+docker compose exec postgres psql -U ballistics_user -d ballistics -c "\dt data_detector.*"
 ```
 
 ## Data Quality

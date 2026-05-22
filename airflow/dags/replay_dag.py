@@ -16,6 +16,11 @@ import os
 from datetime import datetime, timedelta
 
 from airflow.decorators import dag, task
+from etl.src.data_detector import (
+    pipeline_run_failed,
+    pipeline_run_started,
+    pipeline_run_succeeded,
+)
 
 
 default_args = {
@@ -24,6 +29,9 @@ default_args = {
     "start_date": datetime(2025, 4, 20),
     "retries": 2,
     "retry_delay": timedelta(minutes=10),
+    "on_execute_callback": pipeline_run_started,
+    "on_success_callback": pipeline_run_succeeded,
+    "on_failure_callback": pipeline_run_failed,
 }
 
 
@@ -38,7 +46,7 @@ default_args = {
 def replay_dag():
 
     @task
-    def replay_dlq():
+    def replay_dlq(**context):
         """
         Scan S3 DLQ for failed extractions.
         Re-extract from API, write to landing zone, load to Postgres.
@@ -46,7 +54,8 @@ def replay_dag():
         """
         from etl.src.extract_fixtures import mark_fixtures_bootstrap_done
         from etl.src.extract_metadata import get_db_connection
-        from etl.src.s3_landing import list_dlq_entries, replay_from_dlq
+        from etl.src.replay_dlq import replay_from_dlq
+        from etl.src.s3_landing import list_dlq_entries
         from etl.src.logger import get_logger
         from etl.src.config import EXTRACT_FIXTURES_LOG
 
@@ -65,7 +74,7 @@ def replay_dag():
         try:
             for entry in entries:
                 try:
-                    success = replay_from_dlq(entry, conn)
+                    success = replay_from_dlq(entry, conn, context=context)
                     if success:
                         cur = conn.cursor()
                         cur.execute(
@@ -99,7 +108,7 @@ def replay_dag():
             conn.close()
 
     @task
-    def check_dlq():
+    def check_dlq(**context):
         """
         Check if any DLQ entries remain after replay.
         Logs a warning with details. Production: this would trigger Slack/email.
@@ -107,6 +116,7 @@ def replay_dag():
         from etl.src.s3_landing import list_dlq_entries
         from etl.src.logger import get_logger
         from etl.src.config import EXTRACT_FIXTURES_LOG
+        from etl.src.data_detector import record_data_quality_event_from_context
 
         logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
 
@@ -114,6 +124,18 @@ def replay_dag():
         if not entries:
             logger.info("DLQ is clear. All league-seasons processed.")
             return
+
+        record_data_quality_event_from_context(
+            context,
+            severity="warning",
+            check_name="dlq_not_empty",
+            status="open",
+            details={
+                "remaining_dlq_count": len(entries),
+                "entries": entries,
+            },
+            error_message=f"{len(entries)} league-season(s) remain in DLQ after replay",
+        )
 
         logger.warning(
             "%d league-season(s) remain in DLQ after replay:",

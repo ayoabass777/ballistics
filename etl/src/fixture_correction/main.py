@@ -6,7 +6,11 @@ import argparse
 import os
 
 from etl.src.config import UPDATE_FIXTURES_LOG
-from etl.src.fixture_correction import correct_changed_fixtures, correct_missed_fixtures
+from etl.src.fixture_correction import (
+    FIXTURE_CORRECTION_BOUND,
+    correct_changed_fixtures,
+    correct_missed_fixtures,
+)
 from etl.src.logger import get_logger
 
 logger = get_logger(__name__, log_path=UPDATE_FIXTURES_LOG)
@@ -23,13 +27,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--count",
         type=int,
-        default=11,
-        help="Number of fixtures to check per league (default: 11).",
+        default=FIXTURE_CORRECTION_BOUND,
+        help=f"Number of fixtures to check per league (default: {FIXTURE_CORRECTION_BOUND}).",
     )
     return parser.parse_args()
 
 
-def run(mode: str, count: int) -> int:
+def run(mode: str = "both", count: int = FIXTURE_CORRECTION_BOUND) -> int:
     updated_total = 0
     if mode in {"missed", "both"}:
         updated = correct_missed_fixtures(no_of_fixtures=count)

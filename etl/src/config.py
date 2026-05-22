@@ -1,5 +1,10 @@
-from dotenv import load_dotenv
 import os
+
+try:
+    from dotenv import load_dotenv
+except ModuleNotFoundError:
+    def load_dotenv(*args, **kwargs):
+        return False
 
 load_dotenv(override=True)
 
@@ -24,8 +29,10 @@ DB_CONFIG = {
 
 API = {
     "key": os.getenv("API_KEY"),
-    "host": os.getenv("API_HOST"),
     "url": os.getenv("API_URL"),
+}
+API_HEADERS = {
+    "x-apisports-key": API["key"],
 }
 
 MIN_SEASON_TRACKER = _env_int("MIN_SEASON_TRACKER", 2020)

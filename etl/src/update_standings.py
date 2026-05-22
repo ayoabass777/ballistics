@@ -3,7 +3,7 @@ Fetch league standings from the API and upsert into raw.raw_league_standings key
 """
 import argparse
 import time
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import psycopg2
 from psycopg2.extras import execute_values
@@ -194,18 +194,25 @@ def upsert_standings(rows: List[Dict[str, Any]]) -> int:
         conn.close()
 
 
-def update_standings() -> int:
+def update_standings(return_summary: bool = False) -> Union[int, Dict[str, Any]]:
     """
     Fetch standings for all current league seasons and upsert into DB.
     """
     start = time.time()
     total_rows = 0
+    leagues_updated: List[Dict[str, Any]] = []
     conn = get_db_connection()
     cur = conn.cursor()
     try:
         league_rows = get_league_seasons(cur)
         if not league_rows:
             logger.info("No league seasons found for standings update.")
+            if return_summary:
+                return {
+                    "total_rows": 0,
+                    "league_count": 0,
+                    "leagues_updated": [],
+                }
             return 0
 
         for league_season_id, api_league_id, season in league_rows:
@@ -224,10 +231,24 @@ def update_standings() -> int:
                 row["season"] = season
             inserted = upsert_standings(extracted)
             total_rows += inserted
+            leagues_updated.append(
+                {
+                    "league_season_id": league_season_id,
+                    "api_league_id": api_league_id,
+                    "season": season,
+                    "row_count": inserted,
+                }
+            )
             logger.info(
                 "Upserted %d standings rows for league_season_id=%s", inserted, league_season_id
             )
         logger.info("Standings update complete: %d rows in %.2fs", total_rows, time.time() - start)
+        if return_summary:
+            return {
+                "total_rows": total_rows,
+                "league_count": len(leagues_updated),
+                "leagues_updated": leagues_updated,
+            }
         return total_rows
     finally:
         cur.close()
