@@ -47,6 +47,12 @@ def _pipeline_run_payload(
     }
 
 
+def _task_instance_state(context: Dict[str, Any]) -> Optional[str]:
+    task_instance = context.get("task_instance") or context.get("ti")
+    state = getattr(task_instance, "state", None)
+    return str(state).lower() if state is not None else None
+
+
 def record_pipeline_run(
     *,
     run_id: str,
@@ -136,7 +142,7 @@ def _record_from_context(context: Dict[str, Any], status: str, error_message: Op
         run_type=payload["run_type"],
         status=payload["status"],
         started_at=event_time if status == "running" else None,
-        finished_at=event_time if status in {"success", "failed"} else None,
+        finished_at=event_time if status in {"success", "failed", "skipped"} else None,
         error_message=payload["error_message"],
         metadata=payload["metadata"],
     )
@@ -158,7 +164,8 @@ def pipeline_run_started(context: Dict[str, Any]) -> None:
 
 def pipeline_run_succeeded(context: Dict[str, Any]) -> None:
     """Airflow on_success_callback."""
-    _best_effort_record(context, status="success")
+    status = "skipped" if _task_instance_state(context) == "skipped" else "success"
+    _best_effort_record(context, status=status)
 
 
 def pipeline_run_failed(context: Dict[str, Any]) -> None:
@@ -169,3 +176,8 @@ def pipeline_run_failed(context: Dict[str, Any]) -> None:
         status="failed",
         error_message=str(exception) if exception is not None else None,
     )
+
+
+def pipeline_run_skipped(context: Dict[str, Any]) -> None:
+    """Airflow on_skipped_callback."""
+    _best_effort_record(context, status="skipped")

@@ -17,6 +17,7 @@ This contract defines the task lifecycle events emitted by Airflow for the `data
 - `pipeline_task_started`
 - `pipeline_task_succeeded`
 - `pipeline_task_failed`
+- `pipeline_task_skipped`
 
 ## Event Payload
 
@@ -44,13 +45,13 @@ This contract defines the task lifecycle events emitted by Airflow for the `data
 
 | Field | Required | Description |
 |---|---|---|
-| `event_type` | yes | One of `pipeline_task_started`, `pipeline_task_succeeded`, `pipeline_task_failed`. |
+| `event_type` | yes | One of `pipeline_task_started`, `pipeline_task_succeeded`, `pipeline_task_failed`, `pipeline_task_skipped`. |
 | `event_time` | yes | Producer timestamp computed when the Airflow callback creates the event. |
 | `run_id` | yes | Airflow DAG run identifier. |
 | `dag_id` | yes | Airflow DAG identifier. |
 | `task_id` | yes | Airflow task identifier. |
 | `run_type` | no | Airflow run type, such as `scheduled`, `manual`, or `backfill`. |
-| `status` | yes | Normalized task state: `running`, `success`, or `failed`. |
+| `status` | yes | Normalized task state: `running`, `success`, `failed`, or `skipped`. |
 | `error_message` | no | Failure reason for failed events. |
 | `metadata` | yes | JSON object for Airflow context fields that should not become first-class columns yet. |
 
@@ -61,6 +62,7 @@ This contract defines the task lifecycle events emitted by Airflow for the `data
 | `event_time` on `pipeline_task_started` | `started_at` |
 | `event_time` on `pipeline_task_succeeded` | `finished_at` |
 | `event_time` on `pipeline_task_failed` | `finished_at` |
+| `event_time` on `pipeline_task_skipped` | `finished_at` |
 | `run_id` | `run_id` |
 | `dag_id` | `dag_id` |
 | `task_id` | `task_id` |

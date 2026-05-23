@@ -140,6 +140,35 @@ class PipelineRunDetectorTests(unittest.TestCase):
         self.assertEqual(payload["finished_at"], event_time)
         self.assertEqual(payload["error_message"], "load failed")
 
+    def test_skipped_event_records_skipped_status_and_finished_at(self):
+        event_time = datetime(2026, 5, 21, 7, 6, tzinfo=timezone.utc)
+
+        with (
+            patch.object(pipeline_runs, "utc_now", return_value=event_time),
+            patch.object(pipeline_runs, "record_pipeline_run") as record,
+        ):
+            pipeline_runs.pipeline_run_skipped(airflow_context())
+
+        payload = record.call_args.kwargs
+        self.assertEqual(payload["status"], "skipped")
+        self.assertIsNone(payload["started_at"])
+        self.assertEqual(payload["finished_at"], event_time)
+
+    def test_success_callback_preserves_skipped_task_instance_state(self):
+        event_time = datetime(2026, 5, 21, 7, 7, tzinfo=timezone.utc)
+        context = airflow_context()
+        context["task_instance"].state = "skipped"
+
+        with (
+            patch.object(pipeline_runs, "utc_now", return_value=event_time),
+            patch.object(pipeline_runs, "record_pipeline_run") as record,
+        ):
+            pipeline_runs.pipeline_run_succeeded(context)
+
+        payload = record.call_args.kwargs
+        self.assertEqual(payload["status"], "skipped")
+        self.assertEqual(payload["finished_at"], event_time)
+
 
 class DataMovementDetectorTests(unittest.TestCase):
     def test_context_wrapper_emits_movement_contract_fields(self):

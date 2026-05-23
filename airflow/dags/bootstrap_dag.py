@@ -26,6 +26,7 @@ from airflow.models import Variable
 from airflow.sensors.base import BaseSensorOperator
 from etl.src.data_detector import (
     pipeline_run_failed,
+    pipeline_run_skipped,
     pipeline_run_started,
     pipeline_run_succeeded,
 )
@@ -85,6 +86,7 @@ default_args = {
     "on_execute_callback": pipeline_run_started,
     "on_success_callback": pipeline_run_succeeded,
     "on_failure_callback": pipeline_run_failed,
+    "on_skipped_callback": pipeline_run_skipped,
 }
 
 

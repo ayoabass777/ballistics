@@ -4,6 +4,7 @@ Data detector package facade.
 from etl.src.data_detector.data_movements import record_data_movement, record_data_movement_from_context
 from etl.src.data_detector.pipeline_runs import (
     pipeline_run_failed,
+    pipeline_run_skipped,
     pipeline_run_started,
     pipeline_run_succeeded,
     record_pipeline_run,
@@ -22,6 +23,7 @@ __all__ = [
     "check_standings_stale_from_context",
     "fixture_kickoff_watermark",
     "pipeline_run_failed",
+    "pipeline_run_skipped",
     "pipeline_run_started",
     "pipeline_run_succeeded",
     "record_data_movement",

@@ -151,6 +151,9 @@ Airflow task callbacks write `pipeline_runs` records:
 - `on_execute_callback`: computes producer event time and upserts `status='running'` and `started_at`.
 - `on_success_callback`: computes producer event time and updates `status='success'` and `finished_at`.
 - `on_failure_callback`: computes producer event time and updates `status='failed'`, `finished_at`, and `error_message`.
+- `on_skipped_callback`: computes producer event time and updates `status='skipped'` and `finished_at`.
+
+The success callback also preserves an Airflow task instance state of `skipped` when Airflow reports that state through the callback context. This keeps no-op bootstrap days visible as skipped detector rows instead of successful work.
 
 The detector is best-effort. If the detector schema is missing during early bootstrap, the callback logs a warning and leaves the actual pipeline task result unchanged.
 
