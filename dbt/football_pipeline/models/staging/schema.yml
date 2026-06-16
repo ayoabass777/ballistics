@@ -99,3 +99,76 @@ models:
         tests: [not_null]
       - name: losses
         tests: [not_null]
+
+  # ── data detector staging ──────────────────────────────────────────
+  - name: stg_data_detector_pipeline_runs
+    description: "Staged detector records for Airflow task lifecycle events."
+    columns:
+      - name: pipeline_run_id
+        tests: [not_null, unique]
+      - name: run_id
+        tests: [not_null]
+      - name: dag_id
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['running', 'started', 'success', 'failed', 'skipped']
+      - name: created_at
+        tests: [not_null]
+      - name: updated_at
+        tests: [not_null]
+
+  - name: stg_data_detector_data_movements
+    description: "Staged detector records for movement between API, S3, raw tables, replay, and corrections."
+    columns:
+      - name: data_movement_id
+        tests: [not_null, unique]
+      - name: movement_type
+        tests: [not_null]
+      - name: source_system
+        tests: [not_null]
+      - name: failed_count
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['success', 'failed', 'skipped']
+      - name: detected_at
+        tests: [not_null]
+
+  - name: stg_data_detector_table_snapshots
+    description: "Staged detector records for table row counts, update watermarks, and snapshot details."
+    columns:
+      - name: table_snapshot_id
+        tests: [not_null, unique]
+      - name: table_schema
+        tests: [not_null]
+      - name: table_name
+        tests: [not_null]
+      - name: row_count
+        tests: [not_null]
+      - name: snapshot_at
+        tests: [not_null]
+
+  - name: stg_data_detector_data_quality_events
+    description: "Staged detector records for stale data, load failures, DLQ events, and other quality signals."
+    columns:
+      - name: data_quality_event_id
+        tests: [not_null, unique]
+      - name: severity
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['info', 'warning', 'error', 'critical']
+      - name: check_name
+        tests: [not_null]
+      - name: status
+        tests: [not_null]
+      - name: detected_at
+        tests: [not_null]

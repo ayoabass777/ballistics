@@ -110,7 +110,7 @@ def ensure_data_detector_ready(cur: psycopg2.extensions.cursor) -> None:
         )
         if not table_exists:
             raise RuntimeError(
-                f"Missing table data_detector.{table_name}. Run raw fixture bootstrap DDL first."
+                f"Missing table data_detector.{table_name}. Run data detector bootstrap DDL first."
             )
 
 

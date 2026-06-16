@@ -151,6 +151,10 @@ To verify the detector schema exists after bootstrap/schema setup:
 docker compose exec postgres psql -U ballistics_user -d ballistics -c "\dt data_detector.*"
 ```
 
+The detector table DDL is maintained in `etl/sql/bootstrap_data_detector_schema.sql`; dbt source and staging coverage is under `dbt/football_pipeline/models/staging/`.
+
+Operational detector marts are under `dbt/football_pipeline/models/marts/data_flow/`, including `mart_data_flow_health_summary` for the current health answer.
+
 ## Data Quality
 
 Tests are defined at three levels:

@@ -1,0 +1,33 @@
+SELECT
+    run_id,
+    dag_id,
+    task_id,
+    movement_type,
+    source_system,
+    source_name,
+    source_s3_key,
+    target_schema,
+    target_table,
+    status,
+    COUNT(*) AS movement_event_count,
+    SUM(COALESCE(row_count, 0)) AS rows_moved,
+    SUM(COALESCE(inserted_count, 0)) AS rows_inserted,
+    SUM(COALESCE(updated_count, 0)) AS rows_updated,
+    SUM(COALESCE(deleted_count, 0)) AS rows_deleted,
+    SUM(COALESCE(failed_count, 0)) AS failed_units,
+    MIN(watermark_min) AS watermark_min,
+    MAX(watermark_max) AS watermark_max,
+    MAX(detected_at) AS latest_detected_at,
+    jsonb_agg(details ORDER BY detected_at DESC) FILTER (WHERE details IS NOT NULL) AS movement_details
+FROM {{ ref('stg_data_detector_data_movements') }}
+GROUP BY
+    run_id,
+    dag_id,
+    task_id,
+    movement_type,
+    source_system,
+    source_name,
+    source_s3_key,
+    target_schema,
+    target_table,
+    status

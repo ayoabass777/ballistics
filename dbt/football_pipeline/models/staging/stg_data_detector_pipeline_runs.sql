@@ -1,0 +1,20 @@
+SELECT
+    pipeline_run_id,
+    run_id,
+    dag_id,
+    task_id,
+    run_type,
+    status,
+    started_at,
+    finished_at,
+    kafka_started_at,
+    kafka_finished_at,
+    kafka_topic,
+    kafka_partition,
+    kafka_start_offset,
+    kafka_finish_offset,
+    error_message,
+    metadata,
+    created_at,
+    updated_at
+FROM {{ source('data_detector', 'pipeline_runs') }}

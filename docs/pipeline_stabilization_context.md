@@ -34,7 +34,21 @@ The incremental DAG runs `dbt_seed` as a separate DockerOperator before `run_dbt
 
 ## Data detector schema
 
-The `data_detector` schema is the audit layer for data flow. It is created by the raw bootstrap DDL and contains:
+The `data_detector` schema is the audit layer for data flow. Its canonical DDL is now split into:
+
+```text
+etl/sql/bootstrap_data_detector_schema.sql
+```
+
+The Python wrapper is:
+
+```text
+etl/src/bootstrap_data_detector_schema.py
+```
+
+The raw fixture bootstrap still calls the detector bootstrap after raw schema setup, preserving existing Airflow bootstrap behavior while keeping the detector contract in its own SQL file.
+
+The schema contains:
 
 - `pipeline_runs`: one row per DAG/task execution that should be tracked.
 - `data_movements`: one row per movement across boundaries such as API to S3, S3 to raw, raw to dbt, or replay to raw.
@@ -42,5 +56,15 @@ The `data_detector` schema is the audit layer for data flow. It is created by th
 - `data_quality_events`: durable anomaly records, including DLQ activity, stale tables, failed loads, and unexpected row deltas.
 
 This schema is intentionally separate from `raw`, `dim`, and dbt marts so operational telemetry can evolve without changing analytics table contracts.
+
+dbt source and staging coverage lives under `dbt/football_pipeline/models/staging/`:
+
+- `data_detector__sources.yml`
+- `stg_data_detector_pipeline_runs.sql`
+- `stg_data_detector_data_movements.sql`
+- `stg_data_detector_table_snapshots.sql`
+- `stg_data_detector_data_quality_events.sql`
+
+`run_id` is used for event idempotency. Table-content fingerprinting is intentionally left out of the active schema until the hashing contract is defined.
 
 For table examples and operating rules, see `docs/data_flow_detector.md`.
