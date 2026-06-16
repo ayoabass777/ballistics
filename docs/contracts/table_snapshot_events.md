@@ -27,6 +27,10 @@ Only these tables are currently in scope:
 | `max_kickoff_utc` | no | Max `kickoff_utc` when present. |
 | `details` | yes | JSON object for the pipeline context that triggered the snapshot. |
 
+## Idempotency
+
+`run_id` identifies the Airflow run that produced the snapshot and supports idempotent detector writes. It is not a content-integrity check for the snapshotted table.
+
 ## Current Producers
 
 - Bootstrap fixture loads snapshot `raw.raw_fixtures`.

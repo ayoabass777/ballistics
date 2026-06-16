@@ -20,6 +20,38 @@ The detector records metadata about those flow points so the pipeline can answer
 - Did a table become stale, shrink unexpectedly, or fail to refresh?
 - Is anything stuck in DLQ?
 
+## Bootstrap And dbt Contract
+
+The detector database contract is defined in:
+
+```text
+etl/sql/bootstrap_data_detector_schema.sql
+```
+
+The bootstrap wrapper is:
+
+```text
+etl/src/bootstrap_data_detector_schema.py
+```
+
+`bootstrap_raw_fixtures_schema.py` still calls the detector bootstrap after raw fixture schema setup, so existing bootstrap DAG behavior remains intact. The separate SQL file is now the canonical schema contract for detector tables.
+
+dbt reads the detector tables through the source and staging layer:
+
+```text
+dbt/football_pipeline/models/staging/data_detector__sources.yml
+dbt/football_pipeline/models/staging/stg_data_detector_pipeline_runs.sql
+dbt/football_pipeline/models/staging/stg_data_detector_data_movements.sql
+dbt/football_pipeline/models/staging/stg_data_detector_table_snapshots.sql
+dbt/football_pipeline/models/staging/stg_data_detector_data_quality_events.sql
+```
+
+Operational data flow marts live in:
+
+```text
+dbt/football_pipeline/models/marts/data_flow/
+```
+
 ## Detector Tables
 
 ### `data_detector.pipeline_runs`
@@ -81,6 +113,8 @@ Use it to detect stale tables, unexpected row drops, and mismatches between raw 
 
 `raw.raw_fixtures` snapshots use `kickoff_utc` for `max_kickoff_utc` and `updated_at` for warehouse freshness. `raw.raw_league_standings` snapshots use `updated_at` for freshness, leave `max_kickoff_utc = NULL`, and store `leagues_updated` in `details`.
 
+`run_id` makes detector writes idempotent at the pipeline event level. It answers whether a specific DAG/task run was already recorded.
+
 Current implementation records snapshots for:
 
 - `raw.raw_fixtures` after bootstrap fixture loads.
@@ -134,6 +168,22 @@ flowchart LR
 - Record a `data_quality_events` row for DLQ entries, failed loads, stale data, or unexpected row deltas.
 - Keep detector writes best-effort but visible: if detector recording fails, log it without hiding the underlying pipeline result.
 
+## Operational Marts
+
+The detector marts summarize the raw detector tables into API/dashboard-ready operational analytics.
+
+| Mart | Purpose |
+|---|---|
+| `mart_data_flow_runs` | Latest task status per DAG run and task. |
+| `mart_data_flow_movements` | Movement event counts, rows moved, inserted/updated/deleted rows, failed units, and watermarks by movement/source/target/status. |
+| `mart_data_flow_table_freshness` | Latest snapshot per monitored table with row count, freshness age, threshold status, and detector stale-event status. |
+| `mart_data_flow_quality_events` | Open warning/error/critical quality events. |
+| `mart_data_flow_health_summary` | Single-row health answer: current health, failed tasks, stale tables, open quality events, and most recent movement. |
+
+`mart_data_flow_table_freshness.freshness_threshold_exceeded` is informational and only compares the latest table update timestamp to the configured threshold. `mart_data_flow_table_freshness.is_stale` follows open detector quality events, so it stays aligned with the detector's richer stale rules.
+
+`mart_data_flow_health_summary.is_pipeline_healthy` is `true` only when there are no latest failed tasks, no detector-stale tables, and no open warning/error/critical quality events.
+
 ## Quality Gate
 
 Run the local detector quality gate before changing detector contracts or DAG wiring:
@@ -172,3 +222,10 @@ The movement, snapshot, and quality contracts are documented in:
 - `standings_stale`: open warning when any current league has no standings update within 7 days. Event details include `stale_leagues`.
 - `unexpected_row_drop`: error when a key table has a lower row count than its previous successful snapshot without an explicit full-refresh reason.
 - `zero_update_payload`: info/warning when incremental extraction produces no updates, depending on fixture calendar context.
+
+## Data Detector Next Todo
+
+- Add table-content fingerprinting only after defining a deterministic hashing contract: exact columns, ordering, filtering, and whether volatile timestamps are included.
+- If content fingerprinting is added, store it in `data_detector.table_snapshots` and compute it in `etl/src/data_detector/table_snapshots.py`.
+- Build dashboards/API endpoints on top of `mart_data_flow_health_summary` and the four detail marts before adding Kafka.
+- Consider Kafka only when the project needs event replay, async consumers, external monitoring, or fan-out beyond Postgres-backed operational analytics.

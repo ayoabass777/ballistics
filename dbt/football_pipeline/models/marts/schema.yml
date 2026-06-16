@@ -1,6 +1,89 @@
 version: 2
 
 models:
+  - name: mart_data_flow_runs
+    description: "Latest detector task status per DAG run and task."
+    columns:
+      - name: pipeline_run_id
+        tests: [not_null, unique]
+      - name: run_id
+        tests: [not_null]
+      - name: dag_id
+        tests: [not_null]
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['running', 'started', 'success', 'failed', 'skipped']
+
+  - name: mart_data_flow_movements
+    description: "Aggregated data movement telemetry by DAG run, task, movement type, source, target, and status."
+    columns:
+      - name: run_id
+        tests: [not_null]
+      - name: movement_type
+        tests: [not_null]
+      - name: source_system
+        tests: [not_null]
+      - name: status
+        tests: [not_null]
+      - name: movement_event_count
+        tests: [not_null]
+      - name: rows_moved
+        tests: [not_null]
+      - name: failed_units
+        tests: [not_null]
+
+  - name: mart_data_flow_table_freshness
+    description: "Latest detector snapshot per monitored table with freshness age and stale classification."
+    columns:
+      - name: table_snapshot_id
+        tests: [not_null, unique]
+      - name: table_schema
+        tests: [not_null]
+      - name: table_name
+        tests: [not_null]
+      - name: row_count
+        tests: [not_null]
+      - name: snapshot_at
+        tests: [not_null]
+      - name: is_stale
+        tests: [not_null]
+      - name: freshness_threshold_exceeded
+        description: "Whether the latest table update exceeds the configured freshness threshold. This is informational; is_stale follows open detector quality events."
+        tests: [not_null]
+      - name: stale_event_count
+        tests: [not_null]
+
+  - name: mart_data_flow_quality_events
+    description: "Open warning/error/critical data quality detector events."
+    columns:
+      - name: data_quality_event_id
+        tests: [not_null, unique]
+      - name: severity
+        tests: [not_null]
+      - name: check_name
+        tests: [not_null]
+      - name: status
+        tests: [not_null]
+      - name: detected_at
+        tests: [not_null]
+
+  - name: mart_data_flow_health_summary
+    description: "Single-row operational health summary answering current pipeline health, failures, stale tables, open quality events, and most recent movement."
+    columns:
+      - name: checked_at
+        tests: [not_null]
+      - name: is_pipeline_healthy
+        tests: [not_null]
+      - name: failed_task_count
+        tests: [not_null]
+      - name: stale_table_count
+        tests: [not_null]
+      - name: open_quality_event_count
+        tests: [not_null]
+
   - name: mart_top_team_streaks
     description: "Current (most recent) team streaks per event with length > 2 for the current season."
     columns:

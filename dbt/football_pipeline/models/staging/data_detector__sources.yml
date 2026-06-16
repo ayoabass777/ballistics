@@ -1,0 +1,182 @@
+version: 2
+
+sources:
+  - name: data_detector
+    schema: data_detector
+    description: "Operational detector tables that record pipeline task runs, data movements, table snapshots, and data quality events."
+    tables:
+      - name: pipeline_runs
+        description: "Task-level pipeline run lifecycle records captured from Airflow callbacks."
+        loaded_at_field: updated_at
+        freshness:
+          warn_after: {count: 26, period: hour}
+          error_after: {count: 52, period: hour}
+        columns:
+          - name: pipeline_run_id
+            description: "Primary key for a detector pipeline run record."
+            tests:
+              - not_null
+              - unique
+          - name: run_id
+            description: "Airflow DAG run identifier."
+            tests:
+              - not_null
+          - name: dag_id
+            description: "Airflow DAG identifier."
+            tests:
+              - not_null
+          - name: task_id
+            description: "Airflow task identifier."
+          - name: status
+            description: "Task lifecycle state recorded by the detector."
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['running', 'started', 'success', 'failed', 'skipped']
+          - name: started_at
+            description: "Task start timestamp from Airflow context."
+          - name: finished_at
+            description: "Task terminal timestamp from Airflow callback."
+          - name: metadata
+            description: "Additional detector metadata for the pipeline task."
+          - name: created_at
+            description: "Detector record creation timestamp."
+            tests:
+              - not_null
+          - name: updated_at
+            description: "Detector record update timestamp."
+            tests:
+              - not_null
+
+      - name: data_movements
+        description: "Records movement of data between systems and layers, including watermarks and row counts."
+        loaded_at_field: detected_at
+        freshness:
+          warn_after: {count: 26, period: hour}
+          error_after: {count: 52, period: hour}
+        columns:
+          - name: data_movement_id
+            description: "Primary key for a detector data movement record."
+            tests:
+              - not_null
+              - unique
+          - name: pipeline_run_id
+            description: "Optional foreign key to the related pipeline run detector record."
+          - name: movement_type
+            description: "Logical movement category such as api_to_s3, s3_to_raw, raw_correction, or replay."
+            tests:
+              - not_null
+          - name: source_system
+            description: "Origin system or layer for the movement."
+            tests:
+              - not_null
+          - name: target_schema
+            description: "Target database schema when the movement lands in the warehouse."
+          - name: target_table
+            description: "Target database table when the movement lands in the warehouse."
+          - name: row_count
+            description: "Total rows moved or affected."
+          - name: failed_count
+            description: "Rows that failed during the movement."
+            tests:
+              - not_null
+          - name: watermark_column
+            description: "Column used to describe the movement range."
+          - name: watermark_min
+            description: "Minimum watermark value observed for this movement."
+          - name: watermark_max
+            description: "Maximum watermark value observed for this movement."
+          - name: status
+            description: "Movement status."
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['success', 'failed', 'skipped']
+          - name: details
+            description: "Movement-specific detail payload."
+          - name: detected_at
+            description: "Timestamp when the detector recorded the movement."
+            tests:
+              - not_null
+
+      - name: table_snapshots
+        description: "Point-in-time table-level row counts and watermarks for detector-monitored warehouse tables."
+        loaded_at_field: snapshot_at
+        freshness:
+          warn_after: {count: 26, period: hour}
+          error_after: {count: 52, period: hour}
+        columns:
+          - name: table_snapshot_id
+            description: "Primary key for a detector table snapshot record."
+            tests:
+              - not_null
+              - unique
+          - name: pipeline_run_id
+            description: "Optional foreign key to the related pipeline run detector record."
+          - name: table_schema
+            description: "Database schema for the snapshotted table."
+            tests:
+              - not_null
+          - name: table_name
+            description: "Database table name for the snapshotted table."
+            tests:
+              - not_null
+          - name: row_count
+            description: "Total row count at snapshot time."
+            tests:
+              - not_null
+          - name: max_created_at
+            description: "Maximum created_at value observed in the snapshotted table."
+          - name: max_updated_at
+            description: "Maximum updated_at value observed in the snapshotted table."
+          - name: max_kickoff_utc
+            description: "Maximum fixture kickoff timestamp when the table has fixture time."
+          - name: details
+            description: "Snapshot-specific detail payload."
+          - name: snapshot_at
+            description: "Timestamp when the detector recorded the snapshot."
+            tests:
+              - not_null
+
+      - name: data_quality_events
+        description: "Detector-emitted data quality events such as stale data, load failures, and DLQ events."
+        loaded_at_field: detected_at
+        columns:
+          - name: data_quality_event_id
+            description: "Primary key for a detector data quality event."
+            tests:
+              - not_null
+              - unique
+          - name: pipeline_run_id
+            description: "Optional foreign key to the related pipeline run detector record."
+          - name: severity
+            description: "Quality event severity."
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['info', 'warning', 'error', 'critical']
+          - name: check_name
+            description: "Stable detector check name."
+            tests:
+              - not_null
+          - name: table_schema
+            description: "Impacted database schema when applicable."
+          - name: table_name
+            description: "Impacted database table when applicable."
+          - name: source_s3_key
+            description: "Impacted S3 object key when applicable."
+          - name: status
+            description: "Quality event status."
+            tests:
+              - not_null
+          - name: details
+            description: "Quality-event detail payload."
+          - name: error_message
+            description: "Human-readable error detail for failure events."
+          - name: detected_at
+            description: "Timestamp when the detector recorded the quality event."
+            tests:
+              - not_null
