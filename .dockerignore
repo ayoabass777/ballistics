@@ -1,0 +1,11 @@
+.git
+**/__pycache__
+*.pyc
+.venv
+venv
+.claude
+airflow/logs
+**/*.log
+.pytest_cache
+.coverage
+htmlcov

@@ -46,6 +46,7 @@ from engine.eval.predict_upcoming import predict_upcoming, _tier
 from engine.eval.predict_mismatch import predict_mismatch, _market_label
 from engine.eval.predict_dixon_coles import predict_dixon_coles
 from engine.eval.scrape_sportybet import odds_for_pick
+from engine.eval.db import get_conn
 from engine.eval.team_strength import load_team_df, compute_team_strength
 from engine.eval.bayesian_streaks import (
     get_fixture_beliefs,
@@ -453,6 +454,317 @@ def _market_tier(unified_market: str, avg_confidence: float,
     return None
 
 
+def _f(v):
+    """Coerce numpy/NaN/None to a plain float or None (JSON/DB safe)."""
+    if v is None:
+        return None
+    try:
+        return float(v) if pd.notna(v) else None
+    except (TypeError, ValueError):
+        return None
+
+
+# ── per-model signal extraction (shared by run_consensus and run_model) ───────
+# Each returns a list of normalised picks:
+#   {fixture_id, model, unified_market, probability, raw_probability, detail}
+
+def poisson_signals(poisson_picks) -> list[dict]:
+    out = []
+    if poisson_picks is None or poisson_picks.empty:
+        return out
+    for _, row in poisson_picks.iterrows():
+        unified = _normalise_market("poisson", f"{row['direction']} {row['line']}")
+        if unified:
+            out.append({"fixture_id": int(row["fixture_id"]), "model": "poisson",
+                        "unified_market": unified, "probability": _f(row["probability"]),
+                        "raw_probability": _f(row.get("raw_probability")),
+                        "detail": {"tier": _tier(row["probability"]),
+                                   "raw": _f(row.get("raw_probability"))}})
+    return out
+
+
+def mismatch_signals(mismatch_picks) -> list[dict]:
+    out = []
+    for p in mismatch_picks:
+        unified = _normalise_market("mismatch", p.market, favourite=p.favourite)
+        if unified:
+            out.append({"fixture_id": int(p.fixture_id), "model": "mismatch",
+                        "unified_market": unified, "probability": _f(p.confidence),
+                        "raw_probability": None,
+                        "detail": {"gap": p.gap, "gap_bin": p.gap_bin,
+                                   "h2h_boost": p.h2h_boost}})
+    return out
+
+
+def bayesian_signals(bayesian_by_fixture, home_away: dict) -> list[dict]:
+    """home_away: {fixture_id: (home_name, away_name)} — for the concede→OPP remap."""
+    out = []
+    for fid, sides in bayesian_by_fixture.items():
+        ha = home_away.get(fid)
+        for side in ("home", "away"):
+            for b in sides.get(side, []):
+                if b["event"] == "BTTS":
+                    continue
+                unified = _normalise_market("bayesian", f"{b['team']} {b['event']}",
+                                            side=side, team=b["team"])
+                if not unified:
+                    continue
+                if unified.startswith("OPP_"):
+                    if not ha:
+                        continue
+                    opp_side = "home" if side == "away" else "away"
+                    unified = f"{ha[0] if opp_side == 'home' else ha[1]} Over 0.5"
+                out.append({"fixture_id": int(fid), "model": "bayesian",
+                            "unified_market": unified, "probability": _f(b["posterior"]),
+                            "raw_probability": None,
+                            "detail": {"streak": b["streak"], "trend": b["trend"],
+                                       "n": b["n"], "base_rate": b["base_rate"]}})
+    return out
+
+
+def dixon_signals(dixon_picks) -> list[dict]:
+    out = []
+    if dixon_picks is None or dixon_picks.empty:
+        return out
+    for _, row in dixon_picks.iterrows():
+        unified = _normalise_market("dixon_coles", row["market"])
+        if unified:
+            out.append({"fixture_id": int(row["fixture_id"]), "model": "dixon_coles",
+                        "unified_market": unified, "probability": _f(row["probability"]),
+                        "raw_probability": _f(row.get("raw_probability")),
+                        "detail": {"raw": _f(row.get("raw_probability")),
+                                   "lambda_home": _f(row.get("lambda_home")),
+                                   "lambda_away": _f(row.get("lambda_away"))}})
+    return out
+
+
+def _score_pool(consensus: dict, fixture_meta: dict,
+                fixture_strength_all: dict, odds_map: dict) -> list[dict]:
+    """Apply gates, tiers, odds/EV and rank the consensus dict into a pool.
+
+    Pure function of its inputs — shared by the in-process `run_consensus`
+    and the fan-in `build_consensus_from_signals` (DAG) path.
+    """
+    ranked = []
+    for key, pick in consensus.items():
+        fid = pick["fixture_id"]
+        meta = fixture_meta.get(fid)
+        if not meta:
+            continue
+
+        # Drop leagues SportyBet-NG cannot book — keep the pool to bettable markets
+        if not _is_bookable(meta["league"], meta.get("country", "")):
+            continue
+
+        models = set(pick["models"])
+        n_models = len(models)
+        max_conf = max(pick["confidences"])
+        avg_conf = sum(pick["confidences"]) / len(pick["confidences"])
+        strength_rank = _fixture_strength_rank(fixture_strength_all.get(fid))
+
+        if not _passes_goal_model_rules(pick["unified_market"], models):
+            continue
+        if (pick["unified_market"] == "Match Over 1.5"
+                and avg_conf < OVER15_DC_POISSON_THRESHOLD):
+            continue
+        strength_gate = None
+        if pick["unified_market"] == "Match Under 3.5":
+            passes_strength, strength_gate = _under35_strength_gate(
+                fixture_strength_all.get(fid))
+            if not passes_strength:
+                continue
+        market_tier = _market_tier(
+            pick["unified_market"], avg_conf, strength_gate)
+        if pick["unified_market"] == "Match Under 3.5" and not market_tier:
+            continue
+
+        # Filter by tier thresholds
+        if n_models >= 3 and avg_conf < TRIO_THRESHOLD:
+            continue
+        if n_models == 2 and avg_conf < DUO_THRESHOLD:
+            continue
+        if n_models == 1 and max_conf < SOLO_THRESHOLD:
+            continue
+
+        est_odds = _est_odds(avg_conf, pick["unified_market"])
+        if est_odds < MIN_EST_ODDS:
+            continue
+
+        sportify = _sportify_market(pick["unified_market"], meta["home"], meta["away"])
+
+        # Real SportyBet odds + EV where available (else fall back to est_odds)
+        real_odds = odds_for_pick(
+            odds_map.get(fid, {}), sportify["market"], sportify["selection"],
+            sportify.get("line"), meta["home"], meta["away"])
+        has_odds = real_odds is not None
+        book_odds = real_odds if has_odds else est_odds
+        ev = round(avg_conf * real_odds, 4) if has_odds else None
+
+        # Score by consensus strength then EV (real edge), not fabricated odds.
+        # No odds yet → neutral EV proxy of 1.0 so it ranks below priced +EV legs.
+        score = n_models * 1.0 + avg_conf + (ev - 1.0 if has_odds else 0.0)
+
+        ranked.append({
+            "fixture_id": fid,
+            "match": f"{meta['home']} vs {meta['away']}",
+            "home": meta["home"],
+            "away": meta["away"],
+            "league": meta["league"],
+            "kickoff": meta["kickoff"],
+            "unified_market": pick["unified_market"],
+            "sportybet_market": sportify["market"],
+            "sportybet_selection": sportify["selection"],
+            "line": sportify.get("line"),
+            "n_models": n_models,
+            "models": sorted(set(pick["models"])),
+            "max_confidence": round(max_conf, 4),
+            "avg_confidence": round(avg_conf, 4),
+            "consensus_score": round(score, 4),
+            "est_odds": est_odds,
+            "real_odds": round(real_odds, 2) if has_odds else None,
+            "has_odds": has_odds,
+            "ev": ev,
+            "odds": round(book_odds, 2),
+            "country": meta.get("country", ""),
+            "details": pick["details"],
+            "strength_gate": strength_gate,
+            "strength_rank": strength_rank,
+            "market_tier": market_tier,
+        })
+
+    ranked.sort(key=lambda x: (-x["n_models"], -x["consensus_score"]))
+
+    print(f"  {len(ranked)} consensus picks after filtering")
+    by_tier = {4: 0, 3: 0, 2: 0, 1: 0}
+    for r in ranked:
+        by_tier[r["n_models"]] = by_tier.get(r["n_models"], 0) + 1
+    print(f"  4-model: {by_tier.get(4,0)} | 3-model: {by_tier.get(3,0)} | "
+          f"2-model: {by_tier.get(2,0)} | "
+          f"1-model (P≥{SOLO_THRESHOLD:.0%}): {by_tier.get(1,0)}")
+    return ranked
+
+
+def _league_id_country_map(conn) -> tuple[dict, dict]:
+    """(api_league_id→league_name, api_league_id→country) from DB + metadata.yaml."""
+    league_map_df = pd.read_sql("""
+        SELECT DISTINCT r.api_league_id, f.league_name AS league
+        FROM raw.raw_fixtures r
+        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
+    """, conn)
+    lmap = dict(zip(league_map_df["api_league_id"], league_map_df["league"]))
+
+    import yaml
+    lid_country = {}
+    _meta_path = Path(__file__).resolve().parents[2] / "data" / "metadata.yaml"
+    if _meta_path.exists():
+        with open(_meta_path) as _f:
+            _meta = yaml.safe_load(_f)
+        name_countries = {}
+        for entry in _meta.get("countries", []):
+            for lg in entry.get("leagues", []):
+                name_countries.setdefault(lg["name"], []).append(entry["country"])
+        for lid, lname in lmap.items():
+            cs = name_countries.get(lname, [])
+            lid_country[lid] = cs[0] if len(cs) == 1 else None
+        if not all(lid_country.values()):
+            OVERRIDE = {39: "England", 116: "Belarus", 233: "Egypt", 235: "Russia",
+                        104: "Norway", 117: "Belarus", 72: "Brazil", 136: "Italy"}
+            for lid, c in OVERRIDE.items():
+                if lid in lid_country:
+                    lid_country[lid] = c
+    return lmap, lid_country
+
+
+def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
+    """{fid: {fixture_id, home, away, league, kickoff, country}} for given fixtures."""
+    own = conn is None
+    conn = conn or get_conn()
+    try:
+        ids = [int(f) for f in fixture_ids]
+        if not ids:
+            return {}
+        lmap, lid_country = _league_id_country_map(conn)
+        df = pd.read_sql("""
+            SELECT fixture_id, home_team_name AS home, away_team_name AS away,
+                   kickoff_utc AS kickoff, api_league_id
+            FROM raw.raw_fixtures WHERE fixture_id = ANY(%(ids)s)
+        """, conn, params={"ids": ids})
+        meta = {}
+        for _, r in df.iterrows():
+            fid = int(r["fixture_id"])
+            lid = r["api_league_id"]
+            meta[fid] = {"fixture_id": fid, "home": r["home"], "away": r["away"],
+                         "league": lmap.get(lid, "Unknown"), "kickoff": str(r["kickoff"]),
+                         "country": lid_country.get(lid, "") or ""}
+        return meta
+    finally:
+        if own:
+            conn.close()
+
+
+def _analysis_from_signals(signals: list[dict], fixture_meta: dict,
+                           fixture_strength_all: dict) -> list[dict]:
+    """Best-effort per-fixture analysis rebuilt from stored signals (for the JSON feed)."""
+    fa = {}
+    for fid, meta in fixture_meta.items():
+        fa[fid] = {**meta,
+                   "bookable": _is_bookable(meta["league"], meta.get("country", "")),
+                   "poisson": [], "mismatch": [], "bayesian": [], "dixon_coles": [],
+                   "strength": fixture_strength_all.get(fid)}
+    for s in signals:
+        entry = fa.get(s["fixture_id"])
+        if not entry or s["model"] not in entry:
+            continue
+        entry[s["model"]].append({"market": s["unified_market"],
+                                  "probability": s["probability"],
+                                  **(s.get("detail") or {})})
+    out = [v for v in fa.values()
+           if v["poisson"] or v["mismatch"] or v["bayesian"] or v["dixon_coles"]]
+    out.sort(key=lambda x: x.get("kickoff", ""))
+    return out
+
+
+def build_consensus_from_signals(signals: list[dict],
+                                 target_odds: float = TARGET_ODDS,
+                                 bankroll: float = 0, run_ds: str | None = None) -> dict:
+    """Fan-in path: build the consensus pool/slips from already-computed model
+    signals (read from raw.model_picks), with no model imports. Writes
+    raw.consensus_pool when run_ds is given. See docs/engine_orchestration.md.
+    """
+    consensus = {}
+    for s in signals:
+        if s.get("probability") is None:
+            continue
+        key = (s["fixture_id"], s["unified_market"])
+        c = consensus.setdefault(key, {"fixture_id": s["fixture_id"],
+                                       "unified_market": s["unified_market"],
+                                       "models": [], "confidences": [], "details": []})
+        c["models"].append(s["model"])
+        c["confidences"].append(s["probability"])
+        if s.get("detail"):
+            c["details"].append(s["detail"])
+
+    fids = {s["fixture_id"] for s in signals}
+    conn = get_conn()
+    try:
+        fixture_meta = fixture_meta_from_db(fids, conn)
+        fixture_strength_all = _load_fixture_strength_profiles(conn)
+    finally:
+        conn.close()
+
+    odds_map = _load_sportybet_odds()
+    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map)
+    analysis = _analysis_from_signals(signals, fixture_meta, fixture_strength_all)
+    slips = _build_slips(ranked, target_odds, bankroll=bankroll)
+
+    if run_ds:
+        from engine.eval.picks_store import write_consensus_pool
+        n = write_consensus_pool(run_ds, ranked)
+        print(f"  wrote {n} rows to raw.consensus_pool (run_ds={run_ds})")
+
+    return {"pool": ranked, "slips": slips, "fixture_analysis": analysis}
+
+
 def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
                   bankroll: float = 0) -> dict:
     """Run all four models and build consensus picks."""
@@ -651,56 +963,15 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         if detail:
             consensus[key]["details"].append(detail)
 
-    # Poisson picks
-    if not poisson_picks.empty:
-        for _, row in poisson_picks.iterrows():
-            fid = int(row["fixture_id"])
-            raw_mkt = f"{row['direction']} {row['line']}"
-            unified = _normalise_market("poisson", raw_mkt)
-            if unified:
-                _add_pick(fid, unified, "poisson", row["probability"],
-                          {"tier": _tier(row["probability"]), "raw": row.get("raw_probability")})
-
-    # Mismatch picks
-    for p in mismatch_picks:
-        unified = _normalise_market("mismatch", p.market, favourite=p.favourite)
-        if unified:
-            _add_pick(p.fixture_id, unified, "mismatch", p.confidence,
-                      {"gap": p.gap, "gap_bin": p.gap_bin, "h2h_boost": p.h2h_boost})
-
-    # Bayesian picks
-    for fid, sides in bayesian_by_fixture.items():
-        meta = fixture_meta.get(fid)
-        if not meta:
-            continue
-        for side in ("home", "away"):
-            for b in sides.get(side, []):
-                team = b["team"]
-                event = b["event"]
-                if event == "BTTS":
-                    continue
-                raw_mkt = f"{team} {event}"
-                unified = _normalise_market("bayesian", raw_mkt, side=side,
-                                           team=team)
-                if unified:
-                    if unified.startswith("OPP_"):
-                        opp_side = "home" if side == "away" else "away"
-                        opp_team = meta["home"] if opp_side == "home" else meta["away"]
-                        unified = f"{opp_team} Over 0.5"
-                    _add_pick(fid, unified, "bayesian", b["posterior"],
-                              {"streak": b["streak"], "trend": b["trend"],
-                               "n": b["n"], "base_rate": b["base_rate"]})
-
-    # Dixon-Coles picks
-    if not dixon_coles_picks.empty:
-        for _, row in dixon_coles_picks.iterrows():
-            fid = int(row["fixture_id"])
-            unified = _normalise_market("dixon_coles", row["market"])
-            if unified:
-                _add_pick(fid, unified, "dixon_coles", row["probability"],
-                          {"raw": row.get("raw_probability"),
-                           "lambda_home": row.get("lambda_home"),
-                           "lambda_away": row.get("lambda_away")})
+    # Collect normalised signals from every model (shared with run_model)
+    _home_away = {fid: (m["home"], m["away"]) for fid, m in fixture_meta.items()}
+    _signals = (poisson_signals(poisson_picks)
+                + mismatch_signals(mismatch_picks)
+                + bayesian_signals(bayesian_by_fixture, _home_away)
+                + dixon_signals(dixon_coles_picks))
+    for sig in _signals:
+        _add_pick(sig["fixture_id"], sig["unified_market"], sig["model"],
+                  sig["probability"], sig["detail"])
 
     # ── Load real SportyBet odds (populated by scrape_sportybet) ─────────
     odds_map = _load_sportybet_odds()
@@ -710,102 +981,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         print("  no SportyBet odds in DB — run scrape_sportybet; falling back to est_odds")
 
     # ── Score and rank ──────────────────────────────────────────────────
-    ranked = []
-    for key, pick in consensus.items():
-        fid = pick["fixture_id"]
-        meta = fixture_meta.get(fid)
-        if not meta:
-            continue
-
-        # Drop leagues SportyBet-NG cannot book — keep the pool to bettable markets
-        if not _is_bookable(meta["league"], meta.get("country", "")):
-            continue
-
-        models = set(pick["models"])
-        n_models = len(models)
-        max_conf = max(pick["confidences"])
-        avg_conf = sum(pick["confidences"]) / len(pick["confidences"])
-        strength_rank = _fixture_strength_rank(fixture_strength_all.get(fid))
-
-        if not _passes_goal_model_rules(pick["unified_market"], models):
-            continue
-        if (pick["unified_market"] == "Match Over 1.5"
-                and avg_conf < OVER15_DC_POISSON_THRESHOLD):
-            continue
-        strength_gate = None
-        if pick["unified_market"] == "Match Under 3.5":
-            passes_strength, strength_gate = _under35_strength_gate(
-                fixture_strength_all.get(fid))
-            if not passes_strength:
-                continue
-        market_tier = _market_tier(
-            pick["unified_market"], avg_conf, strength_gate)
-        if pick["unified_market"] == "Match Under 3.5" and not market_tier:
-            continue
-
-        # Filter by tier thresholds
-        if n_models >= 3 and avg_conf < TRIO_THRESHOLD:
-            continue
-        if n_models == 2 and avg_conf < DUO_THRESHOLD:
-            continue
-        if n_models == 1 and max_conf < SOLO_THRESHOLD:
-            continue
-
-        est_odds = _est_odds(avg_conf, pick["unified_market"])
-        if est_odds < MIN_EST_ODDS:
-            continue
-
-        sportify = _sportify_market(pick["unified_market"], meta["home"], meta["away"])
-
-        # Real SportyBet odds + EV where available (else fall back to est_odds)
-        real_odds = odds_for_pick(
-            odds_map.get(fid, {}), sportify["market"], sportify["selection"],
-            sportify.get("line"), meta["home"], meta["away"])
-        has_odds = real_odds is not None
-        book_odds = real_odds if has_odds else est_odds
-        ev = round(avg_conf * real_odds, 4) if has_odds else None
-
-        # Score by consensus strength then EV (real edge), not fabricated odds.
-        # No odds yet → neutral EV proxy of 1.0 so it ranks below priced +EV legs.
-        score = n_models * 1.0 + avg_conf + (ev - 1.0 if has_odds else 0.0)
-
-        ranked.append({
-            "fixture_id": fid,
-            "match": f"{meta['home']} vs {meta['away']}",
-            "home": meta["home"],
-            "away": meta["away"],
-            "league": meta["league"],
-            "kickoff": meta["kickoff"],
-            "unified_market": pick["unified_market"],
-            "sportybet_market": sportify["market"],
-            "sportybet_selection": sportify["selection"],
-            "line": sportify.get("line"),
-            "n_models": n_models,
-            "models": sorted(set(pick["models"])),
-            "max_confidence": round(max_conf, 4),
-            "avg_confidence": round(avg_conf, 4),
-            "consensus_score": round(score, 4),
-            "est_odds": est_odds,
-            "real_odds": round(real_odds, 2) if has_odds else None,
-            "has_odds": has_odds,
-            "ev": ev,
-            "odds": round(book_odds, 2),
-            "country": meta.get("country", ""),
-            "details": pick["details"],
-            "strength_gate": strength_gate,
-            "strength_rank": strength_rank,
-            "market_tier": market_tier,
-        })
-
-    ranked.sort(key=lambda x: (-x["n_models"], -x["consensus_score"]))
-
-    print(f"  {len(ranked)} consensus picks after filtering")
-    by_tier = {4: 0, 3: 0, 2: 0, 1: 0}
-    for r in ranked:
-        by_tier[r["n_models"]] = by_tier.get(r["n_models"], 0) + 1
-    print(f"  4-model: {by_tier.get(4,0)} | 3-model: {by_tier.get(3,0)} | "
-          f"2-model: {by_tier.get(2,0)} | "
-          f"1-model (P≥{SOLO_THRESHOLD:.0%}): {by_tier.get(1,0)}")
+    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map)
 
     # ── Per-fixture analysis (all raw model signals) ──────────────────
     fixture_analysis = {}
@@ -1115,10 +1291,23 @@ if __name__ == "__main__":
                         help="Target total odds per slip")
     parser.add_argument("--bankroll", type=float, default=0,
                         help="Total bankroll for stake sizing (e.g. 300000)")
+    parser.add_argument("--from-picks", action="store_true",
+                        help="Fan-in mode: build from raw.model_picks (set by run_model) "
+                             "instead of running the 4 models in-process")
+    parser.add_argument("--run-ds", default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                        help="Prediction run date (used with --from-picks)")
     args = parser.parse_args()
 
-    result = run_consensus(days=args.days, target_odds=args.target_odds,
-                           bankroll=args.bankroll)
+    if args.from_picks:
+        from engine.eval.picks_store import read_model_picks
+        signals = read_model_picks(args.run_ds)
+        print(f"Fan-in: {len(signals)} signals from raw.model_picks (run_ds={args.run_ds})")
+        result = build_consensus_from_signals(
+            signals, target_odds=args.target_odds, bankroll=args.bankroll,
+            run_ds=args.run_ds)
+    else:
+        result = run_consensus(days=args.days, target_odds=args.target_odds,
+                               bankroll=args.bankroll)
     print_slips(result)
     if result["slips"]:
         save_slips(result)
