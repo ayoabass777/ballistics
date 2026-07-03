@@ -47,6 +47,9 @@ ELO_TABLE = "elo.team_elo_history"
 RECORD_FLOOR_BAYESIAN = 0.60
 RECORD_FLOOR_POISSON = 0.55
 RECORD_FLOOR_MISMATCH = 0.60
+RECORD_FLOOR_DC = 0.55
+
+MODELS = ("bayesian", "poisson", "mismatch", "dixon_coles")
 
 # Fraction of folds used to FIT calibration maps; the rest are held out
 # for evaluation so the report never grades a map on the data that fit it.
@@ -554,6 +557,53 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
     return results
 
 
+def _dixon_coles_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
+                      id_map: dict, league_map: dict) -> list[dict]:
+    """Dixon-Coles predictions from per-league fits on pre-cutoff matches."""
+    from engine.eval.predict_dixon_coles import fit_league_dc, fixture_markets
+
+    results = []
+    hist = _load_historical_h2h_before(conn, cutoff_dt)
+    if hist.empty:
+        return results
+    hist["kickoff_utc"] = pd.to_datetime(hist["kickoff_utc"], utc=True)
+
+    test_df = test_fixtures.copy()
+    test_df["league"] = test_df["api_league_id"].map(league_map)
+    test_df = test_df[test_df["league"].notna()].copy()
+    if test_df.empty:
+        return results
+
+    ref_time = pd.Timestamp(cutoff_dt)
+    for league, te_lg in test_df.groupby("league"):
+        lg_hist = hist[hist["league"] == league]
+        params = fit_league_dc(lg_hist, ref_time)
+        if params is None:
+            continue
+        for _, fix in te_lg.iterrows():
+            home_h2h = id_map.get(fix["home_team_id"])
+            away_h2h = id_map.get(fix["away_team_id"])
+            if home_h2h is None or away_h2h is None:
+                continue
+            fm = fixture_markets(params, home_h2h, away_h2h,
+                                 fix["home_team_name"], fix["away_team_name"])
+            if fm is None:
+                continue
+            for market, raw in fm["markets"].items():
+                if raw < RECORD_FLOOR_DC:
+                    continue
+                outcome = _actual_outcome(fix, market)
+                if outcome is not None:
+                    results.append({
+                        "fixture_id": int(fix["fixture_id"]),
+                        "model": "dixon_coles",
+                        "market": market,
+                        "predicted_prob_raw": round(float(raw), 4),
+                        "actual": outcome,
+                    })
+    return results
+
+
 # ── De-duplication ─────────────────────────────────────────────────────
 
 def deduplicate_predictions(preds: list[dict]) -> list[dict]:
@@ -790,6 +840,14 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
             except Exception as e:
                 print(f"    Mismatch failed: {e}")
 
+            # Dixon-Coles
+            try:
+                dcp = _dixon_coles_fold(conn, test_fix, cutoff_dt, id_map, league_map)
+                fold_preds.extend(dcp)
+                print(f"    DixonColes: {len(dcp)} raw predictions")
+            except Exception as e:
+                print(f"    DixonColes failed: {e}")
+
             # Attach fixture info
             fix_lookup = test_fix.set_index("fixture_id").to_dict("index")
             for pred in fold_preds:
@@ -821,7 +879,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
         print("\nFitting calibration maps (fit folds only)...")
         fit_maps = {}
-        for model in ("bayesian", "poisson", "mismatch"):
+        for model in MODELS:
             mp = [p for p in fit_preds if p["model"] == model]
             points = fit_pava_map([p["predicted_prob_raw"] for p in mp],
                                   [float(p["actual"]) for p in mp])
@@ -845,6 +903,8 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
             if p["model"] == "poisson" and cal < CALIBRATED_THRESHOLD:
                 continue
             if p["model"] == "mismatch" and raw < MM_MIN_CONFIDENCE:
+                continue
+            if p["model"] == "dixon_coles" and cal < CALIBRATED_THRESHOLD:
                 continue
             q = dict(p)
             q["predicted_prob"] = round(cal, 4)
@@ -880,7 +940,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
         # ── Shipped maps: method validated above, refit on ALL folds so the
         # live maps use every raw prediction, including the most recent ──
         shipped_models = {}
-        for model in ("bayesian", "poisson", "mismatch"):
+        for model in MODELS:
             mp = [p for p in all_predictions if p["model"] == model]
             shipped_models[model] = fit_pava_map(
                 [p["predicted_prob_raw"] for p in mp],
