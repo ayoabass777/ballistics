@@ -106,13 +106,8 @@ ELO_TABLE = "elo.team_elo_history"
 
 
 def _get_conn():
-    return psycopg2.connect(
-        dbname="ballistics",
-        user="ballistics_user",
-        password="ronaldo",
-        host="localhost",
-        port=5432,
-    )
+    from engine.eval.db import get_conn
+    return get_conn()
 
 
 def load_historical(conn) -> pd.DataFrame:
@@ -262,7 +257,7 @@ def predict_upcoming(days: int = 7, threshold: float = None) -> pd.DataFrame:
         upcoming_s["cluster"] = assign_clusters_seasonal(train_s, upcoming_s)
 
         results = []
-        for line in [2.5, 3.5]:
+        for line in [1.5, 2.5, 3.5]:
             # ── OVER MODEL: per-cluster Poisson ──
             clusters = sorted(train_s["cluster"].unique())
             over_probs = np.full(len(upcoming_s), np.nan)

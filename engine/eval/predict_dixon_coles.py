@@ -47,6 +47,31 @@ def _calibrate(raw: float) -> float:
     return raw
 
 
+def load_dc_historical(conn) -> pd.DataFrame:
+    """Load historical matches for Dixon-Coles without Elo-dependent joins."""
+    sql = """
+        SELECT
+            f.fixture_id,
+            f.kickoff_utc,
+            f.season,
+            r.api_league_id,
+            f.league_name AS league,
+            f.team_id AS home_team_id,
+            f.opponent_id AS away_team_id,
+            f.team_name AS home_team,
+            f.opponent_name AS away_team,
+            f.goals_for AS home_goals,
+            f.goals_against AS away_goals
+        FROM raw.fact_head_to_head f
+        JOIN raw.raw_fixtures r
+          ON r.fixture_id = f.fixture_id
+        WHERE f.is_played
+          AND f.is_home
+        ORDER BY f.kickoff_utc
+    """
+    return pd.read_sql(sql, conn)
+
+
 # ── fitting ─────────────────────────────────────────────────────────────────
 
 def fit_league_dc(matches: pd.DataFrame, ref_time, xi: float = XI) -> dict | None:
@@ -156,6 +181,7 @@ def fixture_markets(params: dict, home_id, away_id,
     ii, jj = np.indices(P.shape)
     total = ii + jj
     markets = {
+        "Match Over 1.5": float(P[total > 1.5].sum()),
         "Match Over 2.5": float(P[total > 2.5].sum()),
         "Match Under 2.5": float(P[total < 2.5].sum()),
         "Match Over 3.5": float(P[total > 3.5].sum()),
@@ -176,14 +202,14 @@ def fixture_markets(params: dict, home_id, away_id,
 def predict_dixon_coles(days: int = 7,
                         threshold: float = CALIBRATED_THRESHOLD) -> pd.DataFrame:
     from engine.eval.predict_upcoming import (
-        _get_conn, load_historical, load_upcoming,
+        _get_conn, load_upcoming,
         _load_league_map, _build_team_id_map,
     )
 
     conn = _get_conn()
     try:
         print("Loading historical matches...")
-        hist = load_historical(conn)
+        hist = load_dc_historical(conn)
         print(f"  {len(hist)} matches")
 
         print("Loading upcoming fixtures...")
@@ -202,8 +228,8 @@ def predict_dixon_coles(days: int = 7,
     hist["kickoff_utc"] = pd.to_datetime(hist["kickoff_utc"], utc=True)
 
     results = []
-    for league, up_lg in upcoming.groupby("league"):
-        lg_hist = hist[hist["league"] == league]
+    for api_league_id, up_lg in upcoming.groupby("api_league_id"):
+        lg_hist = hist[hist["api_league_id"] == api_league_id]
         params = fit_league_dc(lg_hist, ref_time)
         if params is None:
             continue
@@ -225,7 +251,7 @@ def predict_dixon_coles(days: int = 7,
                     "kickoff": row["kickoff_utc"],
                     "home": row["home_team"],
                     "away": row["away_team"],
-                    "league": league,
+                    "league": row["league"],
                     "market": market,
                     "probability": round(cal, 4),
                     "raw_probability": round(raw, 4),

@@ -35,6 +35,16 @@ MIN_GAMES_CONFIDENT: int = 6
 
 # ── data ────────────────────────────────────────────────────────────────────
 
+def _with_league_key(df: pd.DataFrame) -> pd.DataFrame:
+    """Rank within the real league-season, not just the display league name."""
+    out = df.copy()
+    if "league_season_id" in out.columns:
+        out["_league_key"] = out["league_season_id"].astype(str)
+    else:
+        out["_league_key"] = out["league"].astype(str)
+    return out
+
+
 def load_team_df(conn, current_season_only: bool = True,
                  cutoff=None) -> pd.DataFrame:
     """Load played team-match rows. `cutoff` restricts to kickoffs before
@@ -109,13 +119,17 @@ def _compute_split_agg(df: pd.DataFrame, is_home: bool) -> pd.DataFrame:
     split = df[df["is_home"] == is_home]
     if split.empty:
         return pd.DataFrame()
+    agg_fields = {
+        "league": ("league", "first"),
+        "games": ("goals_for", "count"),
+        "scored": ("goals_for", "sum"),
+        "conceded": ("goals_against", "sum"),
+    }
+    if "league_season_id" in split.columns:
+        agg_fields["league_season_id"] = ("league_season_id", "first")
     agg = (
-        split.groupby(["league", "team_id"])
-        .agg(
-            games=("goals_for", "count"),
-            scored=("goals_for", "sum"),
-            conceded=("goals_against", "sum"),
-        )
+        split.groupby(["_league_key", "team_id"])
+        .agg(**agg_fields)
         .reset_index()
     )
     agg["attack_rate"] = agg["scored"] / agg["games"]
@@ -127,7 +141,7 @@ def _shrink_and_percentile(
     agg: pd.DataFrame, league_stats: pd.DataFrame,
 ) -> pd.DataFrame:
     """Apply shrinkage + within-league percentile to an aggregated DataFrame."""
-    agg = agg.merge(league_stats, on="league", how="left")
+    agg = agg.merge(league_stats, on="_league_key", how="left")
     agg["attack_shrunk"] = agg.apply(
         lambda r: _shrink_rate(
             r["scored"], r["games"],
@@ -140,9 +154,10 @@ def _shrink_and_percentile(
         axis=1)
 
     rows = []
-    for league, grp in agg.groupby("league"):
+    for _, grp in agg.groupby("_league_key"):
         if len(grp) < 2:
             continue
+        league = grp["league"].iloc[0]
         atk_vals = grp["attack_shrunk"].values
         def_vals = grp["defense_shrunk"].values
         league_size = len(grp)
@@ -158,7 +173,9 @@ def _shrink_and_percentile(
             def_pct = 100.0 - def_pct + (100.0 / len(def_vals))
             def_pct = min(max(def_pct, 0.0), 100.0)
             rows.append({
+                "_league_key": row["_league_key"],
                 "league": league,
+                "league_season_id": row.get("league_season_id"),
                 "team_id": row["team_id"],
                 "attack_shrunk": round(row["attack_shrunk"], 3),
                 "defense_shrunk": round(row["defense_shrunk"], 3),
@@ -191,21 +208,27 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
     away_attack_shrunk, away_defense_shrunk, away_attack_percentile,
     away_defense_percentile.
     """
+    df = _with_league_key(df)
+
     # Overall aggregation
+    agg_fields = {
+        "league": ("league", "first"),
+        "games_played": ("goals_for", "count"),
+        "total_scored": ("goals_for", "sum"),
+        "total_conceded": ("goals_against", "sum"),
+    }
+    if "league_season_id" in df.columns:
+        agg_fields["league_season_id"] = ("league_season_id", "first")
     team_agg = (
-        df.groupby(["league", "team_id"])
-        .agg(
-            games_played=("goals_for", "count"),
-            total_scored=("goals_for", "sum"),
-            total_conceded=("goals_against", "sum"),
-        )
+        df.groupby(["_league_key", "team_id"])
+        .agg(**agg_fields)
         .reset_index()
     )
     team_agg["attack_rate"] = team_agg["total_scored"] / team_agg["games_played"]
     team_agg["defense_rate"] = team_agg["total_conceded"] / team_agg["games_played"]
 
     league_stats = (
-        team_agg.groupby("league")
+        team_agg.groupby("_league_key")
         .agg(
             league_attack_mean=("attack_rate", "mean"),
             league_attack_var=("attack_rate", "var"),
@@ -214,7 +237,7 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
         )
         .reset_index()
     )
-    team_agg = team_agg.merge(league_stats, on="league")
+    team_agg = team_agg.merge(league_stats, on="_league_key")
 
     team_agg["attack_shrunk"] = team_agg.apply(
         lambda r: _shrink_rate(
@@ -228,7 +251,8 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
         axis=1)
 
     rows = []
-    for league, grp in team_agg.groupby("league"):
+    for _, grp in team_agg.groupby("_league_key"):
+        league = grp["league"].iloc[0]
         attack_vals = grp["attack_shrunk"].values
         defense_vals = grp["defense_shrunk"].values
         league_size = len(grp)
@@ -247,7 +271,9 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
             def_pct = min(max(def_pct, 0.0), 100.0)
 
             rows.append({
+                "_league_key": row["_league_key"],
                 "league": league,
+                "league_season_id": row.get("league_season_id"),
                 "team_id": row["team_id"],
                 "games_played": int(row["games_played"]),
                 "attack_rate": round(row["attack_rate"], 3),
@@ -280,11 +306,11 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
             "league_size": "home_league_size",
         })
         result = result.merge(
-            home_strength[["league", "team_id", "home_attack_shrunk",
+            home_strength[["_league_key", "team_id", "home_attack_shrunk",
                            "home_defense_shrunk", "home_attack_percentile",
                            "home_defense_percentile", "home_attack_rank",
                            "home_defense_rank", "home_league_size"]],
-            on=["league", "team_id"], how="left")
+            on=["_league_key", "team_id"], how="left")
 
     if not away_agg.empty:
         away_strength = _shrink_and_percentile(away_agg, league_stats)
@@ -298,13 +324,13 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
             "league_size": "away_league_size",
         })
         result = result.merge(
-            away_strength[["league", "team_id", "away_attack_shrunk",
+            away_strength[["_league_key", "team_id", "away_attack_shrunk",
                            "away_defense_shrunk", "away_attack_percentile",
                            "away_defense_percentile", "away_attack_rank",
                            "away_defense_rank", "away_league_size"]],
-            on=["league", "team_id"], how="left")
+            on=["_league_key", "team_id"], how="left")
 
-    return result
+    return result.drop(columns=["_league_key"], errors="ignore")
 
 
 # ── reporting ───────────────────────────────────────────────────────────────

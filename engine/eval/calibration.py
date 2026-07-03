@@ -48,13 +48,8 @@ logger = get_logger(__name__)
 
 
 def _get_conn():
-    return psycopg2.connect(
-        dbname="ballistics",
-        user="ballistics_user",
-        password="ronaldo",
-        host="localhost",
-        port=5432,
-    )
+    from engine.eval.db import get_conn
+    return get_conn()
 
 
 def _actual_outcome(row: pd.Series, market: str) -> bool | None:

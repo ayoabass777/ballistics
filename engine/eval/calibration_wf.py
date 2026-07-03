@@ -57,13 +57,8 @@ CAL_FRAC_DEFAULT = 0.4
 
 
 def _get_conn():
-    return psycopg2.connect(
-        dbname="ballistics",
-        user="ballistics_user",
-        password="ronaldo",
-        host="localhost",
-        port=5432,
-    )
+    from engine.eval.db import get_conn
+    return get_conn()
 
 
 def _actual_outcome(row: pd.Series, market: str) -> bool | None:
@@ -356,7 +351,7 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
     Mirrors live predict_upcoming exactly: per-cluster Poisson on OVER_COLS
     for overs, a separate global Poisson on UNDER_COLS for unders, and the
-    live lines [2.5, 3.5]. Records RAW probabilities — calibration is
+    live lines [1.5, 2.5, 3.5]. Records RAW probabilities — calibration is
     fitted/applied downstream, never inside the fold.
     """
     from engine.eval.predict_upcoming import (
@@ -401,7 +396,7 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
     train_s["cluster"] = assign_clusters_seasonal(train_s, train_s)
     test_s["cluster"] = assign_clusters_seasonal(train_s, test_s)
 
-    for line in [2.5, 3.5]:
+    for line in [1.5, 2.5, 3.5]:
         # ── OVER: per-cluster Poisson on OVER_COLS (as live) ──
         clusters = sorted(train_s["cluster"].unique())
         over_probs = np.full(len(test_s), np.nan)

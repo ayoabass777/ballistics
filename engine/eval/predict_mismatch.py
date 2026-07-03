@@ -91,13 +91,8 @@ class MismatchPick:
 
 
 def _get_conn():
-    return psycopg2.connect(
-        dbname="ballistics",
-        user="ballistics_user",
-        password="ronaldo",
-        host="localhost",
-        port=5432,
-    )
+    from engine.eval.db import get_conn
+    return get_conn()
 
 
 def _build_team_id_map(conn) -> dict:

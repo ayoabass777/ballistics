@@ -105,6 +105,18 @@ td.confidence { font-weight: 600; }
 .tier-badge.trio { background: #1a3a2a; color: #3fb950; }
 .tier-badge.duo { background: #1a2a3a; color: #58a6ff; }
 .tier-badge.solo { background: #21262d; color: #8b949e; }
+.market-tier-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; font-size: 0.65rem; padding: 2px 7px; border-radius: 3px; font-weight: 700; }
+.market-tier-badge.a { background: #1a3a2a; color: #3fb950; }
+.market-tier-badge.b { background: #0f3340; color: #39c5cf; }
+.market-tier-badge.c { background: #3a2a1a; color: #d29922; }
+.market-tier-empty { color: #6e7681; font-size: 0.75rem; }
+.model-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.model-chip { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 3px; font-size: 0.62rem; font-weight: 700; }
+.model-chip.poisson { background: rgba(121,192,255,.14); color: #79c0ff; }
+.model-chip.dixon_coles { background: rgba(63,185,80,.14); color: #3fb950; }
+.model-chip.mismatch { background: rgba(210,168,255,.14); color: #d2a8ff; }
+.model-chip.bayesian { background: rgba(210,153,34,.14); color: #d29922; }
+.model-chip.unknown { background: #21262d; color: #8b949e; }
 
 /* Pagination */
 .pagination { display: flex; justify-content: center; gap: 6px; padding: 16px; }
@@ -180,10 +192,18 @@ td.confidence { font-weight: 600; }
       When multiple models independently agree on a pick, accuracy jumps dramatically.
       Solo picks (1 model) are <strong style="color:#f85149">5.4% overconfident</strong>.
       Duo picks (2 models) are <strong style="color:#3fb950">perfectly calibrated</strong>.
-      Trio picks (3 models) are <strong style="color:#3fb950">slightly underconfident</strong> — the sweet spot.
+      Trio+ picks (3-4 models) are <strong style="color:#3fb950">slightly underconfident</strong> — the sweet spot.
     </p>
   </div>
   <div class="tier-grid" id="tier-grid"></div>
+  <div class="section">
+    <h2>Market Calibration Tiers</h2>
+    <p style="color:#8b949e;font-size:0.85rem;line-height:1.5;margin-bottom:14px">
+      Over 1.5 tiers are calibrated from DC + Poisson consensus thresholds. Under 3.5 tiers here are probability-only;
+      the consensus slip applies the extra attack/defence strength gate before treating them as playable.
+    </p>
+    <div class="tier-grid" id="market-tier-grid"></div>
+  </div>
   <div class="section">
     <h2>Confidence by Tier</h2>
     <div id="tier-cal-chart"></div>
@@ -196,12 +216,14 @@ td.confidence { font-weight: 600; }
     <input type="search" id="search" placeholder="Search team or market...">
     <select id="filter-tier">
       <option value="">All Tiers</option>
-      <option value="3">Trio (3 models)</option>
+      <option value="4">All 4 models</option>
+      <option value="3plus">Trio+ (3-4 models)</option>
       <option value="2">Duo (2 models)</option>
       <option value="1">Solo (1 model)</option>
     </select>
     <select id="filter-result"><option value="">All Results</option><option value="hit">Hits</option><option value="miss">Misses</option></select>
     <select id="filter-market"><option value="">All Markets</option></select>
+    <select id="filter-model"><option value="">All Models</option></select>
     <select id="filter-conf">
       <option value="">All Confidence</option>
       <option value="90">90%+</option>
@@ -209,6 +231,12 @@ td.confidence { font-weight: 600; }
       <option value="80">80%+</option>
       <option value="75">75%+</option>
       <option value="70">70%+</option>
+    </select>
+    <select id="filter-market-tier">
+      <option value="">All Market Tiers</option>
+      <option value="A">Tier A</option>
+      <option value="B">Tier B+</option>
+      <option value="C">Tier C+</option>
     </select>
   </div>
   <div class="table-wrap">
@@ -226,6 +254,7 @@ td.confidence { font-weight: 600; }
           <th data-col="n_models">Tier</th>
           <th data-col="models">Models</th>
           <th data-col="predicted_prob">Confidence</th>
+          <th data-col="market_tier">Market Tier</th>
           <th data-col="actual">Result</th>
         </tr>
       </thead>
@@ -281,6 +310,7 @@ function init() {
   renderBaseRates();
   renderLiftChart();
   renderTiers();
+  renderMarketTiers();
   renderTierCal();
   populateFilters();
   renderPicks();
@@ -302,7 +332,7 @@ function init() {
     renderPicks();
   }));
 
-  ['search', 'filter-tier', 'filter-result', 'filter-market', 'filter-conf'].forEach(id => {
+  ['search', 'filter-tier', 'filter-result', 'filter-market', 'filter-model', 'filter-conf', 'filter-market-tier'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', () => { currentPage = 1; renderPicks(); });
     el.addEventListener('change', () => { currentPage = 1; renderPicks(); });
@@ -342,8 +372,8 @@ function renderVerdict() {
   if (solo && trio) {
     const soloGap = solo.avg_predicted - solo.actual_hit_rate;
     const trioGap = trio.avg_predicted - trio.actual_hit_rate;
-    text += ` <strong>Solo picks are ${(soloGap*100).toFixed(1)}% overconfident</strong> — only bet on duo/trio consensus where calibration is honest.`;
-    if (trioGap < 0) text += ` Trio picks actually underpredict by ${(-trioGap*100).toFixed(1)}%.`;
+    text += ` <strong>Solo picks are ${(soloGap*100).toFixed(1)}% overconfident</strong> — only bet on duo/trio+ consensus where calibration is honest.`;
+    if (trioGap < 0) text += ` Trio+ picks actually underpredict by ${(-trioGap*100).toFixed(1)}%.`;
   }
 
   document.getElementById('verdict-banner').innerHTML = `
@@ -393,7 +423,13 @@ function renderCalChart() {
 
 function renderModels() {
   const models = DATA.per_model || {};
-  const colors = { bayesian: '#d2a8ff', poisson: '#79c0ff', mismatch: '#3fb950' };
+  const colors = { bayesian: '#d29922', dixon_coles: '#3fb950', mismatch: '#d2a8ff', poisson: '#79c0ff' };
+  const displayNames = {
+    bayesian: 'Bayesian',
+    dixon_coles: 'Dixon-Coles',
+    mismatch: 'Mismatch',
+    poisson: 'Poisson',
+  };
   document.getElementById('model-grid').innerHTML = Object.entries(models).map(([name, s]) => {
     const hitRate = (s.actual_hit_rate * 100).toFixed(1);
     const pct = Math.round(s.actual_hit_rate * 100);
@@ -402,7 +438,7 @@ function renderModels() {
     const gapColor = s.overconfidence > 0.02 ? '#f85149' : s.overconfidence < -0.02 ? '#3fb950' : '#8b949e';
     return `<div class="model-card">
       <div class="ring" style="background:${ringBg}"><span style="background:#161b22;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;color:${clr}">${hitRate}%</span></div>
-      <h3 style="text-align:center;color:${clr}">${name.charAt(0).toUpperCase() + name.slice(1)}</h3>
+      <h3 style="text-align:center;color:${clr}">${displayNames[name] || name.charAt(0).toUpperCase() + name.slice(1)}</h3>
       <div class="stat-row"><span class="stat-label">Participates in</span><span>${s.n.toLocaleString()} picks</span></div>
       <div class="stat-row"><span class="stat-label">Brier Score</span><span>${s.brier.toFixed(4)}</span></div>
       <div class="stat-row"><span class="stat-label">Avg Predicted</span><span>${(s.avg_predicted*100).toFixed(1)}%</span></div>
@@ -462,7 +498,7 @@ function renderLiftChart() {
 function renderTiers() {
   const c = DATA.consensus || {};
   const order = ['trio', 'duo', 'solo'];
-  const labels = { trio: 'Trio (3 models agree)', duo: 'Duo (2 models agree)', solo: 'Solo (1 model)' };
+  const labels = { trio: 'Trio+ (3-4 models agree)', duo: 'Duo (2 models agree)', solo: 'Solo (1 model)' };
   const classes = { trio: 'recommended', duo: 'recommended', solo: 'danger' };
 
   document.getElementById('tier-grid').innerHTML = order.filter(t => c[t]).map(tier => {
@@ -486,6 +522,42 @@ function renderTiers() {
   }).join('');
 }
 
+function renderMarketTiers() {
+  const markets = ['Match Over 1.5', 'Match Under 3.5'];
+  const tiers = ['A', 'B', 'C'];
+  const thresholdText = {
+    'Match Over 1.5': { A: '>=80%', B: '78-79%', C: '75-77%' },
+    'Match Under 3.5': { A: '>=80%', B: '75-79%', C: '72-74%' },
+  };
+  const rows = [];
+
+  markets.forEach(market => {
+    tiers.forEach(tier => {
+      const subset = predictions.filter(p => p.market === market && marketTier(p) === tier);
+      if (!subset.length) return;
+      const hits = subset.filter(p => p.actual).length;
+      const hitRate = hits / subset.length;
+      const avgPred = subset.reduce((sum, p) => sum + p.predicted_prob, 0) / subset.length;
+      const gap = avgPred - hitRate;
+      const gapColor = gap > 0.02 ? '#f85149' : gap < -0.02 ? '#3fb950' : '#58a6ff';
+      rows.push(`<div class="tier-card ${Math.abs(gap) <= 0.02 ? 'recommended' : gap > 0.02 ? 'caution' : 'recommended'}">
+        <div class="tier-name">${market} <span class="market-tier-badge ${tier.toLowerCase()}">${tier}</span></div>
+        <div class="tier-hit" style="color:${gapColor}">${(hitRate * 100).toFixed(1)}%</div>
+        <div class="tier-meta">${thresholdText[market][tier]} confidence · predicted ${(avgPred * 100).toFixed(1)}%</div>
+        <div class="tier-bar"><div class="tier-fill" style="width:${hitRate * 100}%;background:${gapColor}"></div></div>
+        <div class="tier-detail">
+          <span>${subset.length.toLocaleString()} picks</span>
+          <span>${hits.toLocaleString()} hits</span>
+          <span style="color:${gapColor}">Gap: ${gap>0?'+':''}${(gap*100).toFixed(1)}%</span>
+        </div>
+      </div>`);
+    });
+  });
+
+  document.getElementById('market-tier-grid').innerHTML = rows.join('')
+    || '<p style="color:#8b949e">No Over 1.5 or Under 3.5 tiered picks in this report.</p>';
+}
+
 function renderTierCal() {
   const c = DATA.consensus || {};
   const tiers = ['trio', 'duo', 'solo'].filter(t => c[t]);
@@ -495,7 +567,10 @@ function renderTierCal() {
   const tierBins = {};
   for (const tier of tiers) {
     const nModels = tier === 'trio' ? 3 : tier === 'duo' ? 2 : 1;
-    const tierPreds = predictions.filter(p => (p.n_models || 1) === nModels);
+    const tierPreds = predictions.filter(p => {
+      const nm = p.n_models || 1;
+      return tier === 'trio' ? nm >= nModels : nm === nModels;
+    });
     const bins = [];
     for (let lo = 0.65; lo < 1.0; lo += 0.05) {
       const hi = lo + 0.05;
@@ -534,6 +609,64 @@ function populateFilters() {
   const markets = [...new Set(predictions.map(p => p.market))].sort();
   const marketSel = document.getElementById('filter-market');
   markets.forEach(m => marketSel.innerHTML += `<option value="${m}">${m}</option>`);
+  const modelSel = document.getElementById('filter-model');
+  [...models].sort().forEach(m => {
+    modelSel.innerHTML += `<option value="${m}">${modelDisplayName(m)}</option>`;
+  });
+}
+
+function modelDisplayName(model) {
+  return {
+    bayesian: 'Bayesian',
+    dixon_coles: 'Dixon-Coles',
+    mismatch: 'Mismatch',
+    poisson: 'Poisson',
+  }[model] || model;
+}
+
+function modelShortName(model) {
+  return {
+    bayesian: 'B',
+    dixon_coles: 'D',
+    mismatch: 'M',
+    poisson: 'P',
+  }[model] || model.slice(0, 1).toUpperCase();
+}
+
+function modelChips(models) {
+  const parts = (models || '').split(',').filter(Boolean);
+  if (!parts.length) return '<span style="color:#6e7681">-</span>';
+  return `<span class="model-chips">${parts.map(m =>
+    `<span class="model-chip ${m}" title="${modelDisplayName(m)}">${modelShortName(m)}</span>`
+  ).join('')}</span>`;
+}
+
+function marketTier(p) {
+  const prob = p.predicted_prob || 0;
+  if (p.market === 'Match Over 1.5') {
+    if (prob >= 0.80) return 'A';
+    if (prob >= 0.78) return 'B';
+    if (prob >= 0.75) return 'C';
+  }
+  if (p.market === 'Match Under 3.5') {
+    if (prob >= 0.80) return 'A';
+    if (prob >= 0.75) return 'B';
+    if (prob >= 0.72) return 'C';
+  }
+  return '';
+}
+
+function marketTierScore(p) {
+  return {A: 3, B: 2, C: 1}[marketTier(p)] || 0;
+}
+
+function marketTierBadge(p) {
+  const tier = marketTier(p);
+  if (!tier) return '<span class="market-tier-empty">-</span>';
+  const title = p.market === 'Match Under 3.5'
+    ? 'Under 3.5 probability tier; consensus slip also applies strength gate'
+    : `${p.market} calibration tier`;
+  return `<span class="market-tier-badge ${tier.toLowerCase()}" title="${title}">${tier}</span>`;
 }
 
 function getFiltered() {
@@ -542,20 +675,29 @@ function getFiltered() {
   const tier = document.getElementById('filter-tier').value;
   const result = document.getElementById('filter-result').value;
   const market = document.getElementById('filter-market').value;
+  const model = document.getElementById('filter-model').value;
   const conf = document.getElementById('filter-conf').value;
+  const marketTierFilter = document.getElementById('filter-market-tier').value;
+  const tierRank = {A: 3, B: 2, C: 1};
 
   if (q) data = data.filter(p => (p.home + ' ' + p.away + ' ' + p.market).toLowerCase().includes(q));
-  if (tier) data = data.filter(p => (p.n_models || 1) === parseInt(tier));
+  if (tier === '4') data = data.filter(p => (p.n_models || 1) >= 4);
+  if (tier === '3plus') data = data.filter(p => (p.n_models || 1) >= 3);
+  if (tier === '2') data = data.filter(p => (p.n_models || 1) === 2);
+  if (tier === '1') data = data.filter(p => (p.n_models || 1) === 1);
   if (result === 'hit') data = data.filter(p => p.actual);
   if (result === 'miss') data = data.filter(p => !p.actual);
   if (market) data = data.filter(p => p.market === market);
+  if (model) data = data.filter(p => (p.models || '').split(',').includes(model));
   if (conf) data = data.filter(p => p.predicted_prob >= parseInt(conf) / 100);
+  if (marketTierFilter) data = data.filter(p => marketTierScore(p) >= tierRank[marketTierFilter]);
 
   data.sort((a, b) => {
     let va = a[sortCol], vb = b[sortCol];
     if (sortCol === 'match') { va = a.home + ' vs ' + a.away; vb = b.home + ' vs ' + b.away; }
     if (sortCol === 'actual') { va = a.actual ? 1 : 0; vb = b.actual ? 1 : 0; }
     if (sortCol === 'models') { va = a.models || ''; vb = b.models || ''; }
+    if (sortCol === 'market_tier') { va = marketTierScore(a); vb = marketTierScore(b); }
     if (va < vb) return sortDir;
     if (va > vb) return -sortDir;
     return 0;
@@ -577,7 +719,7 @@ function renderPicks() {
   document.getElementById('picks-body').innerHTML = page.map(p => {
     const nm = p.n_models || 1;
     const tierCls = nm >= 3 ? 'trio' : nm >= 2 ? 'duo' : 'solo';
-    const tierLabel = nm >= 3 ? 'TRIO' : nm >= 2 ? 'DUO' : 'SOLO';
+    const tierLabel = nm >= 4 ? 'ALL 4' : nm >= 3 ? 'TRIO' : nm >= 2 ? 'DUO' : 'SOLO';
     const confColor = p.predicted_prob >= 0.9 ? '#3fb950' : p.predicted_prob >= 0.8 ? '#58a6ff' : p.predicted_prob >= 0.7 ? '#d29922' : '#8b949e';
     return `<tr>
       <td>${p.kickoff || ''}</td>
@@ -585,8 +727,9 @@ function renderPicks() {
       <td>${p.score}</td>
       <td>${p.market}</td>
       <td><span class="tier-badge ${tierCls}">${tierLabel}</span></td>
-      <td style="font-size:0.75rem;color:#8b949e">${(p.models||'').split(',').join(', ')}</td>
+      <td>${modelChips(p.models)}</td>
       <td class="confidence" style="color:${confColor}">${(p.predicted_prob * 100).toFixed(1)}%</td>
+      <td>${marketTierBadge(p)}</td>
       <td>${p.actual ? '<span class="hit-text">HIT</span>' : '<span class="miss-text">MISS</span>'}</td>
     </tr>`;
   }).join('');

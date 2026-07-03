@@ -356,10 +356,8 @@ def print_top_configs(results_df: pd.DataFrame, top_n: int = 30) -> None:
 
 
 if __name__ == "__main__":
-    import psycopg2
-    conn = psycopg2.connect(
-        dbname="ballistics", user="ballistics_user",
-        password="ronaldo", host="localhost", port=5432)
+    from engine.eval.db import get_conn
+    conn = get_conn()
     df = load_backtest_df(conn)
     conn.close()
 
