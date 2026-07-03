@@ -1,0 +1,224 @@
+{
+  "generated": "2026-06-29 11:47",
+  "total_stake": 45000,
+  "bankroll": 300000,
+  "slips": [
+    {
+      "name": "Slip 1 \u2014 Favorites",
+      "stake": 15000,
+      "legs": [
+        {
+          "match": "Rigas FS vs BFC Daugavpils",
+          "league": "Latvia Virsliga",
+          "kickoff": "Tue Jun 30 08:00",
+          "market": "1X2",
+          "selection": "Rigas FS (Home Win)",
+          "odds": 1.21,
+          "model_signal": "Home Over 0.5 @ 90%, duo (B+M)",
+          "sportybet_id": "ID:23174"
+        },
+        {
+          "match": "Afturelding vs KF Aegir",
+          "league": "Iceland 1. deild",
+          "kickoff": "Mon Jun 29 12:15",
+          "market": "1X2",
+          "selection": "Afturelding (Home Win)",
+          "odds": 1.24,
+          "model_signal": "Home Over 0.5 @ 89%, duo (B+M)",
+          "sportybet_id": "ID:29704"
+        },
+        {
+          "match": "FK Liepaja vs Ogre United",
+          "league": "Latvia Virsliga",
+          "kickoff": "Tue Jun 30 09:00",
+          "market": "1X2",
+          "selection": "FK Liepaja (Home Win)",
+          "odds": 1.3,
+          "model_signal": "Home Over 0.5 @ 85%, duo (B+M)",
+          "sportybet_id": "ID:17869"
+        },
+        {
+          "match": "Riga FC vs FS Jelgava",
+          "league": "Latvia Virsliga",
+          "kickoff": "Fri Jul 03 09:00",
+          "market": "1X2",
+          "selection": "Riga FC (Home Win)",
+          "odds": 1.25,
+          "model_signal": "Home Over 0.5 @ 88%, duo (B+M)",
+          "sportybet_id": "ID:14140"
+        },
+        {
+          "match": "Fylkir Reykjavik vs KF Aegir",
+          "league": "Iceland 1. deild",
+          "kickoff": "Fri Jul 03 12:15",
+          "market": "1X2",
+          "selection": "Fylkir (Away Win)",
+          "odds": 1.45,
+          "model_signal": "Fylkir Over 0.5 @ 86%, duo (B+M)",
+          "sportybet_id": "ID:39058"
+        },
+        {
+          "match": "Rigas FS vs FK Auda",
+          "league": "Latvia Virsliga",
+          "kickoff": "Sat Jul 04 08:00",
+          "market": "1X2",
+          "selection": "Rigas FS (Home Win)",
+          "odds": 1.46,
+          "model_signal": "Home Over 0.5 @ 86%, duo (B+M)",
+          "sportybet_id": "ID:26650"
+        },
+        {
+          "match": "Leiknir R. vs Volsungur",
+          "league": "Iceland 1. deild",
+          "kickoff": "Sat Jul 04 09:00",
+          "market": "1X2",
+          "selection": "Leiknir R. (Home Win)",
+          "odds": 1.63,
+          "model_signal": "Home Over 0.5 @ 87%, duo (B+M)",
+          "sportybet_id": "ID:35009"
+        }
+      ],
+      "total_odds": 8.41,
+      "potential_return": 126200,
+      "n_legs": 7
+    },
+    {
+      "name": "Slip 2 \u2014 Goals (Over/Under)",
+      "stake": 15000,
+      "legs": [
+        {
+          "match": "Afturelding vs KF Aegir",
+          "league": "Iceland 1. deild",
+          "kickoff": "Mon Jun 29 12:15",
+          "market": "Over/Under",
+          "selection": "Over 3.5",
+          "odds": 1.53,
+          "model_signal": "Over 1.5 @ 89%, duo (B+M). Heavy favorite, high-scoring",
+          "sportybet_id": "ID:29704"
+        },
+        {
+          "match": "Rigas FS vs BFC Daugavpils",
+          "league": "Latvia Virsliga",
+          "kickoff": "Tue Jun 30 08:00",
+          "market": "GG/NG",
+          "selection": "GG (Both Teams to Score)",
+          "odds": 1.9,
+          "model_signal": "Home Over 0.5 @ 90% + Away Over 0.5 implied by GG=1.90",
+          "sportybet_id": "ID:23174"
+        },
+        {
+          "match": "FK Liepaja vs Ogre United",
+          "league": "Latvia Virsliga",
+          "kickoff": "Tue Jun 30 09:00",
+          "market": "Over/Under",
+          "selection": "Over 2.5",
+          "odds": 1.57,
+          "model_signal": "Over 1.5 @ 85%, Home Over 0.5 @ 85%, duo",
+          "sportybet_id": "ID:17869"
+        },
+        {
+          "match": "Riga FC vs FS Jelgava",
+          "league": "Latvia Virsliga",
+          "kickoff": "Fri Jul 03 09:00",
+          "market": "Over/Under",
+          "selection": "Over 2.5",
+          "odds": 1.54,
+          "model_signal": "Over 1.5 @ 83%, Home Over 0.5 @ 88%, duo",
+          "sportybet_id": "ID:14140"
+        },
+        {
+          "match": "IR Reykjavik vs Afturelding",
+          "league": "Iceland 1. deild",
+          "kickoff": "Fri Jul 03 12:15",
+          "market": "Over/Under",
+          "selection": "Over 1.5",
+          "odds": 1.3,
+          "model_signal": "Over 1.5 @ 86%, duo (B+M)",
+          "sportybet_id": "ID:16212"
+        },
+        {
+          "match": "Rigas FS vs FK Auda",
+          "league": "Latvia Virsliga",
+          "kickoff": "Sat Jul 04 08:00",
+          "market": "Over/Under",
+          "selection": "Over 2.5",
+          "odds": 1.54,
+          "model_signal": "Home Over 0.5 @ 86%, duo. GG=1.66 implies both sides score",
+          "sportybet_id": "ID:26650"
+        }
+      ],
+      "total_odds": 14.07,
+      "potential_return": 211067,
+      "n_legs": 6
+    },
+    {
+      "name": "Slip 3 \u2014 Mixed (Favorites + Goals + GG)",
+      "stake": 15000,
+      "legs": [
+        {
+          "match": "Afturelding vs KF Aegir",
+          "league": "Iceland 1. deild",
+          "kickoff": "Mon Jun 29 12:15",
+          "market": "1X2",
+          "selection": "Afturelding (Home Win)",
+          "odds": 1.24,
+          "model_signal": "Home Over 0.5 @ 89%, duo (B+M)",
+          "sportybet_id": "ID:29704"
+        },
+        {
+          "match": "FK Liepaja vs Ogre United",
+          "league": "Latvia Virsliga",
+          "kickoff": "Tue Jun 30 09:00",
+          "market": "GG/NG",
+          "selection": "GG (Both Teams to Score)",
+          "odds": 1.74,
+          "model_signal": "Home Over 0.5 @ 85%, GG signal from both teams scoring",
+          "sportybet_id": "ID:17869"
+        },
+        {
+          "match": "Riga FC vs FS Jelgava",
+          "league": "Latvia Virsliga",
+          "kickoff": "Fri Jul 03 09:00",
+          "market": "GG/NG",
+          "selection": "GG (Both Teams to Score)",
+          "odds": 1.74,
+          "model_signal": "Home Over 0.5 @ 88%, GG=1.74 on SportyBet",
+          "sportybet_id": "ID:14140"
+        },
+        {
+          "match": "Grotta vs HK Kopavogur",
+          "league": "Iceland 1. deild",
+          "kickoff": "Fri Jul 03 12:15",
+          "market": "1X2",
+          "selection": "HK Kopavogur (Away Win)",
+          "odds": 1.77,
+          "model_signal": "Over 1.5 @ 89%, Kopavogur is favourite (away)",
+          "sportybet_id": "ID:38962"
+        },
+        {
+          "match": "BFC Daugavpils vs FK Liepaja",
+          "league": "Latvia Virsliga",
+          "kickoff": "Sat Jul 04 06:00",
+          "market": "Over/Under",
+          "selection": "Over 2.5",
+          "odds": 1.57,
+          "model_signal": "Both teams active scorers, O2.5 line at 1.57",
+          "sportybet_id": "ID:39207"
+        },
+        {
+          "match": "Rigas FS vs FK Auda",
+          "league": "Latvia Virsliga",
+          "kickoff": "Sat Jul 04 08:00",
+          "market": "1X2",
+          "selection": "Rigas FS (Home Win)",
+          "odds": 1.46,
+          "model_signal": "Home Over 0.5 @ 86%, duo (B+M)",
+          "sportybet_id": "ID:26650"
+        }
+      ],
+      "total_odds": 15.23,
+      "potential_return": 228474,
+      "n_legs": 6
+    }
+  ]
+}

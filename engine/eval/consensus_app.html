@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ballistics — Consensus Picks</title>
+<style>
+:root {
+  --bg: #0d1117; --bg2: #161b22; --bg3: #21262d; --bg4: #30363d;
+  --text: #e6edf3; --text2: #8b949e; --text3: #6e7681;
+  --accent: #58a6ff; --accent2: #1f6feb;
+  --green: #3fb950; --green-bg: rgba(63,185,80,.12);
+  --amber: #d29922; --amber-bg: rgba(210,153,34,.12);
+  --red: #f85149; --red-bg: rgba(248,81,73,.12);
+  --purple: #bc8cff; --purple-bg: rgba(188,140,255,.12);
+  --teal: #3ddbd9; --teal-bg: rgba(61,219,217,.12);
+  --border: #30363d;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+a { color: var(--accent); text-decoration: none; }
+
+.container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+/* Header */
+.header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 0; position: sticky; top: 0; z-index: 100; }
+.header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.logo { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 28px; height: 28px; background: var(--accent2); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.header-meta { font-size: 13px; color: var(--text2); display: flex; gap: 16px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; background: var(--bg2); border-bottom: 1px solid var(--border); }
+.tab { padding: 12px 20px; font-size: 14px; font-weight: 500; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+/* Stats bar */
+.stats-bar { display: flex; gap: 12px; padding: 16px 0; flex-wrap: wrap; }
+.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; min-width: 120px; flex: 1; }
+.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.stat-value { font-size: 22px; font-weight: 600; }
+.stat-value.green { color: var(--green); }
+.stat-value.amber { color: var(--amber); }
+.stat-value.purple { color: var(--purple); }
+.stat-value.accent { color: var(--accent); }
+
+/* Filters */
+.filters { display: flex; gap: 10px; padding: 12px 0; flex-wrap: wrap; align-items: center; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+select, input[type="text"], input[type="date"] { background: var(--bg3); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 13px; outline: none; min-width: 140px; }
+input[type="date"] { min-width: 130px; }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); }
+select:focus, input:focus { border-color: var(--accent); }
+.search-box { position: relative; }
+.search-box input { padding-left: 30px; width: 220px; }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; pointer-events: none; }
+
+/* Table */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; margin: 8px 0 24px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: var(--bg2); padding: 10px 12px; text-align: left; font-weight: 500; color: var(--text2); font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; position: sticky; top: 0; z-index: 5; }
+thead th:hover { color: var(--text); }
+thead th .sort-arrow { margin-left: 4px; font-size: 10px; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:hover { background: var(--bg2); }
+tbody tr.selected { background: rgba(31,111,235,.15); }
+tbody td { padding: 8px 12px; white-space: nowrap; }
+
+/* Badges */
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+.badge-bm { background: var(--purple-bg); color: var(--purple); }
+.badge-bp { background: var(--teal-bg); color: var(--teal); }
+.badge-mp { background: var(--green-bg); color: var(--green); }
+.badge-bmp { background: var(--amber-bg); color: var(--amber); }
+.badge-solo { background: var(--bg3); color: var(--text2); }
+.conf-bar { display: inline-flex; align-items: center; gap: 6px; }
+.conf-fill { height: 6px; border-radius: 3px; min-width: 20px; }
+.conf-high { background: var(--green); }
+.conf-mid { background: var(--accent); }
+.conf-low { background: var(--amber); }
+.market-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.mt-team { background: rgba(88,166,255,.12); color: var(--accent); }
+.mt-over { background: var(--green-bg); color: var(--green); }
+.mt-under { background: var(--amber-bg); color: var(--amber); }
+.mt-other { background: var(--bg3); color: var(--text2); }
+.mt-win { background: var(--purple-bg); color: var(--purple); }
+
+/* Slip builder */
+.slip-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+.slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.slip-title { font-size: 16px; font-weight: 600; }
+.slip-odds { font-size: 24px; font-weight: 700; color: var(--green); }
+.slip-actions { display: flex; gap: 8px; }
+.btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text); transition: all 0.15s; }
+.btn:hover { background: var(--bg4); }
+.btn-primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+.btn-primary:hover { background: #388bfd; }
+.btn-danger { color: var(--red); }
+.btn-danger:hover { background: var(--red-bg); }
+.slip-legs { display: flex; flex-direction: column; gap: 4px; max-height: 400px; overflow-y: auto; }
+.slip-leg { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg); border-radius: 6px; font-size: 12px; }
+.slip-leg .match-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.slip-leg .sel-name { color: var(--accent); font-weight: 500; min-width: 120px; }
+.slip-leg .odds-val { color: var(--green); font-weight: 600; min-width: 40px; text-align: right; }
+.slip-leg .remove-btn { color: var(--text3); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; }
+.slip-leg .remove-btn:hover { color: var(--red); background: var(--red-bg); }
+.slip-empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px; }
+.add-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; font-size: 14px; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); transition: all 0.1s; }
+.add-btn:hover { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+.add-btn.in-slip { background: var(--green); color: #fff; border-color: var(--green); }
+
+/* Date group */
+.date-group { padding: 8px 12px; background: var(--bg2); font-size: 12px; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border); }
+
+/* Copy toast */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--green); color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px; z-index: 1000; display: none; }
+
+/* Sections */
+.section { display: none; padding-top: 8px; }
+.section.active { display: block; }
+
+/* Fixture analysis */
+.fixture-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.fixture-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; cursor: pointer; }
+.fixture-card-header:hover { background: var(--bg3); }
+.fixture-match { font-size: 15px; font-weight: 600; }
+.fixture-meta { font-size: 12px; color: var(--text2); display: flex; gap: 16px; }
+.fixture-models-count { display: flex; gap: 4px; }
+.model-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.model-dot.active { opacity: 1; }
+.model-dot.inactive { opacity: 0.2; }
+.dot-p { background: var(--teal); }
+.dot-m { background: var(--purple); }
+.dot-b { background: var(--amber); }
+.fixture-card-body { display: none; padding: 0 16px 16px; }
+.fixture-card.open .fixture-card-body { display: block; }
+.fixture-card.open .fixture-card-header { border-bottom: 1px solid var(--border); }
+.model-section { margin-top: 12px; }
+.model-section-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.model-section-title .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.signal-row { display: flex; align-items: center; gap: 12px; padding: 4px 8px; border-radius: 4px; font-size: 13px; }
+.signal-row:hover { background: var(--bg3); }
+.signal-market { min-width: 200px; font-weight: 500; }
+.signal-conf { min-width: 60px; font-weight: 600; }
+.signal-detail { color: var(--text2); font-size: 12px; }
+.no-signals { color: var(--text3); font-size: 13px; font-style: italic; padding: 4px 8px; }
+.fixture-chevron { color: var(--text3); font-size: 14px; transition: transform 0.15s; }
+.fixture-card.open .fixture-chevron { transform: rotate(90deg); }
+
+/* Team strength panel */
+.strength-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; padding: 12px; background: var(--bg3); border-radius: 6px; }
+.strength-team { }
+.strength-team-name { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.strength-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.strength-table th { text-align: left; color: var(--text3); font-weight: 500; padding: 2px 6px; }
+.strength-table td { padding: 2px 6px; }
+.strength-table tr:hover { background: var(--bg2); }
+.str-bar { display: inline-block; height: 6px; border-radius: 3px; vertical-align: middle; margin-right: 4px; }
+.str-atk { background: var(--teal); }
+.str-def { background: var(--blue); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 0 12px; }
+  .stats-bar { gap: 8px; }
+  .stat-card { min-width: 80px; padding: 8px 12px; }
+  .stat-value { font-size: 18px; }
+  .filters { flex-direction: column; }
+  select, input[type="text"] { width: 100%; }
+  .header-meta { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="container header-inner">
+    <div class="logo"><div class="logo-icon">⚽</div> Ballistics</div>
+    <div class="header-meta">
+      <span id="genTime"></span>
+      <span id="poolCount"></span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-tab="picks">All picks</div>
+    <div class="tab" data-tab="builder">Slip builder</div>
+    <div class="tab" data-tab="analysis">Fixture analysis</div>
+    <div class="tab" data-tab="prebuilt">Pre-built slips</div>
+  </div>
+
+  <!-- ALL PICKS TAB -->
+  <div class="section active" id="sec-picks">
+    <div class="stats-bar" id="statsBar"></div>
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Search</span>
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="fSearch" placeholder="Team or league..."></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">League</span>
+        <select id="fLeague"><option value="">All leagues</option></select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Market</span>
+        <select id="fMarket">
+          <option value="">All markets</option>
+          <option value="team">Team to score</option>
+          <option value="over">Over 1.5 / 2.5</option>
+          <option value="under">Under</option>
+          <option value="win">Win</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Models</span>
+        <select id="fModels">
+          <option value="">All combos</option>
+          <option value="3">Trio (B+M+P)</option>
+          <option value="2+">2+ models</option>
+          <option value="B+M">B+M</option>
+          <option value="B+P">B+P</option>
+          <option value="M+P">M+P</option>
+          <option value="solo">Solo only</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Min confidence</span>
+        <select id="fConf">
+          <option value="70">70%+</option>
+          <option value="75">75%+</option>
+          <option value="80">80%+</option>
+          <option value="85">85%+</option>
+          <option value="90">90%+</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">From</span>
+        <input type="date" id="fDateFrom">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">To</span>
+        <input type="date" id="fDateTo">
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px"></th>
+            <th data-sort="conf">Conf <span class="sort-arrow">▼</span></th>
+            <th data-sort="models">Models</th>
+            <th data-sort="kickoff">Kickoff <span class="sort-arrow"></span></th>
+            <th>Match</th>
+            <th>Selection</th>
+            <th data-sort="odds">Odds <span class="sort-arrow"></span></th>
+            <th data-sort="league">League <span class="sort-arrow"></span></th>
+            <th data-sort="country">Country <span class="sort-arrow"></span></th>
+          </tr>
+        </thead>
+        <tbody id="picksBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SLIP BUILDER TAB -->
+  <div class="section" id="sec-builder">
+    <div class="stats-bar">
+      <div class="stat-card"><div class="stat-label">Selections</div><div class="stat-value accent" id="slipCount">0</div></div>
+      <div class="stat-card"><div class="stat-label">Total odds</div><div class="stat-value green" id="slipOdds">1.00x</div></div>
+      <div class="stat-card"><div class="stat-label">Potential return</div><div class="stat-value amber" id="slipReturn">₦0</div></div>
+    </div>
+    <div class="slip-panel">
+      <div class="slip-header">
+        <div class="slip-title">Your slip</div>
+        <div class="slip-actions">
+          <input type="text" id="stakeInput" placeholder="Stake (₦)" style="width:100px;text-align:right">
+          <button class="btn" id="copySlip">Copy list</button>
+          <button class="btn btn-danger" id="clearSlip">Clear all</button>
+        </div>
+      </div>
+      <div class="slip-legs" id="slipLegs">
+        <div class="slip-empty">Click + on any pick to add it here</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIXTURE ANALYSIS TAB -->
+  <div class="section" id="sec-analysis">
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Search</span>
+        <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="faSearch" placeholder="Team or league..."></div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Min models</span>
+        <select id="faModels">
+          <option value="1">Any model</option>
+          <option value="2" selected>2+ models</option>
+          <option value="3">All 3 models</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">From</span>
+        <input type="date" id="faDateFrom">
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">To</span>
+        <input type="date" id="faDateTo">
+      </div>
+    </div>
+    <div id="analysisContainer"></div>
+  </div>
+
+  <!-- PRE-BUILT SLIPS TAB -->
+  <div class="section" id="sec-prebuilt">
+    <div id="prebuiltContainer"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA = null;
+let slip = [];
+let sortCol = 'conf';
+let sortDir = 1;
+
+const LEAGUE_COUNTRY = {
+  'Virsliga': 'Latvia', '1. Deild': 'Iceland', 'Meistriliiga': 'Estonia',
+  '1 Lyga': 'Lithuania', 'A Lyga': 'Lithuania',
+  'Veikkausliiga': 'Finland', 'First Division': 'Ireland', 'Allsvenskan': 'Sweden',
+  'Premier Division': 'Ireland', 'USL Championship': 'USA',
+  'USL League One': 'USA', 'Super League': 'China', 'Division 2 - Södra Svealand': 'Sweden',
+  'Eliteserien': 'Norway', 'Superettan': 'Sweden', 'Ligue 1': 'France', 'Ligue 2': 'France',
+  'La Liga': 'Spain', 'Serie A': 'Italy', 'Bundesliga': 'Germany', '2. Bundesliga': 'Germany',
+  'Eredivisie': 'Netherlands', 'Jupiler Pro League': 'Belgium', 'Primeira Liga': 'Portugal',
+  'Championship': 'England', 'League Two': 'England', 'Scottish Premiership': 'Scotland',
+  'MLS': 'USA', 'K League 1': 'South Korea', 'J1 League': 'Japan',
+  'Erovnuli Liga': 'Georgia', 'Superliga': 'Denmark', 'Süper Lig': 'Turkey',
+  'Premiership': 'Scotland', 'Segunda Division': 'Spain', 'Primeira Liga': 'Portugal',
+};
+function getCountry(league, pick) {
+  if (pick && pick.country) return pick.country;
+  return LEAGUE_COUNTRY[league] || '—';
+}
+
+function marketType(sel) {
+  const s = sel.sportybet_selection;
+  if (s.includes('Under')) return 'under';
+  if (s.includes('Win')) return 'win';
+  if (s.includes('Over 1.5') || s.includes('Over 2.5') || s.includes('Over 3.5')) return 'over';
+  if (s.includes('Over 0.5')) return 'team';
+  if (s.includes('BTTS')) return 'other';
+  return 'other';
+}
+
+function marketTag(mt) {
+  const cls = {team:'mt-team', over:'mt-over', under:'mt-under', win:'mt-win', other:'mt-other'}[mt] || 'mt-other';
+  return cls;
+}
+
+function modelsBadge(models) {
+  const tag = models.map(m => m[0].toUpperCase()).join('+');
+  if (tag.includes('B') && tag.includes('M') && tag.includes('P')) return `<span class="badge badge-bmp">${tag}</span>`;
+  if (tag === 'B+M') return `<span class="badge badge-bm">${tag}</span>`;
+  if (tag === 'B+P') return `<span class="badge badge-bp">${tag}</span>`;
+  if (tag === 'M+P') return `<span class="badge badge-mp">${tag}</span>`;
+  return `<span class="badge badge-solo">${tag}</span>`;
+}
+
+function confBar(c) {
+  const pct = Math.round(c * 100);
+  const cls = pct >= 85 ? 'conf-high' : pct >= 78 ? 'conf-mid' : 'conf-low';
+  return `<div class="conf-bar"><div class="conf-fill ${cls}" style="width:${pct * 0.6}px"></div><span>${pct}%</span></div>`;
+}
+
+function formatKickoff(k) {
+  try {
+    const d = new Date(k);
+    const pst = new Date(d.getTime() - 8 * 60 * 60 * 1000);
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${days[pst.getUTCDay()]} ${months[pst.getUTCMonth()]} ${pst.getUTCDate()} ${String(pst.getUTCHours()).padStart(2,'0')}:${String(pst.getUTCMinutes()).padStart(2,'0')} PST`;
+  } catch { return k.slice(0, 16); }
+}
+
+function dateKey(k) {
+  try {
+    const d = new Date(k);
+    const pst = new Date(d.getTime() - 8 * 60 * 60 * 1000);
+    return pst.toISOString().slice(0, 10);
+  } catch { return ''; }
+}
+
+function todayPST() {
+  const d = new Date(Date.now() - 8 * 60 * 60 * 1000);
+  return d.toISOString().slice(0, 10);
+}
+
+function isInSlip(p) {
+  return slip.some(s => s.fixture_id === p.fixture_id && s.sportybet_selection === p.sportybet_selection);
+}
+
+function toggleSlip(p) {
+  const idx = slip.findIndex(s => s.fixture_id === p.fixture_id && s.sportybet_selection === p.sportybet_selection);
+  if (idx >= 0) slip.splice(idx, 1);
+  else slip.push(p);
+  renderPicks();
+  renderSlip();
+}
+
+function removeFromSlip(i) {
+  slip.splice(i, 1);
+  renderPicks();
+  renderSlip();
+}
+
+function getFilteredPool() {
+  const search = document.getElementById('fSearch').value.toLowerCase();
+  const league = document.getElementById('fLeague').value;
+  const market = document.getElementById('fMarket').value;
+  const models = document.getElementById('fModels').value;
+  const conf = parseInt(document.getElementById('fConf').value) / 100;
+  const dateFrom = document.getElementById('fDateFrom').value;
+  const dateTo = document.getElementById('fDateTo').value;
+
+  return DATA.pool.filter(p => {
+    if (search && !p.match.toLowerCase().includes(search) && !p.league.toLowerCase().includes(search) && !getCountry(p.league, p).toLowerCase().includes(search)) return false;
+    if (league && p.league !== league) return false;
+    if (market && marketType(p) !== market) return false;
+    if (conf && p.avg_confidence < conf) return false;
+    if (dateFrom && dateKey(p.kickoff) < dateFrom) return false;
+    if (dateTo && dateKey(p.kickoff) > dateTo) return false;
+    if (models === '3' && p.n_models < 3) return false;
+    if (models === '2+' && p.n_models < 2) return false;
+    if (models === 'B+M' && !(p.models.includes('bayesian') && p.models.includes('mismatch') && p.n_models === 2)) return false;
+    if (models === 'B+P' && !(p.models.includes('bayesian') && p.models.includes('poisson') && p.n_models === 2)) return false;
+    if (models === 'M+P' && !(p.models.includes('mismatch') && p.models.includes('poisson') && p.n_models === 2)) return false;
+    if (models === 'solo' && p.n_models > 1) return false;
+    return true;
+  });
+}
+
+function sortPool(pool) {
+  const key = sortCol;
+  return pool.sort((a, b) => {
+    let va, vb;
+    if (key === 'conf') { va = a.avg_confidence; vb = b.avg_confidence; }
+    else if (key === 'odds') { va = a.est_odds; vb = b.est_odds; }
+    else if (key === 'kickoff') { va = a.kickoff; vb = b.kickoff; }
+    else if (key === 'league') { va = a.league; vb = b.league; }
+    else if (key === 'country') { va = getCountry(a.league, a); vb = getCountry(b.league, b); }
+    else if (key === 'models') { va = a.n_models; vb = b.n_models; }
+    else { va = a.avg_confidence; vb = b.avg_confidence; }
+    if (va < vb) return sortDir;
+    if (va > vb) return -sortDir;
+    return 0;
+  });
+}
+
+function renderStats(filtered) {
+  const bar = document.getElementById('statsBar');
+  const duo = filtered.filter(p => p.n_models >= 2).length;
+  const avgConf = filtered.length ? Math.round(filtered.reduce((s,p) => s + p.avg_confidence, 0) / filtered.length * 100) : 0;
+  const leagues = new Set(filtered.map(p => p.league)).size;
+  bar.innerHTML = `
+    <div class="stat-card"><div class="stat-label">Showing</div><div class="stat-value accent">${filtered.length}</div></div>
+    <div class="stat-card"><div class="stat-label">2+ model consensus</div><div class="stat-value purple">${duo}</div></div>
+    <div class="stat-card"><div class="stat-label">Avg confidence</div><div class="stat-value green">${avgConf}%</div></div>
+    <div class="stat-card"><div class="stat-label">Leagues</div><div class="stat-value amber">${leagues}</div></div>
+    <div class="stat-card"><div class="stat-label">In slip</div><div class="stat-value accent">${slip.length}</div></div>
+  `;
+}
+
+function renderPicks() {
+  const filtered = sortPool(getFilteredPool());
+  renderStats(filtered);
+  const tbody = document.getElementById('picksBody');
+  tbody.innerHTML = filtered.map(p => {
+    const mt = marketType(p);
+    const inSlip = isInSlip(p);
+    return `<tr class="${inSlip ? 'selected' : ''}">
+      <td><span class="add-btn ${inSlip ? 'in-slip' : ''}" data-fid="${p.fixture_id}" data-sel="${p.sportybet_selection}">${inSlip ? '✓' : '+'}</span></td>
+      <td>${confBar(p.avg_confidence)}</td>
+      <td>${modelsBadge(p.models)}</td>
+      <td style="font-size:12px;color:var(--text2)">${formatKickoff(p.kickoff)}</td>
+      <td style="font-weight:500">${p.match}</td>
+      <td><span class="market-tag ${marketTag(mt)}">${p.sportybet_selection}</span></td>
+      <td style="font-weight:600;color:var(--green)">${p.est_odds.toFixed(2)}</td>
+      <td style="font-size:12px;color:var(--text2)">${p.league}</td>
+      <td style="font-size:12px;color:var(--text2)">${getCountry(p.league, p)}</td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('.add-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const fid = parseInt(btn.dataset.fid);
+      const sel = btn.dataset.sel;
+      const pick = DATA.pool.find(p => p.fixture_id === fid && p.sportybet_selection === sel);
+      if (pick) toggleSlip(pick);
+    });
+  });
+}
+
+function renderSlip() {
+  document.getElementById('slipCount').textContent = slip.length;
+  const totalOdds = slip.reduce((acc, p) => acc * p.est_odds, 1);
+  document.getElementById('slipOdds').textContent = totalOdds.toFixed(2) + 'x';
+  const stake = parseFloat(document.getElementById('stakeInput').value) || 0;
+  document.getElementById('slipReturn').textContent = '₦' + Math.round(stake * totalOdds).toLocaleString();
+
+  const container = document.getElementById('slipLegs');
+  if (slip.length === 0) {
+    container.innerHTML = '<div class="slip-empty">Click + on any pick to add it here</div>';
+    return;
+  }
+  container.innerHTML = slip.map((p, i) => `
+    <div class="slip-leg">
+      <span class="remove-btn" data-i="${i}">✕</span>
+      <span class="match-name">${p.match}</span>
+      <span class="sel-name">${p.sportybet_selection}</span>
+      <span class="odds-val">${p.est_odds.toFixed(2)}</span>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => removeFromSlip(parseInt(btn.dataset.i)));
+  });
+}
+
+function renderPrebuilt() {
+  const container = document.getElementById('prebuiltContainer');
+  container.innerHTML = DATA.slips.map((slip, si) => `
+    <div class="slip-panel" style="margin-top:16px">
+      <div class="slip-header">
+        <div class="slip-title">${slip.name}</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span style="font-size:14px;color:var(--text2)">${slip.legs} legs</span>
+          <div class="slip-odds">${slip.est_total_odds.toFixed(1)}x</div>
+          <button class="btn btn-primary copy-prebuilt" data-idx="${si}">Copy</button>
+        </div>
+      </div>
+      <div class="slip-legs">
+        ${slip.selections.map((s, i) => `
+          <div class="slip-leg">
+            <span style="color:var(--text3);min-width:24px;text-align:center">${i+1}</span>
+            ${modelsBadge(s.models)}
+            <span style="min-width:36px;text-align:center">${Math.round(s.avg_confidence * 100)}%</span>
+            <span style="font-size:11px;color:var(--text3);min-width:100px">${formatKickoff(s.kickoff)}</span>
+            <span class="match-name">${s.match}</span>
+            <span class="sel-name">${s.sportybet_selection}</span>
+            <span class="odds-val">${s.est_odds.toFixed(2)}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.copy-prebuilt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx);
+      const s = DATA.slips[idx];
+      const text = s.selections.map((sel, i) =>
+        `${i+1}. ${sel.match} — ${sel.sportybet_selection} @${sel.est_odds.toFixed(2)} (${sel.league})`
+      ).join('\n');
+      const header = `${s.name}\n${s.legs} legs | ${s.est_total_odds.toFixed(1)}x\n${'─'.repeat(50)}\n`;
+      navigator.clipboard.writeText(header + text).then(() => showToast('Slip copied!'));
+    });
+  });
+}
+
+function confColor(c) {
+  if (c >= 0.85) return 'var(--green)';
+  if (c >= 0.75) return 'var(--accent)';
+  if (c >= 0.65) return 'var(--amber)';
+  return 'var(--text2)';
+}
+
+function renderSignalBar(conf) {
+  const pct = Math.round(conf * 100);
+  return `<span style="color:${confColor(conf)};font-weight:600">${pct}%</span>`;
+}
+
+function renderStrengthPanel(f) {
+  const s = f.strength;
+  if (!s) return '<div class="strength-panel" style="grid-template-columns:1fr"><div class="no-signals">No strength data available</div></div>';
+
+  function teamBlock(profile, name, context) {
+    if (!profile) return `<div class="strength-team"><div class="strength-team-name">${name}</div><div class="no-signals">No data</div></div>`;
+    const o = profile.overall;
+    const ctx = profile[context];
+    const bar = (pct, cls) => `<span class="str-bar ${cls}" style="width:${Math.round(pct * 0.6)}px"></span>${Math.round(pct)}%`;
+    const rank = (r, sz) => r != null && sz ? `#${r}/${sz}` : '';
+    let html = `<div class="strength-team">
+      <div class="strength-team-name">${name}</div>
+      <table class="strength-table">
+        <tr><th></th><th>Attack</th><th>Defense</th></tr>
+        <tr><td style="color:var(--text3)">Goals/game</td>
+            <td>${o.attack_shrunk.toFixed(2)}</td>
+            <td>${o.defense_shrunk.toFixed(2)}</td></tr>
+        <tr><td style="color:var(--text3)">League %ile</td>
+            <td>${bar(o.attack_pct, 'str-atk')}</td>
+            <td>${bar(o.defense_pct, 'str-def')}</td></tr>
+        <tr><td style="color:var(--text3)">Rank</td>
+            <td>${rank(o.attack_rank, o.league_size)}</td>
+            <td>${rank(o.defense_rank, o.league_size)}</td></tr>`;
+    if (ctx) {
+      html += `<tr><td colspan="3" style="padding-top:6px;color:var(--text3);font-weight:500">${context.toUpperCase()} split</td></tr>
+        <tr><td style="color:var(--text3)">Goals/game</td>
+            <td>${ctx.attack_shrunk.toFixed(2)}</td>
+            <td>${ctx.defense_shrunk.toFixed(2)}</td></tr>
+        <tr><td style="color:var(--text3)">League %ile</td>
+            <td>${bar(ctx.attack_pct, 'str-atk')}</td>
+            <td>${bar(ctx.defense_pct, 'str-def')}</td></tr>
+        <tr><td style="color:var(--text3)">Rank</td>
+            <td>${rank(ctx.attack_rank, ctx.league_size)}</td>
+            <td>${rank(ctx.defense_rank, ctx.league_size)}</td></tr>`;
+    }
+    html += '</table></div>';
+    return html;
+  }
+
+  return `<div class="model-section">
+    <div class="model-section-title"><span class="dot" style="background:var(--green)"></span> Team Strength <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(goals/game + league percentile)</span></div>
+    <div class="strength-panel">
+      ${teamBlock(s.home_team, f.home, 'home')}
+      ${teamBlock(s.away_team, f.away, 'away')}
+    </div>
+  </div>`;
+}
+
+function renderAnalysis() {
+  const search = document.getElementById('faSearch').value.toLowerCase();
+  const minModels = parseInt(document.getElementById('faModels').value);
+  const dateFrom = document.getElementById('faDateFrom').value;
+  const dateTo = document.getElementById('faDateTo').value;
+  const analysis = (DATA.fixture_analysis || []).filter(f => {
+    const modelCount = (f.poisson.length > 0 ? 1 : 0) + (f.mismatch.length > 0 ? 1 : 0) + (f.bayesian.length > 0 ? 1 : 0);
+    if (modelCount < minModels) return false;
+    if (search && !f.home.toLowerCase().includes(search) && !f.away.toLowerCase().includes(search) && !f.league.toLowerCase().includes(search)) return false;
+    const dk = dateKey(f.kickoff);
+    if (dateFrom && dk < dateFrom) return false;
+    if (dateTo && dk > dateTo) return false;
+    return true;
+  });
+
+  const container = document.getElementById('analysisContainer');
+  if (!analysis.length) {
+    container.innerHTML = '<div style="padding:48px;text-align:center;color:var(--text3)">No fixtures match filters</div>';
+    return;
+  }
+
+  container.innerHTML = analysis.map((f, i) => {
+    const hasP = f.poisson.length > 0, hasM = f.mismatch.length > 0, hasB = f.bayesian.length > 0;
+    const modelCount = (hasP?1:0) + (hasM?1:0) + (hasB?1:0);
+
+    const poissonHTML = f.poisson.length ? f.poisson.map(p =>
+      `<div class="signal-row">
+        <span class="signal-market">${p.market}</span>
+        <span class="signal-conf">${renderSignalBar(p.probability)}</span>
+        <span class="signal-detail">Tier ${p.tier}</span>
+      </div>`
+    ).join('') : '<div class="no-signals">No Poisson signals</div>';
+
+    const mismatchHTML = f.mismatch.length ? f.mismatch.map(m =>
+      `<div class="signal-row">
+        <span class="signal-market">${m.label}</span>
+        <span class="signal-conf">${renderSignalBar(m.confidence)}</span>
+        <span class="signal-detail">gap=${m.gap} (${m.gap_bin}) ${m.h2h ? m.h2h : ''}${m.fav_atk ? ' atk=' + m.fav_atk + '%' : ''}</span>
+      </div>`
+    ).join('') : '<div class="no-signals">No Mismatch signals (gap &lt; 100 or no data)</div>';
+
+    const bayesianHTML = f.bayesian.length ? f.bayesian.map(b => {
+      const delta = b.posterior - b.base_rate;
+      const sign = delta >= 0 ? '+' : '';
+      const trendIcon = b.trend === 'hot' ? ' ↑' : b.trend === 'cold' ? ' ↓' : '';
+      return `<div class="signal-row">
+        <span class="signal-market">${b.team} — ${b.event.replace(/_/g,' ')}</span>
+        <span class="signal-conf">${renderSignalBar(b.posterior)}</span>
+        <span class="signal-detail">base=${Math.round(b.base_rate*100)}% (${sign}${Math.round(delta*100)}%) n=${b.n} streak=${b.streak}${trendIcon}</span>
+      </div>`;
+    }).join('') : '<div class="no-signals">No Bayesian signals (insufficient history)</div>';
+
+    return `<div class="fixture-card" data-idx="${i}">
+      <div class="fixture-card-header">
+        <div>
+          <div class="fixture-match">${f.home} vs ${f.away}</div>
+          <div class="fixture-meta">
+            <span>${formatKickoff(f.kickoff)}</span>
+            <span>${f.league}</span>
+            <span>${getCountry(f.league, f)}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="fixture-models-count" title="P / M / B">
+            <span class="model-dot dot-p ${hasP ? 'active' : 'inactive'}" title="Poisson"></span>
+            <span class="model-dot dot-m ${hasM ? 'active' : 'inactive'}" title="Mismatch"></span>
+            <span class="model-dot dot-b ${hasB ? 'active' : 'inactive'}" title="Bayesian"></span>
+          </div>
+          <span style="font-size:12px;color:var(--text2)">${modelCount}/3</span>
+          <span class="fixture-chevron">▶</span>
+        </div>
+      </div>
+      <div class="fixture-card-body">
+        ${renderStrengthPanel(f)}
+        <div class="model-section">
+          <div class="model-section-title"><span class="dot dot-p"></span> Poisson GLM <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(expected goals model)</span></div>
+          ${poissonHTML}
+        </div>
+        <div class="model-section">
+          <div class="model-section-title"><span class="dot dot-m"></span> Mismatch Elo <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(strength gap + H2H)</span></div>
+          ${mismatchHTML}
+        </div>
+        <div class="model-section">
+          <div class="model-section-title"><span class="dot dot-b"></span> Bayesian Streaks <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(form + recency)</span></div>
+          ${bayesianHTML}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.fixture-card-header').forEach(hdr => {
+    hdr.addEventListener('click', () => {
+      hdr.parentElement.classList.toggle('open');
+    });
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2000);
+}
+
+function populateFilters() {
+  const leagues = [...new Set(DATA.pool.map(p => p.league))].sort();
+  const lSel = document.getElementById('fLeague');
+  leagues.forEach(l => { const o = document.createElement('option'); o.value = l; o.textContent = l; lSel.appendChild(o); });
+
+  const today = todayPST();
+  const dates = [...new Set(DATA.pool.map(p => dateKey(p.kickoff)))].sort();
+  const allDates = DATA.fixture_analysis ? [...new Set(DATA.fixture_analysis.map(f => dateKey(f.kickoff)))].sort() : dates;
+  const lastDate = allDates.length ? allDates[allDates.length - 1] : (dates.length ? dates[dates.length - 1] : today);
+  document.getElementById('fDateFrom').value = today;
+  document.getElementById('fDateTo').value = lastDate;
+  document.getElementById('faDateFrom').value = today;
+  document.getElementById('faDateTo').value = lastDate;
+}
+
+function init(data) {
+  DATA = data;
+  document.getElementById('genTime').textContent = 'Generated: ' + data.generated;
+  document.getElementById('poolCount').textContent = data.pool_size + ' total picks';
+  populateFilters();
+  renderPicks();
+  renderSlip();
+  renderPrebuilt();
+  renderAnalysis();
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('sec-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('#fSearch, #fLeague, #fMarket, #fModels, #fConf, #fDateFrom, #fDateTo').forEach(el => {
+    el.addEventListener('input', renderPicks);
+    el.addEventListener('change', renderPicks);
+  });
+
+  document.querySelectorAll('#faSearch, #faModels, #faDateFrom, #faDateTo').forEach(el => {
+    el.addEventListener('input', renderAnalysis);
+    el.addEventListener('change', renderAnalysis);
+  });
+
+  document.querySelectorAll('thead th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if (sortCol === col) sortDir *= -1;
+      else { sortCol = col; sortDir = 1; }
+      document.querySelectorAll('thead th .sort-arrow').forEach(s => s.textContent = '');
+      th.querySelector('.sort-arrow').textContent = sortDir === 1 ? '▼' : '▲';
+      renderPicks();
+    });
+  });
+
+  document.getElementById('copySlip').addEventListener('click', () => {
+    if (!slip.length) return;
+    const totalOdds = slip.reduce((a, p) => a * p.est_odds, 1);
+    const text = slip.map((p, i) =>
+      `${i+1}. ${p.match} — ${p.sportybet_selection} @${p.est_odds.toFixed(2)} (${p.league})`
+    ).join('\n');
+    const header = `Custom Slip\n${slip.length} legs | ${totalOdds.toFixed(1)}x\n${'─'.repeat(50)}\n`;
+    navigator.clipboard.writeText(header + text).then(() => showToast('Slip copied to clipboard!'));
+  });
+
+  document.getElementById('clearSlip').addEventListener('click', () => {
+    slip = [];
+    renderPicks();
+    renderSlip();
+  });
+
+  document.getElementById('stakeInput').addEventListener('input', renderSlip);
+}
+
+// Load data
+const today_ds = new Date().toISOString().slice(0, 10);
+fetch(`./consensus_slips_${today_ds}.json`)
+  .then(r => r.json())
+  .then(init)
+  .catch(e => {
+    document.querySelector('.container').innerHTML = `
+      <div style="padding:48px;text-align:center;color:var(--text2)">
+        <h2 style="margin-bottom:12px">Could not load data</h2>
+        <p>Make sure <code>consensus_slips_2026-06-27.json</code> is in the same directory.</p>
+        <p style="margin-top:8px;font-size:13px;color:var(--text3)">${e.message}</p>
+      </div>`;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+generated: 2026-06-25 10:06 UTC
+calibrated_threshold: 0.65
+tiers:
+  A: '>=75% (~79% hit)'
+  B: 70-74% (~76% hit)
+  C: 65-69% (~74% hit)
+picks:
+- fixture: FA Šiauliai II vs Babrungas
+  kickoff: 2026-06-27 14:00 UTC
+  league: 1 Lyga
+  league_goal_avg: 3.11
+  line: 2.5
+  direction: OVER
+  confidence: 0.681
+  raw_confidence: 0.681
+  tier: C
+- fixture: Novorizontino vs Vila Nova
+  kickoff: 2026-06-26 22:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.774
+  raw_confidence: 0.805
+  tier: A
+- fixture: Criciuma vs São Bernardo
+  kickoff: 2026-06-27 19:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.772
+  raw_confidence: 0.803
+  tier: A
+- fixture: Athletic Club vs Avai
+  kickoff: 2026-06-28 19:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.77
+  raw_confidence: 0.801
+  tier: A
+- fixture: Fortaleza EC vs Sport Recife
+  kickoff: 2026-06-28 21:30 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.768
+  raw_confidence: 0.799
+  tier: A
+- fixture: Botafogo SP vs CRB
+  kickoff: 2026-06-30 23:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.767
+  raw_confidence: 0.798
+  tier: A
+- fixture: Juventude vs Ceara
+  kickoff: 2026-06-28 19:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.766
+  raw_confidence: 0.797
+  tier: A
+- fixture: Nautico Recife vs Goias
+  kickoff: 2026-06-28 21:30 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.766
+  raw_confidence: 0.797
+  tier: A
+- fixture: Cuiaba vs Londrina
+  kickoff: 2026-06-25 23:30 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.754
+  raw_confidence: 0.785
+  tier: A
+- fixture: Operario-PR vs America Mineiro
+  kickoff: 2026-06-27 14:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.754
+  raw_confidence: 0.785
+  tier: A
+- fixture: Bohemians vs St Patrick's Athl.
+  kickoff: 2026-06-26 19:00 UTC
+  league: Premier Division
+  league_goal_avg: 2.47
+  line: 3.5
+  direction: UNDER
+  confidence: 0.752
+  raw_confidence: 0.789
+  tier: A
+- fixture: Banga vs Hegelmann Litauen
+  kickoff: 2026-06-28 15:00 UTC
+  league: A Lyga
+  league_goal_avg: 2.54
+  line: 3.5
+  direction: UNDER
+  confidence: 0.748
+  raw_confidence: 0.779
+  tier: B
+- fixture: Atletico Goianiense vs Ponte Preta
+  kickoff: 2026-06-28 19:00 UTC
+  league: Serie B
+  league_goal_avg: 2.41
+  line: 3.5
+  direction: UNDER
+  confidence: 0.747
+  raw_confidence: 0.778
+  tier: B
+- fixture: Derry City vs Drogheda United
+  kickoff: 2026-06-26 18:45 UTC
+  league: Premier Division
+  league_goal_avg: 2.47
+  line: 3.5
+  direction: UNDER
+  confidence: 0.745
+  raw_confidence: 0.782
+  tier: B
+- fixture: Džiugas Telšiai vs FK Zalgiris Vilnius
+  kickoff: 2026-06-28 15:45 UTC
+  league: A Lyga
+  league_goal_avg: 2.54
+  line: 3.5
+  direction: UNDER
+  confidence: 0.743
+  raw_confidence: 0.774
+  tier: B
+- fixture: Dinamo Brest vs FC Minsk
+  kickoff: 2026-06-27 15:30 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.739
+  raw_confidence: 0.759
+  tier: B
+- fixture: Sligo Rovers vs Shelbourne
+  kickoff: 2026-06-27 18:45 UTC
+  league: Premier Division
+  league_goal_avg: 2.47
+  line: 3.5
+  direction: UNDER
+  confidence: 0.737
+  raw_confidence: 0.774
+  tier: B
+- fixture: Panevėžys vs Suduva Marijampole
+  kickoff: 2026-06-29 15:45 UTC
+  league: A Lyga
+  league_goal_avg: 2.54
+  line: 3.5
+  direction: UNDER
+  confidence: 0.734
+  raw_confidence: 0.765
+  tier: B
+- fixture: Dundalk vs Waterford
+  kickoff: 2026-06-26 18:45 UTC
+  league: Premier Division
+  league_goal_avg: 2.47
+  line: 3.5
+  direction: UNDER
+  confidence: 0.731
+  raw_confidence: 0.768
+  tier: B
+- fixture: Šiauliai vs TransINVEST Vilnius
+  kickoff: 2026-06-29 15:30 UTC
+  league: A Lyga
+  league_goal_avg: 2.54
+  line: 3.5
+  direction: UNDER
+  confidence: 0.731
+  raw_confidence: 0.762
+  tier: B
+- fixture: Arsenal vs FC Gomel
+  kickoff: 2026-06-26 17:00 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.73
+  raw_confidence: 0.75
+  tier: B
+- fixture: Shamrock Rovers vs Galway United
+  kickoff: 2026-06-26 18:30 UTC
+  league: Premier Division
+  league_goal_avg: 2.47
+  line: 3.5
+  direction: UNDER
+  confidence: 0.73
+  raw_confidence: 0.767
+  tier: B
+- fixture: Baranovichi vs Slavia Mozyr
+  kickoff: 2026-06-26 15:00 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.728
+  raw_confidence: 0.748
+  tier: B
+- fixture: Torpedo Zhodino vs Bate Borisov
+  kickoff: 2026-06-27 11:30 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.713
+  raw_confidence: 0.733
+  tier: B
+- fixture: FC Isloch Minsk R. vs Belshina
+  kickoff: 2026-06-28 13:00 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.692
+  raw_confidence: 0.712
+  tier: C
+- fixture: Dinamo Minsk vs FC Vitebsk
+  kickoff: 2026-06-27 17:30 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.676
+  raw_confidence: 0.696
+  tier: C
+- fixture: ML Vitebsk vs Naftan
+  kickoff: 2026-06-27 13:30 UTC
+  league: Premier League
+  league_goal_avg: 2.63
+  line: 3.5
+  direction: UNDER
+  confidence: 0.666
+  raw_confidence: 0.686
+  tier: C
+- fixture: Spokane Velocity vs Forward Madison
+  kickoff: 2026-07-02 01:00 UTC
+  league: USL League One
+  league_goal_avg: 2.7
+  line: 3.5
+  direction: UNDER
+  confidence: 0.652
+  raw_confidence: 0.743
+  tier: C
