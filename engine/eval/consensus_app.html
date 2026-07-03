@@ -339,6 +339,7 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
         <input type="date" id="faDateTo">
       </div>
     </div>
+    <div id="faCount" style="padding:4px 2px 10px;font-size:13px;color:var(--text2)"></div>
     <div id="analysisContainer"></div>
   </div>
 
@@ -747,6 +748,14 @@ function renderAnalysis() {
     return true;
   });
 
+  const total = (DATA.fixture_analysis || []).length;
+  const legs = analysis.reduce((n, f) => n
+    + (f.poisson || []).length + (f.mismatch || []).length
+    + (f.bayesian || []).length + (f.dixon_coles || []).length, 0);
+  const dateNote = (dateFrom || dateTo) ? ` · ${dateFrom || '…'} → ${dateTo || '…'}` : '';
+  document.getElementById('faCount').textContent =
+    `Showing ${analysis.length} of ${total} fixtures (${legs} model signals)${dateNote}`;
+
   const container = document.getElementById('analysisContainer');
   if (!analysis.length) {
     container.innerHTML = '<div style="padding:48px;text-align:center;color:var(--text3)">No fixtures match filters</div>';
@@ -762,40 +771,51 @@ function renderAnalysis() {
     const hasB = bayesian.length > 0, hasD = dixonColes.length > 0;
     const modelCount = (hasP?1:0) + (hasM?1:0) + (hasB?1:0) + (hasD?1:0);
 
+    // fixture_analysis comes in two shapes: the rich in-process one and the
+    // leaner fan-in (from-picks) one. Render tolerantly of missing fields.
+    const pct = v => (v == null || isNaN(v)) ? '–' : Math.round(v * 100) + '%';
     const poissonHTML = poisson.length ? poisson.map(p =>
       `<div class="signal-row">
-        <span class="signal-market">${p.market}</span>
+        <span class="signal-market">${p.market ?? ''}</span>
         <span class="signal-conf">${renderSignalBar(p.probability)}</span>
-        <span class="signal-detail">Tier ${p.tier}</span>
+        <span class="signal-detail">${p.tier != null ? 'Tier ' + p.tier : ''}</span>
       </div>`
     ).join('') : '<div class="no-signals">No Poisson signals</div>';
 
     const mismatchHTML = mismatch.length ? mismatch.map(m =>
       `<div class="signal-row">
-        <span class="signal-market">${m.label}</span>
-        <span class="signal-conf">${renderSignalBar(m.confidence)}</span>
-        <span class="signal-detail">gap=${m.gap} (${m.gap_bin}) ${m.h2h ? m.h2h : ''}${m.fav_atk ? ' atk=' + m.fav_atk + '%' : ''}</span>
+        <span class="signal-market">${m.label ?? m.market ?? ''}</span>
+        <span class="signal-conf">${renderSignalBar(m.confidence ?? m.probability)}</span>
+        <span class="signal-detail">${m.gap != null ? 'gap=' + m.gap + (m.gap_bin ? ' (' + m.gap_bin + ')' : '') : ''} ${m.h2h ? m.h2h : ''}${m.fav_atk ? ' atk=' + m.fav_atk + '%' : ''}</span>
       </div>`
     ).join('') : '<div class="no-signals">No Mismatch signals (gap &lt; 100 or no data)</div>';
 
     const bayesianHTML = bayesian.length ? bayesian.map(b => {
-      const delta = b.posterior - b.base_rate;
-      const sign = delta >= 0 ? '+' : '';
-      const trendIcon = b.trend === 'hot' ? ' ↑' : b.trend === 'cold' ? ' ↓' : '';
+      const conf = b.posterior ?? b.probability;
+      const label = (b.team && b.event) ? `${b.team} — ${b.event.replace(/_/g,' ')}` : (b.market ?? '');
+      let detail = '';
+      if (b.base_rate != null) {
+        const delta = conf - b.base_rate;
+        const trendIcon = b.trend === 'hot' ? ' ↑' : b.trend === 'cold' ? ' ↓' : '';
+        detail = `base=${pct(b.base_rate)} (${delta >= 0 ? '+' : ''}${Math.round(delta*100)}%)${b.n != null ? ' n=' + b.n : ''}${b.streak != null ? ' streak=' + b.streak : ''}${trendIcon}`;
+      }
       return `<div class="signal-row">
-        <span class="signal-market">${b.team} — ${b.event.replace(/_/g,' ')}</span>
-        <span class="signal-conf">${renderSignalBar(b.posterior)}</span>
-        <span class="signal-detail">base=${Math.round(b.base_rate*100)}% (${sign}${Math.round(delta*100)}%) n=${b.n} streak=${b.streak}${trendIcon}</span>
+        <span class="signal-market">${label}</span>
+        <span class="signal-conf">${renderSignalBar(conf)}</span>
+        <span class="signal-detail">${detail}</span>
       </div>`;
     }).join('') : '<div class="no-signals">No Bayesian signals (insufficient history)</div>';
 
-    const dixonColesHTML = dixonColes.length ? dixonColes.map(d =>
-      `<div class="signal-row">
-        <span class="signal-market">${d.market}</span>
+    const dixonColesHTML = dixonColes.length ? dixonColes.map(d => {
+      const raw = d.raw_probability ?? d.raw;
+      const extra = [d.tier != null ? 'Tier ' + d.tier : '', raw != null ? 'raw=' + pct(raw) : '',
+                     d.lambda_home != null ? 'λh=' + d.lambda_home : '', d.lambda_away != null ? 'λa=' + d.lambda_away : ''].filter(Boolean).join(' · ');
+      return `<div class="signal-row">
+        <span class="signal-market">${d.market ?? ''}</span>
         <span class="signal-conf">${renderSignalBar(d.probability)}</span>
-        <span class="signal-detail">Tier ${d.tier} · raw=${Math.round(d.raw_probability*100)}% λh=${d.lambda_home} λa=${d.lambda_away}</span>
-      </div>`
-    ).join('') : '<div class="no-signals">No Dixon-Coles signals</div>';
+        <span class="signal-detail">${extra}</span>
+      </div>`;
+    }).join('') : '<div class="no-signals">No Dixon-Coles signals</div>';
 
     return `<div class="fixture-card" data-idx="${i}">
       <div class="fixture-card-header">
@@ -940,16 +960,20 @@ async function loadData() {
     candidates.push(`./consensus_slips_${d.toISOString().slice(0, 10)}.json`);
     d.setUTCDate(d.getUTCDate() - 1);
   }
-  let lastErr = null;
+  let lastErr = null, loaded = null;
   for (const url of candidates) {
     try {
-      const r = await fetch(url);
+      // no-store: the JSON is regenerated under the same filename, so a cached
+      // copy would show stale data (e.g. missing the latest models/fixtures).
+      const r = await fetch(url, { cache: 'no-store' });
       if (!r.ok) { lastErr = new Error(`${url} → HTTP ${r.status}`); continue; }
-      const data = await r.json();
-      init(data);
-      return;
+      loaded = await r.json();
+      break;
     } catch (e) { lastErr = e; }
   }
+  // init() is intentionally OUTSIDE the fetch loop: a render error on the newest
+  // file must surface, not silently fall back to an older (stale) date file.
+  if (loaded) { init(loaded); return; }
   const isFile = location.protocol === 'file:';
   document.querySelector('.container').innerHTML = `
     <div style="padding:48px;text-align:center;color:var(--text2)">
