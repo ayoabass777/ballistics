@@ -35,8 +35,13 @@ MIN_GAMES_CONFIDENT: int = 6
 
 # ── data ────────────────────────────────────────────────────────────────────
 
-def load_team_df(conn, current_season_only: bool = True) -> pd.DataFrame:
+def load_team_df(conn, current_season_only: bool = True,
+                 cutoff=None) -> pd.DataFrame:
+    """Load played team-match rows. `cutoff` restricts to kickoffs before
+    that datetime — required for walk-forward backtests so strength never
+    sees matches after the fold's training cutoff."""
     season_filter = "AND is_current" if current_season_only else ""
+    cutoff_filter = "AND kickoff_utc < %(cutoff)s" if cutoff is not None else ""
     sql = f"""
         SELECT
             league_season_id,
@@ -45,11 +50,12 @@ def load_team_df(conn, current_season_only: bool = True) -> pd.DataFrame:
             goals_for, goals_against,
             is_home, kickoff_utc
         FROM {SOURCE_TABLE}
-        WHERE is_played {season_filter}
+        WHERE is_played {season_filter} {cutoff_filter}
         ORDER BY kickoff_utc
     """
-    df = pd.read_sql(sql, conn)
-    if df.empty:
+    params = {"cutoff": cutoff} if cutoff is not None else None
+    df = pd.read_sql(sql, conn, params=params)
+    if df.empty and cutoff is None:
         raise RuntimeError("No played matches found.")
     return df
 
@@ -77,16 +83,22 @@ def _shrink_rate(observed_total: float, n_games: int,
                  league_mean: float, league_var: float) -> float:
     """Shrink an observed per-game rate toward the league mean.
 
-    Uses a Beta-Binomial–style shrinkage where the prior strength
-    (kappa) is estimated from the league-wide variance of team rates.
-    Shrunk rate = (kappa * league_mean + n * observed_mean) / (kappa + n).
+    Gamma-Poisson shrinkage: goal rates are Poisson counts, so the
+    conjugate prior is Gamma(alpha, beta) with mean m = alpha/beta and
+    between-team variance v = alpha/beta². Moment matching gives
+    beta = m/v, and beta acts as the prior strength in games (kappa).
+    Shrunk rate = (kappa * league_mean + total) / (kappa + n).
+
+    (The previous Beta-Binomial formula m(1-m)/v assumed a proportion in
+    [0,1]; goal rates exceed 1, so it went negative and clamped to a
+    one-game prior — i.e. shrinkage was effectively disabled.)
     """
     if n_games == 0:
         return league_mean
     observed_mean = observed_total / n_games
-    if league_var <= 0:
+    if league_var <= 0 or league_mean <= 0:
         return observed_mean
-    kappa = max(league_mean * (1.0 - league_mean) / league_var - 1.0, 1.0)
+    kappa = max(league_mean / league_var, 1.0)
     return (kappa * league_mean + n_games * observed_mean) / (kappa + n_games)
 
 

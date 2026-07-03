@@ -28,10 +28,24 @@ import pandas as pd
 import psycopg2
 import yaml
 
+from engine.eval.calibration_maps import apply_points, load_points
 from engine.eval.team_strength import load_team_df, compute_team_strength
 from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
+
+_MISMATCH_POINTS = load_points("mismatch")
+
+
+def _calibrate_conf(raw: float) -> float:
+    """Map a raw empirical confidence through the fitted calibration map.
+
+    Identity when calibration_maps.json is absent. Not applied to the
+    draw market — the map is fitted on >=0.60 confidences only.
+    """
+    if _MISMATCH_POINTS:
+        return apply_points(_MISMATCH_POINTS, raw)
+    return raw
 
 SOURCE_TABLE = "raw.fact_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
@@ -242,10 +256,12 @@ def _lookup_hit_rate(
     return 0.0, 0
 
 
-def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]]) -> dict:
+def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]],
+                      cutoff=None) -> dict:
     """Load H2H win/draw/loss for favourite vs underdog pairs.
 
     matchups: list of (fav_rf_id, dog_rf_id).
+    `cutoff` restricts to matches before that datetime (walk-forward safety).
     Returns {(fav_rf_id, dog_rf_id): (wins, draws, losses)}.
     """
     if not matchups:
@@ -261,13 +277,14 @@ def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]]) -> di
         all_fh.add(a)
         all_fh.add(b)
 
+    cutoff_filter = "AND kickoff_utc < %(cutoff)s" if cutoff is not None else ""
     df = pd.read_sql(f"""
         SELECT team_id, opponent_id, goals_for, goals_against
         FROM {SOURCE_TABLE}
         WHERE team_id IN ({','.join(str(x) for x in all_fh)})
           AND opponent_id IN ({','.join(str(x) for x in all_fh)})
-          AND is_played
-    """, conn)
+          AND is_played {cutoff_filter}
+    """, conn, params={"cutoff": cutoff} if cutoff is not None else None)
 
     pair_results = {}
     for fav_fh, dog_fh in pairs_to_query:
@@ -284,12 +301,16 @@ def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]]) -> di
     return result
 
 
-def _load_team_strength(conn, id_map: dict) -> dict:
+def _load_team_strength(conn, id_map: dict, cutoff=None) -> dict:
     """Load attack/defense shrunk rates keyed by rf_id.
 
+    `cutoff` restricts to matches before that datetime (walk-forward safety);
+    an empty window yields no strength data and therefore no adjustments.
     Returns {rf_id: {"attack": float, "defense": float, "league": str}}.
     """
-    df = load_team_df(conn)
+    df = load_team_df(conn, cutoff=cutoff)
+    if df.empty:
+        return {}
     strength = compute_team_strength(df)
     # strength is keyed by fh team_id — invert id_map for lookup
     fh_to_rf = {}
@@ -472,6 +493,8 @@ def predict_mismatch(
                 conf, n = _lookup_hit_rate(hit_rates, row["league"], gap_bin, market)
                 str_adj = _strength_adjustment(market, fav_strength, dog_strength)
                 adjusted = max(min(conf + str_adj, 0.99), 0.0)
+                # Gate on RAW confidence (mirrors the walk-forward backtest),
+                # then report the calibrated probability.
                 if adjusted >= MIN_CONFIDENCE and n >= MIN_SAMPLE:
                     picks.append(MismatchPick(
                         fixture_id=int(row["fixture_id"]),
@@ -486,7 +509,7 @@ def predict_mismatch(
                         gap=round(gap),
                         gap_bin=gap_bin,
                         market=market,
-                        confidence=round(adjusted, 3),
+                        confidence=round(_calibrate_conf(adjusted), 3),
                         sample_size=n,
                         fav_is_home=fav_is_home,
                         h2h_wins=h2h_w,
@@ -514,7 +537,7 @@ def predict_mismatch(
                     gap=round(gap),
                     gap_bin=gap_bin,
                     market="fav_win",
-                    confidence=round(adjusted_win, 3),
+                    confidence=round(_calibrate_conf(adjusted_win), 3),
                     sample_size=win_n,
                     fav_is_home=fav_is_home,
                     h2h_wins=h2h_w,

@@ -1,15 +1,18 @@
 """
-Model calibration backtest.
+Model calibration backtest — IN-SAMPLE ONLY.
 
-Runs all three prediction models on completed historical fixtures (walk-forward),
-compares predicted probabilities to actual outcomes, and produces:
-  1. Calibration curves — does 80% predicted ≈ 80% actual?
-  2. Brier scores — overall accuracy per model and consensus
-  3. Confidence adjustment map — raw_confidence → calibrated_confidence
+WARNING: this script trains every model on the SAME fixtures it then
+evaluates (no date cutoffs anywhere): Bayesian beliefs include the
+outcome of the fixture being predicted, Poisson trains on the test set,
+and mismatch hit rates include test fixtures. Numbers here are an upper
+bound / smoke test, NOT evidence of skill.
+
+Use engine.eval.calibration_wf (walk-forward, leak-free) for anything
+that informs calibration maps, thresholds, or real betting decisions.
 
 Usage:
     python -m engine.eval.calibration
-    python -m engine.eval.calibration --months 3 --output calibration_report.json
+    python -m engine.eval.calibration --months 3 --output my_report.json
 """
 
 from __future__ import annotations
@@ -543,7 +546,8 @@ def run_calibration(months: int = 3) -> dict:
     conn = _get_conn()
     try:
         print("=" * 60)
-        print("  CALIBRATION BACKTEST")
+        print("  CALIBRATION BACKTEST — IN-SAMPLE (models see test outcomes)")
+        print("  For honest numbers use: python -m engine.eval.calibration_wf")
         print(f"  Period: last {months} months of completed fixtures")
         print("=" * 60)
 
@@ -665,7 +669,9 @@ if __name__ == "__main__":
     if args.output:
         out_path = Path(args.output)
     else:
-        out_path = Path(__file__).parent / "calibration_report.json"
+        # Never write to calibration_report.json — that file belongs to the
+        # walk-forward backtest and must not be overwritten by in-sample runs.
+        out_path = Path(__file__).parent / "calibration_report_insample.json"
 
     with open(out_path, "w") as f:
         json.dump(report, f, indent=2, default=str)

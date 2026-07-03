@@ -204,6 +204,8 @@ BETTING_EVENTS = {
 
 MIN_POSTERIOR_INTERESTING = 0.65
 
+# Legacy fallback map — superseded by calibration_maps.json (fitted by
+# calibration_wf on held-out folds). Kept only for when that file is absent.
 CALIBRATION_MAP = [
     (0.65, 0.628),
     (0.70, 0.671),
@@ -215,9 +217,19 @@ CALIBRATION_MAP = [
     (1.00, 0.900),
 ]
 
+from engine.eval.calibration_maps import apply_points, load_points
+
+_BAYESIAN_POINTS = load_points("bayesian")
+
 
 def calibrate_posterior(raw: float) -> float:
-    """Piecewise-linear recalibration from walk-forward backtest."""
+    """Recalibrate a raw posterior using the fitted walk-forward map.
+
+    Uses the monotonic map from calibration_maps.json when available;
+    falls back to the legacy piecewise CALIBRATION_MAP otherwise.
+    """
+    if _BAYESIAN_POINTS:
+        return apply_points(_BAYESIAN_POINTS, raw)
     if raw <= CALIBRATION_MAP[0][0]:
         return raw
     for i in range(1, len(CALIBRATION_MAP)):

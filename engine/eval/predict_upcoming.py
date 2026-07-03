@@ -82,7 +82,20 @@ LEAGUE_PENALTIES = {
     "1. Deild": 0.256,
 }
 
+from engine.eval.calibration_maps import apply_points, load_points
+
+_POISSON_POINTS = load_points("poisson")
+
+
 def _calibrate_prob(raw_prob: float, league: str) -> float:
+    """Calibrate a raw Poisson probability.
+
+    Prefers the monotonic map fitted by calibration_wf on held-out folds
+    (calibration_maps.json); falls back to the legacy cap + per-league
+    penalty when the file is absent.
+    """
+    if _POISSON_POINTS:
+        return apply_points(_POISSON_POINTS, raw_prob)
     capped = min(raw_prob, CONFIDENCE_CAP)
     penalty = LEAGUE_PENALTIES.get(league, 0.0)
     return max(capped - penalty, 0.0)

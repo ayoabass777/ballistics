@@ -29,10 +29,10 @@ from engine.eval.bayesian_streaks import (
     HALF_LIFE,
     MIN_POSTERIOR_INTERESTING,
     PRIOR_STRENGTH,
-    calibrate_posterior,
     compute_beliefs,
     compute_league_base_rates,
 )
+from engine.eval.calibration_maps import MAPS_PATH, apply_points, fit_pava_map
 from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
@@ -40,6 +40,17 @@ logger = get_logger(__name__)
 EVENTS_TABLE = "raw.fact_head_to_head_events"
 H2H_TABLE = "raw.fact_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
+
+# Folds record RAW model probabilities down to these floors (below the live
+# betting gates) so the calibration fit has support around the thresholds.
+# Live gates are applied later, at evaluation time only.
+RECORD_FLOOR_BAYESIAN = 0.60
+RECORD_FLOOR_POISSON = 0.55
+RECORD_FLOOR_MISMATCH = 0.60
+
+# Fraction of folds used to FIT calibration maps; the rest are held out
+# for evaluation so the report never grades a map on the data that fit it.
+CAL_FRAC_DEFAULT = 0.4
 
 
 def _get_conn():
@@ -303,7 +314,7 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
             target_fh = id_map.get(target_rf, target_rf)
             for b in belief_by_team.get(target_fh, []):
-                if b.posterior < MIN_POSTERIOR_INTERESTING:
+                if b.posterior < RECORD_FLOOR_BAYESIAN:
                     continue
                 market = None
                 if b.event_name == "Over_1_5":
@@ -330,7 +341,7 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                             "fixture_id": fid,
                             "model": "bayesian",
                             "market": market,
-                            "predicted_prob": round(calibrate_posterior(b.posterior), 4),
+                            "predicted_prob_raw": round(float(b.posterior), 4),
                             "actual": outcome,
                         })
     return results
@@ -338,12 +349,17 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
 def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                   id_map: dict, league_map: dict) -> list[dict]:
-    """Poisson predictions trained only on fixtures before cutoff."""
+    """Poisson predictions trained only on fixtures before cutoff.
+
+    Mirrors live predict_upcoming exactly: per-cluster Poisson on OVER_COLS
+    for overs, a separate global Poisson on UNDER_COLS for unders, and the
+    live lines [2.5, 3.5]. Records RAW probabilities — calibration is
+    fitted/applied downstream, never inside the fold.
+    """
     from engine.eval.predict_upcoming import (
         prepare_features, compute_form_features, compute_strength_features,
         compute_rest_days, assign_clusters_seasonal, _fit_poisson_lambda,
-        _predict_poisson_over, OVER_COLS, MIN_TRAIN_PER_CLUSTER,
-        _calibrate_prob,
+        _predict_poisson_over, OVER_COLS, UNDER_COLS, MIN_TRAIN_PER_CLUSTER,
     )
     from engine.eval.cluster_backtest import ELO_GAP_SENSITIVITY, _MEDIAN_SENSITIVITY
 
@@ -382,7 +398,8 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
     train_s["cluster"] = assign_clusters_seasonal(train_s, train_s)
     test_s["cluster"] = assign_clusters_seasonal(train_s, test_s)
 
-    for line in [1.5, 2.5, 3.5]:
+    for line in [2.5, 3.5]:
+        # ── OVER: per-cluster Poisson on OVER_COLS (as live) ──
         clusters = sorted(train_s["cluster"].unique())
         over_probs = np.full(len(test_s), np.nan)
 
@@ -403,26 +420,30 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         if nan_mask.any():
             over_probs[nan_mask] = (train_s["total_goals"] > line).mean()
 
+        # ── UNDER: separate global Poisson on UNDER_COLS (as live) ──
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            params_u = _fit_poisson_lambda(train_s["total_goals"].values,
+                                           train_s[UNDER_COLS].values)
+        under_probs = 1.0 - _predict_poisson_over(
+            params_u, test_s[UNDER_COLS].values, line)
+
         for i, (_, row) in enumerate(test_s.iterrows()):
             fid = int(row["fixture_id"])
             fix_row = test_fixtures[test_fixtures["fixture_id"] == fid]
             if fix_row.empty:
                 continue
             fix_row = fix_row.iloc[0]
-            league = row.get("league", "")
 
-            over_cal = _calibrate_prob(float(over_probs[i]), league)
-            under_cal = _calibrate_prob(float(1.0 - over_probs[i]), league)
-
-            for mkt, prob in [(f"Match Over {line}", over_cal),
-                              (f"Match Under {line}", under_cal)]:
-                if prob < 0.65:
+            for mkt, prob in [(f"Match Over {line}", float(over_probs[i])),
+                              (f"Match Under {line}", float(under_probs[i]))]:
+                if prob < RECORD_FLOOR_POISSON:
                     continue
                 outcome = _actual_outcome(fix_row, mkt)
                 if outcome is not None:
                     results.append({
                         "fixture_id": fid, "model": "poisson",
-                        "market": mkt, "predicted_prob": round(prob, 4),
+                        "market": mkt, "predicted_prob_raw": round(prob, 4),
                         "actual": outcome,
                     })
     return results
@@ -472,8 +493,8 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         return results
 
     matchups = [(f[6], f[7]) for f in fixture_info]
-    h2h_map = _load_h2h_records(conn, id_map, matchups)
-    strength_map = _load_team_strength(conn, id_map)
+    h2h_map = _load_h2h_records(conn, id_map, matchups, cutoff=cutoff_dt)
+    strength_map = _load_team_strength(conn, id_map, cutoff=cutoff_dt)
 
     for row, h_elo, a_elo, gap, bin_info, fav_is_home, fav_rf, dog_rf in fixture_info:
         gap_bin, _, _ = bin_info
@@ -494,7 +515,7 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
             conf, n = _lookup_hit_rate(hit_rates, row.get("league", ""), gap_bin, mkt)
             str_adj = _strength_adjustment(mkt, fav_strength, dog_strength)
             adjusted = max(min(conf + str_adj, 0.99), 0.0)
-            if adjusted < MIN_CONFIDENCE or n < MIN_SAMPLE:
+            if adjusted < RECORD_FLOOR_MISMATCH or n < MIN_SAMPLE:
                 continue
             if mkt == "fav_to_score":
                 market = f"{fav_name} Over 0.5"
@@ -512,21 +533,21 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                 results.append({
                     "fixture_id": int(row["fixture_id"]),
                     "model": "mismatch", "market": market,
-                    "predicted_prob": round(adjusted, 4),
+                    "predicted_prob_raw": round(adjusted, 4),
                     "actual": outcome,
                 })
 
         win_conf, win_n = _lookup_hit_rate(
             hit_rates, row.get("league", ""), gap_bin, "fav_win")
         adjusted_win = min(win_conf + h2h_boost, 0.95)
-        if adjusted_win >= MIN_CONFIDENCE and win_n >= MIN_SAMPLE:
+        if adjusted_win >= RECORD_FLOOR_MISMATCH and win_n >= MIN_SAMPLE:
             market = f"{fav_name} Win"
             outcome = _actual_outcome(fix_row, market)
             if outcome is not None:
                 results.append({
                     "fixture_id": int(row["fixture_id"]),
                     "model": "mismatch", "market": market,
-                    "predicted_prob": round(adjusted_win, 4),
+                    "predicted_prob_raw": round(adjusted_win, 4),
                     "actual": outcome,
                 })
 
@@ -683,12 +704,15 @@ def compute_base_rates(fixtures: pd.DataFrame) -> dict:
 
 # ── Main walk-forward runner ──────────────────────────────────────────
 
-def run_walk_forward(months: int = 6, fold_days: int = 14) -> dict:
+def run_walk_forward(months: int = 6, fold_days: int = 14,
+                     cal_frac: float = CAL_FRAC_DEFAULT) -> dict:
     conn = _get_conn()
     try:
         print("=" * 60)
         print("  WALK-FORWARD CALIBRATION (no data leakage)")
         print(f"  Period: last {months} months | fold size: {fold_days} days")
+        print(f"  Calibration maps fitted on first {cal_frac:.0%} of folds,")
+        print(f"  evaluated on the remainder only")
         print("=" * 60)
 
         print("\nLoading all completed fixtures...")
@@ -778,6 +802,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14) -> dict:
                 pred["kickoff"] = str(finfo.get("kickoff_utc", ""))[:16]
                 pred["fold"] = i + 1
 
+            test_fix["fold"] = i + 1
             all_predictions.extend(fold_preds)
             all_test_fixtures = pd.concat([all_test_fixtures, test_fix],
                                           ignore_index=True)
@@ -785,21 +810,102 @@ def run_walk_forward(months: int = 6, fold_days: int = 14) -> dict:
         print(f"\n{'─' * 60}")
         print(f"  Total raw predictions: {len(all_predictions)}")
 
+        # ── Fit/eval fold split — maps are never graded on their own data ──
+        n_folds = len(folds)
+        n_fit = min(max(1, int(round(n_folds * cal_frac))), n_folds - 1)
+        fit_preds = [p for p in all_predictions if p["fold"] <= n_fit]
+        eval_preds = [p for p in all_predictions if p["fold"] > n_fit]
+        print(f"  Calibration-fit folds 1-{n_fit}: {len(fit_preds)} predictions")
+        print(f"  Evaluation folds {n_fit + 1}-{n_folds}: "
+              f"{len(eval_preds)} predictions")
+
+        print("\nFitting calibration maps (fit folds only)...")
+        fit_maps = {}
+        for model in ("bayesian", "poisson", "mismatch"):
+            mp = [p for p in fit_preds if p["model"] == model]
+            points = fit_pava_map([p["predicted_prob_raw"] for p in mp],
+                                  [float(p["actual"]) for p in mp])
+            fit_maps[model] = points
+            print(f"  {model:<10s} {len(mp):>6d} preds → "
+                  f"{f'{len(points)} map points' if points else 'insufficient data (identity)'}")
+
+        # ── Apply maps + LIVE gates to eval-fold predictions ──
+        # Gates mirror production: bayesian raw >= MIN_POSTERIOR_INTERESTING,
+        # poisson calibrated >= CALIBRATED_THRESHOLD, mismatch raw >= MIN_CONFIDENCE.
+        from engine.eval.predict_upcoming import CALIBRATED_THRESHOLD
+        from engine.eval.predict_mismatch import MIN_CONFIDENCE as MM_MIN_CONFIDENCE
+
+        gated = []
+        for p in eval_preds:
+            raw = p["predicted_prob_raw"]
+            points = fit_maps.get(p["model"]) or []
+            cal = apply_points(points, raw) if points else raw
+            if p["model"] == "bayesian" and raw < MIN_POSTERIOR_INTERESTING:
+                continue
+            if p["model"] == "poisson" and cal < CALIBRATED_THRESHOLD:
+                continue
+            if p["model"] == "mismatch" and raw < MM_MIN_CONFIDENCE:
+                continue
+            q = dict(p)
+            q["predicted_prob"] = round(cal, 4)
+            gated.append(q)
+        print(f"\n  Eval predictions passing live gates: {len(gated)}")
+
         # De-duplicate: one prediction per (fixture, market)
-        deduped = deduplicate_predictions(all_predictions)
+        deduped = deduplicate_predictions(gated)
         print(f"  After dedup: {len(deduped)} unique (fixture, market) predictions")
         print(f"  Unique fixtures with predictions: "
               f"{len(set(p['fixture_id'] for p in deduped))}")
 
-        # Compute calibration on de-duplicated predictions
-        print("\nComputing calibration...")
+        print("\nComputing calibration (eval folds only)...")
         report = compute_calibration(deduped)
+
+        # Same picks scored on RAW probabilities, to show the maps' effect
+        raw_scored = [dict(p, predicted_prob=p["predicted_prob_raw"])
+                      for p in gated]
+        raw_deduped = deduplicate_predictions(raw_scored)
+        rdf = pd.DataFrame(raw_deduped)
+        if not rdf.empty:
+            rdf["actual_int"] = rdf["actual"].astype(int)
+            report["eval_raw_summary"] = {
+                "n": len(rdf),
+                "brier_score": round(float(((rdf["predicted_prob"] -
+                                             rdf["actual_int"]) ** 2).mean()), 4),
+                "avg_predicted": round(float(rdf["predicted_prob"].mean()), 4),
+                "overall_hit_rate": round(float(rdf["actual_int"].mean()), 4),
+                "overconfidence": round(float(rdf["predicted_prob"].mean() -
+                                              rdf["actual_int"].mean()), 4),
+            }
+
+        # ── Shipped maps: method validated above, refit on ALL folds so the
+        # live maps use every raw prediction, including the most recent ──
+        shipped_models = {}
+        for model in ("bayesian", "poisson", "mismatch"):
+            mp = [p for p in all_predictions if p["model"] == model]
+            shipped_models[model] = fit_pava_map(
+                [p["predicted_prob_raw"] for p in mp],
+                [float(p["actual"]) for p in mp])
+        shipped_maps = {
+            "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+            "method": "walk-forward equal-count bins + PAVA, refit on all folds",
+            "months": months,
+            "fold_days": fold_days,
+            "n_folds": n_folds,
+            "validation": "fit on folds 1-%d, evaluated on folds %d-%d" % (
+                n_fit, n_fit + 1, n_folds),
+            "models": shipped_models,
+        }
+
+        eval_fixtures = all_test_fixtures[all_test_fixtures["fold"] > n_fit]
         report["raw_prediction_count"] = len(all_predictions)
-        report["base_rates"] = compute_base_rates(all_test_fixtures)
+        report["base_rates"] = compute_base_rates(eval_fixtures)
         report["predictions"] = deduped
-        report["method"] = "walk-forward"
+        report["method"] = "walk-forward (calibration fit/eval fold split)"
         report["fold_days"] = fold_days
-        report["n_folds"] = len(folds)
+        report["n_folds"] = n_folds
+        report["n_fit_folds"] = n_fit
+        report["fit_maps"] = fit_maps
+        report["shipped_maps"] = shipped_maps
 
         return report
 
@@ -816,11 +922,14 @@ def print_report(report: dict) -> None:
     print(f"  WALK-FORWARD CALIBRATION REPORT")
     print(f"  Method: {report.get('method', 'unknown')} | "
           f"{report.get('n_folds', '?')} folds of "
-          f"{report.get('fold_days', '?')} days")
+          f"{report.get('fold_days', '?')} days | "
+          f"maps fit on folds 1-{report.get('n_fit_folds', '?')}")
+    print(f"  Metrics below are EVAL FOLDS ONLY (never seen by the maps)")
     print(f"{'=' * 70}")
     print(f"  De-duplicated predictions: {report['n']}")
     print(f"  Unique fixtures:           {report.get('unique_fixtures', '?')}")
-    print(f"  Raw predictions (pre-dedup): {report.get('raw_prediction_count', '?')}")
+    print(f"  Raw predictions (all folds, pre-gate): "
+          f"{report.get('raw_prediction_count', '?')}")
     print(f"  Brier score:       {report['brier_score']:.4f}  "
           f"(lower = better, 0 = perfect)")
     print(f"  Avg predicted:     {report['avg_predicted']:.1%}")
@@ -829,6 +938,14 @@ def print_report(report: dict) -> None:
     label = ("OVERCONFIDENT" if oc > 0.02 else
              "UNDERCONFIDENT" if oc < -0.02 else "WELL CALIBRATED")
     print(f"  Overconfidence:    {oc:+.1%}  ({label})")
+
+    raw_sum = report.get("eval_raw_summary")
+    if raw_sum:
+        print(f"\n  Same picks, RAW (uncalibrated) probabilities:")
+        print(f"    brier={raw_sum['brier_score']:.4f}  "
+              f"predicted={raw_sum['avg_predicted']:.1%}  "
+              f"actual={raw_sum['overall_hit_rate']:.1%}  "
+              f"gap={raw_sum['overconfidence']:+.1%}")
 
     br = report.get("base_rates", {})
     if br:
@@ -897,10 +1014,15 @@ if __name__ == "__main__":
         description="Walk-forward calibration backtest")
     parser.add_argument("--months", type=int, default=6)
     parser.add_argument("--fold-days", type=int, default=14)
+    parser.add_argument("--cal-frac", type=float, default=CAL_FRAC_DEFAULT,
+                        help="Fraction of folds used to fit calibration maps")
     parser.add_argument("--output", type=str, default=None)
+    parser.add_argument("--no-save-maps", action="store_true",
+                        help="Skip writing calibration_maps.json for live use")
     args = parser.parse_args()
 
-    report = run_walk_forward(months=args.months, fold_days=args.fold_days)
+    report = run_walk_forward(months=args.months, fold_days=args.fold_days,
+                              cal_frac=args.cal_frac)
     print_report(report)
 
     out_path = Path(args.output) if args.output else (
@@ -908,3 +1030,8 @@ if __name__ == "__main__":
     with open(out_path, "w") as f:
         json.dump(report, f, indent=2, default=str)
     print(f"\nReport saved to {out_path}")
+
+    if not args.no_save_maps and report.get("shipped_maps"):
+        with open(MAPS_PATH, "w") as f:
+            json.dump(report["shipped_maps"], f, indent=2)
+        print(f"Live calibration maps saved to {MAPS_PATH}")
