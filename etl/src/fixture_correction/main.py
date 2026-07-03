@@ -8,8 +8,10 @@ import os
 from etl.src.config import UPDATE_FIXTURES_LOG
 from etl.src.fixture_correction import (
     FIXTURE_CORRECTION_BOUND,
+    RECONCILE_WINDOW_DAYS,
     correct_changed_fixtures,
     correct_missed_fixtures,
+    reconcile_upcoming_fixtures,
 )
 from etl.src.logger import get_logger
 
@@ -20,9 +22,10 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Correct fixture kickoff times.")
     parser.add_argument(
         "--mode",
-        choices=["missed", "changed", "both"],
+        choices=["missed", "changed", "reconcile", "both"],
         default="both",
-        help="Which fixtures to correct: recently played (missed), upcoming (changed), or both.",
+        help="Which fixtures to correct: recently played (missed), upcoming per-league "
+             "(changed), DB-anchored upcoming window (reconcile), or all (both).",
     )
     parser.add_argument(
         "--count",
@@ -30,16 +33,26 @@ def parse_args() -> argparse.Namespace:
         default=FIXTURE_CORRECTION_BOUND,
         help=f"Number of fixtures to check per league (default: {FIXTURE_CORRECTION_BOUND}).",
     )
+    parser.add_argument(
+        "--reconcile-days",
+        type=int,
+        default=RECONCILE_WINDOW_DAYS,
+        help=f"Forward window (days) for reconcile mode (default: {RECONCILE_WINDOW_DAYS}).",
+    )
     return parser.parse_args()
 
 
-def run(mode: str = "both", count: int = FIXTURE_CORRECTION_BOUND) -> int:
+def run(mode: str = "both", count: int = FIXTURE_CORRECTION_BOUND,
+        reconcile_days: int = RECONCILE_WINDOW_DAYS) -> int:
     updated_total = 0
     if mode in {"missed", "both"}:
         updated = correct_missed_fixtures(no_of_fixtures=count)
         updated_total += len(updated)
     if mode in {"changed", "both"}:
         updated = correct_changed_fixtures(no_of_fixtures=count)
+        updated_total += len(updated)
+    if mode in {"reconcile", "both"}:
+        updated = reconcile_upcoming_fixtures(days=reconcile_days)
         updated_total += len(updated)
     return updated_total
 
@@ -49,7 +62,7 @@ if __name__ == "__main__":
         logger.warning("Environment variable UPDATE_FIXTURES_LOG not set; using default log path: %s", UPDATE_FIXTURES_LOG)
     args = parse_args()
     try:
-        updated_count = run(args.mode, args.count)
+        updated_count = run(args.mode, args.count, args.reconcile_days)
         logger.info("Fixture correction complete: %d fixtures updated.", updated_count)
     except KeyboardInterrupt:
         logger.warning("KeyboardInterrupt received; shutting down fixture correction.")

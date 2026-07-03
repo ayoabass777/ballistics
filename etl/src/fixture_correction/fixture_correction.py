@@ -190,3 +190,107 @@ def correct_changed_fixtures(no_of_fixtures: int = FIXTURE_CORRECTION_BOUND) -> 
             continue
     logger.info("Updated %d fixtures in correct_changed_fixtures.", len(updated_fixtures))
     return updated_fixtures
+
+
+RECONCILE_WINDOW_DAYS = 14
+ORPHAN_STATUS = "ORPHAN"   # DB fixture the API no longer lists (superseded/removed)
+
+
+def _db_ns_fixture_ids_in_window(league_id: int, season: int, days: int) -> List[str]:
+    """api_fixture_ids of this league-season's NS fixtures stored in [now, now+days]."""
+    con = get_db_connection()
+    cur = con.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT api_fixture_id
+            FROM raw.raw_fixtures
+            WHERE api_league_id = %s AND season = %s
+              AND fixture_status = 'NS'
+              AND kickoff_utc >= NOW()
+              AND kickoff_utc <  NOW() + make_interval(days => %s)
+              AND api_fixture_id IS NOT NULL
+            """,
+            (league_id, season, days),
+        )
+        return [str(r[0]) for r in cur.fetchall()]
+    finally:
+        con.close()
+
+
+def mark_fixtures_status(api_fixture_ids: List[str], status: str) -> int:
+    """Set fixture_status for the given api_fixture_ids. Returns rows affected."""
+    if not api_fixture_ids:
+        return 0
+    con = get_db_connection()
+    cur = con.cursor()
+    try:
+        cur.execute(
+            """
+            UPDATE raw.raw_fixtures
+            SET fixture_status = %s, updated_at = NOW()
+            WHERE api_fixture_id = ANY(%s)
+            """,
+            (status, [int(i) for i in api_fixture_ids]),
+        )
+        con.commit()
+        return cur.rowcount
+    except Exception as e:
+        logger.error("Error marking fixtures %s as %s: %s", api_fixture_ids[:3], status, e, exc_info=True)
+        con.rollback()
+        return 0
+    finally:
+        con.close()
+
+
+def reconcile_upcoming_fixtures(days: int = RECONCILE_WINDOW_DAYS) -> List[Dict[str, Any]]:
+    """Set-reconcile each current league-season's upcoming fixtures against the
+    API's authoritative list for the window.
+
+    Closes two blind spots the ``next N``/``last N`` correction functions miss:
+      * date drift — corrected via _process_fixtures on the API's returned set;
+      * ORPHANS — a DB NS fixture stuck on a stale future date whose id the API no
+        longer lists (a provisional round replaced by new fixture ids). Fetch-by-id
+        returns nothing for these, so per-id checks can't see them; here we diff the
+        DB's NS set against the API's set and mark the leftovers ORPHAN, dropping
+        them from every NS-based query (e.g. the betting pool).
+
+    Guard: orphan-marking only runs when the API returned ≥1 fixture for the
+    league-season, so a transient empty API response never nukes real fixtures.
+    """
+    updated: List[Dict[str, Any]] = []
+    from datetime import timedelta
+    now = datetime.now(timezone.utc)
+    frm = now.strftime("%Y-%m-%d")
+    to = (now + timedelta(days=days)).strftime("%Y-%m-%d")
+
+    for league_id, season in get_league_seasons():
+        try:
+            api_fixtures = fetch_fixtures(
+                FIXTURES_ENDPOINT,
+                {"league": league_id, "season": season, "from": frm, "to": to},
+            )
+        except Exception as e:
+            logger.error("reconcile: API fetch failed for league %s: %s", league_id, e, exc_info=True)
+            continue
+
+        # 1. date corrections on the fixtures the API still lists
+        updated.extend(_process_fixtures(api_fixtures))
+
+        api_ids = {str(f.get("fixture", {}).get("id")) for f in api_fixtures
+                   if f.get("fixture", {}).get("id") is not None}
+        if not api_ids:
+            logger.info("reconcile: league %s returned no API fixtures in window; skipping orphan check.", league_id)
+            continue
+
+        # 2. orphans: DB NS fixtures in window the API no longer lists
+        db_ids = set(_db_ns_fixture_ids_in_window(league_id, season, days))
+        orphans = db_ids - api_ids
+        if orphans:
+            n = mark_fixtures_status(list(orphans), ORPHAN_STATUS)
+            logger.info("reconcile: league %s — marked %d orphaned fixtures %s.",
+                        league_id, n, ORPHAN_STATUS)
+            updated.extend({"fixture_id": oid, "action": "orphaned"} for oid in orphans)
+
+    logger.info("Reconciled/flagged %d fixtures (window=%dd).", len(updated), days)
+    return updated
