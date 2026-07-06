@@ -74,6 +74,43 @@ def load_dc_historical(conn) -> pd.DataFrame:
 
 # ── fitting ─────────────────────────────────────────────────────────────────
 
+XG_WEIGHT = 0.5   # blend weight for xG where available: (1-w)*goals + w*xg
+
+
+def blend_xg(matches: pd.DataFrame, conn, weight: float = XG_WEIGHT) -> pd.DataFrame:
+    """Blend expected goals into home_goals/away_goals where raw.fixture_xg has it.
+
+    xG is a lower-variance signal than raw scorelines, but only a few leagues carry
+    it (see memory xg-data-coverage), so this is a per-fixture, opt-in blend: rows
+    with no xG keep their actual goals unchanged. Shared by the live predictor and
+    the walk-forward fold so fit and eval stay consistent.
+    """
+    if weight <= 0 or matches.empty or "fixture_id" not in matches.columns:
+        return matches
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT to_regclass('raw.fixture_xg')")
+        if cur.fetchone()[0] is None:
+            return matches
+        xg = pd.read_sql("SELECT fixture_id, home_xg, away_xg FROM raw.fixture_xg", conn)
+    except Exception:  # noqa: BLE001
+        return matches
+    if xg.empty:
+        return matches
+
+    m = matches.merge(xg, on="fixture_id", how="left")
+    m["home_goals"] = m["home_goals"].astype(float)
+    m["away_goals"] = m["away_goals"].astype(float)
+    hmask = m["home_xg"].notna()
+    amask = m["away_xg"].notna()
+    m.loc[hmask, "home_goals"] = (
+        (1 - weight) * m.loc[hmask, "home_goals"] + weight * m.loc[hmask, "home_xg"])
+    m.loc[amask, "away_goals"] = (
+        (1 - weight) * m.loc[amask, "away_goals"] + weight * m.loc[amask, "away_xg"])
+    m.attrs["n_blended"] = int((hmask | amask).sum())
+    return m.drop(columns=["home_xg", "away_xg"])
+
+
 def fit_league_dc(matches: pd.DataFrame, ref_time, xi: float = XI) -> dict | None:
     """Fit one league's Dixon-Coles model on matches before ref_time.
 
@@ -210,7 +247,8 @@ def predict_dixon_coles(days: int = 7,
     try:
         print("Loading historical matches...")
         hist = load_dc_historical(conn)
-        print(f"  {len(hist)} matches")
+        hist = blend_xg(hist, conn)
+        print(f"  {len(hist)} matches (xG-blended: {hist.attrs.get('n_blended', 0)})")
 
         print("Loading upcoming fixtures...")
         upcoming = load_upcoming(conn, days=days)

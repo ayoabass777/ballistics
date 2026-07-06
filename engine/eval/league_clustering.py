@@ -47,14 +47,16 @@ MAX_GOALS_FOR_DIST: int = 10
 def load_match_df(conn) -> pd.DataFrame:
     sql = f"""
         SELECT
-            league_name AS league,
-            fixture_id,
-            goals_for AS home_goals,
-            goals_against AS away_goals,
-            fulltime_result
-        FROM {SOURCE_TABLE}
-        WHERE is_played AND is_home
-        ORDER BY kickoff_utc
+            f.league_name AS league,
+            rf.api_league_id AS league_id,
+            f.fixture_id,
+            f.goals_for AS home_goals,
+            f.goals_against AS away_goals,
+            f.fulltime_result
+        FROM {SOURCE_TABLE} f
+        JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+        WHERE f.is_played AND f.is_home
+        ORDER BY f.kickoff_utc
     """
     df = pd.read_sql(sql, conn)
     if df.empty:
@@ -77,13 +79,17 @@ def build_league_profiles(df: pd.DataFrame) -> pd.DataFrame:
     df["over_2_5"] = (df["total_goals"] > 2.5).astype(int)
     df["btts"] = ((df["home_goals"] > 0) & (df["away_goals"] > 0)).astype(int)
 
+    # Group on the unique league id when available — bare league_name conflates
+    # same-named leagues across countries (e.g. Brazil vs Italy "Serie B",
+    # Egypt vs England "Premier League"). Fall back to name if id is absent.
+    key = "league_id" if "league_id" in df.columns else "league"
     rows = []
-    for league, g in df.groupby("league"):
+    for kval, g in df.groupby(key):
         n = len(g)
         if n < MIN_LEAGUE_MATCHES:
             continue
-        rows.append({
-            "league": league,
+        row = {
+            "league": g["league"].iloc[0] if "league" in g.columns else kval,
             "n_matches": n,
             "mean_goals": g["total_goals"].mean(),
             "std_goals": g["total_goals"].std(),
@@ -91,7 +97,10 @@ def build_league_profiles(df: pd.DataFrame) -> pd.DataFrame:
             "home_win_rate": g["home_win"].mean(),
             "p_over_2_5": g["over_2_5"].mean(),
             "p_btts": g["btts"].mean(),
-        })
+        }
+        if key == "league_id":
+            row["league_id"] = kval
+        rows.append(row)
     return pd.DataFrame(rows)
 
 

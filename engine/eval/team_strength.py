@@ -177,6 +177,8 @@ def _shrink_and_percentile(
                 "league": league,
                 "league_season_id": row.get("league_season_id"),
                 "team_id": row["team_id"],
+                "attack_rate": round(row["attack_rate"], 3),
+                "defense_rate": round(row["defense_rate"], 3),
                 "attack_shrunk": round(row["attack_shrunk"], 3),
                 "defense_shrunk": round(row["defense_shrunk"], 3),
                 "attack_percentile": round(atk_pct, 1),
@@ -188,7 +190,28 @@ def _shrink_and_percentile(
     return pd.DataFrame(rows)
 
 
-def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
+def _league_stats(agg: pd.DataFrame) -> pd.DataFrame:
+    """Per-league mean/var of attack_rate & defense_rate — the shrinkage prior.
+
+    Computed from whatever slice is passed (overall, home-only, or away-only) so
+    each context shrinks toward its OWN baseline, not the overall one.
+    """
+    return (
+        agg.groupby("_league_key")
+        .agg(
+            league_attack_mean=("attack_rate", "mean"),
+            league_attack_var=("attack_rate", "var"),
+            league_defense_mean=("defense_rate", "mean"),
+            league_defense_var=("defense_rate", "var"),
+        )
+        .reset_index()
+    )
+
+
+def compute_team_strength(df: pd.DataFrame, split_prior: str = "own") -> pd.DataFrame:
+    """split_prior: 'own' (correct) shrinks home/away splits toward their own
+    home/away league baseline; 'overall' reproduces the pre-fix behaviour
+    (splits shrunk toward the overall mean) — used only for the gate backtest."""
     """Compute attack/defense percentiles for every team within its league.
 
     Returns overall, home-only, and away-only strength metrics.
@@ -227,16 +250,7 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
     team_agg["attack_rate"] = team_agg["total_scored"] / team_agg["games_played"]
     team_agg["defense_rate"] = team_agg["total_conceded"] / team_agg["games_played"]
 
-    league_stats = (
-        team_agg.groupby("_league_key")
-        .agg(
-            league_attack_mean=("attack_rate", "mean"),
-            league_attack_var=("attack_rate", "var"),
-            league_defense_mean=("defense_rate", "mean"),
-            league_defense_var=("defense_rate", "var"),
-        )
-        .reset_index()
-    )
+    league_stats = _league_stats(team_agg)
     team_agg = team_agg.merge(league_stats, on="_league_key")
 
     team_agg["attack_shrunk"] = team_agg.apply(
@@ -295,8 +309,12 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
     away_agg = _compute_split_agg(df, is_home=False)
 
     if not home_agg.empty:
-        home_strength = _shrink_and_percentile(home_agg, league_stats)
+        # shrink home-only rates toward the league's HOME baseline, not overall
+        home_ls = league_stats if split_prior == "overall" else _league_stats(home_agg)
+        home_strength = _shrink_and_percentile(home_agg, home_ls)
         home_strength = home_strength.rename(columns={
+            "attack_rate": "home_attack_rate",
+            "defense_rate": "home_defense_rate",
             "attack_shrunk": "home_attack_shrunk",
             "defense_shrunk": "home_defense_shrunk",
             "attack_percentile": "home_attack_percentile",
@@ -306,15 +324,20 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
             "league_size": "home_league_size",
         })
         result = result.merge(
-            home_strength[["_league_key", "team_id", "home_attack_shrunk",
+            home_strength[["_league_key", "team_id", "home_attack_rate",
+                           "home_defense_rate", "home_attack_shrunk",
                            "home_defense_shrunk", "home_attack_percentile",
                            "home_defense_percentile", "home_attack_rank",
                            "home_defense_rank", "home_league_size"]],
             on=["_league_key", "team_id"], how="left")
 
     if not away_agg.empty:
-        away_strength = _shrink_and_percentile(away_agg, league_stats)
+        # shrink away-only rates toward the league's AWAY baseline, not overall
+        away_ls = league_stats if split_prior == "overall" else _league_stats(away_agg)
+        away_strength = _shrink_and_percentile(away_agg, away_ls)
         away_strength = away_strength.rename(columns={
+            "attack_rate": "away_attack_rate",
+            "defense_rate": "away_defense_rate",
             "attack_shrunk": "away_attack_shrunk",
             "defense_shrunk": "away_defense_shrunk",
             "attack_percentile": "away_attack_percentile",
@@ -324,7 +347,8 @@ def compute_team_strength(df: pd.DataFrame) -> pd.DataFrame:
             "league_size": "away_league_size",
         })
         result = result.merge(
-            away_strength[["_league_key", "team_id", "away_attack_shrunk",
+            away_strength[["_league_key", "team_id", "away_attack_rate",
+                           "away_defense_rate", "away_attack_shrunk",
                            "away_defense_shrunk", "away_attack_percentile",
                            "away_defense_percentile", "away_attack_rank",
                            "away_defense_rank", "away_league_size"]],

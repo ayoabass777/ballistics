@@ -114,13 +114,14 @@ def load_historical(conn) -> pd.DataFrame:
     sql = f"""
         SELECT
             f.fixture_id, f.kickoff_utc, f.season,
-            f.league_name AS league,
+            f.league_name AS league, rf.api_league_id AS league_id,
             f.team_id AS home_team_id, f.opponent_id AS away_team_id,
             f.team_name AS home_team, f.opponent_name AS away_team,
             f.goals_for AS home_goals, f.goals_against AS away_goals,
             COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
             COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
         FROM {SOURCE_TABLE} f
+        JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} eh ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} ea ON ea.team_id = f.opponent_id AND ea.fixture_id = f.fixture_id
         WHERE f.is_played AND f.is_home
@@ -159,6 +160,7 @@ def _load_league_map(conn) -> dict:
 def _map_league_names(upcoming: pd.DataFrame, league_map: dict) -> pd.DataFrame:
     out = upcoming.copy()
     out["league"] = out["api_league_id"].map(league_map)
+    out["league_id"] = out["api_league_id"]   # unique key for league clustering
     return out
 
 

@@ -71,6 +71,13 @@ UNDER35_TIER_A_THRESHOLD = 0.80
 UNDER35_TIER_B_THRESHOLD = 0.75
 UNDER35_TIER_C_THRESHOLD = 0.72
 
+# In high-scoring leagues Poisson overpredicts unders (+4.4% walk-forward gap,
+# because its per-cluster fit pools lower-scoring leagues) while Dixon-Coles —
+# fit per league — stays calibrated (+0.6%). So Match Under markets in these
+# leagues are priced off DC alone instead of the equal DC+Poisson blend.
+HIGH_SCORING_AVG_GOALS = 3.1     # league goals/game above which to favour DC on unders
+UNDER_HIGH_DC_WEIGHT = 1.0       # weight on DC's prob there (1.0 = DC-only)
+
 TARGET_ODDS = 5.0
 MAX_LEGS = 5
 MIN_LEGS = 3
@@ -294,6 +301,8 @@ def _passes_goal_model_rules(unified: str, models: set[str]) -> bool:
 def _strength_profile(row: pd.Series) -> dict:
     profile = {
         "overall": {
+            "attack_rate": round(float(row["attack_rate"]), 2),
+            "defense_rate": round(float(row["defense_rate"]), 2),
             "attack_shrunk": round(float(row["attack_shrunk"]), 3),
             "defense_shrunk": round(float(row["defense_shrunk"]), 3),
             "attack_pct": round(float(row["attack_percentile"]), 1),
@@ -307,6 +316,8 @@ def _strength_profile(row: pd.Series) -> dict:
         col_atk = f"{ctx}_attack_shrunk"
         if col_atk in row.index and pd.notna(row.get(col_atk)):
             profile[ctx] = {
+                "attack_rate": round(float(row[f"{ctx}_attack_rate"]), 2) if pd.notna(row.get(f"{ctx}_attack_rate")) else None,
+                "defense_rate": round(float(row[f"{ctx}_defense_rate"]), 2) if pd.notna(row.get(f"{ctx}_defense_rate")) else None,
                 "attack_shrunk": round(float(row[f"{ctx}_attack_shrunk"]), 3),
                 "defense_shrunk": round(float(row[f"{ctx}_defense_shrunk"]), 3),
                 "attack_pct": round(float(row[f"{ctx}_attack_percentile"]), 1),
@@ -538,8 +549,37 @@ def dixon_signals(dixon_picks) -> list[dict]:
     return out
 
 
+def _high_scoring_fixture_ids(fixture_ids, conn=None) -> set:
+    """fixture_ids whose league averages > HIGH_SCORING_AVG_GOALS goals/game."""
+    ids = [int(f) for f in fixture_ids]
+    if not ids:
+        return set()
+    own = conn is None
+    conn = conn or get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT rf.api_league_id, avg(f.goals_for + f.goals_against)
+            FROM raw.fact_head_to_head f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            WHERE f.is_home AND f.is_played AND rf.season IN (2025, 2026)
+            GROUP BY rf.api_league_id
+        """)
+        high_lids = {lid for lid, ag in cur.fetchall()
+                     if ag is not None and float(ag) > HIGH_SCORING_AVG_GOALS}
+        cur.execute("SELECT fixture_id, api_league_id FROM raw.raw_fixtures "
+                    "WHERE fixture_id = ANY(%s)", (ids,))
+        return {int(fid) for fid, lid in cur.fetchall() if lid in high_lids}
+    except Exception:  # noqa: BLE001
+        return set()
+    finally:
+        if own:
+            conn.close()
+
+
 def _score_pool(consensus: dict, fixture_meta: dict,
-                fixture_strength_all: dict, odds_map: dict) -> list[dict]:
+                fixture_strength_all: dict, odds_map: dict,
+                high_scoring_fids: set = frozenset()) -> list[dict]:
     """Apply gates, tiers, odds/EV and rank the consensus dict into a pool.
 
     Pure function of its inputs — shared by the in-process `run_consensus`
@@ -560,6 +600,14 @@ def _score_pool(consensus: dict, fixture_meta: dict,
         n_models = len(models)
         max_conf = max(pick["confidences"])
         avg_conf = sum(pick["confidences"]) / len(pick["confidences"])
+
+        # DC-favoured unders in high-scoring leagues: Poisson overpredicts unders
+        # there while DC stays calibrated, so price off DC's probability.
+        if (pick["unified_market"].startswith("Match Under")
+                and fid in high_scoring_fids and "dixon_coles" in pick["models"]):
+            dc_conf = pick["confidences"][pick["models"].index("dixon_coles")]
+            avg_conf = UNDER_HIGH_DC_WEIGHT * dc_conf + (1 - UNDER_HIGH_DC_WEIGHT) * avg_conf
+
         strength_rank = _fixture_strength_rank(fixture_strength_all.get(fid))
 
         if not _passes_goal_model_rules(pick["unified_market"], models):
@@ -753,7 +801,9 @@ def build_consensus_from_signals(signals: list[dict],
         conn.close()
 
     odds_map = _load_sportybet_odds()
-    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map)
+    high_scoring_fids = _high_scoring_fixture_ids(fixture_meta.keys())
+    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map,
+                         high_scoring_fids)
     analysis = _analysis_from_signals(signals, fixture_meta, fixture_strength_all)
     slips = _build_slips(ranked, target_odds, bankroll=bankroll)
 
@@ -981,7 +1031,9 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         print("  no SportyBet odds in DB — run scrape_sportybet; falling back to est_odds")
 
     # ── Score and rank ──────────────────────────────────────────────────
-    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map)
+    high_scoring_fids = _high_scoring_fixture_ids(fixture_meta.keys())
+    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map,
+                         high_scoring_fids)
 
     # ── Per-fixture analysis (all raw model signals) ──────────────────
     fixture_analysis = {}

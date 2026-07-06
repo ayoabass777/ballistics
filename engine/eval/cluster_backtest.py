@@ -380,19 +380,24 @@ def assign_clusters_seasonal(train_df: pd.DataFrame,
     if "season" not in train_df.columns:
         return assign_clusters_hierarchical(train_df, target_df)
 
+    # Key on the unique league id when both frames carry it, so same-named
+    # leagues in different countries aren't merged into one cluster profile.
+    key = ("league_id" if "league_id" in train_df.columns
+           and "league_id" in target_df.columns else "league")
+
     latest_season = train_df["season"].max()
     season_df = train_df[train_df["season"] == latest_season]
     profiles = build_league_profiles(season_df)
 
     # leagues with too few matches in latest season: try previous season
-    all_leagues = set(train_df["league"].unique())
-    profiled_leagues = set(profiles["league"].unique()) if "league" in profiles.columns else set()
+    all_leagues = set(train_df[key].unique())
+    profiled_leagues = set(profiles[key].unique()) if key in profiles.columns else set()
     missing = all_leagues - profiled_leagues
 
     if missing and latest_season > train_df["season"].min():
         prev_df = train_df[train_df["season"] == latest_season - 1]
         prev_profiles = build_league_profiles(prev_df)
-        prev_fill = prev_profiles[prev_profiles["league"].isin(missing)]
+        prev_fill = prev_profiles[prev_profiles[key].isin(missing)]
         if not prev_fill.empty:
             profiles = pd.concat([profiles, prev_fill], ignore_index=True)
 
@@ -400,9 +405,9 @@ def assign_clusters_seasonal(train_df: pd.DataFrame,
         return pd.Series(1, index=target_df.index)
 
     ward_df, _, _ = cluster_ward(profiles)
-    league_to_cluster = dict(zip(ward_df["league"], ward_df["cluster"]))
+    league_to_cluster = dict(zip(ward_df[key], ward_df["cluster"]))
     fallback = ward_df["cluster"].mode().iloc[0]
-    return target_df["league"].map(lambda lg: league_to_cluster.get(lg, fallback))
+    return target_df[key].map(lambda lg: league_to_cluster.get(lg, fallback))
 
 
 # ── model helpers ───────────────────────────────────────────────────────────

@@ -166,12 +166,14 @@ def _load_historical_h2h_before(conn, cutoff_dt) -> pd.DataFrame:
     """Load fact_head_to_head with Elo for played fixtures BEFORE cutoff."""
     return pd.read_sql(f"""
         SELECT f.fixture_id, f.kickoff_utc, f.season, f.league_name AS league,
+               rf.api_league_id AS league_id,
                f.team_id AS home_team_id, f.opponent_id AS away_team_id,
                f.team_name AS home_team, f.opponent_name AS away_team,
                f.goals_for AS home_goals, f.goals_against AS away_goals,
                COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
                COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
         FROM {H2H_TABLE} f
+        JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} eh ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} ea ON ea.team_id = f.opponent_id AND ea.fixture_id = f.fixture_id
         WHERE f.is_played AND f.is_home
@@ -369,6 +371,7 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
     test_df = test_fixtures.copy()
     test_df["league"] = test_df["api_league_id"].map(league_map)
+    test_df["league_id"] = test_df["api_league_id"]   # unique key for league clustering
     test_df = test_df[test_df["league"].notna()].copy()
     if test_df.empty:
         return results
@@ -463,6 +466,7 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
     test_df = test_fixtures.copy()
     test_df["league"] = test_df["api_league_id"].map(league_map)
+    test_df["league_id"] = test_df["api_league_id"]   # unique key for league clustering
     test_df = test_df[test_df["league"].notna()].copy()
     if test_df.empty:
         return results
@@ -555,16 +559,18 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 def _dixon_coles_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                       id_map: dict, league_map: dict) -> list[dict]:
     """Dixon-Coles predictions from per-league fits on pre-cutoff matches."""
-    from engine.eval.predict_dixon_coles import fit_league_dc, fixture_markets
+    from engine.eval.predict_dixon_coles import fit_league_dc, fixture_markets, blend_xg
 
     results = []
     hist = _load_historical_h2h_before(conn, cutoff_dt)
     if hist.empty:
         return results
     hist["kickoff_utc"] = pd.to_datetime(hist["kickoff_utc"], utc=True)
+    hist = blend_xg(hist, conn)   # xG only for pre-cutoff matches → no leak
 
     test_df = test_fixtures.copy()
     test_df["league"] = test_df["api_league_id"].map(league_map)
+    test_df["league_id"] = test_df["api_league_id"]   # unique key for league clustering
     test_df = test_df[test_df["league"].notna()].copy()
     if test_df.empty:
         return results
