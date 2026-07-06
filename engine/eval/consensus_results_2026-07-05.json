@@ -1,0 +1,1240 @@
+{
+  "generated": "2026-07-05 18:58 UTC",
+  "days": 10,
+  "summary": {
+    "fixtures": 33,
+    "picks": 59,
+    "hit_rate": 0.7966,
+    "by_tier": {
+      "4": {
+        "n": 2,
+        "hit_rate": 1.0
+      },
+      "3": {
+        "n": 15,
+        "hit_rate": 0.8667
+      },
+      "2": {
+        "n": 38,
+        "hit_rate": 0.7368
+      },
+      "1": {
+        "n": 4,
+        "hit_rate": 1.0
+      }
+    }
+  },
+  "results": [
+    {
+      "fixture_id": 66248,
+      "match": "Indy Eleven vs Charleston Battery",
+      "home": "Indy Eleven",
+      "away": "Charleston Battery",
+      "league": "USL Championship",
+      "country": "USA",
+      "kickoff": "2026-07-04 20:00:00+00:00",
+      "score": "2-0",
+      "total": 2,
+      "picks": [
+        {
+          "selection": "Charleston Battery Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7674,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.19,
+          "ev": 0.9132,
+          "hit": false
+        },
+        {
+          "selection": "Indy Eleven Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7869,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.24,
+          "ev": 0.9757,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 48420,
+      "match": "Londrina vs CRB",
+      "home": "Londrina",
+      "away": "CRB",
+      "league": "Serie B",
+      "country": "Brazil",
+      "kickoff": "2026-07-04 19:00:00+00:00",
+      "score": "5-0",
+      "total": 5,
+      "picks": [
+        {
+          "selection": "Londrina Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7791,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "CRB Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7576,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 48421,
+      "match": "Novorizontino vs Atletico Goianiense",
+      "home": "Novorizontino",
+      "away": "Atletico Goianiense",
+      "league": "Serie B",
+      "country": "Brazil",
+      "kickoff": "2026-07-04 19:00:00+00:00",
+      "score": "3-0",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Novorizontino Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7679,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 48419,
+      "match": "Criciuma vs Sport Recife",
+      "home": "Criciuma",
+      "away": "Sport Recife",
+      "league": "Serie B",
+      "country": "Brazil",
+      "kickoff": "2026-07-04 19:00:00+00:00",
+      "score": "1-0",
+      "total": 1,
+      "picks": [
+        {
+          "selection": "Criciuma Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7546,
+          "n_models": 1,
+          "models": [
+            "bayesian"
+          ],
+          "odds": 1.25,
+          "ev": 0.9432,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 59512,
+      "match": "Longford Town vs UCD",
+      "home": "Longford Town",
+      "away": "UCD",
+      "league": "First Division",
+      "country": "Ireland",
+      "kickoff": "2026-07-04 18:30:00+00:00",
+      "score": "2-1",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Longford Town Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7407,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "UCD Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.727,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 55065,
+      "match": "Trans Narva vs FC Levadia Tallinn",
+      "home": "Trans Narva",
+      "away": "FC Levadia Tallinn",
+      "league": "Meistriliiga",
+      "country": "Estonia",
+      "kickoff": "2026-07-04 16:00:00+00:00",
+      "score": "1-3",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "Over 1.5",
+          "market": "Over/Under",
+          "confidence": 0.7924,
+          "n_models": 4,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch",
+            "poisson"
+          ],
+          "odds": 1.15,
+          "ev": 0.9113,
+          "hit": true
+        },
+        {
+          "selection": "FC Levadia Tallinn Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.8034,
+          "n_models": 1,
+          "models": [
+            "bayesian"
+          ],
+          "odds": 1.18,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "FC Levadia Tallinn Win",
+          "market": "1X2",
+          "confidence": 0.8286,
+          "n_models": 2,
+          "models": [
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.22,
+          "ev": 1.0109,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 57230,
+      "match": "Leiknir R. vs Völsungur",
+      "home": "Leiknir R.",
+      "away": "Völsungur",
+      "league": "1. Deild",
+      "country": "Iceland",
+      "kickoff": "2026-07-04 16:00:00+00:00",
+      "score": "3-3",
+      "total": 6,
+      "picks": [
+        {
+          "selection": "Over 2.5",
+          "market": "Over/Under",
+          "confidence": 0.7269,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "mismatch",
+            "poisson"
+          ],
+          "odds": 1.45,
+          "ev": 1.0541,
+          "hit": true
+        },
+        {
+          "selection": "Leiknir R. Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.812,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.1,
+          "ev": 0.8932,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 70561,
+      "match": "Bryne vs Sandnes ULF",
+      "home": "Bryne",
+      "away": "Sandnes ULF",
+      "league": "1. Division",
+      "country": "Norway",
+      "kickoff": "2026-07-04 16:00:00+00:00",
+      "score": "1-1",
+      "total": 2,
+      "picks": [
+        {
+          "selection": "Over 1.5",
+          "market": "Over/Under",
+          "confidence": 0.7859,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.19,
+          "ev": 0.9352,
+          "hit": true
+        },
+        {
+          "selection": "Bryne Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7729,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.15,
+          "ev": 0.8888,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 55066,
+      "match": "Paide vs Vaprus",
+      "home": "Paide",
+      "away": "Vaprus",
+      "league": "Meistriliiga",
+      "country": "Estonia",
+      "kickoff": "2026-07-04 16:00:00+00:00",
+      "score": "3-1",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "Paide Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.8011,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.12,
+          "ev": 0.8973,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 51012,
+      "match": "VPS vs Mariehamn",
+      "home": "VPS",
+      "away": "Mariehamn",
+      "league": "Veikkausliiga",
+      "country": "Finland",
+      "kickoff": "2026-07-04 15:00:00+00:00",
+      "score": "4-0",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "VPS Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.8218,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.18,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 60844,
+      "match": "Rīgas FS vs Auda",
+      "home": "Rīgas FS",
+      "away": "Auda",
+      "league": "Virsliga",
+      "country": "Latvia",
+      "kickoff": "2026-07-04 15:00:00+00:00",
+      "score": "1-1",
+      "total": 2,
+      "picks": [
+        {
+          "selection": "Rīgas FS Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.8135,
+          "n_models": 1,
+          "models": [
+            "bayesian"
+          ],
+          "odds": 1.18,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "Rīgas FS Win",
+          "market": "1X2",
+          "confidence": 0.7828,
+          "n_models": 2,
+          "models": [
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.4,
+          "ev": 1.0959,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 44982,
+      "match": "Neman vs Arsenal",
+      "home": "Neman",
+      "away": "Arsenal",
+      "league": "Premier League",
+      "country": "Belarus",
+      "kickoff": "2026-07-04 15:00:00+00:00",
+      "score": "0-1",
+      "total": 1,
+      "picks": [
+        {
+          "selection": "Neman Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7378,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.16,
+          "ev": 0.8559,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 51011,
+      "match": "FF Jaro vs Ilves",
+      "home": "FF Jaro",
+      "away": "Ilves",
+      "league": "Veikkausliiga",
+      "country": "Finland",
+      "kickoff": "2026-07-04 14:00:00+00:00",
+      "score": "2-1",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Over 1.5",
+          "market": "Over/Under",
+          "confidence": 0.7949,
+          "n_models": 4,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch",
+            "poisson"
+          ],
+          "odds": 1.18,
+          "ev": 0.938,
+          "hit": true
+        },
+        {
+          "selection": "Ilves Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.791,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.16,
+          "ev": 0.9176,
+          "hit": true
+        },
+        {
+          "selection": "FF Jaro Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7775,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.3,
+          "ev": 1.0108,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 70560,
+      "match": "hodd vs Stromsgodset",
+      "home": "hodd",
+      "away": "Stromsgodset",
+      "league": "1. Division",
+      "country": "Norway",
+      "kickoff": "2026-07-04 14:00:00+00:00",
+      "score": "4-3",
+      "total": 7,
+      "picks": [
+        {
+          "selection": "Over 1.5",
+          "market": "Over/Under",
+          "confidence": 0.7961,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.33,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "Stromsgodset Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.767,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "hodd Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7623,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 51010,
+      "match": "SJK vs Turku PS",
+      "home": "SJK",
+      "away": "Turku PS",
+      "league": "Veikkausliiga",
+      "country": "Finland",
+      "kickoff": "2026-07-04 14:00:00+00:00",
+      "score": "3-1",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "SJK Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7557,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 57229,
+      "match": "Grindavik vs Vestri",
+      "home": "Grindavik",
+      "away": "Vestri",
+      "league": "1. Deild",
+      "country": "Iceland",
+      "kickoff": "2026-07-04 14:00:00+00:00",
+      "score": "0-0",
+      "total": 0,
+      "picks": [
+        {
+          "selection": "Grindavik Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7327,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.2,
+          "ev": 0.8792,
+          "hit": false
+        },
+        {
+          "selection": "Vestri Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.724,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.2,
+          "ev": 0.8688,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 42572,
+      "match": "Degerfors IF vs Malmo FF",
+      "home": "Degerfors IF",
+      "away": "Malmo FF",
+      "league": "Allsvenskan",
+      "country": "Sweden",
+      "kickoff": "2026-07-04 13:00:00+00:00",
+      "score": "0-1",
+      "total": 1,
+      "picks": [
+        {
+          "selection": "Malmo FF Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.8148,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.21,
+          "ev": 0.9859,
+          "hit": true
+        },
+        {
+          "selection": "Degerfors IF Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7431,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.36,
+          "ev": 1.0106,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 42571,
+      "match": "Halmstad vs Vasteras SK FK",
+      "home": "Halmstad",
+      "away": "Vasteras SK FK",
+      "league": "Allsvenskan",
+      "country": "Sweden",
+      "kickoff": "2026-07-04 13:00:00+00:00",
+      "score": "1-3",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "Vasteras SK FK Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7626,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "Halmstad Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7437,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 60843,
+      "match": "BFC Daugavpils vs FK Liepaja",
+      "home": "BFC Daugavpils",
+      "away": "FK Liepaja",
+      "league": "Virsliga",
+      "country": "Latvia",
+      "kickoff": "2026-07-04 13:00:00+00:00",
+      "score": "3-1",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "BFC Daugavpils Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.749,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.32,
+          "ev": 0.9887,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 44980,
+      "match": "FC Vitebsk vs FC Dnepr Mogilev",
+      "home": "FC Vitebsk",
+      "away": "FC Dnepr Mogilev",
+      "league": "Premier League",
+      "country": "Belarus",
+      "kickoff": "2026-07-04 13:00:00+00:00",
+      "score": "1-0",
+      "total": 1,
+      "picks": [
+        {
+          "selection": "FC Vitebsk Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.741,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.27,
+          "ev": 0.9411,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 61999,
+      "match": "Panevėžys vs Hegelmann Litauen",
+      "home": "Panevėžys",
+      "away": "Hegelmann Litauen",
+      "league": "A Lyga",
+      "country": "Lithuania",
+      "kickoff": "2026-07-04 13:00:00+00:00",
+      "score": "1-1",
+      "total": 2,
+      "picks": [
+        {
+          "selection": "Panevėžys Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7273,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.26,
+          "ev": 0.9163,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 70559,
+      "match": "Egersund vs Moss",
+      "home": "Egersund",
+      "away": "Moss",
+      "league": "1. Division",
+      "country": "Norway",
+      "kickoff": "2026-07-04 12:00:00+00:00",
+      "score": "3-0",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Over 1.5",
+          "market": "Over/Under",
+          "confidence": 0.8044,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.14,
+          "ev": 0.917,
+          "hit": true
+        },
+        {
+          "selection": "Egersund Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7933,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.14,
+          "ev": 0.9044,
+          "hit": true
+        },
+        {
+          "selection": "Moss Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.73,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.24,
+          "ev": 0.9052,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 51009,
+      "match": "Lahti vs Gnistan",
+      "home": "Lahti",
+      "away": "Gnistan",
+      "league": "Veikkausliiga",
+      "country": "Finland",
+      "kickoff": "2026-07-04 12:00:00+00:00",
+      "score": "1-0",
+      "total": 1,
+      "picks": [
+        {
+          "selection": "Gnistan Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7316,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "mismatch"
+          ],
+          "odds": 1.3,
+          "ev": 0.951,
+          "hit": false
+        },
+        {
+          "selection": "Lahti Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7573,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.23,
+          "ev": 0.9315,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 73876,
+      "match": "Tianjin Teda vs Sichuan Jiuniu",
+      "home": "Tianjin Teda",
+      "away": "Sichuan Jiuniu",
+      "league": "Super League",
+      "country": "China",
+      "kickoff": "2026-07-04 12:00:00+00:00",
+      "score": "3-0",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Tianjin Teda Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7674,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 73874,
+      "match": "Beijing Guoan vs Shandong Luneng",
+      "home": "Beijing Guoan",
+      "away": "Shandong Luneng",
+      "league": "Super League",
+      "country": "China",
+      "kickoff": "2026-07-04 11:35:00+00:00",
+      "score": "2-0",
+      "total": 2,
+      "picks": [
+        {
+          "selection": "Over 1.5",
+          "market": "Over/Under",
+          "confidence": 0.7855,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.11,
+          "ev": 0.8719,
+          "hit": true
+        },
+        {
+          "selection": "Shandong Luneng Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7573,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.27,
+          "ev": 0.9618,
+          "hit": false
+        },
+        {
+          "selection": "Beijing Guoan Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.8223,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.09,
+          "ev": 0.8963,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 73875,
+      "match": "Dalian Zhixing vs Wuhan Three Towns",
+      "home": "Dalian Zhixing",
+      "away": "Wuhan Three Towns",
+      "league": "Super League",
+      "country": "China",
+      "kickoff": "2026-07-04 11:35:00+00:00",
+      "score": "3-2",
+      "total": 5,
+      "picks": [
+        {
+          "selection": "Dalian Zhixing Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7835,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.15,
+          "ev": 0.901,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 75555,
+      "match": "Shenzhen Juniors vs Nantong Zhiyun",
+      "home": "Shenzhen Juniors",
+      "away": "Nantong Zhiyun",
+      "league": "League One",
+      "country": "China",
+      "kickoff": "2026-07-04 11:00:00+00:00",
+      "score": "0-0",
+      "total": 0,
+      "picks": [
+        {
+          "selection": "Under 3.5",
+          "market": "Over/Under",
+          "confidence": 0.7539,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.29,
+          "ev": 0.9725,
+          "hit": true
+        },
+        {
+          "selection": "Nantong Zhiyun Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7262,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.36,
+          "ev": 0.9877,
+          "hit": false
+        },
+        {
+          "selection": "Shenzhen Juniors Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.747,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.29,
+          "ev": 0.9637,
+          "hit": false
+        }
+      ]
+    },
+    {
+      "fixture_id": 73873,
+      "match": "Qingdao Youth Island vs SHANGHAI SIPG",
+      "home": "Qingdao Youth Island",
+      "away": "SHANGHAI SIPG",
+      "league": "Super League",
+      "country": "China",
+      "kickoff": "2026-07-04 11:00:00+00:00",
+      "score": "2-1",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Under 3.5",
+          "market": "Over/Under",
+          "confidence": 0.7223,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "Qingdao Youth Island Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7934,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "SHANGHAI SIPG Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7422,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 73872,
+      "match": "Shenyang Urban vs Chongqing Tongliang Long",
+      "home": "Shenyang Urban",
+      "away": "Chongqing Tongliang Long",
+      "league": "Super League",
+      "country": "China",
+      "kickoff": "2026-07-04 11:00:00+00:00",
+      "score": "3-1",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "Chongqing Tongliang Long Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7385,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        },
+        {
+          "selection": "Shenyang Urban Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.788,
+          "n_models": 1,
+          "models": [
+            "bayesian"
+          ],
+          "odds": 1.25,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 75557,
+      "match": "Ningbo Professional vs Hebei Kungfu",
+      "home": "Ningbo Professional",
+      "away": "Hebei Kungfu",
+      "league": "League One",
+      "country": "China",
+      "kickoff": "2026-07-04 11:00:00+00:00",
+      "score": "2-1",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Ningbo Professional Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7313,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.35,
+          "ev": null,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 75556,
+      "match": "Shaanxi Union vs Wuxi Wugou",
+      "home": "Shaanxi Union",
+      "away": "Wuxi Wugou",
+      "league": "League One",
+      "country": "China",
+      "kickoff": "2026-07-04 11:00:00+00:00",
+      "score": "2-1",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Shaanxi Union Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7517,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.23,
+          "ev": 0.9246,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 75554,
+      "match": "Suzhou Dongwu vs Guangzhou E-Power",
+      "home": "Suzhou Dongwu",
+      "away": "Guangzhou E-Power",
+      "league": "League One",
+      "country": "China",
+      "kickoff": "2026-07-04 11:00:00+00:00",
+      "score": "2-2",
+      "total": 4,
+      "picks": [
+        {
+          "selection": "Guangzhou E-Power Over 0.5",
+          "market": "Away Team Over/Under",
+          "confidence": 0.7477,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.14,
+          "ev": 0.8523,
+          "hit": true
+        }
+      ]
+    },
+    {
+      "fixture_id": 75553,
+      "match": "Yanbian Longding vs Heilongjiang Lava Spring",
+      "home": "Yanbian Longding",
+      "away": "Heilongjiang Lava Spring",
+      "league": "League One",
+      "country": "China",
+      "kickoff": "2026-07-04 10:00:00+00:00",
+      "score": "3-0",
+      "total": 3,
+      "picks": [
+        {
+          "selection": "Under 3.5",
+          "market": "Over/Under",
+          "confidence": 0.7372,
+          "n_models": 3,
+          "models": [
+            "bayesian",
+            "dixon_coles",
+            "poisson"
+          ],
+          "odds": 1.25,
+          "ev": 0.9215,
+          "hit": true
+        },
+        {
+          "selection": "Yanbian Longding Over 0.5",
+          "market": "Home Team Over/Under",
+          "confidence": 0.7696,
+          "n_models": 2,
+          "models": [
+            "bayesian",
+            "dixon_coles"
+          ],
+          "odds": 1.24,
+          "ev": 0.9543,
+          "hit": true
+        }
+      ]
+    }
+  ]
+}

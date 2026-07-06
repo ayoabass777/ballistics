@@ -138,6 +138,13 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
 .book-chip { font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 600; letter-spacing: .02em; }
 .book-chip.ok { background: var(--green-bg); color: var(--green); }
 .book-chip.nb { background: var(--red-bg); color: var(--red); }
+.res-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; }
+.res-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.res-score { font-weight: 700; font-size: 16px; white-space: nowrap; }
+.res-pick { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; border-top: 1px solid var(--border); margin-top: 6px; }
+.res-badge { font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 10px; min-width: 34px; text-align: center; }
+.res-badge.hit { background: var(--green-bg); color: var(--green); }
+.res-badge.miss { background: var(--red-bg); color: var(--red); }
 .fixture-models-count { display: flex; gap: 4px; }
 .model-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .model-dot.active { opacity: 1; }
@@ -157,6 +164,12 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
 .signal-market { min-width: 200px; font-weight: 500; }
 .signal-conf { min-width: 60px; font-weight: 600; }
 .signal-detail { color: var(--text2); font-size: 12px; }
+.signal-sources { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; min-width: 220px; }
+.signal-source { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 4px; background: var(--bg3); font-size: 12px; font-weight: 600; }
+.signal-source.p { color: var(--teal); }
+.signal-source.d { color: var(--green); }
+.signal-source.b { color: var(--amber); }
+.signal-source.muted { color: var(--text3); font-weight: 500; }
 .no-signals { color: var(--text3); font-size: 13px; font-style: italic; padding: 4px 8px; }
 .fixture-chevron { color: var(--text3); font-size: 14px; transition: transform 0.15s; }
 .fixture-card.open .fixture-chevron { transform: rotate(90deg); }
@@ -203,6 +216,7 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
     <div class="tab" data-tab="builder">Slip builder</div>
     <div class="tab" data-tab="analysis">Fixture analysis</div>
     <div class="tab" data-tab="prebuilt">Pre-built slips</div>
+    <div class="tab" data-tab="results">Results</div>
   </div>
 
   <!-- ALL PICKS TAB -->
@@ -346,6 +360,12 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
   <!-- PRE-BUILT SLIPS TAB -->
   <div class="section" id="sec-prebuilt">
     <div id="prebuiltContainer"></div>
+  </div>
+
+  <!-- RESULTS TAB -->
+  <div class="section" id="sec-results">
+    <div class="stats-bar" id="resultsSummary"></div>
+    <div id="resultsContainer"></div>
   </div>
 </div>
 
@@ -692,11 +712,15 @@ function renderStrengthPanel(f) {
     const ctx = profile[context];
     const bar = (pct, cls) => `<span class="str-bar ${cls}" style="width:${Math.round(pct * 0.6)}px"></span>${Math.round(pct)}%`;
     const rank = (r, sz) => r != null && sz ? `#${r}/${sz}` : '';
+    const gpg = v => (v == null ? '–' : v.toFixed(2));
     let html = `<div class="strength-team">
       <div class="strength-team-name">${name}</div>
       <table class="strength-table">
         <tr><th></th><th>Attack</th><th>Defense</th></tr>
         <tr><td style="color:var(--text3)">Goals/game</td>
+            <td>${gpg(o.attack_rate)}</td>
+            <td>${gpg(o.defense_rate)}</td></tr>
+        <tr><td style="color:var(--text3)" title="empirical-Bayes shrunk toward league mean — the model's estimate">Adjusted</td>
             <td>${o.attack_shrunk.toFixed(2)}</td>
             <td>${o.defense_shrunk.toFixed(2)}</td></tr>
         <tr><td style="color:var(--text3)">League %ile</td>
@@ -708,6 +732,9 @@ function renderStrengthPanel(f) {
     if (ctx) {
       html += `<tr><td colspan="3" style="padding-top:6px;color:var(--text3);font-weight:500">${context.toUpperCase()} split</td></tr>
         <tr><td style="color:var(--text3)">Goals/game</td>
+            <td>${gpg(ctx.attack_rate)}</td>
+            <td>${gpg(ctx.defense_rate)}</td></tr>
+        <tr><td style="color:var(--text3)" title="shrunk toward league mean">Adjusted</td>
             <td>${ctx.attack_shrunk.toFixed(2)}</td>
             <td>${ctx.defense_shrunk.toFixed(2)}</td></tr>
         <tr><td style="color:var(--text3)">League %ile</td>
@@ -774,13 +801,92 @@ function renderAnalysis() {
     // fixture_analysis comes in two shapes: the rich in-process one and the
     // leaner fan-in (from-picks) one. Render tolerantly of missing fields.
     const pct = v => (v == null || isNaN(v)) ? '–' : Math.round(v * 100) + '%';
-    const poissonHTML = poisson.length ? poisson.map(p =>
-      `<div class="signal-row">
-        <span class="signal-market">${p.market ?? ''}</span>
-        <span class="signal-conf">${renderSignalBar(p.probability)}</span>
-        <span class="signal-detail">${p.tier != null ? 'Tier ' + p.tier : ''}</span>
-      </div>`
-    ).join('') : '<div class="no-signals">No Poisson signals</div>';
+    const poissonMarketName = p => {
+      const m = p.market ?? '';
+      if (m.startsWith('OVER ')) return 'Match Over ' + m.slice(5);
+      if (m.startsWith('UNDER ')) return 'Match Under ' + m.slice(6);
+      return m;
+    };
+    const isMatchGoal = m => /^Match (Over|Under) \d+\.5$/.test(m || '');
+    const isTeamGoal = m => / Over 0\.5$/.test(m || '') && !m.startsWith('Match ');
+    const sourcePill = (cls, label, conf, detail = '') =>
+      `<span class="signal-source ${cls}" title="${detail}">${label} ${renderSignalBar(conf)}</span>`;
+
+    const matchMarkets = new Set();
+    poisson.forEach(p => {
+      const m = poissonMarketName(p);
+      if (isMatchGoal(m)) matchMarkets.add(m);
+    });
+    dixonColes.forEach(d => {
+      if (isMatchGoal(d.market)) matchMarkets.add(d.market);
+    });
+    const matchGoalsHTML = matchMarkets.size ? [...matchMarkets].sort().map(market => {
+      const p = poisson.find(x => poissonMarketName(x) === market);
+      const d = dixonColes.find(x => x.market === market);
+      const bits = [];
+      if (p) bits.push(sourcePill('p', 'P', p.probability, p.tier != null ? 'Poisson Tier ' + p.tier : 'Poisson'));
+      if (d) {
+        const raw = d.raw_probability ?? d.raw;
+        const detail = [
+          d.tier != null ? 'DC Tier ' + d.tier : 'Dixon-Coles',
+          raw != null ? 'raw=' + pct(raw) : '',
+          d.lambda_home != null ? 'λh=' + d.lambda_home : '',
+          d.lambda_away != null ? 'λa=' + d.lambda_away : '',
+        ].filter(Boolean).join(' · ');
+        bits.push(sourcePill('d', 'DC', d.probability, detail));
+      }
+      const verdict = p && d ? 'agreement' : p ? 'Poisson only' : 'DC only';
+      return `<div class="signal-row">
+        <span class="signal-market">${market}</span>
+        <span class="signal-sources">${bits.join('')}</span>
+        <span class="signal-detail">${verdict}</span>
+      </div>`;
+    }).join('') : '<div class="no-signals">No match-goals signals</div>';
+
+    const teamMarkets = new Set();
+    dixonColes.forEach(d => {
+      if (isTeamGoal(d.market)) teamMarkets.add(d.market);
+    });
+    bayesian.forEach(b => {
+      if (b.team && ['score_1goal', 'Over_0_5', 'Over 0.5'].includes(b.event)) {
+        teamMarkets.add(`${b.team} Over 0.5`);
+      } else if (b.market && isTeamGoal(b.market)) {
+        teamMarkets.add(b.market);
+      }
+    });
+    const teamGoalsHTML = teamMarkets.size ? [...teamMarkets].sort().map(market => {
+      const d = dixonColes.find(x => x.market === market);
+      const b = bayesian.find(x => {
+        if (x.team && ['score_1goal', 'Over_0_5', 'Over 0.5'].includes(x.event)) {
+          return `${x.team} Over 0.5` === market;
+        }
+        return x.market === market;
+      });
+      const bits = [];
+      if (d) {
+        const raw = d.raw_probability ?? d.raw;
+        const detail = [
+          d.tier != null ? 'DC Tier ' + d.tier : 'Dixon-Coles',
+          raw != null ? 'raw=' + pct(raw) : '',
+          d.lambda_home != null ? 'λh=' + d.lambda_home : '',
+          d.lambda_away != null ? 'λa=' + d.lambda_away : '',
+        ].filter(Boolean).join(' · ');
+        bits.push(sourcePill('d', 'DC', d.probability, detail));
+      }
+      if (b) {
+        const conf = b.posterior ?? b.probability;
+        const detail = b.base_rate != null
+          ? `Bayesian base=${pct(b.base_rate)}${b.n != null ? ' · n=' + b.n : ''}${b.streak != null ? ' · streak=' + b.streak : ''}`
+          : 'Bayesian';
+        bits.push(sourcePill('b', 'B', conf, detail));
+      }
+      const verdict = d && b ? 'agreement' : d ? 'DC only' : 'Bayesian only';
+      return `<div class="signal-row">
+        <span class="signal-market">${market}</span>
+        <span class="signal-sources">${bits.join('')}</span>
+        <span class="signal-detail">${verdict}</span>
+      </div>`;
+    }).join('') : '<div class="no-signals">No team-to-score signals</div>';
 
     const mismatchHTML = mismatch.length ? mismatch.map(m =>
       `<div class="signal-row">
@@ -790,7 +896,12 @@ function renderAnalysis() {
       </div>`
     ).join('') : '<div class="no-signals">No Mismatch signals (gap &lt; 100 or no data)</div>';
 
-    const bayesianHTML = bayesian.length ? bayesian.map(b => {
+    const otherBayesian = bayesian.filter(b => {
+      if (b.team && ['score_1goal', 'Over_0_5', 'Over 0.5'].includes(b.event)) return false;
+      if (b.market && isTeamGoal(b.market)) return false;
+      return true;
+    });
+    const bayesianHTML = otherBayesian.length ? otherBayesian.map(b => {
       const conf = b.posterior ?? b.probability;
       const label = (b.team && b.event) ? `${b.team} — ${b.event.replace(/_/g,' ')}` : (b.market ?? '');
       let detail = '';
@@ -805,17 +916,6 @@ function renderAnalysis() {
         <span class="signal-detail">${detail}</span>
       </div>`;
     }).join('') : '<div class="no-signals">No Bayesian signals (insufficient history)</div>';
-
-    const dixonColesHTML = dixonColes.length ? dixonColes.map(d => {
-      const raw = d.raw_probability ?? d.raw;
-      const extra = [d.tier != null ? 'Tier ' + d.tier : '', raw != null ? 'raw=' + pct(raw) : '',
-                     d.lambda_home != null ? 'λh=' + d.lambda_home : '', d.lambda_away != null ? 'λa=' + d.lambda_away : ''].filter(Boolean).join(' · ');
-      return `<div class="signal-row">
-        <span class="signal-market">${d.market ?? ''}</span>
-        <span class="signal-conf">${renderSignalBar(d.probability)}</span>
-        <span class="signal-detail">${extra}</span>
-      </div>`;
-    }).join('') : '<div class="no-signals">No Dixon-Coles signals</div>';
 
     return `<div class="fixture-card" data-idx="${i}">
       <div class="fixture-card-header">
@@ -844,19 +944,19 @@ function renderAnalysis() {
       <div class="fixture-card-body">
         ${renderStrengthPanel(f)}
         <div class="model-section">
-          <div class="model-section-title"><span class="dot dot-p"></span> Poisson GLM <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(expected goals model)</span></div>
-          ${poissonHTML}
+          <div class="model-section-title"><span class="dot dot-p"></span> Match Goals <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(Poisson total goals + Dixon-Coles scoreline)</span></div>
+          ${matchGoalsHTML}
         </div>
         <div class="model-section">
-          <div class="model-section-title"><span class="dot dot-d"></span> Dixon-Coles <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(scoreline distribution)</span></div>
-          ${dixonColesHTML}
+          <div class="model-section-title"><span class="dot dot-d"></span> Team Goals <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(Dixon-Coles team score + Bayesian form)</span></div>
+          ${teamGoalsHTML}
         </div>
         <div class="model-section">
           <div class="model-section-title"><span class="dot dot-m"></span> Mismatch Elo <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(strength gap + H2H)</span></div>
           ${mismatchHTML}
         </div>
         <div class="model-section">
-          <div class="model-section-title"><span class="dot dot-b"></span> Bayesian Streaks <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(form + recency)</span></div>
+          <div class="model-section-title"><span class="dot dot-b"></span> Other Bayesian Streaks <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(form + recency)</span></div>
           ${bayesianHTML}
         </div>
       </div>
@@ -989,7 +1089,58 @@ async function loadData() {
       <p style="margin-top:12px;font-size:13px;color:var(--text3)">${lastErr ? lastErr.message : ''}</p>
     </div>`;
 }
+// ── Results tab: graded recent predictions ──────────────────────────────
+let RESULTS = null;
+async function loadResults() {
+  const d = new Date();
+  for (let i = 0; i < 21; i++) {
+    const url = `./consensus_results_${d.toISOString().slice(0, 10)}.json`;
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (r.ok) { RESULTS = await r.json(); renderResults(); return; }
+    } catch (e) { /* try next date */ }
+    d.setUTCDate(d.getUTCDate() - 1);
+  }
+  document.getElementById('resultsContainer').innerHTML =
+    '<div style="padding:48px;text-align:center;color:var(--text3)">No results yet — run <code>python -m engine.eval.results_review</code></div>';
+}
+
+function renderResults() {
+  if (!RESULTS) return;
+  const s = RESULTS.summary || {};
+  const tiers = Object.entries(s.by_tier || {}).map(([t, d]) =>
+    `<div class="stat-card"><div class="stat-label">${t}-model</div><div class="stat-value">${(d.hit_rate*100).toFixed(0)}%</div><div style="font-size:11px;color:var(--text3)">n=${d.n}</div></div>`).join('');
+  document.getElementById('resultsSummary').innerHTML =
+    `<div class="stat-card"><div class="stat-label">Played fixtures</div><div class="stat-value">${s.fixtures||0}</div></div>`
+    + `<div class="stat-card"><div class="stat-label">Predictions graded</div><div class="stat-value">${s.picks||0}</div></div>`
+    + `<div class="stat-card"><div class="stat-label">Hit rate</div><div class="stat-value green">${s.hit_rate!=null?(s.hit_rate*100).toFixed(1)+'%':'—'}</div></div>`
+    + tiers;
+
+  const rows = RESULTS.results || [];
+  const cont = document.getElementById('resultsContainer');
+  if (!rows.length) { cont.innerHTML = '<div style="padding:48px;text-align:center;color:var(--text3)">No graded fixtures in window</div>'; return; }
+  cont.innerHTML = rows.map(f => {
+    const hits = f.picks.filter(p => p.hit).length;
+    const picks = f.picks.map(p => `
+      <div class="res-pick">
+        <span class="res-badge ${p.hit?'hit':'miss'}">${p.hit?'HIT':'MISS'}</span>
+        <span style="flex:1">${p.selection}</span>
+        <span style="color:var(--text3);font-size:12px">${modelsBadge(p.models)} ${(p.confidence*100).toFixed(0)}%${p.ev!=null?' · EV '+p.ev.toFixed(2):''}</span>
+      </div>`).join('');
+    return `<div class="res-card">
+      <div class="res-head">
+        <div>
+          <div style="font-weight:600">${f.match}</div>
+          <div style="font-size:12px;color:var(--text2)">${formatKickoff(f.kickoff)} · ${f.league} · ${hits}/${f.picks.length} hit</div>
+        </div>
+        <div class="res-score">${f.score}</div>
+      </div>${picks}
+    </div>`;
+  }).join('');
+}
+
 loadData();
+loadResults();
 </script>
 </body>
 </html>
