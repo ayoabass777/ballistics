@@ -145,6 +145,14 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
 .res-badge { font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 10px; min-width: 34px; text-align: center; }
 .res-badge.hit { background: var(--green-bg); color: var(--green); }
 .res-badge.miss { background: var(--red-bg); color: var(--red); }
+.gate-strip { margin: 4px 0 10px; }
+.gate-strip-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; }
+.gate-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; border-top: 1px solid var(--border); }
+.gate-pill { font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 10px; min-width: 54px; text-align: center; }
+.gate-pill.in { background: var(--green-bg); color: var(--green); }
+.gate-pill.out { background: var(--bg3); color: var(--text3); }
+.gate-market { min-width: 150px; }
+.gate-reason { color: var(--text3); font-size: 12px; }
 .fixture-models-count { display: flex; gap: 4px; }
 .model-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .model-dot.active { opacity: 1; }
@@ -702,6 +710,20 @@ function renderSignalBar(conf) {
   return `<span style="color:${confColor(conf)};font-weight:600">${pct}%</span>`;
 }
 
+function renderGates(f) {
+  const g = f.gates || [];
+  if (!g.length) return '';
+  const rows = g.map(x => `
+    <div class="gate-row">
+      <span class="gate-pill ${x.in_pool ? 'in' : 'out'}">${x.in_pool ? 'IN POOL' : 'OUT'}</span>
+      <span class="gate-market">${x.market}</span>
+      <span class="gate-reason">${x.in_pool ? '' : x.reason}</span>
+    </div>`).join('');
+  return `<div class="gate-strip">
+    <div class="gate-strip-title">Markets — what clears the gate</div>${rows}
+  </div>`;
+}
+
 function renderStrengthPanel(f) {
   const s = f.strength;
   if (!s) return '<div class="strength-panel" style="grid-template-columns:1fr"><div class="no-signals">No strength data available</div></div>';
@@ -942,6 +964,7 @@ function renderAnalysis() {
         </div>
       </div>
       <div class="fixture-card-body">
+        ${renderGates(f)}
         ${renderStrengthPanel(f)}
         <div class="model-section">
           <div class="model-section-title"><span class="dot dot-p"></span> Match Goals <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(Poisson total goals + Dixon-Coles scoreline)</span></div>

@@ -586,15 +586,20 @@ def _score_pool(consensus: dict, fixture_meta: dict,
     and the fan-in `build_consensus_from_signals` (DAG) path.
     """
     ranked = []
+    gate_status = {}   # (fid, unified_market) -> {"in_pool": bool, "reason": str}
     for key, pick in consensus.items():
         fid = pick["fixture_id"]
+        um = pick["unified_market"]
         meta = fixture_meta.get(fid)
         if not meta:
             continue
 
+        def _reject(reason):
+            gate_status[key] = {"in_pool": False, "reason": reason}
+
         # Drop leagues SportyBet-NG cannot book — keep the pool to bettable markets
         if not _is_bookable(meta["league"], meta.get("country", "")):
-            continue
+            _reject("not on SportyBet"); continue
 
         models = set(pick["models"])
         n_models = len(models)
@@ -603,42 +608,48 @@ def _score_pool(consensus: dict, fixture_meta: dict,
 
         # DC-favoured unders in high-scoring leagues: Poisson overpredicts unders
         # there while DC stays calibrated, so price off DC's probability.
-        if (pick["unified_market"].startswith("Match Under")
+        if (um.startswith("Match Under")
                 and fid in high_scoring_fids and "dixon_coles" in pick["models"]):
             dc_conf = pick["confidences"][pick["models"].index("dixon_coles")]
             avg_conf = UNDER_HIGH_DC_WEIGHT * dc_conf + (1 - UNDER_HIGH_DC_WEIGHT) * avg_conf
 
         strength_rank = _fixture_strength_rank(fixture_strength_all.get(fid))
 
-        if not _passes_goal_model_rules(pick["unified_market"], models):
+        if not _passes_goal_model_rules(um, models):
+            if um == "BTTS Yes":
+                _reject("needs Dixon-Coles")
+            elif um == "Match Over 1.5" or um.startswith("Match Under"):
+                _reject("needs DC + Poisson")
+            else:
+                _reject("solo goal-model pick")
             continue
-        if (pick["unified_market"] == "Match Over 1.5"
-                and avg_conf < OVER15_DC_POISSON_THRESHOLD):
+        if um == "Match Over 1.5" and avg_conf < OVER15_DC_POISSON_THRESHOLD:
+            _reject(f"below Over 1.5 floor ({avg_conf:.0%} < {OVER15_DC_POISSON_THRESHOLD:.0%})")
             continue
         strength_gate = None
-        if pick["unified_market"] == "Match Under 3.5":
+        if um == "Match Under 3.5":
             passes_strength, strength_gate = _under35_strength_gate(
                 fixture_strength_all.get(fid))
             if not passes_strength:
-                continue
-        market_tier = _market_tier(
-            pick["unified_market"], avg_conf, strength_gate)
-        if pick["unified_market"] == "Match Under 3.5" and not market_tier:
-            continue
+                _reject("fails Under 3.5 strength gate"); continue
+        market_tier = _market_tier(um, avg_conf, strength_gate)
+        if um == "Match Under 3.5" and not market_tier:
+            _reject("below Under 3.5 tier"); continue
 
         # Filter by tier thresholds
         if n_models >= 3 and avg_conf < TRIO_THRESHOLD:
-            continue
+            _reject(f"below trio threshold ({avg_conf:.0%} < {TRIO_THRESHOLD:.0%})"); continue
         if n_models == 2 and avg_conf < DUO_THRESHOLD:
-            continue
+            _reject(f"below duo threshold ({avg_conf:.0%} < {DUO_THRESHOLD:.0%})"); continue
         if n_models == 1 and max_conf < SOLO_THRESHOLD:
-            continue
+            _reject(f"below solo threshold ({max_conf:.0%} < {SOLO_THRESHOLD:.0%})"); continue
 
-        est_odds = _est_odds(avg_conf, pick["unified_market"])
+        est_odds = _est_odds(avg_conf, um)
         if est_odds < MIN_EST_ODDS:
-            continue
+            _reject("est odds too short"); continue
 
-        sportify = _sportify_market(pick["unified_market"], meta["home"], meta["away"])
+        gate_status[key] = {"in_pool": True, "reason": "in pool"}
+        sportify = _sportify_market(um, meta["home"], meta["away"])
 
         # Real SportyBet odds + EV where available (else fall back to est_odds)
         real_odds = odds_for_pick(
@@ -689,7 +700,7 @@ def _score_pool(consensus: dict, fixture_meta: dict,
     print(f"  4-model: {by_tier.get(4,0)} | 3-model: {by_tier.get(3,0)} | "
           f"2-model: {by_tier.get(2,0)} | "
           f"1-model (P≥{SOLO_THRESHOLD:.0%}): {by_tier.get(1,0)}")
-    return ranked
+    return ranked, gate_status
 
 
 def _league_id_country_map(conn) -> tuple[dict, dict]:
@@ -750,14 +761,27 @@ def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
             conn.close()
 
 
+def _gates_by_fixture(gate_status: dict) -> dict:
+    """(fid, market)->status  ==>  {fid: [{market, in_pool, reason}, ...]}."""
+    out = {}
+    for (fid, market), gs in gate_status.items():
+        out.setdefault(fid, []).append({"market": market, **gs})
+    for lst in out.values():
+        lst.sort(key=lambda g: (not g["in_pool"], g["market"]))  # in-pool first
+    return out
+
+
 def _analysis_from_signals(signals: list[dict], fixture_meta: dict,
-                           fixture_strength_all: dict) -> list[dict]:
+                           fixture_strength_all: dict,
+                           gate_status: dict | None = None) -> list[dict]:
     """Best-effort per-fixture analysis rebuilt from stored signals (for the JSON feed)."""
+    gates = _gates_by_fixture(gate_status or {})
     fa = {}
     for fid, meta in fixture_meta.items():
         fa[fid] = {**meta,
                    "bookable": _is_bookable(meta["league"], meta.get("country", "")),
                    "poisson": [], "mismatch": [], "bayesian": [], "dixon_coles": [],
+                   "gates": gates.get(fid, []),
                    "strength": fixture_strength_all.get(fid)}
     for s in signals:
         entry = fa.get(s["fixture_id"])
@@ -802,9 +826,10 @@ def build_consensus_from_signals(signals: list[dict],
 
     odds_map = _load_sportybet_odds()
     high_scoring_fids = _high_scoring_fixture_ids(fixture_meta.keys())
-    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map,
-                         high_scoring_fids)
-    analysis = _analysis_from_signals(signals, fixture_meta, fixture_strength_all)
+    ranked, gate_status = _score_pool(consensus, fixture_meta, fixture_strength_all,
+                                      odds_map, high_scoring_fids)
+    analysis = _analysis_from_signals(signals, fixture_meta, fixture_strength_all,
+                                      gate_status)
     slips = _build_slips(ranked, target_odds, bankroll=bankroll)
 
     if run_ds:
@@ -1032,8 +1057,9 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
 
     # ── Score and rank ──────────────────────────────────────────────────
     high_scoring_fids = _high_scoring_fixture_ids(fixture_meta.keys())
-    ranked = _score_pool(consensus, fixture_meta, fixture_strength_all, odds_map,
-                         high_scoring_fids)
+    ranked, gate_status = _score_pool(consensus, fixture_meta, fixture_strength_all,
+                                      odds_map, high_scoring_fids)
+    gates_by_fid = _gates_by_fixture(gate_status)
 
     # ── Per-fixture analysis (all raw model signals) ──────────────────
     fixture_analysis = {}
@@ -1041,6 +1067,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         fixture_analysis[fid] = {
             **meta,
             "bookable": _is_bookable(meta["league"], meta.get("country", "")),
+            "gates": gates_by_fid.get(fid, []),
             "poisson": [],
             "mismatch": [],
             "bayesian": [],

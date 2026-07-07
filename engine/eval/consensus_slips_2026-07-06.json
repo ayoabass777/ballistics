@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-06 19:02 UTC",
+  "generated": "2026-07-06 23:45 UTC",
   "models": [
     "poisson_glm",
     "mismatch_elo",
@@ -42,7 +42,7 @@
         "mismatch",
         "poisson"
       ],
-      "avg_confidence": 0.8102,
+      "avg_confidence": 0.8103,
       "max_confidence": 0.8201,
       "est_odds": 1.26,
       "real_odds": null,
@@ -688,7 +688,7 @@
       "real_odds": 1.14,
       "odds": 1.14,
       "has_odds": true,
-      "ev": 0.9041,
+      "ev": 0.904,
       "country": "Norway",
       "strength_gate": null,
       "strength_rank": {
@@ -1700,7 +1700,7 @@
         "dixon_coles",
         "poisson"
       ],
-      "avg_confidence": 0.7935,
+      "avg_confidence": 0.7934,
       "max_confidence": 0.8272,
       "est_odds": 1.33,
       "real_odds": null,
@@ -2020,7 +2020,7 @@
         "dixon_coles",
         "poisson"
       ],
-      "avg_confidence": 0.7904,
+      "avg_confidence": 0.7905,
       "max_confidence": 0.8063,
       "est_odds": 1.33,
       "real_odds": null,
@@ -2335,7 +2335,7 @@
         "dixon_coles",
         "poisson"
       ],
-      "avg_confidence": 0.7882,
+      "avg_confidence": 0.7881,
       "max_confidence": 0.8272,
       "est_odds": 1.33,
       "real_odds": null,
@@ -2902,7 +2902,7 @@
         "dixon_coles",
         "mismatch"
       ],
-      "avg_confidence": 0.7648,
+      "avg_confidence": 0.765,
       "max_confidence": 0.8272,
       "est_odds": 1.25,
       "real_odds": null,
@@ -3155,7 +3155,7 @@
         "mismatch"
       ],
       "avg_confidence": 0.7596,
-      "max_confidence": 0.7987,
+      "max_confidence": 0.7988,
       "est_odds": 1.25,
       "real_odds": null,
       "odds": 1.25,
@@ -3485,7 +3485,7 @@
         "poisson"
       ],
       "avg_confidence": 0.749,
-      "max_confidence": 0.8003,
+      "max_confidence": 0.8002,
       "est_odds": 1.55,
       "real_odds": null,
       "odds": 1.55,
@@ -3610,7 +3610,7 @@
         "dixon_coles",
         "poisson"
       ],
-      "avg_confidence": 0.7917,
+      "avg_confidence": 0.7916,
       "max_confidence": 0.8272,
       "est_odds": 1.33,
       "real_odds": 1.2,
@@ -3872,7 +3872,7 @@
         "dixon_coles",
         "poisson"
       ],
-      "avg_confidence": 0.7326,
+      "avg_confidence": 0.7325,
       "max_confidence": 0.7678,
       "est_odds": 1.35,
       "real_odds": null,
@@ -5255,7 +5255,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7992,
+      "avg_confidence": 0.7991,
       "max_confidence": 0.8272,
       "est_odds": 1.25,
       "real_odds": null,
@@ -5627,7 +5627,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7958,
+      "avg_confidence": 0.7957,
       "max_confidence": 0.8255,
       "est_odds": 1.25,
       "real_odds": null,
@@ -5875,7 +5875,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7908,
+      "avg_confidence": 0.7907,
       "max_confidence": 0.8189,
       "est_odds": 1.25,
       "real_odds": null,
@@ -5999,7 +5999,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7854,
+      "avg_confidence": 0.7855,
       "max_confidence": 0.7892,
       "est_odds": 1.25,
       "real_odds": null,
@@ -6309,8 +6309,8 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.778,
-      "max_confidence": 0.8102,
+      "avg_confidence": 0.7781,
+      "max_confidence": 0.8103,
       "est_odds": 1.25,
       "real_odds": null,
       "odds": 1.25,
@@ -6805,7 +6805,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7656,
+      "avg_confidence": 0.7655,
       "max_confidence": 0.8147,
       "est_odds": 1.25,
       "real_odds": null,
@@ -6991,7 +6991,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7612,
+      "avg_confidence": 0.7611,
       "max_confidence": 0.7983,
       "est_odds": 1.25,
       "real_odds": null,
@@ -7239,7 +7239,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7563,
+      "avg_confidence": 0.7562,
       "max_confidence": 0.7942,
       "est_odds": 1.25,
       "real_odds": null,
@@ -7487,7 +7487,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7521,
+      "avg_confidence": 0.752,
       "max_confidence": 0.7851,
       "est_odds": 1.25,
       "real_odds": null,
@@ -7550,7 +7550,7 @@
         "dixon_coles"
       ],
       "avg_confidence": 0.7519,
-      "max_confidence": 0.7599,
+      "max_confidence": 0.7598,
       "est_odds": 1.25,
       "real_odds": null,
       "odds": 1.25,
@@ -7673,7 +7673,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7496,
+      "avg_confidence": 0.7497,
       "max_confidence": 0.7906,
       "est_odds": 1.35,
       "real_odds": null,
@@ -7983,7 +7983,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.744,
+      "avg_confidence": 0.7441,
       "max_confidence": 0.7704,
       "est_odds": 1.35,
       "real_odds": null,
@@ -8045,7 +8045,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7435,
+      "avg_confidence": 0.7436,
       "max_confidence": 0.8025,
       "est_odds": 1.35,
       "real_odds": null,
@@ -8169,7 +8169,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7374,
+      "avg_confidence": 0.7373,
       "max_confidence": 0.7902,
       "est_odds": 1.35,
       "real_odds": null,
@@ -8231,7 +8231,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7368,
+      "avg_confidence": 0.7369,
       "max_confidence": 0.7839,
       "est_odds": 1.35,
       "real_odds": null,
@@ -8293,8 +8293,8 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7363,
-      "max_confidence": 0.7562,
+      "avg_confidence": 0.7362,
+      "max_confidence": 0.756,
       "est_odds": 1.35,
       "real_odds": null,
       "odds": 1.35,
@@ -8603,7 +8603,7 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7326,
+      "avg_confidence": 0.7325,
       "max_confidence": 0.7953,
       "est_odds": 1.35,
       "real_odds": null,
@@ -8852,7 +8852,7 @@
         "dixon_coles"
       ],
       "avg_confidence": 0.7319,
-      "max_confidence": 0.7405,
+      "max_confidence": 0.7406,
       "est_odds": 1.35,
       "real_odds": null,
       "odds": 1.35,
@@ -8975,8 +8975,8 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7302,
-      "max_confidence": 0.766,
+      "avg_confidence": 0.7301,
+      "max_confidence": 0.7656,
       "est_odds": 1.35,
       "real_odds": null,
       "odds": 1.35,
@@ -9286,7 +9286,7 @@
         "dixon_coles"
       ],
       "avg_confidence": 0.7242,
-      "max_confidence": 0.7437,
+      "max_confidence": 0.7438,
       "est_odds": 1.35,
       "real_odds": null,
       "odds": 1.35,
@@ -9533,8 +9533,8 @@
         "bayesian",
         "dixon_coles"
       ],
-      "avg_confidence": 0.7209,
-      "max_confidence": 0.7633,
+      "avg_confidence": 0.721,
+      "max_confidence": 0.7635,
       "est_odds": 1.35,
       "real_odds": null,
       "odds": 1.35,
@@ -11595,6 +11595,43 @@
       "kickoff": "2026-07-06 03:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Alta Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Charlotte Independence Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Alta Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (77% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -11713,39 +11750,39 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7877,
-          "raw_probability": 0.8358,
+          "probability": 0.7878,
+          "raw_probability": 0.8359,
           "tier": "A",
           "lambda_home": 1.7,
           "lambda_away": 1.61
         },
         {
           "market": "Alta Over 0.5",
-          "probability": 0.7754,
-          "raw_probability": 0.8175,
+          "probability": 0.7753,
+          "raw_probability": 0.8174,
           "tier": "A",
           "lambda_home": 1.7,
           "lambda_away": 1.61
         },
         {
           "market": "Charlotte Independence Over 0.5",
-          "probability": 0.7633,
-          "raw_probability": 0.7996,
+          "probability": 0.7635,
+          "raw_probability": 0.7998,
           "tier": "A",
           "lambda_home": 1.7,
           "lambda_away": 1.61
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.655,
-          "raw_probability": 0.647,
+          "probability": 0.6551,
+          "raw_probability": 0.6472,
           "tier": "C",
           "lambda_home": 1.7,
           "lambda_away": 1.61
         },
         {
           "market": "Match Over 2.5",
-          "probability": 0.6509,
+          "probability": 0.651,
           "raw_probability": 0.6423,
           "tier": "C",
           "lambda_home": 1.7,
@@ -11833,6 +11870,48 @@
       "kickoff": "2026-07-06 15:45:00+00:00",
       "country": "Lithuania",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Suduva Marijampole Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Suduva Marijampole Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "TransINVEST Vilnius Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Transinvest Vilnius Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Transinvest Vilnius Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -11971,15 +12050,15 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7235,
-          "raw_probability": 0.7509,
+          "probability": 0.7234,
+          "raw_probability": 0.7508,
           "tier": "B",
           "lambda_home": 1.36,
           "lambda_away": 1.24
         },
         {
           "market": "Suduva Marijampole Over 0.5",
-          "probability": 0.7169,
+          "probability": 0.7168,
           "raw_probability": 0.7429,
           "tier": "B",
           "lambda_home": 1.36,
@@ -11988,7 +12067,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.7116,
-          "raw_probability": 0.7366,
+          "raw_probability": 0.7367,
           "tier": "B",
           "lambda_home": 1.36,
           "lambda_away": 1.24
@@ -12083,6 +12162,28 @@
       "kickoff": "2026-07-06 16:00:00+00:00",
       "country": "Latvia",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Ogre United Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Super Nova Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -12265,6 +12366,33 @@
       "kickoff": "2026-07-06 17:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Gais Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "IF Brommapojkarna Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "If Brommapojkarna Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (77% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -12487,6 +12615,53 @@
       "kickoff": "2026-07-06 17:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "BK Hacken Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Bk Hacken Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Djurgardens IF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Bk Hacken Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Djurgardens If Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (68% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -12715,6 +12890,43 @@
       "kickoff": "2026-07-06 22:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Botafogo SP Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Avai Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Botafogo Sp Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Botafogo Sp Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (68% < 78%)"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -12813,8 +13025,8 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7858,
-          "raw_probability": 0.833,
+          "probability": 0.7859,
+          "raw_probability": 0.8331,
           "tier": "A",
           "lambda_home": 1.33,
           "lambda_away": 0.8
@@ -12829,15 +13041,15 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6513,
-          "raw_probability": 0.6427,
+          "probability": 0.6514,
+          "raw_probability": 0.6428,
           "tier": "C",
           "lambda_home": 1.33,
           "lambda_away": 0.8
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6504,
+          "probability": 0.6505,
           "raw_probability": 0.6417,
           "tier": "C",
           "lambda_home": 1.33,
@@ -12925,6 +13137,38 @@
       "kickoff": "2026-07-06 22:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "São Bernardo Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Vila Nova Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (80% < 80%)"
+        },
+        {
+          "market": "Vila Nova Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (80% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13023,16 +13267,16 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7966,
-          "raw_probability": 0.8553,
+          "probability": 0.7967,
+          "raw_probability": 0.8556,
           "tier": "A",
           "lambda_home": 1.01,
           "lambda_away": 1.0
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6713,
-          "raw_probability": 0.6739,
+          "probability": 0.6715,
+          "raw_probability": 0.6744,
           "tier": "C",
           "lambda_home": 1.01,
           "lambda_away": 1.0
@@ -13119,6 +13363,38 @@
       "kickoff": "2026-07-07 23:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Athletic Club Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Athletic Club Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (72% < 72%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (68% < 78%)"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Operario-PR Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13217,31 +13493,31 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7804,
-          "raw_probability": 0.825,
+          "probability": 0.7803,
+          "raw_probability": 0.8248,
           "tier": "A",
           "lambda_home": 1.12,
           "lambda_away": 1.05
         },
         {
           "market": "Athletic Club Over 0.5",
-          "probability": 0.6709,
-          "raw_probability": 0.673,
+          "probability": 0.671,
+          "raw_probability": 0.6733,
           "tier": "C",
           "lambda_home": 1.12,
           "lambda_away": 1.05
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6611,
-          "raw_probability": 0.6542,
+          "probability": 0.6614,
+          "raw_probability": 0.6545,
           "tier": "C",
           "lambda_home": 1.12,
           "lambda_away": 1.05
         },
         {
           "market": "Operario-PR Over 0.5",
-          "probability": 0.6587,
+          "probability": 0.6586,
           "raw_probability": 0.6513,
           "tier": "C",
           "lambda_home": 1.12,
@@ -13329,6 +13605,18 @@
       "kickoff": "2026-07-08 08:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13357,6 +13645,18 @@
       "kickoff": "2026-07-08 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13385,6 +13685,28 @@
       "kickoff": "2026-07-08 20:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Tormenta Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Portland Hearts Of Pine Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13478,6 +13800,38 @@
       "kickoff": "2026-07-08 23:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Hartford Athletic Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Hartford Athletic Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Orange County Sc Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13662,6 +14016,33 @@
       "kickoff": "2026-07-08 23:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Greenville Triumph Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Greenville Triumph Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Sarasota Paradise Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13750,24 +14131,24 @@
       "dixon_coles": [
         {
           "market": "Greenville Triumph Over 0.5",
-          "probability": 0.7705,
-          "raw_probability": 0.8103,
+          "probability": 0.7706,
+          "raw_probability": 0.8104,
           "tier": "A",
           "lambda_home": 1.66,
           "lambda_away": 0.83
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.7312,
-          "raw_probability": 0.7602,
+          "probability": 0.7311,
+          "raw_probability": 0.76,
           "tier": "B",
           "lambda_home": 1.66,
           "lambda_away": 0.83
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6864,
-          "raw_probability": 0.7026,
+          "probability": 0.6866,
+          "raw_probability": 0.7029,
           "tier": "C",
           "lambda_home": 1.66,
           "lambda_away": 0.83
@@ -13854,6 +14235,33 @@
       "kickoff": "2026-07-08 23:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Criciuma Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Ponte Preta Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -13962,15 +14370,15 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7987,
-          "raw_probability": 0.8601,
+          "probability": 0.7988,
+          "raw_probability": 0.8603,
           "tier": "A",
           "lambda_home": 0.53,
           "lambda_away": 1.45
         },
         {
           "market": "Criciuma Over 0.5",
-          "probability": 0.7366,
+          "probability": 0.7365,
           "raw_probability": 0.7665,
           "tier": "B",
           "lambda_home": 0.53,
@@ -13978,8 +14386,8 @@
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6742,
-          "raw_probability": 0.6812,
+          "probability": 0.6743,
+          "raw_probability": 0.6814,
           "tier": "C",
           "lambda_home": 0.53,
           "lambda_away": 1.45
@@ -14066,6 +14474,43 @@
       "kickoff": "2026-07-08 23:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "NY Cosmos Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Naples Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Ny Cosmos Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Ny Cosmos Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -14164,24 +14609,24 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7749,
-          "raw_probability": 0.8168,
+          "probability": 0.7748,
+          "raw_probability": 0.8167,
           "tier": "A",
           "lambda_home": 1.6,
           "lambda_away": 1.56
         },
         {
           "market": "NY Cosmos Over 0.5",
-          "probability": 0.7627,
-          "raw_probability": 0.7987,
+          "probability": 0.7626,
+          "raw_probability": 0.7985,
           "tier": "A",
           "lambda_home": 1.6,
           "lambda_away": 1.56
         },
         {
           "market": "Naples Over 0.5",
-          "probability": 0.7562,
-          "raw_probability": 0.7898,
+          "probability": 0.756,
+          "raw_probability": 0.7896,
           "tier": "A",
           "lambda_home": 1.6,
           "lambda_away": 1.56
@@ -14268,6 +14713,38 @@
       "kickoff": "2026-07-09 02:30:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Sacramento Republic Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Rhode Island Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Sacramento Republic Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -14377,7 +14854,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.7888,
-          "raw_probability": 0.8377,
+          "raw_probability": 0.8376,
           "tier": "A",
           "lambda_home": 1.09,
           "lambda_away": 1.02
@@ -14385,15 +14862,15 @@
         {
           "market": "Sacramento Republic Over 0.5",
           "probability": 0.6671,
-          "raw_probability": 0.6636,
+          "raw_probability": 0.6638,
           "tier": "C",
           "lambda_home": 1.09,
           "lambda_away": 1.02
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6561,
-          "raw_probability": 0.6483,
+          "probability": 0.6559,
+          "raw_probability": 0.6481,
           "tier": "C",
           "lambda_home": 1.09,
           "lambda_away": 1.02
@@ -14480,6 +14957,48 @@
       "kickoff": "2026-07-10 11:35:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Shandong Luneng Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Yunnan Yukun Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (69% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Shandong Luneng Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Shandong Luneng Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -14643,7 +15162,7 @@
         {
           "market": "Match Over 2.5",
           "probability": 0.6924,
-          "raw_probability": 0.7114,
+          "raw_probability": 0.7113,
           "tier": "C",
           "lambda_home": 2.35,
           "lambda_away": 1.33
@@ -14658,7 +15177,7 @@
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.6688,
+          "probability": 0.6687,
           "raw_probability": 0.6677,
           "tier": "C",
           "lambda_home": 2.35,
@@ -14746,6 +15265,28 @@
       "kickoff": "2026-07-10 14:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Niva Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Slonim Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -14874,7 +15415,7 @@
         },
         {
           "market": "Match Over 2.5",
-          "probability": 0.6517,
+          "probability": 0.6516,
           "raw_probability": 0.6431,
           "tier": "C",
           "lambda_home": 1.22,
@@ -14962,6 +15503,53 @@
       "kickoff": "2026-07-10 15:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "FC Energetik-Bgu Minsk Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "FC Energetik-Bgu Minsk Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "FC Energetik-Bgu Minsk Win",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Fc Energetik-Bgu Minsk Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Ostrovets FC Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Ostrovets Fc Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -15086,14 +15674,14 @@
         {
           "market": "FC Energetik-Bgu Minsk Over 0.5",
           "probability": 0.817,
-          "raw_probability": 0.9016,
+          "raw_probability": 0.9015,
           "tier": "A",
           "lambda_home": 1.01,
           "lambda_away": 2.32
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7965,
+          "probability": 0.7964,
           "raw_probability": 0.855,
           "tier": "A",
           "lambda_home": 1.01,
@@ -15102,7 +15690,7 @@
         {
           "market": "FC Energetik-Bgu Minsk Over 1.5",
           "probability": 0.671,
-          "raw_probability": 0.6734,
+          "raw_probability": 0.6733,
           "tier": "C",
           "lambda_home": 1.01,
           "lambda_away": 2.32
@@ -15205,6 +15793,43 @@
       "kickoff": "2026-07-10 15:30:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "FC Minsk Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "FC Dnepr Mogilev Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Fc Dnepr Mogilev Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Fc Dnepr Mogilev Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Fc Minsk Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -15374,7 +15999,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.7416,
-          "raw_probability": 0.7725,
+          "raw_probability": 0.7724,
           "tier": "B",
           "lambda_home": 0.99,
           "lambda_away": 1.44
@@ -15389,8 +16014,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6943,
-          "raw_probability": 0.7142,
+          "probability": 0.6944,
+          "raw_probability": 0.7143,
           "tier": "C",
           "lambda_home": 0.99,
           "lambda_away": 1.44
@@ -15477,6 +16102,43 @@
       "kickoff": "2026-07-10 16:00:00+00:00",
       "country": "Finland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "VPS Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "SJK Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (69% < 72%)"
+        },
+        {
+          "market": "Sjk Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Vps Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        },
+        {
+          "market": "Vps Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -15600,7 +16262,7 @@
         {
           "market": "SJK Over 0.5",
           "probability": 0.6633,
-          "raw_probability": 0.6568,
+          "raw_probability": 0.6567,
           "tier": "C",
           "lambda_home": 1.86,
           "lambda_away": 1.07
@@ -15687,6 +16349,33 @@
       "kickoff": "2026-07-10 16:00:00+00:00",
       "country": "Estonia",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Laagri Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Trans Narva Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -15879,6 +16568,43 @@
       "kickoff": "2026-07-10 18:45:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Cork City Double Chance",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Cork City Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Cork City Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Cork City Win",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        },
+        {
+          "market": "Longford Town Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -16086,32 +16812,32 @@
         },
         {
           "market": "Cork City Win",
-          "probability": 0.7798,
-          "raw_probability": 0.8241,
+          "probability": 0.7799,
+          "raw_probability": 0.8242,
           "tier": "A",
           "lambda_home": 2.32,
           "lambda_away": 0.35
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7154,
-          "raw_probability": 0.7412,
+          "probability": 0.7155,
+          "raw_probability": 0.7414,
           "tier": "B",
           "lambda_home": 2.32,
           "lambda_away": 0.35
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6991,
-          "raw_probability": 0.7212,
+          "probability": 0.699,
+          "raw_probability": 0.7211,
           "tier": "C",
           "lambda_home": 2.32,
           "lambda_away": 0.35
         },
         {
           "market": "Cork City Over 1.5",
-          "probability": 0.6709,
-          "raw_probability": 0.6731,
+          "probability": 0.671,
+          "raw_probability": 0.6733,
           "tier": "C",
           "lambda_home": 2.32,
           "lambda_away": 0.35
@@ -16198,6 +16924,38 @@
       "kickoff": "2026-07-10 18:45:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Cobh Ramblers Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Athlone Town Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Athlone Town Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -16336,16 +17094,16 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.795,
-          "raw_probability": 0.8517,
+          "probability": 0.7951,
+          "raw_probability": 0.8519,
           "tier": "A",
           "lambda_home": 0.95,
           "lambda_away": 1.08
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6691,
-          "raw_probability": 0.6686,
+          "probability": 0.6692,
+          "raw_probability": 0.6689,
           "tier": "C",
           "lambda_home": 0.95,
           "lambda_away": 1.08
@@ -16440,6 +17198,33 @@
       "kickoff": "2026-07-10 18:45:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Wexford Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Kerry Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Wexford Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -16538,16 +17323,16 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7795,
-          "raw_probability": 0.8236,
+          "probability": 0.7796,
+          "raw_probability": 0.8238,
           "tier": "A",
           "lambda_home": 1.29,
           "lambda_away": 0.89
         },
         {
           "market": "Wexford Over 0.5",
-          "probability": 0.7017,
-          "raw_probability": 0.7248,
+          "probability": 0.7016,
+          "raw_probability": 0.7246,
           "tier": "B",
           "lambda_home": 1.29,
           "lambda_away": 0.89
@@ -16634,6 +17419,33 @@
       "kickoff": "2026-07-10 18:45:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Finn Harps Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Finn Harps Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Treaty United Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (71% < 72%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -16772,24 +17584,24 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7414,
-          "raw_probability": 0.7723,
+          "probability": 0.7415,
+          "raw_probability": 0.7724,
           "tier": "B",
           "lambda_home": 1.29,
           "lambda_away": 1.14
         },
         {
           "market": "Finn Harps Over 0.5",
-          "probability": 0.7012,
-          "raw_probability": 0.7242,
+          "probability": 0.7011,
+          "raw_probability": 0.724,
           "tier": "B",
           "lambda_home": 1.29,
           "lambda_away": 1.14
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6773,
-          "raw_probability": 0.6886,
+          "probability": 0.6772,
+          "raw_probability": 0.6885,
           "tier": "C",
           "lambda_home": 1.29,
           "lambda_away": 1.14
@@ -16884,6 +17696,48 @@
       "kickoff": "2026-07-10 18:45:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Bray Wanderers Double Chance",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Bray Wanderers Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "UCD Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Ucd Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -17003,39 +17857,39 @@
         {
           "market": "Bray Wanderers Over 0.5",
           "probability": 0.7978,
-          "raw_probability": 0.8579,
+          "raw_probability": 0.8581,
           "tier": "A",
           "lambda_home": 1.95,
           "lambda_away": 1.49
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7947,
-          "raw_probability": 0.8511,
+          "probability": 0.7948,
+          "raw_probability": 0.8513,
           "tier": "A",
           "lambda_home": 1.95,
           "lambda_away": 1.49
         },
         {
           "market": "UCD Over 0.5",
-          "probability": 0.7437,
-          "raw_probability": 0.7749,
+          "probability": 0.7438,
+          "raw_probability": 0.7751,
           "tier": "B",
           "lambda_home": 1.95,
           "lambda_away": 1.49
         },
         {
           "market": "Match Over 2.5",
-          "probability": 0.669,
-          "raw_probability": 0.6685,
+          "probability": 0.6692,
+          "raw_probability": 0.6689,
           "tier": "C",
           "lambda_home": 1.95,
           "lambda_away": 1.49
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.6644,
-          "raw_probability": 0.658,
+          "probability": 0.6646,
+          "raw_probability": 0.6583,
           "tier": "C",
           "lambda_home": 1.95,
           "lambda_away": 1.49
@@ -17122,6 +17976,33 @@
       "kickoff": "2026-07-10 18:45:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Dundalk Double Chance",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dundalk Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Drogheda United Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -17321,7 +18202,7 @@
         {
           "market": "Dundalk Over 0.5",
           "probability": 0.8011,
-          "raw_probability": 0.8655,
+          "raw_probability": 0.8656,
           "tier": "A",
           "lambda_home": 2.01,
           "lambda_away": 1.09
@@ -17336,7 +18217,7 @@
         },
         {
           "market": "Drogheda United Over 0.5",
-          "probability": 0.6676,
+          "probability": 0.6675,
           "raw_probability": 0.6648,
           "tier": "C",
           "lambda_home": 2.01,
@@ -17424,6 +18305,33 @@
       "kickoff": "2026-07-10 19:00:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "St Patrick's Athl. Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "below Under 3.5 tier"
+        },
+        {
+          "market": "Waterford Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        },
+        {
+          "market": "Waterford Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -17602,27 +18510,27 @@
       "dixon_coles": [
         {
           "market": "St Patrick's Athl. Over 0.5",
-          "probability": 0.7901,
-          "raw_probability": 0.8406,
+          "probability": 0.79,
+          "raw_probability": 0.8404,
           "tier": "A",
           "lambda_home": 1.02,
-          "lambda_away": 1.84
+          "lambda_away": 1.83
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7602,
-          "raw_probability": 0.7949,
+          "probability": 0.7601,
+          "raw_probability": 0.7948,
           "tier": "A",
           "lambda_home": 1.02,
-          "lambda_away": 1.84
+          "lambda_away": 1.83
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6733,
-          "raw_probability": 0.6788,
+          "probability": 0.6734,
+          "raw_probability": 0.679,
           "tier": "C",
           "lambda_home": 1.02,
-          "lambda_away": 1.84
+          "lambda_away": 1.83
         }
       ],
       "strength": {
@@ -17706,6 +18614,48 @@
       "kickoff": "2026-07-10 19:15:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "IR Reykjavik Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Throttur Reykjavik Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Ir Reykjavik Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Ir Reykjavik Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Throttur Reykjavik Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -17805,7 +18755,7 @@
         {
           "market": "Throttur Reykjavik Over 0.5",
           "probability": 0.8197,
-          "raw_probability": 0.9155,
+          "raw_probability": 0.9156,
           "tier": "A",
           "lambda_home": 1.63,
           "lambda_away": 2.47
@@ -17820,8 +18770,8 @@
         },
         {
           "market": "IR Reykjavik Over 0.5",
-          "probability": 0.7661,
-          "raw_probability": 0.8038,
+          "probability": 0.766,
+          "raw_probability": 0.8036,
           "tier": "A",
           "lambda_home": 1.63,
           "lambda_away": 2.47
@@ -17836,16 +18786,16 @@
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.7114,
-          "raw_probability": 0.7364,
+          "probability": 0.7113,
+          "raw_probability": 0.7363,
           "tier": "B",
           "lambda_home": 1.63,
           "lambda_away": 2.47
         },
         {
           "market": "Throttur Reykjavik Over 1.5",
-          "probability": 0.6892,
-          "raw_probability": 0.7068,
+          "probability": 0.6894,
+          "raw_probability": 0.707,
           "tier": "C",
           "lambda_home": 1.63,
           "lambda_away": 2.47
@@ -17932,6 +18882,38 @@
       "kickoff": "2026-07-10 19:15:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Grotta Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Leiknir R. Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (65% < 80%)"
+        },
+        {
+          "market": "Leiknir R. Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below trio threshold (70% < 70%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -18030,40 +19012,40 @@
       "dixon_coles": [
         {
           "market": "Leiknir R. Over 0.5",
-          "probability": 0.8005,
-          "raw_probability": 0.8642,
+          "probability": 0.8006,
+          "raw_probability": 0.8643,
           "tier": "A",
           "lambda_home": 2.0,
           "lambda_away": 1.36
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7936,
-          "raw_probability": 0.8486,
+          "probability": 0.7937,
+          "raw_probability": 0.8488,
           "tier": "A",
           "lambda_home": 2.0,
           "lambda_away": 1.36
         },
         {
           "market": "Grotta Over 0.5",
-          "probability": 0.7167,
-          "raw_probability": 0.7428,
+          "probability": 0.7169,
+          "raw_probability": 0.7429,
           "tier": "B",
           "lambda_home": 2.0,
           "lambda_away": 1.36
         },
         {
           "market": "Match Over 2.5",
-          "probability": 0.6588,
-          "raw_probability": 0.6514,
+          "probability": 0.659,
+          "raw_probability": 0.6517,
           "tier": "C",
           "lambda_home": 2.0,
           "lambda_away": 1.36
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.6512,
-          "raw_probability": 0.6426,
+          "probability": 0.6514,
+          "raw_probability": 0.6429,
           "tier": "C",
           "lambda_home": 2.0,
           "lambda_away": 1.36
@@ -18150,6 +19132,43 @@
       "kickoff": "2026-07-10 19:15:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "HK Kopavogur Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Ægir Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "HK Kopavogur Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Hk Kopavogur Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -18280,39 +19299,39 @@
         {
           "market": "HK Kopavogur Over 0.5",
           "probability": 0.8167,
-          "raw_probability": 0.9008,
+          "raw_probability": 0.9009,
           "tier": "A",
           "lambda_home": 1.37,
           "lambda_away": 2.31
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.8086,
-          "raw_probability": 0.8825,
+          "probability": 0.8087,
+          "raw_probability": 0.8827,
           "tier": "A",
           "lambda_home": 1.37,
           "lambda_away": 2.31
         },
         {
           "market": "Ægir Over 0.5",
-          "probability": 0.719,
-          "raw_probability": 0.7455,
+          "probability": 0.7193,
+          "raw_probability": 0.7458,
           "tier": "B",
           "lambda_home": 1.37,
           "lambda_away": 2.31
         },
         {
           "market": "Match Over 2.5",
-          "probability": 0.6922,
-          "raw_probability": 0.7111,
+          "probability": 0.6924,
+          "raw_probability": 0.7114,
           "tier": "C",
           "lambda_home": 1.37,
           "lambda_away": 2.31
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.6706,
-          "raw_probability": 0.6722,
+          "probability": 0.6707,
+          "raw_probability": 0.6725,
           "tier": "C",
           "lambda_home": 1.37,
           "lambda_away": 2.31
@@ -18320,7 +19339,7 @@
         {
           "market": "HK Kopavogur Over 1.5",
           "probability": 0.6704,
-          "raw_probability": 0.6717,
+          "raw_probability": 0.6718,
           "tier": "C",
           "lambda_home": 1.37,
           "lambda_away": 2.31
@@ -18407,6 +19426,43 @@
       "kickoff": "2026-07-10 19:15:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Njardvik Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Grindavik Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Njardvik Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -18486,23 +19542,23 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.8197,
-          "raw_probability": 0.926,
+          "raw_probability": 0.9262,
           "tier": "A",
           "lambda_home": 1.13,
           "lambda_away": 0.43
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.7585,
-          "raw_probability": 0.7925,
+          "probability": 0.7587,
+          "raw_probability": 0.7928,
           "tier": "A",
           "lambda_home": 1.13,
           "lambda_away": 0.43
         },
         {
           "market": "Njardvik Over 0.5",
-          "probability": 0.6729,
-          "raw_probability": 0.6778,
+          "probability": 0.6727,
+          "raw_probability": 0.6773,
           "tier": "C",
           "lambda_home": 1.13,
           "lambda_away": 0.43
@@ -18589,6 +19645,33 @@
       "kickoff": "2026-07-10 22:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Juventude Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Juventude Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -18658,22 +19741,22 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.8027,
-          "raw_probability": 0.8692,
+          "raw_probability": 0.8691,
           "tier": "A",
           "lambda_home": 1.26,
           "lambda_away": 0.68
         },
         {
           "market": "Juventude Over 0.5",
-          "probability": 0.6949,
-          "raw_probability": 0.7151,
+          "probability": 0.695,
+          "raw_probability": 0.7152,
           "tier": "C",
           "lambda_home": 1.26,
           "lambda_away": 0.68
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6812,
+          "probability": 0.6811,
           "raw_probability": 0.695,
           "tier": "C",
           "lambda_home": 1.26,
@@ -18761,6 +19844,33 @@
       "kickoff": "2026-07-10 23:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Sport Recife Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Sport Recife Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -18883,23 +19993,23 @@
           "raw_probability": 0.8775,
           "tier": "A",
           "lambda_home": 1.2,
-          "lambda_away": 0.69
+          "lambda_away": 0.68
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6901,
-          "raw_probability": 0.7081,
+          "probability": 0.6902,
+          "raw_probability": 0.7082,
           "tier": "C",
           "lambda_home": 1.2,
-          "lambda_away": 0.69
+          "lambda_away": 0.68
         },
         {
           "market": "Sport Recife Over 0.5",
-          "probability": 0.6835,
-          "raw_probability": 0.6984,
+          "probability": 0.6834,
+          "raw_probability": 0.6983,
           "tier": "C",
           "lambda_home": 1.2,
-          "lambda_away": 0.69
+          "lambda_away": 0.68
         }
       ],
       "strength": {
@@ -18983,6 +20093,18 @@
       "kickoff": "2026-07-11 08:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -19011,6 +20133,28 @@
       "kickoff": "2026-07-11 10:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Yanbian Longding Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (71% < 78%)"
+        },
+        {
+          "market": "Yanbian Longding Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (77% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -19100,7 +20244,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.783,
-          "raw_probability": 0.8289,
+          "raw_probability": 0.8288,
           "tier": "A",
           "lambda_home": 1.64,
           "lambda_away": 0.51
@@ -19108,7 +20252,7 @@
         {
           "market": "Yanbian Longding Over 0.5",
           "probability": 0.7675,
-          "raw_probability": 0.8057,
+          "raw_probability": 0.8058,
           "tier": "A",
           "lambda_home": 1.64,
           "lambda_away": 0.51
@@ -19116,7 +20260,7 @@
         {
           "market": "Match Over 1.5",
           "probability": 0.6545,
-          "raw_probability": 0.6464,
+          "raw_probability": 0.6465,
           "tier": "C",
           "lambda_home": 1.64,
           "lambda_away": 0.51
@@ -19203,6 +20347,38 @@
       "kickoff": "2026-07-11 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Shaanxi Union Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (74% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "below Under 3.5 tier"
+        },
+        {
+          "market": "Meizhou Kejia Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Shaanxi Union Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Shaanxi Union Win",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -19365,8 +20541,8 @@
         },
         {
           "market": "Shaanxi Union Win",
-          "probability": 0.6567,
-          "raw_probability": 0.649,
+          "probability": 0.6566,
+          "raw_probability": 0.6489,
           "tier": "C",
           "lambda_home": 2.05,
           "lambda_away": 0.81
@@ -19453,6 +20629,18 @@
       "kickoff": "2026-07-11 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -19481,6 +20669,33 @@
       "kickoff": "2026-07-11 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Henan Jianye Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Wuhan Three Towns Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "below Under 3.5 tier"
+        },
+        {
+          "market": "Wuhan Three Towns Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -19731,6 +20946,28 @@
       "kickoff": "2026-07-11 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Guangxi Hengchen Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Wuxi Wugou Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -19829,35 +21066,35 @@
       "dixon_coles": [
         {
           "market": "Guangxi Hengchen Over 0.5",
-          "probability": 0.7405,
-          "raw_probability": 0.7712,
+          "probability": 0.7406,
+          "raw_probability": 0.7713,
           "tier": "B",
           "lambda_home": 1.2,
-          "lambda_away": 1.47
+          "lambda_away": 1.48
         },
         {
           "market": "Match Over 1.5",
           "probability": 0.7344,
-          "raw_probability": 0.7639,
+          "raw_probability": 0.764,
           "tier": "B",
           "lambda_home": 1.2,
-          "lambda_away": 1.47
+          "lambda_away": 1.48
         },
         {
           "market": "Match Under 3.5",
           "probability": 0.6973,
-          "raw_probability": 0.7186,
+          "raw_probability": 0.7185,
           "tier": "C",
           "lambda_home": 1.2,
-          "lambda_away": 1.47
+          "lambda_away": 1.48
         },
         {
           "market": "Wuxi Wugou Over 0.5",
-          "probability": 0.6848,
-          "raw_probability": 0.7003,
+          "probability": 0.6847,
+          "raw_probability": 0.7002,
           "tier": "C",
           "lambda_home": 1.2,
-          "lambda_away": 1.47
+          "lambda_away": 1.48
         }
       ],
       "strength": {
@@ -19941,6 +21178,33 @@
       "kickoff": "2026-07-11 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Dalian Huayi Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dalian Huayi Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (74% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Nanjing City Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (71% < 72%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -20065,7 +21329,7 @@
         },
         {
           "market": "Nanjing City Over 0.5",
-          "probability": 0.7191,
+          "probability": 0.7192,
           "raw_probability": 0.7457,
           "tier": "B",
           "lambda_home": 1.51,
@@ -20074,7 +21338,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.6713,
-          "raw_probability": 0.674,
+          "raw_probability": 0.6739,
           "tier": "C",
           "lambda_home": 1.51,
           "lambda_away": 1.37
@@ -20161,6 +21425,48 @@
       "kickoff": "2026-07-11 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Hangzhou Greentown Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Qingdao Jonoon Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Hangzhou Greentown Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Qingdao Jonoon Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -20338,7 +21644,7 @@
         {
           "market": "Match Over 1.5",
           "probability": 0.7991,
-          "raw_probability": 0.8611,
+          "raw_probability": 0.861,
           "tier": "A",
           "lambda_home": 1.99,
           "lambda_away": 1.46
@@ -20354,14 +21660,14 @@
         {
           "market": "Match Over 2.5",
           "probability": 0.6691,
-          "raw_probability": 0.6687,
+          "raw_probability": 0.6686,
           "tier": "C",
           "lambda_home": 1.99,
           "lambda_away": 1.46
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.6676,
+          "probability": 0.6675,
           "raw_probability": 0.6648,
           "tier": "C",
           "lambda_home": 1.99,
@@ -20449,6 +21755,33 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Orsha Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Smorgon Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -20697,6 +22030,33 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "Estonia",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Vaprus Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (74% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Tammeka Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -20897,6 +22257,33 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Guangzhou E-Power Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Guangzhou E-Power Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Guangzhou E-Power Win",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (71% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21010,7 +22397,7 @@
         {
           "market": "Guangzhou E-Power Win",
           "probability": 0.6636,
-          "raw_probability": 0.6571,
+          "raw_probability": 0.657,
           "tier": "C",
           "lambda_home": 1.81,
           "lambda_away": 0.58
@@ -21097,6 +22484,18 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21125,6 +22524,18 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21153,6 +22564,18 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21181,6 +22604,18 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21209,6 +22644,18 @@
       "kickoff": "2026-07-11 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21237,6 +22684,38 @@
       "kickoff": "2026-07-11 11:35:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Qingdao Youth Island Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Sichuan Jiuniu Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Qingdao Youth Island Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Sichuan Jiuniu Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21413,8 +22892,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7243,
-          "raw_probability": 0.7519,
+          "probability": 0.7244,
+          "raw_probability": 0.752,
           "tier": "B",
           "lambda_home": 1.28,
           "lambda_away": 1.41
@@ -21422,7 +22901,7 @@
         {
           "market": "Sichuan Jiuniu Over 0.5",
           "probability": 0.6989,
-          "raw_probability": 0.7208,
+          "raw_probability": 0.7209,
           "tier": "C",
           "lambda_home": 1.28,
           "lambda_away": 1.41
@@ -21430,7 +22909,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.697,
-          "raw_probability": 0.7182,
+          "raw_probability": 0.7181,
           "tier": "C",
           "lambda_home": 1.28,
           "lambda_away": 1.41
@@ -21517,6 +22996,43 @@
       "kickoff": "2026-07-11 11:35:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Beijing Guoan Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Shanghai Shenhua Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (69% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Shanghai Shenhua Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21631,7 +23147,7 @@
         },
         {
           "market": "Beijing Guoan Over 0.5",
-          "probability": 0.7707,
+          "probability": 0.7706,
           "raw_probability": 0.8105,
           "tier": "A",
           "lambda_home": 1.99,
@@ -21735,6 +23251,43 @@
       "kickoff": "2026-07-11 12:00:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Fredrikstad Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Lillestrom Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Fredrikstad Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Lillestrom Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -21936,8 +23489,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7027,
-          "raw_probability": 0.726,
+          "probability": 0.7026,
+          "raw_probability": 0.7259,
           "tier": "B",
           "lambda_home": 1.19,
           "lambda_away": 1.29
@@ -22040,6 +23593,38 @@
       "kickoff": "2026-07-11 12:00:00+00:00",
       "country": "Finland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "HJK Helsinki Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Lahti Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Hjk Helsinki Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Lahti Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -22271,6 +23856,33 @@
       "kickoff": "2026-07-11 12:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Chengdu Better City Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Chengdu Better City Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (77% < 80%)"
+        },
+        {
+          "market": "Chongqing Tongliang Long Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -22543,6 +24155,48 @@
       "kickoff": "2026-07-11 12:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "Dinamo Minsk II Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Dinamo Minsk Ii Double Chance",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Dinamo Minsk Ii Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "FC Slutsk Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Fc Slutsk Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -22704,15 +24358,15 @@
         {
           "market": "Dinamo Minsk II Over 0.5",
           "probability": 0.7066,
-          "raw_probability": 0.7306,
+          "raw_probability": 0.7307,
           "tier": "B",
           "lambda_home": 1.31,
           "lambda_away": 1.63
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6655,
-          "raw_probability": 0.6597,
+          "probability": 0.6654,
+          "raw_probability": 0.6596,
           "tier": "C",
           "lambda_home": 1.31,
           "lambda_away": 1.63
@@ -22799,6 +24453,43 @@
       "kickoff": "2026-07-11 13:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Aik Stockholm Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Mjallby AIF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Mjallby Aif Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "AIK Stockholm Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Mjallby Aif Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -23041,6 +24732,43 @@
       "kickoff": "2026-07-11 13:00:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Baranovichi Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Torpedo Zhodino Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Baranovichi Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Torpedo Zhodino Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -23236,7 +24964,7 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7516,
+          "probability": 0.7515,
           "raw_probability": 0.7843,
           "tier": "A",
           "lambda_home": 0.83,
@@ -23332,6 +25060,48 @@
       "kickoff": "2026-07-11 13:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Minsk II Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Minsk Ii Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Molodechno-DYuSSh 4 Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Molodechno-Dyussh 4 Double Chance",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Molodechno-Dyussh 4 Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -23465,15 +25235,15 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7737,
-          "raw_probability": 0.815,
+          "probability": 0.7736,
+          "raw_probability": 0.8149,
           "tier": "A",
           "lambda_home": 1.44,
           "lambda_away": 1.57
         },
         {
           "market": "Minsk II Over 0.5",
-          "probability": 0.7579,
+          "probability": 0.7578,
           "raw_probability": 0.7918,
           "tier": "A",
           "lambda_home": 1.44,
@@ -23481,7 +25251,7 @@
         },
         {
           "market": "Molodechno-DYuSSh 4 Over 0.5",
-          "probability": 0.733,
+          "probability": 0.7329,
           "raw_probability": 0.7622,
           "tier": "B",
           "lambda_home": 1.44,
@@ -23577,6 +25347,48 @@
       "kickoff": "2026-07-11 14:00:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Afturelding Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Völsungur Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Afturelding Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (80% < 80%)"
+        },
+        {
+          "market": "Afturelding Win",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 3.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -23687,66 +25499,66 @@
         {
           "market": "Afturelding Over 0.5",
           "probability": 0.8197,
-          "raw_probability": 0.9665,
+          "raw_probability": 0.9664,
           "tier": "A",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "Match Over 1.5",
           "probability": 0.8197,
-          "raw_probability": 0.9552,
+          "raw_probability": 0.9551,
           "tier": "A",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "Match Over 2.5",
-          "probability": 0.8003,
-          "raw_probability": 0.8638,
+          "probability": 0.8002,
+          "raw_probability": 0.8635,
           "tier": "A",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "Afturelding Over 1.5",
-          "probability": 0.7954,
-          "raw_probability": 0.8527,
+          "probability": 0.7953,
+          "raw_probability": 0.8523,
           "tier": "A",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "Völsungur Over 0.5",
-          "probability": 0.7401,
-          "raw_probability": 0.7707,
+          "probability": 0.74,
+          "raw_probability": 0.7706,
           "tier": "B",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.7187,
-          "raw_probability": 0.7452,
+          "probability": 0.7186,
+          "raw_probability": 0.745,
           "tier": "B",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "Afturelding Win",
-          "probability": 0.7147,
-          "raw_probability": 0.7404,
+          "probability": 0.7144,
+          "raw_probability": 0.74,
           "tier": "B",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         },
         {
           "market": "Match Over 3.5",
-          "probability": 0.6955,
-          "raw_probability": 0.716,
+          "probability": 0.6952,
+          "raw_probability": 0.7154,
           "tier": "C",
           "lambda_home": 1.47,
-          "lambda_away": 3.4
+          "lambda_away": 3.39
         }
       ],
       "strength": {
@@ -23830,6 +25642,38 @@
       "kickoff": "2026-07-11 14:00:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Aalesund Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Molde Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Aalesund Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (67% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -23999,8 +25843,8 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7849,
-          "raw_probability": 0.8317,
+          "probability": 0.7848,
+          "raw_probability": 0.8316,
           "tier": "A",
           "lambda_home": 1.41,
           "lambda_away": 1.7
@@ -24103,6 +25947,43 @@
       "kickoff": "2026-07-11 14:00:00+00:00",
       "country": "Finland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Gnistan Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Gnistan Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Gnistan Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Gnistan Win",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Mariehamn Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (77% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -24228,7 +26109,7 @@
         },
         {
           "market": "Gnistan Win",
-          "probability": 0.7297,
+          "probability": 0.7296,
           "raw_probability": 0.7583,
           "tier": "B",
           "lambda_home": 2.25,
@@ -24332,6 +26213,43 @@
       "kickoff": "2026-07-11 14:00:00+00:00",
       "country": "Finland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Turku PS Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Turku Ps Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Ac Oulu Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Turku Ps Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -24534,6 +26452,33 @@
       "kickoff": "2026-07-11 14:00:00+00:00",
       "country": "Estonia",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Kuressaare Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Nõmme United Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (71% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -24744,6 +26689,43 @@
       "kickoff": "2026-07-11 14:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "BATE II Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Bate Ii Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Lida Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Lida Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -24836,17 +26818,17 @@
       ],
       "dixon_coles": [
         {
-          "market": "Match Over 1.5",
+          "market": "Lida Over 0.5",
           "probability": 0.8197,
-          "raw_probability": 0.9106,
+          "raw_probability": 0.9105,
           "tier": "A",
           "lambda_home": 1.5,
           "lambda_away": 2.41
         },
         {
-          "market": "Lida Over 0.5",
+          "market": "Match Over 1.5",
           "probability": 0.8197,
-          "raw_probability": 0.9105,
+          "raw_probability": 0.9106,
           "tier": "A",
           "lambda_home": 1.5,
           "lambda_away": 2.41
@@ -24869,7 +26851,7 @@
         },
         {
           "market": "BTTS Yes",
-          "probability": 0.6958,
+          "probability": 0.6957,
           "raw_probability": 0.7163,
           "tier": "C",
           "lambda_home": 1.5,
@@ -24878,7 +26860,7 @@
         {
           "market": "Lida Over 1.5",
           "probability": 0.6808,
-          "raw_probability": 0.6945,
+          "raw_probability": 0.6944,
           "tier": "C",
           "lambda_home": 1.5,
           "lambda_away": 2.41
@@ -24965,6 +26947,53 @@
       "kickoff": "2026-07-11 15:00:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Dinamo Minsk Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dinamo Minsk Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dinamo Minsk Win",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dinamo Minsk Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Naftan Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Naftan Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -25162,17 +27191,17 @@
       ],
       "dixon_coles": [
         {
-          "market": "Dinamo Minsk Over 0.5",
+          "market": "Match Over 1.5",
           "probability": 0.8197,
-          "raw_probability": 0.9706,
+          "raw_probability": 0.9189,
           "tier": "A",
           "lambda_home": 3.53,
           "lambda_away": 0.56
         },
         {
-          "market": "Match Over 1.5",
+          "market": "Dinamo Minsk Over 0.5",
           "probability": 0.8197,
-          "raw_probability": 0.9189,
+          "raw_probability": 0.9706,
           "tier": "A",
           "lambda_home": 3.53,
           "lambda_away": 0.56
@@ -25283,6 +27312,53 @@
       "kickoff": "2026-07-11 15:00:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Belshina Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "ML Vitebsk Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "ML Vitebsk Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "ML Vitebsk Win",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (78% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Ml Vitebsk Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Ml Vitebsk Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -25525,7 +27601,7 @@
         {
           "market": "Match Over 2.5",
           "probability": 0.7484,
-          "raw_probability": 0.7805,
+          "raw_probability": 0.7806,
           "tier": "B",
           "lambda_home": 3.5,
           "lambda_away": 0.63
@@ -25612,6 +27688,38 @@
       "kickoff": "2026-07-11 15:00:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "FC Isloch Minsk R. Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "FC Isloch Minsk R. Win",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Fc Isloch Minsk R. Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "Fc Isloch Minsk R. Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (71% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -25755,7 +27863,7 @@
         {
           "market": "Match Over 1.5",
           "probability": 0.6686,
-          "raw_probability": 0.6674,
+          "raw_probability": 0.6673,
           "tier": "C",
           "lambda_home": 1.84,
           "lambda_away": 0.41
@@ -25842,6 +27950,58 @@
       "kickoff": "2026-07-11 15:30:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "BK Hacken Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Orgryte Is Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BK Hacken Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "BK Hacken Win",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Bk Hacken Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Bk Hacken Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Orgryte IS Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -26081,6 +28241,38 @@
       "kickoff": "2026-07-11 15:45:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Dinamo Brest Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dinamo Brest Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Slavia Mozyr Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Slavia Mozyr Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -26293,6 +28485,38 @@
       "kickoff": "2026-07-11 16:00:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Tromso Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Valerenga Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Tromso Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        },
+        {
+          "market": "Valerenga Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -26505,7 +28729,7 @@
         {
           "market": "Match Over 1.5",
           "probability": 0.7612,
-          "raw_probability": 0.7965,
+          "raw_probability": 0.7964,
           "tier": "A",
           "lambda_home": 1.98,
           "lambda_away": 0.9
@@ -26600,6 +28824,43 @@
       "kickoff": "2026-07-11 16:00:00+00:00",
       "country": "Lithuania",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Kauno Žalgiris Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Kauno Žalgiris Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Kauno Žalgiris Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (65% < 80%)"
+        },
+        {
+          "market": "Kauno Žalgiris Win",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Panevėžys Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -26743,7 +29004,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.6657,
-          "raw_probability": 0.6603,
+          "raw_probability": 0.6604,
           "tier": "C",
           "lambda_home": 2.18,
           "lambda_away": 0.76
@@ -26838,6 +29099,38 @@
       "kickoff": "2026-07-11 16:00:00+00:00",
       "country": "Ireland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Galway United Double Chance",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Galway United Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Galway United Win",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Sligo Rovers Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (77% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -26994,16 +29287,16 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7362,
-          "raw_probability": 0.7661,
+          "probability": 0.7364,
+          "raw_probability": 0.7663,
           "tier": "B",
           "lambda_home": 1.68,
           "lambda_away": 1.0
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6963,
-          "raw_probability": 0.7171,
+          "probability": 0.6961,
+          "raw_probability": 0.7168,
           "tier": "C",
           "lambda_home": 1.68,
           "lambda_away": 1.0
@@ -27090,6 +29383,33 @@
       "kickoff": "2026-07-11 16:30:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Osipovichy Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Uni Minsk Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -27314,6 +29634,43 @@
       "kickoff": "2026-07-11 17:45:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "FC Gomel Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (72% < 72%)"
+        },
+        {
+          "market": "Fc Gomel Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Fc Gomel Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (74% < 78%)"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Neman Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -27463,7 +29820,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.7865,
-          "raw_probability": 0.8341,
+          "raw_probability": 0.834,
           "tier": "A",
           "lambda_home": 1.37,
           "lambda_away": 0.76
@@ -27574,6 +29931,18 @@
       "kickoff": "2026-07-12 08:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -27602,6 +29971,18 @@
       "kickoff": "2026-07-12 09:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -27630,6 +30011,18 @@
       "kickoff": "2026-07-12 10:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -27658,6 +30051,38 @@
       "kickoff": "2026-07-12 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Tianjin Teda Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Shenyang Urban Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Shenyang Urban Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        },
+        {
+          "market": "Tianjin Teda Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -27823,7 +30248,7 @@
         {
           "market": "Shenyang Urban Over 0.5",
           "probability": 0.7002,
-          "raw_probability": 0.7228,
+          "raw_probability": 0.7227,
           "tier": "B",
           "lambda_home": 1.76,
           "lambda_away": 1.28
@@ -27910,6 +30335,43 @@
       "kickoff": "2026-07-12 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Shenzhen Juniors Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Heilongjiang Lava Spring Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (69% < 72%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Shenzhen Juniors Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -28018,7 +30480,7 @@
       "dixon_coles": [
         {
           "market": "Shenzhen Juniors Over 0.5",
-          "probability": 0.8102,
+          "probability": 0.8103,
           "raw_probability": 0.8862,
           "tier": "A",
           "lambda_home": 2.17,
@@ -28035,7 +30497,7 @@
         {
           "market": "Heilongjiang Lava Spring Over 0.5",
           "probability": 0.7182,
-          "raw_probability": 0.7445,
+          "raw_probability": 0.7446,
           "tier": "B",
           "lambda_home": 2.17,
           "lambda_away": 1.36
@@ -28043,7 +30505,7 @@
         {
           "market": "Match Over 2.5",
           "probability": 0.6763,
-          "raw_probability": 0.6861,
+          "raw_probability": 0.6862,
           "tier": "C",
           "lambda_home": 2.17,
           "lambda_away": 1.36
@@ -28051,7 +30513,7 @@
         {
           "market": "BTTS Yes",
           "probability": 0.6702,
-          "raw_probability": 0.6713,
+          "raw_probability": 0.6714,
           "tier": "C",
           "lambda_home": 2.17,
           "lambda_away": 1.36
@@ -28138,6 +30600,18 @@
       "kickoff": "2026-07-12 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -28166,6 +30640,48 @@
       "kickoff": "2026-07-12 11:00:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Ningbo Professional Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dongguan United Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Ningbo Professional Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Ningbo Professional Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "Ningbo Professional Win",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -28282,8 +30798,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7974,
-          "raw_probability": 0.8572,
+          "probability": 0.7975,
+          "raw_probability": 0.8573,
           "tier": "A",
           "lambda_home": 2.42,
           "lambda_away": 0.93
@@ -28307,7 +30823,7 @@
         {
           "market": "Match Over 2.5",
           "probability": 0.657,
-          "raw_probability": 0.6493,
+          "raw_probability": 0.6494,
           "tier": "C",
           "lambda_home": 2.42,
           "lambda_away": 0.93
@@ -28394,6 +30910,18 @@
       "kickoff": "2026-07-12 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -28422,6 +30950,38 @@
       "kickoff": "2026-07-12 11:30:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Changchun Yatai Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Nantong Zhiyun Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Changchun Yatai Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Nantong Zhiyun Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -28601,7 +31161,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.7816,
-          "raw_probability": 0.8268,
+          "raw_probability": 0.8267,
           "tier": "A",
           "lambda_home": 1.29,
           "lambda_away": 0.88
@@ -28609,15 +31169,15 @@
         {
           "market": "Nantong Zhiyun Over 0.5",
           "probability": 0.7008,
-          "raw_probability": 0.7236,
+          "raw_probability": 0.7237,
           "tier": "B",
           "lambda_home": 1.29,
           "lambda_away": 0.88
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6604,
-          "raw_probability": 0.6533,
+          "probability": 0.6605,
+          "raw_probability": 0.6534,
           "tier": "C",
           "lambda_home": 1.29,
           "lambda_away": 0.88
@@ -28704,6 +31264,43 @@
       "kickoff": "2026-07-12 11:35:00+00:00",
       "country": "China",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "SHANGHAI SIPG Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Shanghai Sipg Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Dalian Zhixing Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Shanghai Sipg Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (77% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -28946,6 +31543,48 @@
       "kickoff": "2026-07-12 12:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Hammarby FF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Hammarby Ff Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Hammarby Ff Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Kalmar FF Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Kalmar Ff Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (77% < 78%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -29179,6 +31818,53 @@
       "kickoff": "2026-07-12 12:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "IFK Goteborg Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Malmo FF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Malmo Ff Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Ifk Goteborg Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Malmo FF Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (68% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -29395,6 +32081,38 @@
       "kickoff": "2026-07-12 12:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Degerfors IF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Vasteras SK FK Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Vasteras Sk Fk Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Degerfors If Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -29597,6 +32315,48 @@
       "kickoff": "2026-07-12 12:30:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Bodo/Glimt Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Bodo/Glimt Win",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "KFUM Oslo Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Kfum Oslo Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Kfum Oslo Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -29786,15 +32546,15 @@
         {
           "market": "Bodo/Glimt Over 0.5",
           "probability": 0.802,
-          "raw_probability": 0.8676,
+          "raw_probability": 0.8675,
           "tier": "A",
           "lambda_home": 0.97,
           "lambda_away": 2.02
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7721,
-          "raw_probability": 0.8126,
+          "probability": 0.772,
+          "raw_probability": 0.8125,
           "tier": "A",
           "lambda_home": 0.97,
           "lambda_away": 2.02
@@ -29889,6 +32649,43 @@
       "kickoff": "2026-07-12 13:00:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "Bumprom Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Bumprom Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Bumprom Win",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Gomel II Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Gomel Ii Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -30136,6 +32933,53 @@
       "kickoff": "2026-07-12 13:00:00+00:00",
       "country": "Belarus",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Arsenal Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Arsenal Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "FC Vitebsk Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Fc Vitebsk Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "Fc Vitebsk Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -30325,7 +33169,7 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.7972,
-          "raw_probability": 0.8568,
+          "raw_probability": 0.8567,
           "tier": "A",
           "lambda_home": 1.16,
           "lambda_away": 0.84
@@ -30428,6 +33272,38 @@
       "kickoff": "2026-07-12 14:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (69% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Novorizontino Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Operario-PR Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Operario-Pr Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        },
+        {
+          "market": "Operario-Pr Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -30486,32 +33362,32 @@
       "dixon_coles": [
         {
           "market": "Match Under 3.5",
-          "probability": 0.7264,
-          "raw_probability": 0.7544,
+          "probability": 0.7263,
+          "raw_probability": 0.7542,
           "tier": "B",
           "lambda_home": 1.26,
           "lambda_away": 1.26
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7067,
-          "raw_probability": 0.7307,
+          "probability": 0.7069,
+          "raw_probability": 0.731,
           "tier": "B",
           "lambda_home": 1.26,
           "lambda_away": 1.26
         },
         {
           "market": "Operario-PR Over 0.5",
-          "probability": 0.6956,
-          "raw_probability": 0.7161,
+          "probability": 0.6957,
+          "raw_probability": 0.7162,
           "tier": "C",
           "lambda_home": 1.26,
           "lambda_away": 1.26
         },
         {
           "market": "Novorizontino Over 0.5",
-          "probability": 0.6949,
-          "raw_probability": 0.715,
+          "probability": 0.695,
+          "raw_probability": 0.7152,
           "tier": "C",
           "lambda_home": 1.26,
           "lambda_away": 1.26
@@ -30598,6 +33474,48 @@
       "kickoff": "2026-07-12 14:30:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "IF Brommapojkarna Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Sirius Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "If Brommapojkarna Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (77% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Sirius Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -30835,6 +33753,38 @@
       "kickoff": "2026-07-12 14:30:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Gais Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Gais Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (73% < 80%)"
+        },
+        {
+          "market": "IF Elfsborg Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "If Elfsborg Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (76% < 78%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -31047,6 +33997,43 @@
       "kickoff": "2026-07-12 15:00:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Brann Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Brann Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        },
+        {
+          "market": "Brann Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Brann Win",
+          "in_pool": false,
+          "reason": "below solo threshold (69% < 80%)"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "below duo threshold (69% < 72%)"
+        },
+        {
+          "market": "Start Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -31246,7 +34233,7 @@
         {
           "market": "Brann Win",
           "probability": 0.6903,
-          "raw_probability": 0.7083,
+          "raw_probability": 0.7084,
           "tier": "C",
           "lambda_home": 2.57,
           "lambda_away": 0.97
@@ -31341,6 +34328,43 @@
       "kickoff": "2026-07-12 15:00:00+00:00",
       "country": "Belarus",
       "bookable": false,
+      "gates": [
+        {
+          "market": "BTTS Yes",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Shakhter Soligorsk Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Volna Double Chance",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        },
+        {
+          "market": "Volna Over 0.5",
+          "in_pool": false,
+          "reason": "not on SportyBet"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -31490,7 +34514,7 @@
         },
         {
           "market": "Volna Over 0.5",
-          "probability": 0.7553,
+          "probability": 0.7552,
           "raw_probability": 0.7887,
           "tier": "A",
           "lambda_home": 1.55,
@@ -31507,7 +34531,7 @@
         {
           "market": "Match Over 2.5",
           "probability": 0.6674,
-          "raw_probability": 0.6645,
+          "raw_probability": 0.6644,
           "tier": "C",
           "lambda_home": 1.55,
           "lambda_away": 1.87
@@ -31594,6 +34618,38 @@
       "kickoff": "2026-07-12 15:00:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Rosenborg Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Kristiansund BK Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Kristiansund Bk Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (80% < 80%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Rosenborg Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -31735,7 +34791,7 @@
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.7368,
+          "probability": 0.7367,
           "raw_probability": 0.7667,
           "tier": "B",
           "lambda_home": 1.52,
@@ -31743,8 +34799,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6988,
-          "raw_probability": 0.7207,
+          "probability": 0.6987,
+          "raw_probability": 0.7206,
           "tier": "C",
           "lambda_home": 1.52,
           "lambda_away": 0.94
@@ -31831,6 +34887,38 @@
       "kickoff": "2026-07-12 15:00:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Ham-Kam Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Sandefjord Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Ham-Kam Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Sandefjord Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -31972,8 +35060,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7285,
-          "raw_probability": 0.7569,
+          "probability": 0.7284,
+          "raw_probability": 0.7568,
           "tier": "B",
           "lambda_home": 1.56,
           "lambda_away": 1.08
@@ -32076,6 +35164,38 @@
       "kickoff": "2026-07-12 15:45:00+00:00",
       "country": "Lithuania",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Transinvest Vilnius Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Banga Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (67% < 72%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (72% < 78%)"
+        },
+        {
+          "market": "TransINVEST Vilnius Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Transinvest Vilnius Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -32306,6 +35426,48 @@
       "kickoff": "2026-07-12 17:15:00+00:00",
       "country": "Norway",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Sarpsborg 08 FF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Viking Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Sarpsborg 08 Ff Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Sarpsborg 08 Ff Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (80% < 80%)"
+        },
+        {
+          "market": "Viking Win",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -32472,8 +35634,8 @@
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7974,
-          "raw_probability": 0.857,
+          "probability": 0.7973,
+          "raw_probability": 0.8569,
           "tier": "A",
           "lambda_home": 1.27,
           "lambda_away": 2.05
@@ -32576,6 +35738,33 @@
       "kickoff": "2026-07-12 19:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Avai Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Avai Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (71% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Nautico Recife Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -32664,32 +35853,32 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7613,
-          "raw_probability": 0.7966,
+          "probability": 0.7614,
+          "raw_probability": 0.7968,
           "tier": "A",
           "lambda_home": 1.35,
           "lambda_away": 1.54
         },
         {
           "market": "Nautico Recife Over 0.5",
-          "probability": 0.7526,
-          "raw_probability": 0.7856,
+          "probability": 0.7527,
+          "raw_probability": 0.7857,
           "tier": "A",
           "lambda_home": 1.35,
           "lambda_away": 1.54
         },
         {
           "market": "Avai Over 0.5",
-          "probability": 0.714,
-          "raw_probability": 0.7395,
+          "probability": 0.7141,
+          "raw_probability": 0.7396,
           "tier": "B",
           "lambda_home": 1.35,
           "lambda_away": 1.54
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6709,
-          "raw_probability": 0.673,
+          "probability": 0.6708,
+          "raw_probability": 0.6728,
           "tier": "C",
           "lambda_home": 1.35,
           "lambda_away": 1.54
@@ -32776,6 +35965,33 @@
       "kickoff": "2026-07-12 19:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "São Bernardo Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "São Bernardo Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -32940,6 +36156,33 @@
       "kickoff": "2026-07-12 21:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Atletico Goianiense Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Atletico Goianiense Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Fortaleza EC Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (66% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (68% < 78%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -33017,17 +36260,17 @@
       ],
       "dixon_coles": [
         {
-          "market": "Atletico Goianiense Over 0.5",
-          "probability": 0.7329,
-          "raw_probability": 0.7621,
+          "market": "Match Under 3.5",
+          "probability": 0.733,
+          "raw_probability": 0.7622,
           "tier": "B",
           "lambda_home": 1.44,
           "lambda_away": 1.04
         },
         {
-          "market": "Match Under 3.5",
-          "probability": 0.7328,
-          "raw_probability": 0.7621,
+          "market": "Atletico Goianiense Over 0.5",
+          "probability": 0.7327,
+          "raw_probability": 0.7619,
           "tier": "B",
           "lambda_home": 1.44,
           "lambda_away": 1.04
@@ -33130,6 +36373,43 @@
       "kickoff": "2026-07-12 22:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "CRB Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Crb Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Crb Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (78% < 80%)"
+        },
+        {
+          "market": "Goias Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (69% < 72%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (71% < 78%)"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -33249,15 +36529,15 @@
         {
           "market": "Match Over 1.5",
           "probability": 0.7699,
-          "raw_probability": 0.8094,
+          "raw_probability": 0.8093,
           "tier": "A",
           "lambda_home": 1.58,
           "lambda_away": 1.39
         },
         {
           "market": "CRB Over 0.5",
-          "probability": 0.7599,
-          "raw_probability": 0.7946,
+          "probability": 0.7598,
+          "raw_probability": 0.7943,
           "tier": "A",
           "lambda_home": 1.58,
           "lambda_away": 1.39
@@ -33265,15 +36545,15 @@
         {
           "market": "Goias Over 0.5",
           "probability": 0.7227,
-          "raw_probability": 0.7499,
+          "raw_probability": 0.75,
           "tier": "B",
           "lambda_home": 1.58,
           "lambda_away": 1.39
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6612,
-          "raw_probability": 0.6542,
+          "probability": 0.6614,
+          "raw_probability": 0.6545,
           "tier": "C",
           "lambda_home": 1.58,
           "lambda_away": 1.39
@@ -33360,6 +36640,48 @@
       "kickoff": "2026-07-13 17:00:00+00:00",
       "country": "Sweden",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Djurgardens IF Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Djurgardens If Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Djurgardens IF Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "Djurgardens IF Win",
+          "in_pool": false,
+          "reason": "below solo threshold (71% < 80%)"
+        },
+        {
+          "market": "Djurgardens If Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "Halmstad Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (75% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (78% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -33591,6 +36913,33 @@
       "kickoff": "2026-07-13 20:15:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Fylkir Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Vestri Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": false,
+          "reason": "solo goal-model pick"
+        },
+        {
+          "market": "Vestri Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -33679,24 +37028,24 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7718,
-          "raw_probability": 0.8122,
+          "probability": 0.7717,
+          "raw_probability": 0.812,
           "tier": "A",
           "lambda_home": 1.63,
           "lambda_away": 1.44
         },
         {
           "market": "Vestri Over 0.5",
-          "probability": 0.7664,
-          "raw_probability": 0.8042,
+          "probability": 0.7663,
+          "raw_probability": 0.8041,
           "tier": "A",
           "lambda_home": 1.63,
           "lambda_away": 1.44
         },
         {
           "market": "Fylkir Over 0.5",
-          "probability": 0.734,
-          "raw_probability": 0.7635,
+          "probability": 0.7339,
+          "raw_probability": 0.7634,
           "tier": "B",
           "lambda_home": 1.63,
           "lambda_away": 1.44
@@ -33783,6 +37132,28 @@
       "kickoff": "2026-07-13 22:00:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "America Mineiro Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Londrina Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (71% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -33871,8 +37242,8 @@
       "dixon_coles": [
         {
           "market": "Match Over 1.5",
-          "probability": 0.7642,
-          "raw_probability": 0.8009,
+          "probability": 0.7641,
+          "raw_probability": 0.8007,
           "tier": "A",
           "lambda_home": 1.41,
           "lambda_away": 1.5
@@ -33880,23 +37251,23 @@
         {
           "market": "Londrina Over 0.5",
           "probability": 0.7454,
-          "raw_probability": 0.777,
+          "raw_probability": 0.7769,
           "tier": "B",
           "lambda_home": 1.41,
           "lambda_away": 1.5
         },
         {
           "market": "America Mineiro Over 0.5",
-          "probability": 0.728,
-          "raw_probability": 0.7563,
+          "probability": 0.7277,
+          "raw_probability": 0.7559,
           "tier": "B",
           "lambda_home": 1.41,
           "lambda_away": 1.5
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6684,
-          "raw_probability": 0.6668,
+          "probability": 0.6686,
+          "raw_probability": 0.6673,
           "tier": "C",
           "lambda_home": 1.41,
           "lambda_away": 1.5
@@ -33983,6 +37354,38 @@
       "kickoff": "2026-07-13 23:30:00+00:00",
       "country": "Brazil",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Ceara Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Athletic Club Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (70% < 80%)"
+        },
+        {
+          "market": "Ceara Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -34089,15 +37492,15 @@
         },
         {
           "market": "Ceara Over 0.5",
-          "probability": 0.6744,
-          "raw_probability": 0.6815,
+          "probability": 0.6745,
+          "raw_probability": 0.6817,
           "tier": "C",
           "lambda_home": 1.14,
           "lambda_away": 0.91
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.6664,
+          "probability": 0.6665,
           "raw_probability": 0.6621,
           "tier": "C",
           "lambda_home": 1.14,
@@ -34185,6 +37588,33 @@
       "kickoff": "2026-07-14 18:00:00+00:00",
       "country": "Iceland",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Grotta Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 2.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Grindavik Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (72% < 72%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -34273,32 +37703,32 @@
       "dixon_coles": [
         {
           "market": "Grotta Over 0.5",
-          "probability": 0.7769,
-          "raw_probability": 0.8198,
+          "probability": 0.7768,
+          "raw_probability": 0.8196,
           "tier": "A",
           "lambda_home": 1.71,
           "lambda_away": 1.04
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7326,
-          "raw_probability": 0.7619,
+          "probability": 0.7324,
+          "raw_probability": 0.7616,
           "tier": "B",
           "lambda_home": 1.71,
           "lambda_away": 1.04
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.686,
-          "raw_probability": 0.7021,
+          "probability": 0.6863,
+          "raw_probability": 0.7024,
           "tier": "C",
           "lambda_home": 1.71,
           "lambda_away": 1.04
         },
         {
           "market": "Grindavik Over 0.5",
-          "probability": 0.6548,
-          "raw_probability": 0.6468,
+          "probability": 0.6547,
+          "raw_probability": 0.6467,
           "tier": "C",
           "lambda_home": 1.71,
           "lambda_away": 1.04
@@ -34385,6 +37815,38 @@
       "kickoff": "2026-07-15 22:30:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "One Knoxville Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Fort Wayne Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Match Under 2.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "One Knoxville Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -34505,23 +37967,23 @@
         {
           "market": "Match Under 3.5",
           "probability": 0.8197,
-          "raw_probability": 0.9086,
+          "raw_probability": 0.9082,
           "tier": "A",
           "lambda_home": 1.04,
           "lambda_away": 0.65
         },
         {
           "market": "Match Under 2.5",
-          "probability": 0.7314,
-          "raw_probability": 0.7604,
+          "probability": 0.7308,
+          "raw_probability": 0.7596,
           "tier": "B",
           "lambda_home": 1.04,
           "lambda_away": 0.65
         },
         {
           "market": "One Knoxville Over 0.5",
-          "probability": 0.6549,
-          "raw_probability": 0.6469,
+          "probability": 0.6557,
+          "raw_probability": 0.6478,
           "tier": "C",
           "lambda_home": 1.04,
           "lambda_away": 0.65
@@ -34608,6 +38070,33 @@
       "kickoff": "2026-07-15 23:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Lexington Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Lexington Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (74% < 78%)"
+        },
+        {
+          "market": "New Mexico United Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (68% < 72%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -34744,15 +38233,15 @@
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.7281,
-          "raw_probability": 0.7564,
+          "probability": 0.728,
+          "raw_probability": 0.7563,
           "tier": "B",
           "lambda_home": 1.45,
           "lambda_away": 1.06
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.6988,
+          "probability": 0.6989,
           "raw_probability": 0.7208,
           "tier": "C",
           "lambda_home": 1.45,
@@ -34760,7 +38249,7 @@
         },
         {
           "market": "New Mexico United Over 0.5",
-          "probability": 0.6597,
+          "probability": 0.6598,
           "raw_probability": 0.6526,
           "tier": "C",
           "lambda_home": 1.45,
@@ -34848,6 +38337,33 @@
       "kickoff": "2026-07-15 23:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Indy Eleven Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Miami FC Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (73% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Miami Fc Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (72% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -34936,35 +38452,35 @@
       "dixon_coles": [
         {
           "market": "Indy Eleven Over 0.5",
-          "probability": 0.766,
-          "raw_probability": 0.8036,
+          "probability": 0.7656,
+          "raw_probability": 0.803,
           "tier": "A",
           "lambda_home": 1.11,
-          "lambda_away": 1.63
+          "lambda_away": 1.62
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7349,
-          "raw_probability": 0.7645,
+          "probability": 0.7343,
+          "raw_probability": 0.7638,
           "tier": "B",
           "lambda_home": 1.11,
-          "lambda_away": 1.63
+          "lambda_away": 1.62
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.6886,
-          "raw_probability": 0.7059,
+          "probability": 0.6893,
+          "raw_probability": 0.7068,
           "tier": "C",
           "lambda_home": 1.11,
-          "lambda_away": 1.63
+          "lambda_away": 1.62
         },
         {
           "market": "Miami FC Over 0.5",
-          "probability": 0.6698,
-          "raw_probability": 0.6703,
+          "probability": 0.6696,
+          "raw_probability": 0.6699,
           "tier": "C",
           "lambda_home": 1.11,
-          "lambda_away": 1.63
+          "lambda_away": 1.62
         }
       ],
       "strength": {
@@ -35048,6 +38564,28 @@
       "kickoff": "2026-07-15 23:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Chattanooga Red Wolves Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Chattanooga Red Wolves Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (72% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -35126,24 +38664,24 @@
       "dixon_coles": [
         {
           "market": "Chattanooga Red Wolves Over 0.5",
-          "probability": 0.7784,
-          "raw_probability": 0.822,
+          "probability": 0.7786,
+          "raw_probability": 0.8222,
           "tier": "A",
           "lambda_home": 1.73,
           "lambda_away": 0.88
         },
         {
           "market": "Match Under 3.5",
-          "probability": 0.7099,
-          "raw_probability": 0.7346,
+          "probability": 0.7096,
+          "raw_probability": 0.7343,
           "tier": "B",
           "lambda_home": 1.73,
           "lambda_away": 0.88
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7031,
-          "raw_probability": 0.7264,
+          "probability": 0.7034,
+          "raw_probability": 0.7268,
           "tier": "B",
           "lambda_home": 1.73,
           "lambda_away": 0.88
@@ -35230,6 +38768,33 @@
       "kickoff": "2026-07-15 23:30:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Pittsburgh Riverhounds Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (75% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "needs DC + Poisson"
+        },
+        {
+          "market": "Sporting JAX Over 0.5",
+          "in_pool": false,
+          "reason": "below duo threshold (70% < 72%)"
+        },
+        {
+          "market": "Sporting Jax Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (76% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -35347,24 +38912,24 @@
       "dixon_coles": [
         {
           "market": "Pittsburgh Riverhounds Over 0.5",
-          "probability": 0.7987,
-          "raw_probability": 0.8602,
+          "probability": 0.7988,
+          "raw_probability": 0.8604,
           "tier": "A",
           "lambda_home": 1.15,
           "lambda_away": 1.97
         },
         {
           "market": "Match Over 1.5",
-          "probability": 0.7789,
-          "raw_probability": 0.8227,
+          "probability": 0.7791,
+          "raw_probability": 0.823,
           "tier": "A",
           "lambda_home": 1.15,
           "lambda_away": 1.97
         },
         {
           "market": "Sporting JAX Over 0.5",
-          "probability": 0.6746,
-          "raw_probability": 0.6822,
+          "probability": 0.6747,
+          "raw_probability": 0.6823,
           "tier": "C",
           "lambda_home": 1.15,
           "lambda_away": 1.97
@@ -35451,6 +39016,43 @@
       "kickoff": "2026-07-16 00:00:00+00:00",
       "country": "USA",
       "bookable": true,
+      "gates": [
+        {
+          "market": "Forward Madison Over 0.5",
+          "in_pool": true,
+          "reason": "in pool"
+        },
+        {
+          "market": "Forward Madison Double Chance",
+          "in_pool": false,
+          "reason": "below solo threshold (79% < 80%)"
+        },
+        {
+          "market": "Forward Madison Over 1.5",
+          "in_pool": false,
+          "reason": "below solo threshold (68% < 80%)"
+        },
+        {
+          "market": "Forward Madison Win",
+          "in_pool": false,
+          "reason": "below solo threshold (74% < 80%)"
+        },
+        {
+          "market": "Match Over 1.5",
+          "in_pool": false,
+          "reason": "below Over 1.5 floor (74% < 78%)"
+        },
+        {
+          "market": "Match Under 3.5",
+          "in_pool": false,
+          "reason": "fails Under 3.5 strength gate"
+        },
+        {
+          "market": "Richmond Kickers Over 0.5",
+          "in_pool": false,
+          "reason": "below solo threshold (67% < 80%)"
+        }
+      ],
       "poisson": [
         {
           "market": "OVER 1.5",
@@ -35579,7 +39181,7 @@
         {
           "market": "Match Over 1.5",
           "probability": 0.7602,
-          "raw_probability": 0.7949,
+          "raw_probability": 0.795,
           "tier": "A",
           "lambda_home": 2.37,
           "lambda_away": 0.62
