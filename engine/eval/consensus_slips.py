@@ -1264,8 +1264,10 @@ def print_slips(result: dict) -> None:
         print()
 
 
-def save_slips(result: dict) -> str:
-    ds = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+def save_slips(result: dict, run_ds: str | None = None) -> str:
+    # Name by an explicit run date fixed at the start of the run, not now(), so a
+    # single run that straddles UTC midnight can't split output across two files.
+    ds = run_ds or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     out_path = Path(__file__).parent / f"consensus_slips_{ds}.json"
 
     pool_items = []
@@ -1374,7 +1376,8 @@ if __name__ == "__main__":
                         help="Fan-in mode: build from raw.model_picks (set by run_model) "
                              "instead of running the 4 models in-process")
     parser.add_argument("--run-ds", default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                        help="Prediction run date (used with --from-picks)")
+                        help="Run date; used for --from-picks and the output filename "
+                             "(fixed once, so a midnight rollover can't split output)")
     args = parser.parse_args()
 
     if args.from_picks:
@@ -1389,4 +1392,4 @@ if __name__ == "__main__":
                                bankroll=args.bankroll)
     print_slips(result)
     if result["slips"]:
-        save_slips(result)
+        save_slips(result, run_ds=args.run_ds)
