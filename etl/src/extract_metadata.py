@@ -119,6 +119,7 @@ def process_league(
     - Records missing leagues.
     """
     league_name = league_data["name"]
+    tier = league_data.get("tier")
     league_info_list = fetch_league_info("leagues", params={"country": country, "name": league_name})
     if not league_info_list:
         logger.warning(f"No league info found for '{league_name}' in country '{country}'")
@@ -126,7 +127,8 @@ def process_league(
         return
     league_info = league_info_list[0]
     api_league_id = league_info.get("league", {}).get("id")
-    league_id = upsert_league(cur, country_id, league_name, api_league_id)
+    league_id = upsert_league(
+        cur, country_id, league_name, api_league_id, tier=tier)
     league_seasons = league_info.get("seasons", [])
     if not league_seasons:
         logger.warning(f"No seasons found for league '{league_name}' in country '{country}'")
@@ -311,27 +313,30 @@ def upsert_league(
     cur: psycopg2.extensions.cursor,
     country_id: int,
     league_name: str,
-    api_league_id: int
+    api_league_id: int,
+    tier: Optional[int] = None,
 ) -> int:
     """
     Insert or update a league in dim_leagues.
     Returns the surrogate league_id.
     """
     sql = """
-    INSERT INTO dim.dim_leagues (country_id, league_name, api_league_id)
-    VALUES (%s, %s, %s)
+    INSERT INTO dim.dim_leagues (country_id, league_name, api_league_id, tier)
+    VALUES (%s, %s, %s, %s)
     ON CONFLICT (api_league_id) DO UPDATE 
     SET 
         league_name = EXCLUDED.league_name,
         country_id = EXCLUDED.country_id,
+        tier = EXCLUDED.tier,
         updated_at = NOW()
     WHERE
         dim.dim_leagues.league_name != EXCLUDED.league_name
         OR dim.dim_leagues.country_id != EXCLUDED.country_id
+        OR dim.dim_leagues.tier IS DISTINCT FROM EXCLUDED.tier
     RETURNING league_id;
     """ 
     try:
-        cur.execute(sql, (country_id, league_name, api_league_id))
+        cur.execute(sql, (country_id, league_name, api_league_id, tier))
         result = cur.fetchone()
         if result:
             return result[0]  # return the league_id
