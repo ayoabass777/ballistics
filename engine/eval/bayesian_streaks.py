@@ -1,10 +1,16 @@
 """
 Bayesian streak engine — Beta-Binomial belief updating per team per event.
 
-Queries fact_team_events (via fact_head_to_head_events) for historical event
-flags, computes posterior P(event) for each team using a Beta prior derived
-from league-wide base rates, and applies exponential recency weighting so
-the posterior tracks recent form.
+Queries fact_team_events (via fact_head_to_head_events) for CURRENT-SEASON
+event flags, and computes posterior P(event) for each team from raw counts:
+k successes out of n matches, with a Beta prior derived from league-wide
+base rates:  P = (alpha0 + k) / (alpha0 + beta0 + n).
+
+Each belief is labelled with its streak context ("home", "away" or "all").
+For upcoming fixtures, both the venue context (home team -> home games,
+away team -> away games) and the overall ("all") context are computed, and
+the highest-probability belief per event is kept, with n and k reported
+alongside so the numbers are verifiable.
 
 The output is a calibrated probability per (team, event, context) triple
 that can feed into the combined predictor alongside Poisson and Mismatch.
@@ -33,7 +39,6 @@ logger = get_logger(__name__)
 EVENTS_TABLE = "raw.fact_head_to_head_events"
 H2H_TABLE = "raw.fact_head_to_head"
 
-HALF_LIFE = 8
 PRIOR_STRENGTH = 15.0
 MIN_MATCHES = 3
 
@@ -44,14 +49,16 @@ class BayesianBelief:
     team_name: str
     league: str
     event_name: str
-    context: str
+    context: str  # streak type: "home", "away" or "all"
     alpha: float
     beta: float
     posterior: float
     league_base_rate: float
-    n_matches: int
+    n_matches: int  # n — total matches in this context (current season)
+    k_matches: int  # k — matches where the streak event applied
     recent_streak: int
     trend: str
+    last_event_utc: object = None  # most-recent event in this league; picks current division
 
 
 def _get_conn():
@@ -59,16 +66,21 @@ def _get_conn():
     return get_conn()
 
 
-def _decay_weights(n: int, half_life: int = HALF_LIFE) -> np.ndarray:
-    """Exponential decay weights, most recent match = index n-1 gets weight 1."""
-    indices = np.arange(n)
-    return np.power(0.5, (n - 1 - indices) / half_life)
+def _event_ts(t) -> int:
+    """Sort key (epoch ns, UTC) for picking a team's most-recent league. NaT/None -> 0."""
+    if t is None or pd.isna(t):
+        return 0
+    return pd.Timestamp(t).value
 
 
 def load_event_history(conn, team_id: Optional[int] = None,
-                       context: str = "all") -> pd.DataFrame:
+                       context: str = "all",
+                       current_season_only: bool = True) -> pd.DataFrame:
     where = ["e.h2h_context_scope = %(context)s"]
     params: dict = {"context": context}
+
+    if current_season_only:
+        where.append("e.is_current")
 
     if team_id is not None:
         where.append("e.team_id = %(team_id)s")
@@ -76,7 +88,7 @@ def load_event_history(conn, team_id: Optional[int] = None,
 
     sql = f"""
         SELECT
-            e.league_name AS league,
+            dl.league_name || ' (' || dc.country_name || ')' AS league,
             e.team_id,
             e.team_name,
             e.event_name,
@@ -84,6 +96,9 @@ def load_event_history(conn, team_id: Optional[int] = None,
             e.kickoff_utc,
             e.fixture_id
         FROM {EVENTS_TABLE} e
+        JOIN dim.dim_league_seasons dls ON dls.league_season_id = e.league_season_id
+        JOIN dim.dim_leagues dl ON dl.league_id = dls.league_id
+        JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
         WHERE {' AND '.join(where)}
         ORDER BY e.team_id, e.event_name, e.kickoff_utc, e.fixture_id
     """
@@ -92,16 +107,19 @@ def load_event_history(conn, team_id: Optional[int] = None,
 
 def compute_league_base_rates(conn, context: str = "all",
                               current_season_only: bool = True) -> pd.DataFrame:
-    season_filter = "AND is_current" if current_season_only else ""
+    season_filter = "AND e.is_current" if current_season_only else ""
     sql = f"""
         SELECT
-            league_name AS league,
-            event_name,
-            AVG(event_flag::float) AS base_rate,
+            dl.league_name || ' (' || dc.country_name || ')' AS league,
+            e.event_name,
+            AVG(e.event_flag::float) AS base_rate,
             COUNT(*) AS n
-        FROM {EVENTS_TABLE}
-        WHERE h2h_context_scope = %(context)s {season_filter}
-        GROUP BY league_name, event_name
+        FROM {EVENTS_TABLE} e
+        JOIN dim.dim_league_seasons dls ON dls.league_season_id = e.league_season_id
+        JOIN dim.dim_leagues dl ON dl.league_id = dls.league_id
+        JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+        WHERE e.h2h_context_scope = %(context)s {season_filter}
+        GROUP BY 1, e.event_name
     """
     return pd.read_sql(sql, conn, params={"context": context})
 
@@ -110,24 +128,18 @@ def compute_beliefs(
     event_df: pd.DataFrame,
     base_rates: pd.DataFrame,
     prior_strength: float = PRIOR_STRENGTH,
-    half_life: int = HALF_LIFE,
-    overall_df: pd.DataFrame | None = None,
+    context: str = "all",
 ) -> list[BayesianBelief]:
     rate_lookup = {
         (r["league"], r["event_name"]): r["base_rate"]
         for _, r in base_rates.iterrows()
     }
 
-    # Pre-group overall (all-context) data for streak/trend if provided
-    overall_groups = {}
-    if overall_df is not None and not overall_df.empty:
-        for (tid, ename), grp in overall_df.groupby(["team_id", "event_name"]):
-            overall_groups[(tid, ename)] = grp["event_flag"].values.astype(float)
-
     beliefs = []
     for (team_id, team_name, league, event_name), grp in event_df.groupby(
         ["team_id", "team_name", "league", "event_name"]
     ):
+        grp = grp[grp["event_flag"].notna()]
         n = len(grp)
         if n < MIN_MATCHES:
             continue
@@ -137,22 +149,21 @@ def compute_beliefs(
         beta_prior = prior_strength * (1 - base_rate)
 
         flags = grp["event_flag"].values.astype(float)
-        weights = _decay_weights(n, half_life)
+        k = int(flags.sum())
 
-        weighted_successes = np.sum(flags * weights)
-        weighted_total = np.sum(weights)
-
-        alpha_post = alpha_prior + weighted_successes
-        beta_post = beta_prior + (weighted_total - weighted_successes)
+        alpha_post = alpha_prior + k
+        beta_post = beta_prior + (n - k)
         posterior = alpha_post / (alpha_post + beta_post)
 
-        # Use overall (all-context) flags for streak/trend when available
-        form_flags = overall_groups.get((team_id, event_name), flags)
+        # Streak/trend from the same context-scoped flags as k/n, so a HOME
+        # row's streak counts home matches only (user decision, July 22 2026).
+        form_flags = flags
         fn = len(form_flags)
 
-        tail_flags = form_flags[-min(10, fn):]
+        # Count the full trailing run in this season/context, not just the
+        # latest ten matches. The probability boost has its own separate cap.
         streak = 0
-        for f in reversed(tail_flags):
+        for f in reversed(form_flags):
             if f == 1:
                 streak += 1
             else:
@@ -166,20 +177,24 @@ def compute_beliefs(
         else:
             trend = "stable"
 
-        ctx = grp.iloc[0].get("context", "all") if "context" in grp.columns else "all"
+        last_event = None
+        if "kickoff_utc" in grp.columns:
+            last_event = pd.to_datetime(grp["kickoff_utc"], utc=True).max()
         beliefs.append(BayesianBelief(
             team_id=int(team_id),
             team_name=str(team_name),
             league=str(league),
             event_name=str(event_name),
-            context=ctx,
+            context=context,
             alpha=round(alpha_post, 3),
             beta=round(beta_post, 3),
             posterior=round(posterior, 4),
             league_base_rate=round(base_rate, 4),
             n_matches=n,
+            k_matches=k,
             recent_streak=streak,
             trend=trend,
+            last_event_utc=last_event,
         ))
 
     return beliefs
@@ -197,7 +212,37 @@ BETTING_EVENTS = {
     "win", "loss", "unbeaten", "BTTS",
 }
 
-MIN_POSTERIOR_INTERESTING = 0.65
+# Display gate: show every streak event whose final score (calibrated
+# posterior + streak boost) is at least this. Applied to the displayed
+# value, not the raw posterior, so the cutoff matches what the user sees.
+MIN_POSTERIOR_INTERESTING = 0.75
+
+# Context selection: prefer the venue-specific belief (home/away) once it has
+# a mature sample of its own; below this, fall back to the overall belief.
+# Note the overall context always has >= the venue's n (venue is a subset),
+# so "most data" alone would always pick "all" — this keeps venue streaks
+# usable without cherry-picking the higher probability.
+VENUE_PREFER_MIN = 6
+
+# Streak boost: an active streak of >= 5 straight matches (overall form) tilts
+# the belief up in log-odds space, capped so it can't run away.
+STREAK_BOOST_MIN = 5
+STREAK_BOOST_STEP = 0.10   # log-odds per streak match at/beyond the minimum
+STREAK_BOOST_CAP = 0.30    # max log-odds tilt (streak 7+)
+STREAK_BOOST_P_CEIL = 0.97
+
+
+def apply_streak_boost(p: float, streak: int) -> float:
+    """Boost probability p for an active streak of >= STREAK_BOOST_MIN matches.
+
+    Works in log-odds so the same tilt means less as p approaches 1:
+    at p=0.75 a 7-match streak adds ~5pp, at p=0.90 only ~2.5pp.
+    """
+    if streak < STREAK_BOOST_MIN or p >= STREAK_BOOST_P_CEIL:
+        return p
+    tilt = min(STREAK_BOOST_CAP, STREAK_BOOST_STEP * (streak - STREAK_BOOST_MIN + 1))
+    log_odds = np.log(p / (1 - p)) + tilt
+    return min(STREAK_BOOST_P_CEIL, float(1 / (1 + np.exp(-log_odds))))
 
 # Legacy fallback map — superseded by calibration_maps.json (fitted by
 # calibration_wf on held-out folds). Kept only for when that file is absent.
@@ -239,7 +284,6 @@ def calibrate_posterior(raw: float) -> float:
 def get_upcoming_beliefs(
     conn, days: int = 7, context: str = "all",
     prior_strength: float = PRIOR_STRENGTH,
-    half_life: int = HALF_LIFE,
 ) -> pd.DataFrame:
     """Compute beliefs for teams with upcoming unplayed fixtures."""
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -279,20 +323,47 @@ def get_upcoming_beliefs(
     event_df = event_df[event_df["team_id"].isin(h2h_ids)]
 
     base_rates = compute_league_base_rates(conn, context=context)
-    beliefs = compute_beliefs(event_df, base_rates, prior_strength, half_life)
+    beliefs = compute_beliefs(event_df, base_rates, prior_strength, context=context)
     return beliefs_to_df(beliefs)
+
+
+def _index_latest_by_event(beliefs: list[BayesianBelief]) -> dict[int, dict[str, BayesianBelief]]:
+    """Index beliefs as {team_id: {event_name: belief}}.
+
+    A team can have history in multiple divisions (promotion/relegation),
+    producing one belief per (league, event). Keep only the belief from the
+    team's most-recently-active league so lower-division form doesn't leak
+    in and events aren't duplicated.
+    """
+    idx: dict[int, dict[str, BayesianBelief]] = {}
+    for b in beliefs:
+        by_event = idx.setdefault(b.team_id, {})
+        prev = by_event.get(b.event_name)
+        if prev is None or _event_ts(b.last_event_utc) > _event_ts(prev.last_event_utc):
+            by_event[b.event_name] = b
+    return idx
 
 
 def get_fixture_beliefs(
     conn, days: int = 7,
     prior_strength: float = PRIOR_STRENGTH,
-    half_life: int = HALF_LIFE,
+    include_below_threshold: bool = False,
 ) -> dict[int, dict]:
     """Return Bayesian beliefs keyed by fixture_id for combined predictor.
 
-    For each upcoming fixture, computes beliefs for both home and away teams
-    using the appropriate context (home/away), filters to betting-relevant
-    events, and returns a dict: {fixture_id: {"home": [...], "away": [...]}}.
+    For each upcoming fixture, computes current-season beliefs for both teams
+    in two contexts — the venue context (home team -> home games, away team ->
+    away games) and the overall "all" context. Per event, the venue belief is
+    primary when its sample is mature (n >= VENUE_PREFER_MIN), the overall
+    belief otherwise; a mature venue primary keeps the overall belief as a
+    secondary entry (primary=False). Each is labelled with its context and
+    raw k/n counts. Consensus consumers should use primary entries only.
+    Active streaks >= STREAK_BOOST_MIN add a capped log-odds boost on top of
+    the calibrated posterior. By default only beliefs at or above
+    MIN_POSTERIOR_INTERESTING are returned. Set include_below_threshold=True
+    for fixture-analysis/audit consumers that need every computed event and
+    its display eligibility. Returns:
+    {fixture_id: {"home": [...], "away": [...]}}.
     """
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     cutoff = today + timedelta(days=days)
@@ -332,55 +403,85 @@ def get_fixture_beliefs(
     logger.info("ID map: %d rf_ids -> %d h2h_ids (%d unmapped)",
                 len(rf_ids), len(h2h_team_ids), len(rf_ids) - len(rf_to_h2h))
 
-    # Load "all" context events once for streak/trend (overall recent form)
+    # All event types are included; consumers that feed the consensus pool
+    # filter to BETTING_EVENTS themselves. Streak/trend are scoped to each
+    # belief's own context (a HOME row shows a home-only streak).
     all_event_df = load_event_history(conn, context="all")
-    all_event_df = all_event_df[
-        all_event_df["team_id"].isin(h2h_team_ids)
-        & all_event_df["event_name"].isin(BETTING_EVENTS)
-    ]
+    all_event_df = all_event_df[all_event_df["team_id"].isin(h2h_team_ids)]
 
-    result = {}
+    idx_by_ctx: dict[str, dict[int, dict[str, BayesianBelief]]] = {}
+    base_rates_all = compute_league_base_rates(conn, context="all")
+    idx_by_ctx["all"] = _index_latest_by_event(compute_beliefs(
+        all_event_df, base_rates_all, prior_strength, context="all"))
+
     for ctx in ("home", "away"):
         event_df = load_event_history(conn, context=ctx)
-        event_df = event_df[
-            event_df["team_id"].isin(h2h_team_ids)
-            & event_df["event_name"].isin(BETTING_EVENTS)
-        ]
+        event_df = event_df[event_df["team_id"].isin(h2h_team_ids)]
         base_rates = compute_league_base_rates(conn, context=ctx)
-        beliefs = compute_beliefs(event_df, base_rates, prior_strength, half_life,
-                                  overall_df=all_event_df)
+        idx_by_ctx[ctx] = _index_latest_by_event(compute_beliefs(
+            event_df, base_rates, prior_strength, context=ctx))
 
-        for b in beliefs:
-            b.context = ctx
+    result = {}
+    for _, fix in fixtures.iterrows():
+        fid = int(fix["fixture_id"])
+        entry = {"home": [], "away": []}
 
-        for _, fix in fixtures.iterrows():
-            fid = int(fix["fixture_id"])
-            if fid not in result:
-                result[fid] = {"home": [], "away": []}
-
-            rf_col = "team_id" if ctx == "home" else "opponent_id"
-            rf_tid = int(fix[rf_col])
-            h2h_tid = rf_to_h2h.get(rf_tid)
+        for side in ("home", "away"):
+            rf_col = "team_id" if side == "home" else "opponent_id"
+            h2h_tid = rf_to_h2h.get(int(fix[rf_col]))
             if h2h_tid is None:
                 continue
-            side = ctx
 
-            for b in beliefs:
-                if b.team_id == h2h_tid and b.posterior >= MIN_POSTERIOR_INTERESTING:
-                    result[fid][side].append({
+            venue = idx_by_ctx[side].get(h2h_tid, {})
+            overall = idx_by_ctx["all"].get(h2h_tid, {})
+
+            # Per event: the venue-context belief is primary when its sample
+            # is mature (n >= VENUE_PREFER_MIN), else the overall belief is.
+            # Selection depends only on data volume, never on the probability
+            # itself, so it avoids the optimism of picking the max posterior.
+            # When a venue belief is primary, the overall belief is kept too
+            # (primary=False) so the all-context streak stays visible —
+            # consumers that feed consensus should use primary entries only.
+            for event_name in set(venue) | set(overall):
+                venue_b = venue.get(event_name)
+                overall_b = overall.get(event_name)
+                if venue_b is not None and venue_b.n_matches >= VENUE_PREFER_MIN:
+                    chosen = [(venue_b, True)]
+                    if overall_b is not None:
+                        chosen.append((overall_b, False))
+                else:
+                    chosen = [(overall_b or venue_b, True)]
+                for b, primary in chosen:
+                    calibrated = calibrate_posterior(b.posterior)
+                    boosted = apply_streak_boost(calibrated, b.recent_streak)
+                    display_eligible = boosted >= MIN_POSTERIOR_INTERESTING
+                    if not display_eligible and not include_below_threshold:
+                        continue
+                    entry[side].append({
                         "event": b.event_name,
-                        "posterior": calibrate_posterior(b.posterior),
+                        "posterior": boosted,
                         "posterior_raw": b.posterior,
+                        "posterior_calibrated": calibrated,
+                        "boost": round(boosted - calibrated, 4) if boosted > calibrated else 0,
                         "base_rate": b.league_base_rate,
+                        "alpha": b.alpha,
+                        "beta": b.beta,
                         "n": b.n_matches,
+                        "k": b.k_matches,
+                        "league": b.league,
+                        "context": b.context,
+                        "primary": primary,
+                        "display_eligible": display_eligible,
+                        "display_threshold": MIN_POSTERIOR_INTERESTING,
                         "streak": b.recent_streak,
                         "trend": b.trend,
                         "team": b.team_name,
                     })
 
-    for fid in list(result):
-        if not result[fid]["home"] and not result[fid]["away"]:
-            del result[fid]
+            entry[side].sort(key=lambda d: d["posterior"], reverse=True)
+
+        if entry["home"] or entry["away"]:
+            result[fid] = entry
 
     return result
 
@@ -394,8 +495,8 @@ def print_beliefs(df: pd.DataFrame, event_filter: Optional[str] = None) -> None:
         df = df[df["event_name"].str.contains(event_filter, case=False)]
 
     print(f"\n{'='*100}")
-    print(f"  BAYESIAN STREAK BELIEFS  ({len(df)} team-events)")
-    print(f"  Prior strength: {PRIOR_STRENGTH} | Half-life: {HALF_LIFE} matches")
+    print(f"  BAYESIAN STREAK BELIEFS  ({len(df)} team-events)  — current season only")
+    print(f"  Prior strength: {PRIOR_STRENGTH} | posterior = (a0 + k) / (a0 + b0 + n)")
     print(f"{'='*100}")
 
     for league in sorted(df["league"].unique()):
@@ -406,10 +507,11 @@ def print_beliefs(df: pd.DataFrame, event_filter: Optional[str] = None) -> None:
             sign = "+" if delta >= 0 else ""
             trend_marker = {"hot": " ↑", "cold": " ↓", "stable": ""}[row["trend"]]
             streak_str = f" [{row['recent_streak']}]" if row["recent_streak"] >= 2 else ""
+            ctx = str(row["context"]).upper()
             print(
-                f"  {row['team_name']:<25s}  {row['event_name']:<16s}  "
+                f"  {row['team_name']:<25s}  {row['event_name']:<16s}  [{ctx:<4s}]  "
                 f"P={row['posterior']:.0%}  base={row['league_base_rate']:.0%}  "
-                f"({sign}{delta:.0%})  n={row['n_matches']}"
+                f"({sign}{delta:.0%})  k={row['k_matches']}/n={row['n_matches']}"
                 f"{streak_str}{trend_marker}"
             )
 
@@ -433,7 +535,7 @@ def run(
         else:
             event_df = load_event_history(conn, team_id=team_id, context=context)
             base_rates = compute_league_base_rates(conn, context=context)
-            beliefs = compute_beliefs(event_df, base_rates)
+            beliefs = compute_beliefs(event_df, base_rates, context=context)
             df = beliefs_to_df(beliefs)
 
         print_beliefs(df, event_filter=event_filter)

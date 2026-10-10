@@ -247,14 +247,19 @@ def _print_fixture(c: dict) -> None:
     bayes = c.get("bayesian_beliefs", {})
     for side in ("home", "away"):
         for b in bayes.get(side, []):
+            if b.get("primary") is False:
+                continue  # secondary all-context view; keep terminal output clean
             trend = {"hot": "↑", "cold": "↓", "stable": ""}[b["trend"]]
             streak_str = f" [{b['streak']}]" if b["streak"] >= 2 else ""
             delta = b["posterior"] - b["base_rate"]
             sign = "+" if delta >= 0 else ""
+            ctx = str(b.get("context", "all")).upper()
+            kn = f"k={b['k']}/n={b['n']}" if b.get("k") is not None else f"n={b['n']}"
+            boost_str = f" ⚡+{b['boost']:.0%}" if b.get("boost") else ""
             print(
-                f"    Bayesian:  {b['team']:<20s} {b['event']:<16s}  →  "
+                f"    Bayesian:  {b['team']:<20s} {b['event']:<16s} [{ctx:<4s}]  →  "
                 f"P={b['posterior']:.0%} (base {b['base_rate']:.0%}, {sign}{delta:.0%}) "
-                f"n={b['n']}{streak_str} {trend}"
+                f"{kn}{streak_str}{boost_str} {trend}"
             )
 
 
@@ -314,6 +319,10 @@ def _build_output_data(combined: list[dict]) -> dict:
                     "confidence": b["posterior"],
                     "base_rate": b["base_rate"],
                     "n_matches": b["n"],
+                    "k_matches": b.get("k"),
+                    "context": b.get("context"),
+                    "primary": b.get("primary", True),
+                    "streak_boost": b.get("boost"),
                     "streak": b["streak"],
                     "trend": b["trend"],
                     "side": side,
