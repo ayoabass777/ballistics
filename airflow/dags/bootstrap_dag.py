@@ -298,6 +298,7 @@ def bootstrap_dag():
             record_data_movement_from_context,
             record_data_quality_event_from_context,
             record_table_snapshot_from_context,
+            resolve_data_quality_events_from_context,
         )
 
         logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
@@ -378,6 +379,14 @@ def bootstrap_dag():
                             "api_league_id": api_league_id,
                             "season_year": season_year,
                         },
+                    )
+                    resolve_data_quality_events_from_context(
+                        context,
+                        check_name="s3_load_failed",
+                        table_schema="raw",
+                        table_name="raw_fixtures",
+                        source_s3_key=s3_key,
+                        reason="the same S3 object loaded successfully",
                     )
                     logger.info("Loaded %d fixtures from %s", count, s3_key)
 

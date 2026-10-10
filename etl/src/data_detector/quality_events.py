@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 import psycopg2
 from psycopg2.extras import Json
 
-from etl.src.data_detector.common import airflow_identity, coerce_iso, logger
+from etl.src.data_detector.common import airflow_identity, coerce_iso, logger, utc_now
 from etl.src.extract_metadata import get_db_connection
 
 RAW_FIXTURE_STALE_HOURS = 26
@@ -103,6 +103,82 @@ def record_data_quality_event_from_context(
         logger.warning("Unexpected detector failure while recording data quality event (%s): %s", check_name, exc)
 
 
+def resolve_data_quality_events(
+    *,
+    check_name: str,
+    run_id: Optional[str] = None,
+    dag_id: Optional[str] = None,
+    task_id: Optional[str] = None,
+    table_schema: Optional[str] = None,
+    table_name: Optional[str] = None,
+    source_s3_key: Optional[str] = None,
+    reason: str,
+) -> int:
+    """Resolve matching open/failed alerts while preserving their audit rows."""
+    clauses = ["check_name = %s", "status IN ('open', 'failed')"]
+    params: list[Any] = [check_name]
+    for column, value in (
+        ("table_schema", table_schema),
+        ("table_name", table_name),
+        ("source_s3_key", source_s3_key),
+    ):
+        if value is not None:
+            clauses.append(f"{column} = %s")
+            params.append(value)
+
+    resolution = {
+        "resolved_at": coerce_iso(utc_now()),
+        "resolution_run_id": run_id,
+        "resolution_dag_id": dag_id,
+        "resolution_task_id": task_id,
+        "reason": reason,
+    }
+    params.insert(0, Json({"resolution": resolution}))
+
+    with get_db_connection() as conn, conn.cursor() as cur:
+        cur.execute(
+            f"""
+            UPDATE data_detector.data_quality_events
+            SET status = 'resolved',
+                details = details || %s
+            WHERE {' AND '.join(clauses)}
+            """,
+            tuple(params),
+        )
+        resolved_count = cur.rowcount
+        conn.commit()
+    return resolved_count
+
+
+def resolve_data_quality_events_from_context(
+    context: Dict[str, Any],
+    *,
+    check_name: str,
+    reason: str,
+    table_schema: Optional[str] = None,
+    table_name: Optional[str] = None,
+    source_s3_key: Optional[str] = None,
+) -> int:
+    """Best-effort Airflow-context wrapper for resolving quality alerts."""
+    identity = airflow_identity(context)
+    try:
+        return resolve_data_quality_events(
+            check_name=check_name,
+            run_id=identity["run_id"],
+            dag_id=identity["dag_id"],
+            task_id=identity["task_id"],
+            table_schema=table_schema,
+            table_name=table_name,
+            source_s3_key=source_s3_key,
+            reason=reason,
+        )
+    except (RuntimeError, psycopg2.Error, OSError) as exc:
+        logger.warning("Failed resolving data quality events (%s): %s", check_name, exc)
+    except Exception as exc:
+        logger.warning("Unexpected detector failure while resolving data quality events (%s): %s", check_name, exc)
+    return 0
+
+
 def check_raw_fixture_stale_from_context(context: Dict[str, Any], stale_hours: int = RAW_FIXTURE_STALE_HOURS) -> None:
     """
     Warn only when current seasons exist, past unresolved fixtures exist, and
@@ -159,6 +235,16 @@ def check_raw_fixture_stale_from_context(context: Dict[str, Any], stale_hours: i
                     "update_age": str(update_age) if update_age is not None else None,
                 },
                 error_message=f"raw.raw_fixtures has unresolved past fixtures and no update within {stale_hours}h",
+            )
+        else:
+            resolve_data_quality_events(
+                check_name="raw_fixture_stale",
+                run_id=identity["run_id"],
+                dag_id=identity["dag_id"],
+                task_id=identity["task_id"],
+                table_schema="raw",
+                table_name="raw_fixtures",
+                reason="raw fixture freshness check passed",
             )
     except (RuntimeError, psycopg2.Error, OSError) as exc:
         logger.warning("Failed running raw_fixture_stale quality check: %s", exc)
@@ -223,6 +309,16 @@ def check_standings_stale_from_context(context: Dict[str, Any], stale_days: int 
                     "stale_leagues": stale_leagues,
                 },
                 error_message=f"{len(stale_leagues)} current league standing(s) have no update within {stale_days} day(s)",
+            )
+        else:
+            resolve_data_quality_events(
+                check_name="standings_stale",
+                run_id=identity["run_id"],
+                dag_id=identity["dag_id"],
+                task_id=identity["task_id"],
+                table_schema="raw",
+                table_name="raw_league_standings",
+                reason="standings freshness check passed",
             )
     except (RuntimeError, psycopg2.Error, OSError) as exc:
         logger.warning("Failed running standings_stale quality check: %s", exc)
