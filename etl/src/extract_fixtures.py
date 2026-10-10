@@ -93,6 +93,12 @@ def daily_sleep_calculator():
     logger.info(f"Sleeping until next UTC day: {sleep_sec} seconds")
     time.sleep(sleep_sec)
 
+class ApiResponseError(Exception):
+    """API answered 200 but reported errors (plan/auth/params) with an empty
+    response body. Must not be treated as 'no data' — that reads as a silent
+    success while the pipeline quietly stops updating."""
+
+
 # Unified rate-limited GET with retry/backoff and 429 handling
 def _rate_limited_get(
     endpoint: str,
@@ -145,6 +151,16 @@ def _rate_limited_get(
             except ValueError:
                 logger.error(f"Failed to parse JSON response on attempt {attempt}/{max_retries}")
                 return []
+
+            # API-Football reports plan/auth/param problems as HTTP 200 with a
+            # populated "errors" field and an empty "response". Raise instead of
+            # returning [] so callers can't mistake a broken key/plan for a
+            # quiet day with no updates. (errors is {} or [] when healthy.)
+            api_errors = payload.get("errors")
+            if api_errors:
+                raise ApiResponseError(
+                    f"API errors for {endpoint} with params {params}: {api_errors}"
+                )
 
             return payload.get("response", [])
         
