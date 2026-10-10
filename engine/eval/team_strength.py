@@ -50,18 +50,21 @@ def load_team_df(conn, current_season_only: bool = True,
     """Load played team-match rows. `cutoff` restricts to kickoffs before
     that datetime — required for walk-forward backtests so strength never
     sees matches after the fold's training cutoff."""
-    season_filter = "AND is_current" if current_season_only else ""
-    cutoff_filter = "AND kickoff_utc < %(cutoff)s" if cutoff is not None else ""
+    season_filter = "AND f.is_current" if current_season_only else ""
+    cutoff_filter = "AND f.kickoff_utc < %(cutoff)s" if cutoff is not None else ""
     sql = f"""
         SELECT
-            league_season_id,
-            league_name || ' ' || season AS league,
-            team_id, team_name,
-            goals_for, goals_against,
-            is_home, kickoff_utc
-        FROM {SOURCE_TABLE}
-        WHERE is_played {season_filter} {cutoff_filter}
-        ORDER BY kickoff_utc
+            f.league_season_id,
+            dl.league_name || ' (' || dc.country_name || ') ' || dls.season AS league,
+            f.team_id, f.team_name,
+            f.goals_for, f.goals_against,
+            f.is_home, f.kickoff_utc
+        FROM {SOURCE_TABLE} f
+        JOIN dim.dim_league_seasons dls ON dls.league_season_id = f.league_season_id
+        JOIN dim.dim_leagues dl ON dl.league_id = dls.league_id
+        JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+        WHERE f.is_played {season_filter} {cutoff_filter}
+        ORDER BY f.kickoff_utc
     """
     params = {"cutoff": cutoff} if cutoff is not None else None
     df = pd.read_sql(sql, conn, params=params)

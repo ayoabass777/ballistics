@@ -28,24 +28,32 @@ import pandas as pd
 import psycopg2
 import yaml
 
-from engine.eval.calibration_maps import apply_points, load_points
+from engine.eval.calibration_maps import (
+    apply_logit_adjustment,
+    apply_points,
+    load_league_adjustments,
+    load_points,
+)
 from engine.eval.team_strength import load_team_df, compute_team_strength
 from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
 
 _MISMATCH_POINTS = load_points("mismatch")
+_MISMATCH_LEAGUE_ADJUSTMENTS = load_league_adjustments("mismatch")
 
 
-def _calibrate_conf(raw: float) -> float:
+def _calibrate_conf(raw: float, api_league_id: int | None = None) -> float:
     """Map a raw empirical confidence through the fitted calibration map.
 
     Identity when calibration_maps.json is absent. Not applied to the
     draw market — the map is fitted on >=0.60 confidences only.
     """
-    if _MISMATCH_POINTS:
-        return apply_points(_MISMATCH_POINTS, raw)
-    return raw
+    calibrated = apply_points(_MISMATCH_POINTS, raw) if _MISMATCH_POINTS else raw
+    if api_league_id is not None:
+        adjustment = _MISMATCH_LEAGUE_ADJUSTMENTS.get(str(int(api_league_id)))
+        calibrated = apply_logit_adjustment(calibrated, adjustment)
+    return calibrated
 
 SOURCE_TABLE = "raw.fact_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
@@ -81,6 +89,8 @@ class MismatchPick:
     confidence: float
     sample_size: int
     fav_is_home: bool
+    api_league_id: int | None = None
+    country: str = ""
     h2h_wins: int = 0
     h2h_draws: int = 0
     h2h_losses: int = 0
@@ -120,19 +130,32 @@ def _get_latest_elo(conn, team_ids: list, id_map: dict) -> dict:
     elo_by_fh = dict(zip(df["team_id"], df["rating"]))
     result = {}
     for rf_id in team_ids:
-        fh_id = id_map.get(rf_id, rf_id)
-        if fh_id in elo_by_fh:
+        # No `, rf_id` fallback: raw_fixtures and fact_head_to_head are disjoint
+        # id spaces, so reusing an rf_id as an fh_id silently borrows an
+        # unrelated club's rating (Le Mans 1298 -> an Eliteserien side at 1689).
+        # Unmapped teams are simply absent; the caller applies the 1500 default.
+        fh_id = id_map.get(rf_id)
+        if fh_id is not None and fh_id in elo_by_fh:
             result[rf_id] = elo_by_fh[fh_id]
     return result
 
 
 def _load_league_map(conn) -> dict:
     df = pd.read_sql("""
-        SELECT DISTINCT r.api_league_id, f.league_name
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
+        SELECT l.api_league_id, l.league_name
+        FROM dim.dim_leagues l
     """, conn)
     return dict(zip(df["api_league_id"], df["league_name"]))
+
+
+def _load_league_country_map(conn) -> dict:
+    """Return API league ID -> country without relying on ambiguous names."""
+    df = pd.read_sql("""
+        SELECT l.api_league_id, c.country_name
+        FROM dim.dim_leagues l
+        JOIN dim.dim_countries c ON c.country_id = l.country_id
+    """, conn)
+    return dict(zip(df["api_league_id"], df["country_name"]))
 
 
 def build_hit_rates(conn) -> pd.DataFrame:
@@ -140,7 +163,10 @@ def build_hit_rates(conn) -> pd.DataFrame:
     sql = f"""
         WITH matches AS (
             SELECT
-                f.fixture_id, f.league_name,
+                f.fixture_id,
+                rf.api_league_id,
+                f.league_name,
+                c.country_name,
                 f.goals_for + f.goals_against AS total,
                 ABS(
                     COALESCE(eh.rating_before_flat, eh.rating_before)
@@ -157,6 +183,9 @@ def build_hit_rates(conn) -> pd.DataFrame:
                     THEN f.goals_against ELSE f.goals_for
                 END AS dog_goals
             FROM {SOURCE_TABLE} f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            JOIN dim.dim_leagues l ON l.api_league_id = rf.api_league_id
+            JOIN dim.dim_countries c ON c.country_id = l.country_id
             JOIN {ELO_TABLE} eh
                 ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
             JOIN {ELO_TABLE} ea
@@ -164,7 +193,9 @@ def build_hit_rates(conn) -> pd.DataFrame:
             WHERE f.is_played AND f.is_home
         )
         SELECT
+            api_league_id,
             league_name,
+            country_name,
             gap,
             fav_goals,
             dog_goals,
@@ -177,14 +208,18 @@ def build_hit_rates(conn) -> pd.DataFrame:
         return pd.DataFrame()
 
     rows = []
-    for league, grp in df.groupby("league_name"):
+    for (api_league_id, league, country), grp in df.groupby(
+        ["api_league_id", "league_name", "country_name"]
+    ):
         for lo, hi, label in GAP_BINS:
             bin_df = grp[(grp["gap"] >= lo) & (grp["gap"] < hi)]
             n = len(bin_df)
             if n < MIN_SAMPLE:
                 continue
             rows.append({
+                "api_league_id": int(api_league_id),
                 "league": league,
+                "country": country,
                 "gap_bin": label,
                 "gap_lo": lo,
                 "gap_hi": hi,
@@ -205,7 +240,9 @@ def build_hit_rates(conn) -> pd.DataFrame:
         if n < MIN_SAMPLE:
             continue
         rows.append({
+            "api_league_id": None,
             "league": "__global__",
+            "country": "__global__",
             "gap_bin": label,
             "gap_lo": lo,
             "gap_hi": hi,
@@ -231,7 +268,11 @@ def _get_gap_bin(gap: float) -> tuple[str, int, int] | None:
 
 
 def _lookup_hit_rate(
-    hit_rates: pd.DataFrame, league: str, gap_bin: str, market: str
+    hit_rates: pd.DataFrame,
+    league: str,
+    gap_bin: str,
+    market: str,
+    api_league_id: int | None = None,
 ) -> tuple[float, int]:
     col_map = {
         "fav_to_score": "fav_scores_pct",
@@ -242,7 +283,24 @@ def _lookup_hit_rate(
         "draw": "draw_pct",
     }
     col = col_map[market]
-    row = hit_rates[(hit_rates["league"] == league) & (hit_rates["gap_bin"] == gap_bin)]
+    row = pd.DataFrame()
+    if api_league_id is not None and "api_league_id" in hit_rates.columns:
+        league_ids = pd.to_numeric(hit_rates["api_league_id"], errors="coerce")
+        row = hit_rates[
+            (league_ids == int(api_league_id))
+            & (hit_rates["gap_bin"] == gap_bin)
+        ]
+    elif "api_league_id" not in hit_rates.columns:
+        # Backwards compatibility for legacy/test frames that predate league IDs.
+        row = hit_rates[
+            (hit_rates["league"] == league)
+            & (hit_rates["gap_bin"] == gap_bin)
+        ]
+    else:
+        # A name-only lookup is safe only when that name identifies one league.
+        named = hit_rates[hit_rates["league"] == league]
+        if named["api_league_id"].dropna().nunique() <= 1:
+            row = named[named["gap_bin"] == gap_bin]
     if not row.empty:
         return float(row.iloc[0][col]), int(row.iloc[0]["n"])
     row = hit_rates[(hit_rates["league"] == "__global__") & (hit_rates["gap_bin"] == gap_bin)]
@@ -261,11 +319,19 @@ def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]],
     """
     if not matchups:
         return {}
-    fav_fh_ids = {rf: id_map.get(rf, rf) for rf, _ in matchups}
-    dog_fh_ids = {rf: id_map.get(rf, rf) for _, rf in matchups}
+    # Unmapped ids stay None rather than falling back to the rf_id, which would
+    # query another club's H2H record (disjoint id spaces).  Those pairs fall
+    # through to the (0, 0, 0) "no history" default below.
+    fav_fh_ids = {rf: id_map.get(rf) for rf, _ in matchups}
+    dog_fh_ids = {rf: id_map.get(rf) for _, rf in matchups}
     pairs_to_query = set()
     for fav_rf, dog_rf in matchups:
-        pairs_to_query.add((fav_fh_ids[fav_rf], dog_fh_ids[dog_rf]))
+        fav_fh, dog_fh = fav_fh_ids[fav_rf], dog_fh_ids[dog_rf]
+        if fav_fh is None or dog_fh is None:
+            continue
+        pairs_to_query.add((fav_fh, dog_fh))
+    if not pairs_to_query:
+        return {(f, d): (0, 0, 0) for f, d in matchups}
 
     all_fh = set()
     for a, b in pairs_to_query:
@@ -315,7 +381,11 @@ def _load_team_strength(conn, id_map: dict, cutoff=None) -> dict:
     result = {}
     for _, row in strength.iterrows():
         fh_id = row["team_id"]
-        rf_id = fh_to_rf.get(fh_id, fh_id)
+        # Same disjoint-id-space rule in reverse: an fh_id with no rf mapping
+        # must not be keyed as though it were an rf_id.
+        rf_id = fh_to_rf.get(fh_id)
+        if rf_id is None:
+            continue
         entry = {
             "attack": row["attack_shrunk"],
             "defense": row["defense_shrunk"],
@@ -435,7 +505,9 @@ def predict_mismatch(
             return [], {}
 
         league_map = _load_league_map(conn)
+        country_map = _load_league_country_map(conn)
         upcoming["league"] = upcoming["api_league_id"].map(league_map)
+        upcoming["country"] = upcoming["api_league_id"].map(country_map)
         upcoming = upcoming[upcoming["league"].notna()].copy()
 
         id_map = _build_team_id_map(conn)
@@ -485,7 +557,13 @@ def predict_mismatch(
 
             # Goals markets (strength-adjusted)
             for market in ["fav_to_score", "fav_over_1.5", "over_1.5", "over_2.5"]:
-                conf, n = _lookup_hit_rate(hit_rates, row["league"], gap_bin, market)
+                conf, n = _lookup_hit_rate(
+                    hit_rates,
+                    row["league"],
+                    gap_bin,
+                    market,
+                    api_league_id=int(row["api_league_id"]),
+                )
                 str_adj = _strength_adjustment(market, fav_strength, dog_strength)
                 adjusted = max(min(conf + str_adj, 0.99), 0.0)
                 # Gate on RAW confidence (mirrors the walk-forward backtest),
@@ -504,9 +582,13 @@ def predict_mismatch(
                         gap=round(gap),
                         gap_bin=gap_bin,
                         market=market,
-                        confidence=round(_calibrate_conf(adjusted), 3),
+                        confidence=round(
+                            _calibrate_conf(adjusted, int(row["api_league_id"])), 3
+                        ),
                         sample_size=n,
                         fav_is_home=fav_is_home,
+                        api_league_id=int(row["api_league_id"]),
+                        country=row.get("country", "") or "",
                         h2h_wins=h2h_w,
                         h2h_draws=h2h_d,
                         h2h_losses=h2h_l,
@@ -516,7 +598,13 @@ def predict_mismatch(
                     ))
 
             # Win market (with H2H adjustment)
-            win_conf, win_n = _lookup_hit_rate(hit_rates, row["league"], gap_bin, "fav_win")
+            win_conf, win_n = _lookup_hit_rate(
+                hit_rates,
+                row["league"],
+                gap_bin,
+                "fav_win",
+                api_league_id=int(row["api_league_id"]),
+            )
             adjusted_win = min(win_conf + h2h_boost, 0.95)
             if adjusted_win >= MIN_CONFIDENCE and win_n >= MIN_SAMPLE:
                 picks.append(MismatchPick(
@@ -532,9 +620,13 @@ def predict_mismatch(
                     gap=round(gap),
                     gap_bin=gap_bin,
                     market="fav_win",
-                    confidence=round(_calibrate_conf(adjusted_win), 3),
+                    confidence=round(
+                        _calibrate_conf(adjusted_win, int(row["api_league_id"])), 3
+                    ),
                     sample_size=win_n,
                     fav_is_home=fav_is_home,
+                    api_league_id=int(row["api_league_id"]),
+                    country=row.get("country", "") or "",
                     h2h_wins=h2h_w,
                     h2h_draws=h2h_d,
                     h2h_losses=h2h_l,
@@ -542,7 +634,13 @@ def predict_mismatch(
                 ))
 
             # Draw market — only for gap bins where draw rate is notable (100-200)
-            draw_conf, draw_n = _lookup_hit_rate(hit_rates, row["league"], gap_bin, "draw")
+            draw_conf, draw_n = _lookup_hit_rate(
+                hit_rates,
+                row["league"],
+                gap_bin,
+                "draw",
+                api_league_id=int(row["api_league_id"]),
+            )
             draw_adj = draw_conf - h2h_boost
             if draw_adj >= 0.25 and draw_n >= MIN_SAMPLE and gap < 200:
                 picks.append(MismatchPick(
@@ -561,6 +659,8 @@ def predict_mismatch(
                     confidence=round(draw_adj, 3),
                     sample_size=draw_n,
                     fav_is_home=fav_is_home,
+                    api_league_id=int(row["api_league_id"]),
+                    country=row.get("country", "") or "",
                     h2h_wins=h2h_w,
                     h2h_draws=h2h_d,
                     h2h_losses=h2h_l,
@@ -689,6 +789,8 @@ def save_picks_yaml(picks: list[MismatchPick]) -> str:
             "fixture": f"{p.home_team} vs {p.away_team}",
             "kickoff": pd.Timestamp(p.kickoff).strftime("%Y-%m-%d %H:%M UTC") if hasattr(p.kickoff, 'strftime') else str(p.kickoff),
             "league": p.league,
+            "country": p.country,
+            "api_league_id": p.api_league_id,
             "market": _market_label(p.market, p.favourite),
             "favourite": p.favourite,
             "underdog": p.underdog,
