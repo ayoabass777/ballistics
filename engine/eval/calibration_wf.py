@@ -26,13 +26,22 @@ import psycopg2
 
 from engine.eval.bayesian_streaks import (
     BETTING_EVENTS,
-    HALF_LIFE,
     MIN_POSTERIOR_INTERESTING,
     PRIOR_STRENGTH,
+    apply_streak_boost,
     compute_beliefs,
     compute_league_base_rates,
 )
-from engine.eval.calibration_maps import MAPS_PATH, apply_points, fit_pava_map
+from engine.eval.calibration_maps import (
+    DC_MARKET_KEYS,
+    DC_POOLED_KEY,
+    MAPS_PATH,
+    dc_calibration_key,
+    apply_logit_adjustment,
+    apply_points,
+    fit_league_logit_adjustments,
+    fit_pava_map,
+)
 from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
@@ -50,10 +59,23 @@ RECORD_FLOOR_MISMATCH = 0.60
 RECORD_FLOOR_DC = 0.55
 
 MODELS = ("bayesian", "poisson", "mismatch", "dixon_coles")
+DC_BOUNDS_1_4_MARKET = "Match Goals 1-4"
+DC_BOUNDS_1_4_CALIBRATION_KEY = "dixon_coles_bounds_1_4"
+CALIBRATION_KEYS = (*MODELS, *DC_MARKET_KEYS)
+LEAGUE_ADJUSTED_CALIBRATION_KEYS = (
+    "mismatch",
+    DC_BOUNDS_1_4_CALIBRATION_KEY,
+)
 
 # Fraction of folds used to FIT calibration maps; the rest are held out
 # for evaluation so the report never grades a map on the data that fit it.
 CAL_FRAC_DEFAULT = 0.4
+LEAGUE_CALIBRATION_MIN_N = 30
+# Per-market DC maps fit on smaller samples; a 150-prediction minimum per bin
+# kept held-out overstatement in thin markets (BTTS, team win, 2.5 lines) to
+# ~5 pts vs ~8 with the default 50 (numbers audit, 2026-10-03).
+DC_MARKET_MIN_BIN_N = 150
+LEAGUE_CALIBRATION_PRIOR_STRENGTH = 200
 
 
 def _get_conn():
@@ -69,6 +91,8 @@ def _actual_outcome(row: pd.Series, market: str) -> bool | None:
     hg, ag = int(hg), int(ag)
     total = hg + ag
 
+    if market == DC_BOUNDS_1_4_MARKET:
+        return 1 <= total <= 4
     if "Match Over" in market:
         return total > float(market.split()[-1])
     if "Match Under" in market:
@@ -99,6 +123,45 @@ def _actual_outcome(row: pd.Series, market: str) -> bool | None:
     return None
 
 
+def _calibration_key(prediction: dict) -> str:
+    """Return the map fitted/applied to one raw prediction."""
+    if prediction["model"] == "dixon_coles":
+        return dc_calibration_key(prediction["market"])
+    return prediction["model"]
+
+
+def _rows_for_key(predictions: list[dict], calibration_key: str) -> list[dict]:
+    """Predictions used to fit one map.
+
+    The pooled "dixon_coles" map is fitted on every DC prediction except
+    Goals 1-4 (which has always had its own map), so it stays a meaningful
+    fallback for market families with too little data of their own.
+    """
+    if calibration_key == DC_POOLED_KEY:
+        return [p for p in predictions if p["model"] == "dixon_coles"
+                and _calibration_key(p) != DC_BOUNDS_1_4_CALIBRATION_KEY]
+    return [p for p in predictions if _calibration_key(p) == calibration_key]
+
+
+def _fit_map(rows: list[dict], calibration_key: str) -> list[list[float]]:
+    """Fit one calibration map with the bin-size rule for its key."""
+    min_bin_n = (DC_MARKET_MIN_BIN_N
+                 if calibration_key in DC_MARKET_KEYS
+                 and calibration_key != DC_BOUNDS_1_4_CALIBRATION_KEY
+                 else 50)
+    return fit_pava_map([p["predicted_prob_raw"] for p in rows],
+                        [float(p["actual"]) for p in rows],
+                        min_bin_n=min_bin_n)
+
+
+def _points_for(maps: dict, calibration_key: str) -> list[list[float]]:
+    """Map points for a key, falling back to the pooled DC map for DC keys."""
+    points = maps.get(calibration_key) or []
+    if not points and calibration_key in DC_MARKET_KEYS:
+        points = maps.get(DC_POOLED_KEY) or []
+    return points
+
+
 # ── Data loaders with date cutoff ──────────────────────────────────────
 
 def load_all_fixtures(conn, months: int = 6) -> pd.DataFrame:
@@ -116,27 +179,52 @@ def load_all_fixtures(conn, months: int = 6) -> pd.DataFrame:
     """, conn, params={"cutoff": cutoff})
 
 
+# Season-at-cutoff scoping: the live model filters events to is_current,
+# but is_current reflects "now" — for a historical fold the leak-free
+# equivalent is each league's season in progress at the fold's cutoff
+# (most recent dim_league_seasons.start_date <= cutoff).
+_SEASON_AT_CUTOFF_CTE = """
+    WITH ls_at_cutoff AS (
+        SELECT DISTINCT ON (league_id) league_season_id, league_id
+        FROM dim.dim_league_seasons
+        WHERE start_date <= %(cutoff)s
+        ORDER BY league_id, start_date DESC
+    )
+"""
+
+
 def _load_event_history_before(conn, cutoff_dt, context: str) -> pd.DataFrame:
-    """Load Bayesian event history for fixtures BEFORE cutoff only."""
+    """Bayesian event history BEFORE cutoff, scoped to the season in
+    progress at the cutoff (mirrors the live current-season-only model)."""
     return pd.read_sql(f"""
-        SELECT e.league_name AS league, e.team_id, e.team_name,
+        {_SEASON_AT_CUTOFF_CTE}
+        SELECT dl.league_name || ' (' || dc.country_name || ')' AS league,
+               e.team_id, e.team_name,
                e.event_name, e.event_flag, e.kickoff_utc, e.fixture_id
         FROM {EVENTS_TABLE} e
+        JOIN ls_at_cutoff la ON la.league_season_id = e.league_season_id
+        JOIN dim.dim_leagues dl ON dl.league_id = la.league_id
+        JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
         WHERE e.h2h_context_scope = %(context)s
           AND e.kickoff_utc < %(cutoff)s
-        ORDER BY e.team_id, e.event_name, e.kickoff_utc
+        ORDER BY e.team_id, e.event_name, e.kickoff_utc, e.fixture_id
     """, conn, params={"context": context, "cutoff": cutoff_dt})
 
 
 def _load_base_rates_before(conn, cutoff_dt, context: str) -> pd.DataFrame:
-    """Compute league base rates from events BEFORE cutoff only."""
+    """League base rates from season-at-cutoff events BEFORE cutoff only."""
     return pd.read_sql(f"""
-        SELECT league_name AS league, event_name,
-               AVG(event_flag::float) AS base_rate, COUNT(*) AS n
-        FROM {EVENTS_TABLE}
-        WHERE h2h_context_scope = %(context)s
-          AND kickoff_utc < %(cutoff)s
-        GROUP BY league_name, event_name
+        {_SEASON_AT_CUTOFF_CTE}
+        SELECT dl.league_name || ' (' || dc.country_name || ')' AS league,
+               e.event_name,
+               AVG(e.event_flag::float) AS base_rate, COUNT(*) AS n
+        FROM {EVENTS_TABLE} e
+        JOIN ls_at_cutoff la ON la.league_season_id = e.league_season_id
+        JOIN dim.dim_leagues dl ON dl.league_id = la.league_id
+        JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+        WHERE e.h2h_context_scope = %(context)s
+          AND e.kickoff_utc < %(cutoff)s
+        GROUP BY 1, e.event_name
     """, conn, params={"context": context, "cutoff": cutoff_dt})
 
 
@@ -213,7 +301,10 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
 
     sql = f"""
         WITH matches AS (
-            SELECT f.fixture_id, f.league_name,
+            SELECT f.fixture_id,
+                   rf.api_league_id,
+                   f.league_name,
+                   c.country_name,
                    f.goals_for + f.goals_against AS total,
                    ABS(COALESCE(eh.rating_before_flat, eh.rating_before)
                      - COALESCE(ea.rating_before_flat, ea.rating_before)) AS gap,
@@ -224,12 +315,16 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
                            > COALESCE(ea.rating_before_flat, ea.rating_before)
                         THEN f.goals_against ELSE f.goals_for END AS dog_goals
             FROM {H2H_TABLE} f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            JOIN dim.dim_leagues l ON l.api_league_id = rf.api_league_id
+            JOIN dim.dim_countries c ON c.country_id = l.country_id
             JOIN {ELO_TABLE} eh ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
             JOIN {ELO_TABLE} ea ON ea.team_id = f.opponent_id AND ea.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home
               AND f.kickoff_utc < %(cutoff)s
         )
-        SELECT league_name, gap, fav_goals, dog_goals, total
+        SELECT api_league_id, league_name, country_name,
+               gap, fav_goals, dog_goals, total
         FROM matches WHERE gap >= 100
     """
     df = pd.read_sql(sql, conn, params={"cutoff": cutoff_dt})
@@ -237,14 +332,18 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
         return pd.DataFrame()
 
     rows = []
-    for league, grp in df.groupby("league_name"):
+    for (api_league_id, league, country), grp in df.groupby(
+        ["api_league_id", "league_name", "country_name"]
+    ):
         for lo, hi, label in GAP_BINS:
             bin_df = grp[(grp["gap"] >= lo) & (grp["gap"] < hi)]
             n = len(bin_df)
             if n < MIN_SAMPLE:
                 continue
             rows.append({
-                "league": league, "gap_bin": label, "n": n,
+                "api_league_id": int(api_league_id),
+                "league": league, "country": country,
+                "gap_bin": label, "n": n,
                 "fav_scores_pct": (bin_df["fav_goals"] >= 1).mean(),
                 "fav_over15_pct": (bin_df["fav_goals"] >= 2).mean(),
                 "over15_pct": (bin_df["total"] > 1.5).mean(),
@@ -261,7 +360,9 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
         if n < MIN_SAMPLE:
             continue
         rows.append({
-            "league": "__global__", "gap_bin": label, "n": n,
+            "api_league_id": None,
+            "league": "__global__", "country": "__global__",
+            "gap_bin": label, "n": n,
             "fav_scores_pct": (bin_df["fav_goals"] >= 1).mean(),
             "fav_over15_pct": (bin_df["fav_goals"] >= 2).mean(),
             "over15_pct": (bin_df["total"] > 1.5).mean(),
@@ -279,31 +380,38 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
 
 def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                    id_map: dict) -> list[dict]:
-    """Bayesian predictions using only events before cutoff."""
+    """Bayesian predictions using only events before cutoff.
+
+    Mirrors the live model: season-at-cutoff history, per-event selection of
+    the venue-context belief when mature (n >= VENUE_PREFER_MIN) else the
+    overall belief, primaries only. Records RAW posteriors plus the streak so
+    the eval gate can apply the live calibrate-then-boost order downstream.
+    """
+    from engine.eval.bayesian_streaks import _index_latest_by_event, VENUE_PREFER_MIN
+
     results = []
     all_rf_ids = set(test_fixtures["home_team_id"].tolist() +
                      test_fixtures["away_team_id"].tolist())
     all_fh_ids = {id_map.get(rf, rf) for rf in all_rf_ids}
 
-    for ctx in ("home", "away"):
+    idx_by_ctx: dict[str, dict] = {}
+    for ctx in ("home", "away", "all"):
         event_df = _load_event_history_before(conn, cutoff_dt, ctx)
         event_df = event_df[
             event_df["team_id"].isin(all_fh_ids)
             & event_df["event_name"].isin(BETTING_EVENTS)
         ]
         if event_df.empty:
+            idx_by_ctx[ctx] = {}
             continue
         base_rates = _load_base_rates_before(conn, cutoff_dt, ctx)
-        beliefs = compute_beliefs(event_df, base_rates)
+        beliefs = compute_beliefs(event_df, base_rates, context=ctx)
+        idx_by_ctx[ctx] = _index_latest_by_event(beliefs)
 
-        belief_by_team = defaultdict(list)
-        for b in beliefs:
-            b.context = ctx
-            belief_by_team[b.team_id].append(b)
-
-        for _, fix in test_fixtures.iterrows():
-            fid = int(fix["fixture_id"])
-            if ctx == "home":
+    for _, fix in test_fixtures.iterrows():
+        fid = int(fix["fixture_id"])
+        for side in ("home", "away"):
+            if side == "home":
                 target_rf = fix["home_team_id"]
                 team_name = fix["home_team_name"]
                 opp_name = fix["away_team_name"]
@@ -313,7 +421,16 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                 opp_name = fix["home_team_name"]
 
             target_fh = id_map.get(target_rf, target_rf)
-            for b in belief_by_team.get(target_fh, []):
+            venue = idx_by_ctx.get(side, {}).get(target_fh, {})
+            overall = idx_by_ctx.get("all", {}).get(target_fh, {})
+
+            for event_name in set(venue) | set(overall):
+                venue_b = venue.get(event_name)
+                overall_b = overall.get(event_name)
+                if venue_b is not None and venue_b.n_matches >= VENUE_PREFER_MIN:
+                    b = venue_b
+                else:
+                    b = overall_b or venue_b
                 if b.posterior < RECORD_FLOOR_BAYESIAN:
                     continue
                 market = None
@@ -342,6 +459,7 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                             "model": "bayesian",
                             "market": market,
                             "predicted_prob_raw": round(float(b.posterior), 4),
+                            "streak": int(b.recent_streak),
                             "actual": outcome,
                         })
     return results
@@ -514,7 +632,13 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         fix_row = fix_row.iloc[0]
 
         for mkt in ["fav_to_score", "fav_over_1.5", "over_1.5", "over_2.5"]:
-            conf, n = _lookup_hit_rate(hit_rates, row.get("league", ""), gap_bin, mkt)
+            conf, n = _lookup_hit_rate(
+                hit_rates,
+                row.get("league", ""),
+                gap_bin,
+                mkt,
+                api_league_id=int(row["api_league_id"]),
+            )
             str_adj = _strength_adjustment(mkt, fav_strength, dog_strength)
             adjusted = max(min(conf + str_adj, 0.99), 0.0)
             if adjusted < RECORD_FLOOR_MISMATCH or n < MIN_SAMPLE:
@@ -540,7 +664,12 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                 })
 
         win_conf, win_n = _lookup_hit_rate(
-            hit_rates, row.get("league", ""), gap_bin, "fav_win")
+            hit_rates,
+            row.get("league", ""),
+            gap_bin,
+            "fav_win",
+            api_league_id=int(row["api_league_id"]),
+        )
         adjusted_win = min(win_conf + h2h_boost, 0.95)
         if adjusted_win >= RECORD_FLOOR_MISMATCH and win_n >= MIN_SAMPLE:
             market = f"{fav_name} Win"
@@ -576,8 +705,10 @@ def _dixon_coles_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         return results
 
     ref_time = pd.Timestamp(cutoff_dt)
-    for league, te_lg in test_df.groupby("league"):
-        lg_hist = hist[hist["league"] == league]
+    # Match the live predictor exactly: league names are not unique across
+    # countries (for example, several competitions are named Premier League).
+    for api_league_id, te_lg in test_df.groupby("league_id"):
+        lg_hist = hist[hist["league_id"] == api_league_id]
         params = fit_league_dc(lg_hist, ref_time)
         if params is None:
             continue
@@ -628,6 +759,9 @@ def deduplicate_predictions(preds: list[dict]) -> list[dict]:
             "away": group[0].get("away", ""),
             "score": group[0].get("score", ""),
             "kickoff": group[0].get("kickoff", ""),
+            "api_league_id": group[0].get("api_league_id"),
+            "league": group[0].get("league", ""),
+            "calibration_scope": group[0].get("calibration_scope", "global"),
         })
     return deduped
 
@@ -698,6 +832,8 @@ def compute_calibration(predictions: list[dict], n_bins: int = 10) -> dict:
 
     # Market type breakdown
     def _market_type(m):
+        if m == DC_BOUNDS_1_4_MARKET:
+            return "bounds_1_4"
         if "Under" in m:
             return "under"
         if "Over 0.5" in m:
@@ -750,13 +886,15 @@ def compute_base_rates(fixtures: pd.DataFrame) -> dict:
         "over_1.5": round(float((total > 1.5).mean()), 4),
         "over_2.5": round(float((total > 2.5).mean()), 4),
         "under_3.5": round(float((total < 3.5).mean()), 4),
+        "bounds_1_4": round(float(((total >= 1) & (total <= 4)).mean()), 4),
     }
 
 
 # ── Main walk-forward runner ──────────────────────────────────────────
 
 def run_walk_forward(months: int = 6, fold_days: int = 14,
-                     cal_frac: float = CAL_FRAC_DEFAULT) -> dict:
+                     cal_frac: float = CAL_FRAC_DEFAULT,
+                     dump_raw: str | None = None) -> dict:
     conn = _get_conn()
     try:
         print("=" * 60)
@@ -859,6 +997,8 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
                 ag = int(finfo.get("goals_away_ft", 0))
                 pred["score"] = f"{hg}-{ag}"
                 pred["kickoff"] = str(finfo.get("kickoff_utc", ""))[:16]
+                pred["api_league_id"] = finfo.get("api_league_id")
+                pred["league"] = league_map.get(finfo.get("api_league_id"), "")
                 pred["fold"] = i + 1
 
             test_fix["fold"] = i + 1
@@ -868,6 +1008,12 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
         print(f"\n{'─' * 60}")
         print(f"  Total raw predictions: {len(all_predictions)}")
+        if dump_raw:
+            # Diagnostic only (2026-10-03): lets top-band calibration be
+            # inspected offline, e.g. engine/eval/top_band_check.py.
+            with open(dump_raw, "w") as fh:
+                json.dump(all_predictions, fh, default=str)
+            print(f"  Raw predictions written to {dump_raw}")
 
         # ── Fit/eval fold split — maps are never graded on their own data ──
         n_folds = len(folds)
@@ -880,13 +1026,28 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
         print("\nFitting calibration maps (fit folds only)...")
         fit_maps = {}
-        for model in MODELS:
-            mp = [p for p in fit_preds if p["model"] == model]
-            points = fit_pava_map([p["predicted_prob_raw"] for p in mp],
-                                  [float(p["actual"]) for p in mp])
-            fit_maps[model] = points
-            print(f"  {model:<10s} {len(mp):>6d} preds → "
+        for calibration_key in CALIBRATION_KEYS:
+            mp = _rows_for_key(fit_preds, calibration_key)
+            points = _fit_map(mp, calibration_key)
+            fit_maps[calibration_key] = points
+            print(f"  {calibration_key:<26s} {len(mp):>6d} preds → "
                   f"{f'{len(points)} map points' if points else 'insufficient data (identity)'}")
+
+        fit_league_adjustments_by_key = {}
+        for calibration_key in LEAGUE_ADJUSTED_CALIBRATION_KEYS:
+            fit_rows = [p for p in fit_preds
+                        if _calibration_key(p) == calibration_key]
+            adjustments = fit_league_logit_adjustments(
+                fit_rows,
+                fit_maps.get(calibration_key) or [],
+                min_n=LEAGUE_CALIBRATION_MIN_N,
+                prior_strength=LEAGUE_CALIBRATION_PRIOR_STRENGTH,
+            )
+            fit_league_adjustments_by_key[calibration_key] = adjustments
+            print(f"  {calibration_key:<26s} "
+                  f"{len(adjustments):>6d} league offsets "
+                  f"(n≥{LEAGUE_CALIBRATION_MIN_N}, "
+                  f"prior={LEAGUE_CALIBRATION_PRIOR_STRENGTH})")
 
         # ── Apply maps + LIVE gates to eval-fold predictions ──
         # Gates mirror production: bayesian raw >= MIN_POSTERIOR_INTERESTING,
@@ -897,10 +1058,22 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
         gated = []
         for p in eval_preds:
             raw = p["predicted_prob_raw"]
-            points = fit_maps.get(p["model"]) or []
-            cal = apply_points(points, raw) if points else raw
-            if p["model"] == "bayesian" and raw < MIN_POSTERIOR_INTERESTING:
-                continue
+            points = _points_for(fit_maps, _calibration_key(p))
+            global_cal = apply_points(points, raw) if points else raw
+            cal = global_cal
+            calibration_key = _calibration_key(p)
+            league_adjustments = fit_league_adjustments_by_key.get(
+                calibration_key, {})
+            if calibration_key in LEAGUE_ADJUSTED_CALIBRATION_KEYS:
+                adjustment = league_adjustments.get(
+                    str(int(p["api_league_id"]))) if p.get("api_league_id") is not None else None
+                cal = apply_logit_adjustment(global_cal, adjustment)
+            if p["model"] == "bayesian":
+                # Live order: calibrate, then streak boost, then the 70% gate
+                # on the final displayed value.
+                cal = apply_streak_boost(cal, int(p.get("streak", 0)))
+                if cal < MIN_POSTERIOR_INTERESTING:
+                    continue
             if p["model"] == "poisson" and cal < CALIBRATED_THRESHOLD:
                 continue
             if p["model"] == "mismatch" and raw < MM_MIN_CONFIDENCE:
@@ -909,6 +1082,14 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
                 continue
             q = dict(p)
             q["predicted_prob"] = round(cal, 4)
+            q["global_calibrated_probability"] = round(global_cal, 4)
+            q["calibration_scope"] = (
+                "global+league"
+                if (calibration_key in LEAGUE_ADJUSTED_CALIBRATION_KEYS
+                    and p.get("api_league_id") is not None
+                    and str(int(p["api_league_id"])) in league_adjustments)
+                else "global"
+            )
             gated.append(q)
         print(f"\n  Eval predictions passing live gates: {len(gated)}")
 
@@ -920,6 +1101,59 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
         print("\nComputing calibration (eval folds only)...")
         report = compute_calibration(deduped)
+
+        # Isolate the directly calibrated bounds market so the league layer can
+        # be judged against the global map on the same held-out predictions.
+        bounds_eval = [p for p in eval_preds
+                       if _calibration_key(p) == DC_BOUNDS_1_4_CALIBRATION_KEY]
+        if bounds_eval:
+            rows = []
+            bounds_points = fit_maps.get(DC_BOUNDS_1_4_CALIBRATION_KEY) or []
+            fit_league_adjustments = fit_league_adjustments_by_key.get(
+                DC_BOUNDS_1_4_CALIBRATION_KEY, {})
+            for p in bounds_eval:
+                global_prob = (apply_points(bounds_points, p["predicted_prob_raw"])
+                               if bounds_points else p["predicted_prob_raw"])
+                league_key = (str(int(p["api_league_id"]))
+                              if p.get("api_league_id") is not None else "")
+                league_prob = apply_logit_adjustment(
+                    global_prob, fit_league_adjustments.get(league_key))
+                rows.append({**p, "global_prob": global_prob,
+                             "league_prob": league_prob,
+                             "actual_int": int(p["actual"])})
+            bdf = pd.DataFrame(rows)
+
+            def _summary(prob_col: str) -> dict:
+                return {
+                    "n": len(bdf),
+                    "avg_predicted": round(float(bdf[prob_col].mean()), 4),
+                    "actual_hit_rate": round(float(bdf["actual_int"].mean()), 4),
+                    "brier": round(float(((bdf[prob_col] - bdf["actual_int"]) ** 2).mean()), 4),
+                    "mean_gap": round(float(bdf[prob_col].mean() - bdf["actual_int"].mean()), 4),
+                }
+
+            by_league = {}
+            for league_id, grp in bdf.groupby("api_league_id"):
+                if len(grp) < 10:
+                    continue
+                by_league[str(int(league_id))] = {
+                    "league": grp["league"].iloc[0],
+                    "n": len(grp),
+                    "global_predicted": round(float(grp["global_prob"].mean()), 4),
+                    "league_predicted": round(float(grp["league_prob"].mean()), 4),
+                    "actual_hit_rate": round(float(grp["actual_int"].mean()), 4),
+                    "global_brier": round(float(((grp["global_prob"] - grp["actual_int"]) ** 2).mean()), 4),
+                    "league_brier": round(float(((grp["league_prob"] - grp["actual_int"]) ** 2).mean()), 4),
+                    "adjustment_fitted": str(int(league_id)) in fit_league_adjustments,
+                }
+            report["bounds_1_4_league_calibration"] = {
+                "global_only": _summary("global_prob"),
+                "league_aware": _summary("league_prob"),
+                "fitted_league_count": len(fit_league_adjustments),
+                "min_n": LEAGUE_CALIBRATION_MIN_N,
+                "prior_strength": LEAGUE_CALIBRATION_PRIOR_STRENGTH,
+                "by_league": by_league,
+            }
 
         # Same picks scored on RAW probabilities, to show the maps' effect
         raw_scored = [dict(p, predicted_prob=p["predicted_prob_raw"])
@@ -941,11 +1175,21 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
         # ── Shipped maps: method validated above, refit on ALL folds so the
         # live maps use every raw prediction, including the most recent ──
         shipped_models = {}
-        for model in MODELS:
-            mp = [p for p in all_predictions if p["model"] == model]
-            shipped_models[model] = fit_pava_map(
-                [p["predicted_prob_raw"] for p in mp],
-                [float(p["actual"]) for p in mp])
+        for calibration_key in CALIBRATION_KEYS:
+            mp = _rows_for_key(all_predictions, calibration_key)
+            shipped_models[calibration_key] = _fit_map(mp, calibration_key)
+        shipped_league_adjustments = {}
+        for calibration_key in LEAGUE_ADJUSTED_CALIBRATION_KEYS:
+            rows = [p for p in all_predictions
+                    if _calibration_key(p) == calibration_key]
+            shipped_league_adjustments[calibration_key] = (
+                fit_league_logit_adjustments(
+                    rows,
+                    shipped_models.get(calibration_key) or [],
+                    min_n=LEAGUE_CALIBRATION_MIN_N,
+                    prior_strength=LEAGUE_CALIBRATION_PRIOR_STRENGTH,
+                )
+            )
         shipped_maps = {
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
             "method": "walk-forward equal-count bins + PAVA, refit on all folds",
@@ -955,6 +1199,11 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
             "validation": "fit on folds 1-%d, evaluated on folds %d-%d" % (
                 n_fit, n_fit + 1, n_folds),
             "models": shipped_models,
+            "league_adjustments": shipped_league_adjustments,
+            "league_adjustment_method": (
+                "empirical-Bayes league logit intercept over global PAVA; "
+                f"min_n={LEAGUE_CALIBRATION_MIN_N}, prior={LEAGUE_CALIBRATION_PRIOR_STRENGTH}"
+            ),
         }
 
         eval_fixtures = all_test_fixtures[all_test_fixtures["fold"] > n_fit]
@@ -1008,6 +1257,17 @@ def print_report(report: dict) -> None:
               f"actual={raw_sum['overall_hit_rate']:.1%}  "
               f"gap={raw_sum['overconfidence']:+.1%}")
 
+    bounds_league = report.get("bounds_1_4_league_calibration")
+    if bounds_league:
+        g = bounds_league["global_only"]
+        l = bounds_league["league_aware"]
+        print(f"\n  Goal Bounds 1-4 league-aware validation:")
+        print(f"    global-only: brier={g['brier']:.4f}  "
+              f"predicted={g['avg_predicted']:.1%}  actual={g['actual_hit_rate']:.1%}")
+        print(f"    league-aware: brier={l['brier']:.4f}  "
+              f"predicted={l['avg_predicted']:.1%}  actual={l['actual_hit_rate']:.1%}")
+        print(f"    fitted league offsets: {bounds_league['fitted_league_count']}")
+
     br = report.get("base_rates", {})
     if br:
         print(f"\n{'─' * 70}")
@@ -1018,6 +1278,7 @@ def print_report(report: dict) -> None:
         print(f"  Match Over 1.5:       {br.get('over_1.5', 0):.1%}")
         print(f"  Match Over 2.5:       {br.get('over_2.5', 0):.1%}")
         print(f"  Match Under 3.5:      {br.get('under_3.5', 0):.1%}")
+        print(f"  Match Goals 1-4:      {br.get('bounds_1_4', 0):.1%}")
 
     print(f"\n{'─' * 70}")
     print(f"  MODEL PARTICIPATION (which models contributed)")
@@ -1047,6 +1308,7 @@ def print_report(report: dict) -> None:
     base_map = {
         "over_match": base.get("over_1.5", 0),
         "under": base.get("under_3.5", 0),
+        "bounds_1_4": base.get("bounds_1_4", 0),
         "team_scores": (base.get("home_scores", 0) + base.get("away_scores", 0)) / 2,
     }
     for mt, stats in report.get("per_market", {}).items():
@@ -1078,12 +1340,14 @@ if __name__ == "__main__":
     parser.add_argument("--cal-frac", type=float, default=CAL_FRAC_DEFAULT,
                         help="Fraction of folds used to fit calibration maps")
     parser.add_argument("--output", type=str, default=None)
+    parser.add_argument("--dump-raw", type=str, default=None,
+                        help="Write every raw walk-forward prediction to this JSON path")
     parser.add_argument("--no-save-maps", action="store_true",
                         help="Skip writing calibration_maps.json for live use")
     args = parser.parse_args()
 
     report = run_walk_forward(months=args.months, fold_days=args.fold_days,
-                              cal_frac=args.cal_frac)
+                              cal_frac=args.cal_frac, dump_raw=args.dump_raw)
     print_report(report)
 
     out_path = Path(args.output) if args.output else (

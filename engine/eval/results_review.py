@@ -27,6 +27,8 @@ def _grade(market: str, selection: str, line, hg: int, ag: int,
            home: str, away: str) -> bool | None:
     """True=hit, False=miss, None=cannot grade — from the sportybet market shape."""
     total = hg + ag
+    if market == "Goal Bounds" and selection == "1-4":
+        return 1 <= total <= 4
     if market == "Over/Under":
         ln = float(line)
         return total > ln if "Over" in selection else total < ln

@@ -26,7 +26,15 @@ import pandas as pd
 from scipy.optimize import minimize
 from scipy.stats import poisson as poisson_dist
 
-from engine.eval.calibration_maps import apply_points, load_points
+from engine.eval.calibration_maps import (
+    DC_MARKET_KEYS,
+    DC_POOLED_KEY,
+    dc_calibration_key,
+    apply_logit_adjustment,
+    apply_points,
+    load_league_adjustments,
+    load_points,
+)
 from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
@@ -36,15 +44,51 @@ MAX_GOALS = 10             # scoreline grid truncation
 MIN_LEAGUE_MATCHES = 50    # skip leagues with thinner history
 RHO_BOUND = 0.15
 CALIBRATED_THRESHOLD = 0.65
+BOUNDS_1_4_MARKET = "Match Goals 1-4"
+BOUNDS_1_4_CALIBRATION_KEY = "dixon_coles_bounds_1_4"
 
 _DC_POINTS = load_points("dixon_coles")
+_DC_BOUNDS_1_4_POINTS = load_points(BOUNDS_1_4_CALIBRATION_KEY)
+_DC_BOUNDS_1_4_LEAGUE_ADJUSTMENTS = load_league_adjustments(
+    BOUNDS_1_4_CALIBRATION_KEY)
+# Per-market maps (2026-10-03). Missing keys (older map files, thin markets)
+# fall back to the pooled DC map, so deployments keep working before refit.
+_DC_MARKET_POINTS = {
+    key: load_points(key) for key in DC_MARKET_KEYS
+    if key != BOUNDS_1_4_CALIBRATION_KEY
+}
 
 
-def _calibrate(raw: float) -> float:
-    """Fitted walk-forward map when available, identity otherwise."""
+def _points_for_market(market: str) -> tuple[list[list[float]] | None, str]:
+    """Return (map points, map key used) for a DC market.
+
+    Order: the market's own map, then the pooled DC map, then identity.
+    The key is recorded on each forecast as calibration provenance.
+    """
+    if market == BOUNDS_1_4_MARKET and _DC_BOUNDS_1_4_POINTS:
+        return _DC_BOUNDS_1_4_POINTS, BOUNDS_1_4_CALIBRATION_KEY
+    key = dc_calibration_key(market)
+    own = _DC_MARKET_POINTS.get(key)
+    if own:
+        return own, key
     if _DC_POINTS:
-        return apply_points(_DC_POINTS, raw)
-    return raw
+        return _DC_POINTS, DC_POOLED_KEY
+    return None, "identity"
+
+
+def _calibrate(raw: float, market: str = "", api_league_id: int | None = None) -> float:
+    """Apply the market-specific map when available, identity otherwise.
+
+    Goal Bounds 1-4 is calibrated directly from its own DC probabilities and
+    outcomes.  Falling back to the general DC map keeps deployments usable
+    until the first calibration run has generated the dedicated map.
+    """
+    points = _points_for_market(market)[0]
+    calibrated = apply_points(points, raw) if points else raw
+    if market == BOUNDS_1_4_MARKET and api_league_id is not None:
+        adjustment = _DC_BOUNDS_1_4_LEAGUE_ADJUSTMENTS.get(str(int(api_league_id)))
+        calibrated = apply_logit_adjustment(calibrated, adjustment)
+    return calibrated
 
 
 def load_dc_historical(conn) -> pd.DataFrame:
@@ -218,6 +262,7 @@ def fixture_markets(params: dict, home_id, away_id,
     ii, jj = np.indices(P.shape)
     total = ii + jj
     markets = {
+        BOUNDS_1_4_MARKET: float(P[(total >= 1) & (total <= 4)].sum()),
         "Match Over 1.5": float(P[total > 1.5].sum()),
         "Match Over 2.5": float(P[total > 2.5].sum()),
         "Match Under 2.5": float(P[total < 2.5].sum()),
@@ -281,18 +326,33 @@ def predict_dixon_coles(days: int = 7,
             if fm is None:
                 continue
             for market, raw in fm["markets"].items():
-                cal = _calibrate(raw)
+                global_cal = _calibrate(raw, market)
+                cal = _calibrate(raw, market, int(api_league_id))
                 if cal < threshold:
                     continue
+                league_adjustment = (
+                    _DC_BOUNDS_1_4_LEAGUE_ADJUSTMENTS.get(str(int(api_league_id)))
+                    if market == BOUNDS_1_4_MARKET else None
+                )
                 results.append({
                     "fixture_id": int(row["fixture_id"]),
                     "kickoff": row["kickoff_utc"],
                     "home": row["home_team"],
                     "away": row["away_team"],
                     "league": row["league"],
+                    "api_league_id": int(api_league_id),
                     "market": market,
                     "probability": round(cal, 4),
+                    "global_calibrated_probability": round(global_cal, 4),
                     "raw_probability": round(raw, 4),
+                    "calibration_scope": (
+                        "global+league" if league_adjustment else "global"
+                    ),
+                    "calibration_map": _points_for_market(market)[1],
+                    "league_adjustment": (
+                        round(float(league_adjustment["logit_delta"]), 6)
+                        if league_adjustment else 0.0
+                    ),
                     "lambda_home": round(fm["lambda_home"], 2),
                     "lambda_away": round(fm["lambda_away"], 2),
                 })

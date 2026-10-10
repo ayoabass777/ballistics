@@ -30,7 +30,6 @@ import psycopg2
 
 from engine.eval.bayesian_streaks import (
     BETTING_EVENTS,
-    HALF_LIFE,
     MIN_POSTERIOR_INTERESTING,
     PRIOR_STRENGTH,
     compute_beliefs,
@@ -388,7 +387,13 @@ def _build_mismatch_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
         fix_row = fix_row.iloc[0]
 
         for mkt in ["fav_to_score", "fav_over_1.5", "over_1.5", "over_2.5"]:
-            conf, n = _lookup_hit_rate(hit_rates, row.get("league", ""), gap_bin, mkt)
+            conf, n = _lookup_hit_rate(
+                hit_rates,
+                row.get("league", ""),
+                gap_bin,
+                mkt,
+                api_league_id=int(row["api_league_id"]),
+            )
             str_adj = _strength_adjustment(mkt, fav_strength, dog_strength)
             adjusted = max(min(conf + str_adj, 0.99), 0.0)
             if adjusted < MIN_CONFIDENCE or n < MIN_SAMPLE:
@@ -409,13 +414,20 @@ def _build_mismatch_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
             if outcome is not None:
                 results.append({
                     "fixture_id": int(row["fixture_id"]),
+                    "api_league_id": int(row["api_league_id"]),
                     "model": "mismatch",
                     "market": market,
                     "predicted_prob": round(adjusted, 4),
                     "actual": outcome,
                 })
 
-        win_conf, win_n = _lookup_hit_rate(hit_rates, row.get("league", ""), gap_bin, "fav_win")
+        win_conf, win_n = _lookup_hit_rate(
+            hit_rates,
+            row.get("league", ""),
+            gap_bin,
+            "fav_win",
+            api_league_id=int(row["api_league_id"]),
+        )
         adjusted_win = min(win_conf + h2h_boost, 0.95)
         if adjusted_win >= MIN_CONFIDENCE and win_n >= MIN_SAMPLE:
             market = f"{fav_name} Win"
@@ -423,6 +435,7 @@ def _build_mismatch_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
             if outcome is not None:
                 results.append({
                     "fixture_id": int(row["fixture_id"]),
+                    "api_league_id": int(row["api_league_id"]),
                     "model": "mismatch",
                     "market": market,
                     "predicted_prob": round(adjusted_win, 4),
