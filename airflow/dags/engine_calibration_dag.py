@@ -26,6 +26,10 @@ ENGINE_MOUNTS = [
 ]
 DB_ENV = {k: os.getenv(k) for k in ("DB_NAME", "DB_USER", "DB_PASSWORD", "DB_PORT")}
 DB_ENV["ENGINE_DB_HOST"] = os.getenv("ENGINE_DB_HOST", "ballistics_postgres")
+# engine/eval/db.py reads ENGINE_DB_HOST; the etl helper (used by elo_service and
+# the backtest modules) reads DB_HOST and defaults to localhost, which is dead
+# inside the container.  Set both so either import path resolves to Postgres.
+DB_ENV["DB_HOST"] = DB_ENV["ENGINE_DB_HOST"]
 
 default_args = {
     "owner": "Ayomide Abass",

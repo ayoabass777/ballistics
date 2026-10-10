@@ -1,5 +1,7 @@
 # Engine Orchestration — Design (not yet built)
 
+2026-10-08 — `engine_predict` gate moved from `fixture_update_dag.extract_xg_task` to `fixture_update_dag.run_dbt` (task `wait_for_dbt_refresh`). The engine reads dbt facts (`raw.fact_head_to_head*`, `raw.fact_fixture_xg`); Airflow logs for Oct 5–7 showed every model finishing before `run_dbt` started, i.e. training on the previous night's facts. Side effect: if `run_dbt` fails, the engine does not run that night (previously it ran on stale facts).
+
 Status: **design only** (July 3 2026). Decision: run engine code via **DockerOperator +
 a dedicated `ballistics-engine` image**, mirroring how dbt already runs. This keeps the
 Airflow image slim (it lacks scipy/statsmodels today, which Poisson and Dixon-Coles need).
@@ -157,17 +159,25 @@ calibration_wf  (DockerOperator: python -m engine.eval.calibration_wf)
 
 **`engine_predict`** — `schedule="@daily"`, catchup=False, `max_active_runs=1`:
 ```
-[poisson] [mismatch] [bayesian] [dixon]  ─►  wait_for_quorum  ─►  consensus  ─►  publish
-  (4 parallel DockerOperator tasks,          (reschedule           (fan-in       (optional)
-   each writes picks + readiness marker)      quorum sensor)        by marker)
+wait_for_xg_refresh ─┬─► refresh_elo ─► mismatch ─┐
+                     └─► [poisson] [bayesian] [dixon] ─► wait_for_quorum ─► consensus
+                                                                          │
+                                                                          ▼
+                                                               verify_daily_shortlists
 ```
+- `refresh_elo` processes newly landed completed fixtures before mismatch reads
+  team ratings. The other three models remain parallel because they do not use Elo.
 - Each model task: `python -m engine.eval.<model> --write-picks --run-ds {{ ds }}` — writes
-  `raw.model_picks` and a `raw.model_runs` marker. Model tasks are peers; none blocks another.
+  `raw.model_picks` and a `raw.model_runs` marker.
 - `wait_for_quorum`: reschedule-mode sensor, `trigger_rule="all_done"` (runs even if some
   model tasks failed). Fires on `ready_models >= QUORUM` **or** grace-window timeout.
 - `consensus`: `python -m engine.eval.consensus_slips --from-picks --run-ds {{ ds }}` —
   reads `raw.model_picks` for `run_ds`, joins latest `raw.sportybet_odds`, writes
   `raw.consensus_pool` + JSON.
+- `verify_daily_shortlists`: checks that the JSON belongs to the current `run_ds`, was
+  generated within six hours, and contains freshly stamped 1–4, Over 1.5, and Elo-gap
+  sections. Empty lists are valid when no events qualify; missing or stale sections fail
+  the daily DAG instead of leaving the dashboard silently outdated.
 
 **`odds_scrape`** — already built, `schedule="0 */4 * * *"`, fully independent.
 

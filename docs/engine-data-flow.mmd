@@ -1,0 +1,36 @@
+flowchart LR
+subgraph inputs ["Refresh and preparation"]
+  fixtures["Refresh fixtures and xG"] --> warehouse["Build dbt features"]
+  fixtures --> gate["Wait for xG refresh"]
+  gate --> elo["Refresh Elo ratings"]
+end
+subgraph engine ["Daily engine"]
+  gate --> poisson["Poisson forecasts"]
+  gate --> bayesian["Bayesian pattern beliefs"]
+  gate --> dc["DC goal forecasts"]
+  elo --> mismatch["Strength mismatch signals"]
+  poisson & bayesian & dc & mismatch --> working[("Daily picks and readiness")]
+  working --> quorum{"Quorum or grace reached?"}
+  quorum --> consensus["Build consensus and analysis"]
+  calibration["Weekly calibration artifacts"] --> poisson & bayesian & dc & mismatch
+  warehouse -.->|"Latest available features"| poisson & bayesian & dc & mismatch
+end
+subgraph history ["New prospective record"]
+  consensus --> capture["Capture with database time"]
+  capture --> archive[("Append-only snapshots and events")]
+  archive --> latest["Latest eligible pre-kickoff event"]
+  latest --> settle["Append outcome observations"]
+  fixtures -->|"Current scores and status"| settle
+  settle --> report["Read forecast record"]
+end
+capture -->|"Only after success"| feed["Replace daily JSON feed"]
+feed --> dashboard["Existing analysis dashboard"]
+latest --> api["Read-only HTTP API: filters, fixture pages, history (local)"]
+settle --> api
+api -.-> future["Forecast record UI pending"]
+legacy["Older daily JSON files"] -.->|"Not verified history"| legacyReview["Legacy results review"]
+style inputs fill:#C2E5FF,stroke:#3DADFF
+style engine fill:#DCCCFF,stroke:#874FFF
+style history fill:#CDF4D3,stroke:#66D575
+style future fill:#FFECBD,stroke:#FFC943
+style legacyReview fill:#D9D9D9,stroke:#B3B3B3

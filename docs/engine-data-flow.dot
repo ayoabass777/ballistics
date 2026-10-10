@@ -1,0 +1,52 @@
+digraph engine {
+  graph [rankdir=TB, bgcolor="#f5f6f1", pad=0.4, nodesep=0.3, ranksep=0.55,
+    fontname="Helvetica", fontsize=24, labelloc=t,
+    label="BALLISTICS  /  ENGINE DATA FLOW\nExisting calculations + new prospective forecast history"];
+  node [shape=box, style="rounded,filled", fillcolor=white, color="#c7d3cd", fontcolor="#1b3329", fontname="Helvetica", fontsize=12, margin="0.18,0.12"];
+  edge [color="#698277", fontname="Helvetica", fontsize=10, fontcolor="#436054", arrowsize=0.65];
+  subgraph cluster_inputs {
+    label="01  INPUTS & PREPARATION"; fontsize=15; color="#b8d5df"; style="rounded,filled"; fillcolor="#eaf3f6";
+    refresh [label="Fixture corrections + xG refresh\nCurrent scores / statuses / kickoff"];
+    features [label="Standings + quality checks + dbt\nLatest warehouse features"];
+    maps [label="Weekly walk-forward calibration\nShared calibration artifacts"];
+    refresh -> features;
+  }
+  subgraph cluster_models {
+    label="02  DAILY CALCULATION"; fontsize=15; color="#c8bddd"; style="rounded,filled"; fillcolor="#f0edf7";
+    gate [label="Wait for xG refresh\nNot gated on dbt completion", fillcolor="#fff1d6"];
+    elo [label="Refresh Elo ratings"];
+    models [label="Parallel model tasks\nPoisson  |  Bayesian  |  Dixon-Coles  |  Mismatch"];
+    working [shape=cylinder, label="Mutable daily working stores\nmodel_picks / model_runs / model_analysis"];
+    quorum [shape=diamond, label="Ready quorum,\nall finished\nor grace elapsed?", fontsize=11];
+    consensus [label="Consensus + fixture analysis\nGates, rankings, context, curated lists"];
+    gate -> elo;
+    gate -> models;
+    elo -> models [label="Mismatch input"];
+    models -> working -> quorum -> consensus;
+  }
+  refresh -> gate;
+  maps -> models [label="Adjust probabilities"];
+  features -> models [style=dashed, label="Reads latest available"];
+  subgraph cluster_history {
+    label="03  NEW APPEND-ONLY RECORD"; fontsize=15; color="#98c5a6"; style="rounded,filled"; fillcolor="#e8f3e9";
+    capture [label="Capture before JSON publication\nDatabase clock + pre-match checks"];
+    snapshots [shape=cylinder, label="Snapshots + DC goal entries\nFull payload; later runs append"];
+    selected [label="Latest eligible pre-kickoff forecast per event\nLate captures cannot replace it"];
+    settle [label="Append outcome observations\nPending / hit / miss / void / unavailable / excluded"];
+    report [label="Read-only record export\nOriginal forecast + latest outcome + revision history"];
+    capture -> snapshots -> selected -> settle -> report;
+  }
+  consensus -> capture;
+  refresh -> settle [label="Current result evidence", color="#3b8b68"];
+  feed [label="Existing daily JSON + dashboard\nStill a replaceable current view"];
+  capture -> feed [label="Only after capture succeeds"];
+  ui [label="Forecast record frontend\nPENDING", fillcolor="#fff1d6"];
+  api [label="Read-only HTTP API (local)\nFilters + fixture pages + correction history"];
+  selected -> api;
+  settle -> api;
+  api -> ui [style=dashed];
+  legacy [label="Older saved JSON / legacy results\nNot certified as pre-kickoff history", fillcolor="#e4e7e4"];
+  feed -> legacy [style=dashed, label="Separate legacy review"];
+  limits [shape=note, label="Receipt time is proven locally; training cutoff is not.\nOnly exported DC goal events are graded.\nSchema tested in isolation; no live deployment performed.", fillcolor="#fff1d6", fontsize=11];
+  report -> limits [style=dashed, arrowhead=none];
+}
