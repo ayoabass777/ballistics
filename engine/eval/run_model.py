@@ -3,8 +3,11 @@ Single-model runner for the fan-out engine pipeline.
 
 Runs ONE prediction model, normalises its picks with the shared
 `*_signals()` helpers (same code the in-process consensus uses), and writes
-them to `raw.model_picks` plus a `raw.model_runs` readiness marker. Each model
-is an independent Airflow task; the quorum sensor gates consensus on the markers.
+them to `raw.model_picks` plus a `raw.model_runs` readiness marker. Bayesian
+also writes its complete per-fixture belief audit to `raw.model_analysis` so
+the fan-in report does not have to reconstruct analysis from filtered picks.
+Each model is an independent Airflow task; the quorum sensor gates consensus
+on the markers.
 
 Usage:
     python -m engine.eval.run_model --model dixon_coles --run-ds 2026-07-03 --days 7
@@ -19,6 +22,7 @@ from engine.eval import picks_store as ps
 from engine.eval.db import get_conn
 from engine.eval.consensus_slips import (
     poisson_signals, mismatch_signals, bayesian_signals, dixon_signals,
+    annotate_bayesian_analysis,
 )
 
 
@@ -50,14 +54,20 @@ def _run_mismatch(days: int) -> list[dict]:
     return mismatch_signals(picks)
 
 
-def _run_bayesian(days: int) -> list[dict]:
+def _run_bayesian(days: int, include_analysis: bool = False):
     from engine.eval.bayesian_streaks import get_fixture_beliefs, _get_conn
     conn = _get_conn()
     try:
-        beliefs = get_fixture_beliefs(conn, days=days)
+        beliefs = get_fixture_beliefs(
+            conn, days=days, include_below_threshold=include_analysis
+        )
     finally:
         conn.close()
-    return bayesian_signals(beliefs, _home_away_map(beliefs.keys()))
+    home_away = _home_away_map(beliefs.keys())
+    if not include_analysis:
+        return bayesian_signals(beliefs, home_away)
+    analysis = annotate_bayesian_analysis(beliefs, home_away)
+    return bayesian_signals(analysis, home_away), analysis
 
 
 def _run_dixon(days: int) -> list[dict]:
@@ -75,7 +85,11 @@ RUNNERS = {
 
 def run_and_store(model: str, run_ds: str, days: int) -> int:
     """Run one model and persist its picks + readiness marker. Returns pick count."""
-    signals = RUNNERS[model](days)
+    if model == "bayesian":
+        signals, analysis = _run_bayesian(days, include_analysis=True)
+        ps.write_model_analysis(run_ds, model, analysis)
+    else:
+        signals = RUNNERS[model](days)
     n = ps.write_model_picks(run_ds, model, signals)
     ps.write_model_run(run_ds, model, "ok" if n else "empty", n)
     return n

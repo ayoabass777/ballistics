@@ -1,10 +1,11 @@
 """
 Durable store for the fan-out engine pipeline.
 
-Three tables couple the model tasks, the quorum sensor, and consensus without
+Four tables couple the model tasks, the quorum sensor, and consensus without
 XCom or in-process calls (see docs/engine_orchestration.md):
 
   raw.model_picks    — one row per (run_ds, model, fixture, unified_market)
+  raw.model_analysis — one audit payload per (run_ds, model, fixture)
   raw.model_runs     — readiness marker each model writes when it finishes
   raw.consensus_pool — consensus output, run_ds-keyed, for queryable history
 
@@ -41,6 +42,17 @@ CREATE TABLE IF NOT EXISTS raw.model_picks (
     written_at      timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS model_picks_run_idx ON raw.model_picks (run_ds, model);
+
+CREATE TABLE IF NOT EXISTS raw.model_analysis (
+    run_ds      date        NOT NULL,
+    model       text        NOT NULL,
+    fixture_id  bigint      NOT NULL,
+    payload     jsonb       NOT NULL,
+    written_at  timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (run_ds, model, fixture_id)
+);
+CREATE INDEX IF NOT EXISTS model_analysis_run_idx
+    ON raw.model_analysis (run_ds, model);
 
 CREATE TABLE IF NOT EXISTS raw.model_runs (
     run_ds      date        NOT NULL,
@@ -147,6 +159,57 @@ def write_model_run(run_ds: str, model: str, status: str, n_picks: int,
                 (run_ds, model, status, n_picks, datetime.now(timezone.utc)),
             )
         conn.commit()
+    finally:
+        if own:
+            conn.close()
+
+
+def write_model_analysis(run_ds: str, model: str, analysis: dict[int, dict],
+                         conn=None) -> int:
+    """Replace one model's fixture-analysis audit payloads for a run date."""
+    own = conn is None
+    conn = conn or get_conn()
+    try:
+        ensure_tables(conn)
+        with conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM raw.model_analysis WHERE run_ds = %s AND model = %s",
+                (run_ds, model),
+            )
+            rows = [
+                (run_ds, model, int(fixture_id),
+                 json.dumps(payload, default=str))
+                for fixture_id, payload in analysis.items()
+            ]
+            if rows:
+                execute_values(
+                    cur,
+                    """INSERT INTO raw.model_analysis
+                       (run_ds, model, fixture_id, payload)
+                       VALUES %s""",
+                    rows,
+                )
+        conn.commit()
+        return len(rows)
+    finally:
+        if own:
+            conn.close()
+
+
+def read_model_analysis(run_ds: str, model: str, conn=None) -> dict[int, dict]:
+    """Read fixture-analysis payloads for one model and run date."""
+    own = conn is None
+    conn = conn or get_conn()
+    try:
+        ensure_tables(conn)
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT fixture_id, payload
+                   FROM raw.model_analysis
+                   WHERE run_ds = %s AND model = %s""",
+                (run_ds, model),
+            )
+            return {int(fixture_id): payload for fixture_id, payload in cur.fetchall()}
     finally:
         if own:
             conn.close()
