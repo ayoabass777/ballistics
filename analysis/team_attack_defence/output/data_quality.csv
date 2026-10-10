@@ -1,0 +1,6 @@
+check,value,rate,severity,interpretation
+Finished fixtures with complete goals,113985,1.0,pass,Raw FT fixtures are usable for goal-rate analysis.
+Duplicate API fixture IDs,0,0.0,pass,No fixture duplication at the raw source grain.
+Future-dated finished fixtures,0,0.0,pass,No obvious future-result leakage in the raw source.
+Transformed fact coverage of raw FT fixtures,79316,0.6958459446418388,high,"The transformed team-match fact is incomplete, so this analysis uses raw fixtures."
+Transformed fact freshness lag (days),0,,pass,The raw source is fresher than the transformed fact.

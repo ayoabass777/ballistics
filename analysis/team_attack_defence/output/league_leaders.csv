@@ -1,0 +1,61 @@
+country,league,league_label,api_league_id,season,attack_leader,attack_index,attack_elo_rank,defence_leader,defence_index,defence_elo_rank,teams,as_of
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2026,Boca Juniors,132.4,1.0,Belgrano Cordoba,133.7,4.0,30,2026-10-06
+Austria,Bundesliga,Austria — Bundesliga,218,2026,Lask Linz,143.3,1.0,Red Bull Salzburg,127.6,2.0,12,2026-09-20
+Belarus,1. Division,Belarus — 1. Division,117,2026,Niva,139.9,2.0,FC Slutsk,135.4,1.0,18,2026-10-04
+Belarus,Premier League,Belarus — Premier League,116,2026,ML Vitebsk,132.3,2.0,Dinamo Minsk,142.4,1.0,16,2026-09-20
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2026,Club Brugge KV,141.6,2.0,Union St. Gilloise,153.7,1.0,18,2026-09-20
+Brazil,Serie A,Brazil — Serie A,71,2026,Flamengo,128.8,1.0,Palmeiras,134.2,2.0,20,2026-10-08
+Brazil,Serie B,Brazil — Serie B,72,2026,Novorizontino,127.8,3.0,Juventude,140.4,2.0,20,2026-10-07
+Bulgaria,First League,Bulgaria — First League,172,2026,Levski Sofia,139.2,1.0,Levski Sofia,161.6,1.0,14,2026-09-20
+Chile,Primera División,Chile — Primera División,265,2026,Colo Colo,134.0,1.0,Concepción,130.9,6.0,16,2026-10-02
+China,League One,China — League One,170,2026,Guangzhou E-Power,141.9,1.0,Nantong Zhiyun,136.5,3.0,16,2026-10-07
+China,League Two,China — League Two,929,2026,Shenzhen 2028,128.4,,Rizhao Yuqi,130.8,,24,2026-08-23
+China,Super League,China — Super League,169,2026,Beijing Guoan,122.0,3.0,Beijing Guoan,123.8,3.0,16,2026-09-18
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2026,Slavia Praha,155.3,1.0,Slavia Praha,137.7,1.0,16,2026-09-20
+Denmark,Superliga,Denmark — Superliga,119,2026,FC Copenhagen,124.4,2.0,FC Midtjylland,116.9,1.0,12,2026-09-20
+Egypt,Premier League,Egypt — Premier League,233,2026,Al Ahly,142.5,1.0,Pyramids FC,125.5,2.0,20,2026-09-17
+England,Championship,England — Championship,40,2026,West Ham,146.2,1.0,Lincoln,118.9,3.0,24,2026-09-20
+England,League One,England — League One,41,2026,Oxford United,125.0,3.0,Bradford,141.6,6.0,24,2026-10-03
+England,League Two,England — League Two,42,2026,Barnet,147.6,1.0,Exeter City,151.5,21.0,24,2026-10-03
+England,Premier League,England — Premier League,39,2026,Brighton,126.7,5.0,Arsenal,144.4,2.0,20,2026-09-20
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2026,FC Levadia Tallinn,152.8,1.0,FC Levadia Tallinn,158.2,1.0,10,2026-09-20
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2026,KuPS,123.7,1.0,Inter Turku,140.6,2.0,12,2026-08-31
+France,Ligue 1,France — Ligue 1,61,2026,Paris Saint Germain,128.6,1.0,Paris Saint Germain,128.0,1.0,18,2026-09-20
+France,Ligue 2,France — Ligue 2,62,2026,Saint Etienne,149.0,1.0,Montpellier,141.7,7.0,18,2026-09-19
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2026,Dinamo Batumi,119.8,3.0,Rustavi,141.5,4.0,10,2026-10-04
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2026,Energie Cottbus,117.0,2.0,FC St. Pauli,117.8,10.0,18,2026-09-20
+Germany,Bundesliga,Germany — Bundesliga,78,2026,Bayern München,154.0,1.0,Borussia Dortmund,136.8,2.0,18,2026-09-20
+Greece,Super League 1,Greece — Super League 1,197,2026,PAOK,144.2,2.0,Olympiakos Piraeus,180.3,4.0,14,2026-09-20
+Iceland,1. Deild,Iceland — 1. Deild,165,2026,Afturelding,139.1,1.0,Throttur Reykjavik,126.6,5.0,12,2026-09-05
+Ireland,First Division,Ireland — First Division,358,2026,Cork City,133.9,1.0,Athlone Town,117.6,7.0,10,2026-10-02
+Ireland,Premier Division,Ireland — Premier Division,357,2026,Bohemians,119.9,3.0,St Patrick's Athl.,150.5,2.0,10,2026-10-08
+Italy,Serie A,Italy — Serie A,135,2026,Inter,150.3,1.0,Juventus,135.3,4.0,20,2026-09-20
+Italy,Serie B,Italy — Serie B,136,2026,Hellas Verona,120.2,14.0,Modena,119.2,7.0,20,2026-09-20
+Japan,J2 League,Japan — J2 League,99,2026,Yokohama FC,126.6,2.0,Oita Trinita,125.0,20.0,20,2026-10-04
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2026,Kairat Almaty,142.5,1.0,Ordabasy,147.2,3.0,16,2026-09-18
+Latvia,Virsliga,Latvia — Virsliga,365,2026,Riga,164.4,2.0,Rīgas FS,137.1,1.0,10,2026-09-20
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2026,Minija,143.3,2.0,Minija,169.5,2.0,16,2026-10-02
+Lithuania,A Lyga,Lithuania — A Lyga,362,2026,Kauno Žalgiris,135.4,2.0,Kauno Žalgiris,147.3,2.0,10,2026-09-20
+Mexico,Liga MX,Mexico — Liga MX,262,2026,Toluca,126.3,2.0,Club Queretaro,124.6,7.0,18,2026-09-28
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2026,Heracles,140.0,8.0,Roda,137.0,6.0,20,2026-10-04
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2026,PSV Eindhoven,147.4,1.0,Twente,138.1,3.0,18,2026-09-20
+Norway,1. Division,Norway — 1. Division,104,2026,Haugesund,142.9,3.0,Bryne,146.5,4.0,16,2026-10-05
+Norway,Eliteserien,Norway — Eliteserien,103,2026,Bodo/Glimt,137.4,1.0,Bodo/Glimt,129.6,1.0,16,2026-09-20
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2026,Lech Poznan,123.1,1.0,Gornik Zabrze,123.2,2.0,18,2026-09-20
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2026,Benfica,152.6,2.0,FC Porto,142.9,1.0,18,2026-09-20
+Romania,Liga I,Romania — Liga I,283,2026,Universitatea Craiova,138.5,1.0,Universitatea Craiova,139.2,1.0,16,2026-10-08
+Russia,Premier League,Russia — Premier League,235,2026,Zenit,130.6,2.0,FC Krasnodar,131.9,1.0,16,2026-09-17
+Scotland,Premiership,Scotland — Premiership,179,2026,Celtic,133.4,2.0,Rangers,134.0,1.0,12,2026-09-20
+Serbia,Super Liga,Serbia — Super Liga,286,2026,FK Crvena Zvezda,152.3,1.0,FK Crvena Zvezda,158.2,1.0,14,2026-09-20
+South-Korea,K League 1,South-Korea — K League 1,292,2026,FC Seoul,131.8,1.0,Jeonbuk Motors,117.2,2.0,12,2026-09-27
+South-Korea,K League 2,South-Korea — K League 2,293,2026,Suwon City FC,133.5,2.0,Suwon Bluewings,129.5,1.0,17,2026-09-20
+Spain,La Liga,Spain — La Liga,140,2026,Barcelona,171.6,1.0,Barcelona,117.7,1.0,20,2026-09-20
+Spain,Segunda Division,Spain — Segunda Division,141,2026,Almeria,125.8,4.0,Mallorca,170.5,3.0,22,2026-10-05
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2026,Hammarby FF,136.3,1.0,Djurgardens IF,137.0,3.0,16,2026-09-20
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2026,Haninge,135.6,1.0,Nyköping,135.8,4.0,14,2026-10-04
+Switzerland,Super League,Switzerland — Super League,207,2026,BSC Young Boys,128.6,3.0,FC Lugano,132.5,1.0,12,2026-09-20
+Turkey,Süper Lig,Turkey — Süper Lig,203,2026,Fenerbahçe,137.7,2.0,Kocaelispor,123.9,10.0,18,2026-09-20
+USA,Major League Soccer,USA — Major League Soccer,253,2026,Inter Miami,130.8,1.0,Nashville SC,131.5,2.0,30,2026-10-07
+USA,USL Championship,USA — USL Championship,255,2026,Charleston Battery,132.0,1.0,Detroit City,156.8,6.0,25,2026-10-04
+USA,USL League One,USA — USL League One,489,2026,Charlotte Independence,136.4,2.0,Forward Madison,138.8,4.0,17,2026-10-08
+Ukraine,Premier League,Ukraine — Premier League,333,2026,Shakhtar Donetsk,153.3,1.0,FC Kharkiv,141.8,4.0,16,2026-10-03

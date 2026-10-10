@@ -1,0 +1,173 @@
+api_league_id,league_label,team_name,attack_leading_seasons,attack_first,attack_last,defence_leading_seasons,defence_first,defence_last,total_leading_seasons
+286,Serbia — Super Liga,FK Crvena Zvezda,7,2020.0,2026.0,6,2020.0,2026.0,13
+78,Germany — Bundesliga,Bayern München,7,2020.0,2026.0,4,2021.0,2026.0,11
+345,Czech-Republic — Czech Liga,Slavia Praha,6,2020.0,2026.0,5,2020.0,2025.0,11
+103,Norway — Eliteserien,Bodo/Glimt,5,2020.0,2025.0,5,2020.0,2026.0,10
+207,Switzerland — Super League,BSC Young Boys,6,2020.0,2026.0,3,2020.0,2023.0,9
+233,Egypt — Premier League,Al Ahly,6,2020.0,2025.0,3,2021.0,2024.0,9
+362,Lithuania — A Lyga,FK Zalgiris Vilnius,5,2020.0,2024.0,4,2020.0,2024.0,9
+235,Russia — Premier League,Zenit,4,2020.0,2026.0,5,2020.0,2024.0,9
+197,Greece — Super League 1,Olympiakos Piraeus,3,2020.0,2022.0,6,2020.0,2026.0,9
+61,France — Ligue 1,Paris Saint Germain,6,2020.0,2025.0,2,2024.0,2025.0,8
+179,Scotland — Premiership,Celtic,4,2021.0,2026.0,4,2021.0,2026.0,8
+39,England — Premier League,Manchester City,5,2020.0,2025.0,2,2020.0,2022.0,7
+135,Italy — Serie A,Inter,5,2021.0,2026.0,2,2020.0,2023.0,7
+172,Bulgaria — First League,Ludogorets,5,2020.0,2024.0,2,2023.0,2024.0,7
+365,Latvia — Virsliga,Rīgas FS,5,2020.0,2025.0,2,2023.0,2026.0,7
+119,Denmark — Superliga,FC Copenhagen,4,2020.0,2026.0,3,2021.0,2026.0,7
+218,Austria — Bundesliga,Red Bull Salzburg,4,2020.0,2023.0,3,2021.0,2026.0,7
+357,Ireland — Premier Division,Shamrock Rovers,4,2020.0,2025.0,3,2020.0,2022.0,7
+329,Estonia — Meistriliiga,Flora Tallinn,3,2021.0,2023.0,4,2020.0,2025.0,7
+71,Brazil — Serie A,Flamengo,5,2020.0,2026.0,1,2025.0,2025.0,6
+333,Ukraine — Premier League,Shakhtar Donetsk,4,2021.0,2025.0,2,2022.0,2023.0,6
+144,Belgium — Jupiler Pro League,Club Brugge KV,3,2023.0,2025.0,3,2020.0,2026.0,6
+329,Estonia — Meistriliiga,FC Levadia Tallinn,3,2024.0,2026.0,3,2023.0,2026.0,6
+94,Portugal — Primeira Liga,FC Porto,2,2020.0,2021.0,4,2021.0,2026.0,6
+203,Turkey — Süper Lig,Galatasaray,1,2025.0,2025.0,5,2020.0,2025.0,6
+203,Turkey — Süper Lig,Fenerbahçe,5,2021.0,2026.0,0,,,5
+88,Netherlands — Eredivisie,PSV Eindhoven,4,2022.0,2025.0,1,2023.0,2023.0,5
+140,Spain — La Liga,Barcelona,4,2020.0,2026.0,1,2022.0,2022.0,5
+94,Portugal — Primeira Liga,Sporting CP,3,2023.0,2025.0,2,2020.0,2024.0,5
+140,Spain — La Liga,Real Madrid,3,2021.0,2023.0,2,2023.0,2025.0,5
+169,China — Super League,SHANGHAI SIPG,3,2023.0,2025.0,2,2021.0,2022.0,5
+244,Finland — Veikkausliiga,HJK Helsinki,3,2020.0,2025.0,2,2020.0,2021.0,5
+489,USA — USL League One,Union Omaha,3,2021.0,2024.0,2,2021.0,2022.0,5
+116,Belarus — Premier League,Shakhter Soligorsk,2,2021.0,2022.0,3,2020.0,2022.0,5
+144,Belgium — Jupiler Pro League,Union St. Gilloise,2,2021.0,2026.0,3,2021.0,2025.0,5
+244,Finland — Veikkausliiga,KuPS,2,2021.0,2026.0,3,2022.0,2024.0,5
+292,South-Korea — K League 1,Jeonbuk Motors,2,2021.0,2025.0,3,2020.0,2025.0,5
+333,Ukraine — Premier League,Dynamo Kyiv,2,2020.0,2023.0,3,2020.0,2024.0,5
+358,Ireland — First Division,Cork City,2,2024.0,2026.0,3,2022.0,2026.0,5
+265,Chile — Primera División,Colo Colo,1,2022.0,2022.0,4,2021.0,2024.0,5
+365,Latvia — Virsliga,Riga,1,2026.0,2026.0,4,2020.0,2025.0,5
+79,Germany — 2. Bundesliga,Hamburger SV,3,2020.0,2024.0,1,2021.0,2021.0,4
+106,Poland — Ekstraklasa,Lech Poznan,3,2021.0,2025.0,1,2021.0,2021.0,4
+119,Denmark — Superliga,FC Midtjylland,3,2021.0,2025.0,1,2020.0,2020.0,4
+128,Argentina — Liga Profesional Argentina,River Plate,3,2021.0,2023.0,1,2021.0,2021.0,4
+71,Brazil — Serie A,Palmeiras,2,2022.0,2023.0,2,2022.0,2026.0,4
+88,Netherlands — Eredivisie,Ajax,2,2020.0,2021.0,2,2020.0,2021.0,4
+262,Mexico — Liga MX,Club America,2,2020.0,2022.0,2,2023.0,2024.0,4
+283,Romania — Liga I,CFR 1907 Cluj,2,2023.0,2024.0,2,2020.0,2021.0,4
+283,Romania — Liga I,FCSB,2,2020.0,2021.0,2,2023.0,2024.0,4
+362,Lithuania — A Lyga,Kauno Žalgiris,2,2025.0,2026.0,2,2025.0,2026.0,4
+389,Kazakhstan — Premier League,FC Astana,2,2022.0,2025.0,2,2022.0,2024.0,4
+595,Sweden — Division 2 - Södra Svealand,Assyriska FF,1,2020.0,2020.0,3,2020.0,2023.0,4
+98,Japan — J1 League,Yokohama F. Marinos,3,2021.0,2023.0,0,,,3
+113,Sweden — Allsvenskan,Malmo FF,3,2020.0,2024.0,0,,,3
+253,USA — Major League Soccer,Inter Miami,3,2024.0,2026.0,0,,,3
+262,Mexico — Liga MX,Toluca,3,2024.0,2026.0,0,,,3
+265,Chile — Primera División,U. Catolica,3,2020.0,2026.0,0,,,3
+327,Georgia — Erovnuli Liga,Dinamo Batumi,3,2021.0,2026.0,0,,,3
+62,France — Ligue 2,Saint Etienne,2,2022.0,2026.0,1,2023.0,2023.0,3
+94,Portugal — Primeira Liga,Benfica,2,2022.0,2026.0,1,2022.0,2022.0,3
+98,Japan — J1 League,Kawasaki Frontale,2,2020.0,2025.0,1,2021.0,2021.0,3
+106,Poland — Ekstraklasa,Legia Warszawa,2,2020.0,2026.0,1,2025.0,2025.0,3
+113,Sweden — Allsvenskan,BK Hacken,2,2022.0,2023.0,1,2020.0,2020.0,3
+116,Belarus — Premier League,ML Vitebsk,2,2025.0,2026.0,1,2025.0,2025.0,3
+136,Italy — Serie B,Venezia,2,2023.0,2025.0,1,2025.0,2025.0,3
+165,Iceland — 1. Deild,Keflavik,2,2020.0,2025.0,1,2024.0,2024.0,3
+179,Scotland — Premiership,Rangers,2,2020.0,2025.0,1,2020.0,2020.0,3
+262,Mexico — Liga MX,Tigres UANL,2,2021.0,2023.0,1,2025.0,2025.0,3
+292,South-Korea — K League 1,FC Seoul,2,2023.0,2026.0,1,2026.0,2026.0,3
+327,Georgia — Erovnuli Liga,Dinamo Tbilisi,2,2020.0,2023.0,1,2020.0,2020.0,3
+361,Lithuania — 1 Lyga,TransINVEST Vilnius,2,2023.0,2025.0,1,2023.0,2023.0,3
+389,Kazakhstan — Premier League,Kairat Almaty,2,2020.0,2026.0,1,2025.0,2025.0,3
+595,Sweden — Division 2 - Södra Svealand,Nyköping,2,2021.0,2023.0,1,2026.0,2026.0,3
+40,England — Championship,Burnley,1,2022.0,2022.0,2,2022.0,2024.0,3
+104,Norway — 1. Division,Lillestrom,1,2025.0,2025.0,2,2020.0,2025.0,3
+106,Poland — Ekstraklasa,Raków Częstochowa,1,2022.0,2022.0,2,2022.0,2024.0,3
+116,Belarus — Premier League,Dinamo Minsk,1,2023.0,2023.0,2,2024.0,2026.0,3
+135,Italy — Serie A,Napoli,1,2022.0,2022.0,2,2022.0,2024.0,3
+172,Bulgaria — First League,Levski Sofia,1,2025.0,2025.0,2,2025.0,2026.0,3
+207,Switzerland — Super League,FC Basel 1893,1,2024.0,2024.0,2,2021.0,2024.0,3
+218,Austria — Bundesliga,Sturm Graz,1,2024.0,2024.0,2,2023.0,2025.0,3
+253,USA — Major League Soccer,Philadelphia Union,1,2022.0,2022.0,2,2022.0,2025.0,3
+265,Chile — Primera División,Universidad de Chile,1,2025.0,2025.0,2,2020.0,2026.0,3
+293,South-Korea — K League 2,Suwon Bluewings,1,2025.0,2025.0,2,2024.0,2026.0,3
+357,Ireland — Premier Division,St Patrick's Athl.,1,2024.0,2024.0,2,2025.0,2026.0,3
+389,Kazakhstan — Premier League,FK Tobol Kostanay,1,2021.0,2021.0,2,2020.0,2021.0,3
+389,Kazakhstan — Premier League,Ordabasy,1,2023.0,2023.0,2,2023.0,2026.0,3
+39,England — Premier League,Arsenal,0,,,3,2023.0,2025.0,3
+41,England — League One,Peterborough,2,2020.0,2023.0,0,,,2
+62,France — Ligue 2,Toulouse,2,2020.0,2021.0,0,,,2
+89,Netherlands — Eerste Divisie,Heracles,2,2022.0,2026.0,0,,,2
+99,Japan — J2 League,V-varen Nagasaki,2,2024.0,2025.0,0,,,2
+117,Belarus — 1. Division,Belshina,2,2021.0,2024.0,0,,,2
+141,Spain — Segunda Division,Eibar,2,2023.0,2026.0,0,,,2
+144,Belgium — Jupiler Pro League,Genk,2,2020.0,2022.0,0,,,2
+165,Iceland — 1. Deild,Afturelding,2,2023.0,2026.0,0,,,2
+197,Greece — Super League 1,PAOK,2,2023.0,2024.0,0,,,2
+255,USA — USL Championship,Charleston Battery,2,2025.0,2026.0,0,,,2
+293,South-Korea — K League 2,Gimcheon Sangmu FC,2,2021.0,2023.0,0,,,2
+293,South-Korea — K League 2,Suwon City FC,2,2020.0,2026.0,0,,,2
+357,Ireland — Premier Division,Bohemians,2,2021.0,2026.0,0,,,2
+358,Ireland — First Division,UCD,2,2020.0,2021.0,0,,,2
+595,Sweden — Division 2 - Södra Svealand,Haninge,2,2024.0,2026.0,0,,,2
+39,England — Premier League,Liverpool,1,2024.0,2024.0,1,2021.0,2021.0,2
+40,England — Championship,Coventry,1,2025.0,2025.0,1,2025.0,2025.0,2
+40,England — Championship,Leeds,1,2024.0,2024.0,1,2023.0,2023.0,2
+41,England — League One,Birmingham,1,2024.0,2024.0,1,2024.0,2024.0,2
+41,England — League One,Ipswich,1,2022.0,2022.0,1,2022.0,2022.0,2
+42,England — League Two,Cambridge United,1,2020.0,2020.0,1,2025.0,2025.0,2
+42,England — League Two,Mansfield Town,1,2022.0,2022.0,1,2023.0,2023.0,2
+61,France — Ligue 1,Lyon,1,2026.0,2026.0,1,2026.0,2026.0,2
+62,France — Ligue 2,Lorient,1,2024.0,2024.0,1,2024.0,2024.0,2
+72,Brazil — Serie B,Botafogo,1,2021.0,2021.0,1,2021.0,2021.0,2
+72,Brazil — Serie B,Cruzeiro,1,2022.0,2022.0,1,2022.0,2022.0,2
+72,Brazil — Serie B,Novorizontino,1,2026.0,2026.0,1,2023.0,2023.0,2
+79,Germany — 2. Bundesliga,FC Schalke 04,1,2021.0,2021.0,1,2025.0,2025.0,2
+89,Netherlands — Eerste Divisie,ADO Den Haag,1,2025.0,2025.0,1,2025.0,2025.0,2
+89,Netherlands — Eerste Divisie,Excelsior,1,2021.0,2021.0,1,2024.0,2024.0,2
+89,Netherlands — Eerste Divisie,Willem II,1,2023.0,2023.0,1,2022.0,2022.0,2
+98,Japan — J1 League,Sanfrecce Hiroshima,1,2024.0,2024.0,1,2025.0,2025.0,2
+99,Japan — J2 League,Albirex Niigata,1,2022.0,2022.0,1,2022.0,2022.0,2
+103,Norway — Eliteserien,Molde,1,2021.0,2021.0,1,2022.0,2022.0,2
+104,Norway — 1. Division,Brann,1,2022.0,2022.0,1,2022.0,2022.0,2
+113,Sweden — Allsvenskan,Hammarby FF,1,2025.0,2025.0,1,2024.0,2024.0,2
+117,Belarus — 1. Division,Arsenal,1,2023.0,2023.0,1,2021.0,2021.0,2
+117,Belarus — 1. Division,Baranovichi,1,2025.0,2025.0,1,2025.0,2025.0,2
+128,Argentina — Liga Profesional Argentina,Racing Club,1,2024.0,2024.0,1,2022.0,2022.0,2
+136,Italy — Serie B,Frosinone,1,2022.0,2022.0,1,2022.0,2022.0,2
+141,Spain — Segunda Division,Almeria,1,2024.0,2024.0,1,2021.0,2021.0,2
+141,Spain — Segunda Division,Espanyol,1,2020.0,2020.0,1,2020.0,2020.0,2
+165,Iceland — 1. Deild,Fram Reykjavik,1,2021.0,2021.0,1,2021.0,2021.0,2
+165,Iceland — 1. Deild,Fylkir,1,2022.0,2022.0,1,2022.0,2022.0,2
+169,China — Super League,Guangzhou Evergrande FC,1,2021.0,2021.0,1,2020.0,2020.0,2
+170,China — League One,Changchun Yatai,1,2020.0,2020.0,1,2020.0,2020.0,2
+170,China — League One,Kunshan,1,2022.0,2022.0,1,2022.0,2022.0,2
+170,China — League One,Sichuan Jiuniu,1,2023.0,2023.0,1,2023.0,2023.0,2
+170,China — League One,Yunnan Yukun,1,2024.0,2024.0,1,2024.0,2024.0,2
+172,Bulgaria — First League,CSKA Sofia,1,2026.0,2026.0,1,2022.0,2022.0,2
+179,Scotland — Premiership,Partick,1,2022.0,2022.0,1,2022.0,2022.0,2
+235,Russia — Premier League,FC Krasnodar,1,2025.0,2025.0,1,2026.0,2026.0,2
+253,USA — Major League Soccer,Columbus Crew,1,2023.0,2023.0,1,2020.0,2020.0,2
+255,USA — USL Championship,Louisville City,1,2024.0,2024.0,1,2025.0,2025.0,2
+255,USA — USL Championship,San Antonio,1,2023.0,2023.0,1,2022.0,2022.0,2
+255,USA — USL Championship,Tampa Bay Rowdies,1,2022.0,2022.0,1,2021.0,2021.0,2
+283,Romania — Liga I,Universitatea Craiova,1,2026.0,2026.0,1,2025.0,2025.0,2
+327,Georgia — Erovnuli Liga,Dila,1,2025.0,2025.0,1,2024.0,2024.0,2
+327,Georgia — Erovnuli Liga,Saburtalo,1,2024.0,2024.0,1,2025.0,2025.0,2
+358,Ireland — First Division,Dundalk,1,2025.0,2025.0,1,2025.0,2025.0,2
+358,Ireland — First Division,Galway United,1,2023.0,2023.0,1,2023.0,2023.0,2
+361,Lithuania — 1 Lyga,FK Trakai,1,2024.0,2024.0,1,2024.0,2024.0,2
+361,Lithuania — 1 Lyga,Šiauliai,1,2021.0,2021.0,1,2021.0,2021.0,2
+365,Latvia — Virsliga,Valmiera / BSS,1,2022.0,2022.0,1,2021.0,2021.0,2
+595,Sweden — Division 2 - Södra Svealand,Atvidabergs FF,1,2025.0,2025.0,1,2025.0,2025.0,2
+929,China — League Two,Guangxi Hengchen,1,2025.0,2025.0,1,2025.0,2025.0,2
+929,China — League Two,Guangzhou E-Power,1,2024.0,2024.0,1,2024.0,2024.0,2
+61,France — Ligue 1,Nice,0,,,2,2021.0,2023.0,2
+71,Brazil — Serie A,Atletico-MG,0,,,2,2021.0,2023.0,2
+88,Netherlands — Eredivisie,Twente,0,,,2,2022.0,2025.0,2
+98,Japan — J1 League,Nagoya Grampus,0,,,2,2020.0,2022.0,2
+104,Norway — 1. Division,Bryne,0,,,2,2024.0,2026.0,2
+106,Poland — Ekstraklasa,Pogon Szczecin,0,,,2,2020.0,2026.0,2
+119,Denmark — Superliga,Aarhus,0,,,2,2022.0,2025.0,2
+169,China — Super League,Chengdu Better City,0,,,2,2025.0,2026.0,2
+233,Egypt — Premier League,Pyramids FC,0,,,2,2023.0,2026.0,2
+233,Egypt — Premier League,Zamalek SC,0,,,2,2020.0,2025.0,2
+244,Finland — Veikkausliiga,Inter Turku,0,,,2,2025.0,2026.0,2
+253,USA — Major League Soccer,Nashville SC,0,,,2,2021.0,2026.0,2
+253,USA — Major League Soccer,Seattle Sounders,0,,,2,2023.0,2024.0,2
+255,USA — USL Championship,Pittsburgh Riverhounds,0,,,2,2020.0,2024.0,2
+292,South-Korea — K League 1,Ulsan Hyundai FC,0,,,2,2022.0,2024.0,2
+489,USA — USL League One,Forward Madison,0,,,2,2024.0,2026.0,2

@@ -1,0 +1,63 @@
+api_league_id,country_name,league_name,league,tier,seasons,first_season,latest_season,fixtures,teams,first_match,last_match
+128,Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,1,7,2020,2026,2880,35,2020-10-30,2026-10-06
+218,Austria,Bundesliga,Austria — Bundesliga,1,7,2020,2026,1213,16,2020-09-11,2026-09-20
+117,Belarus,1. Division,Belarus — 1. Division,2,7,2020,2026,1662,37,2020-04-17,2026-10-04
+116,Belarus,Premier League,Belarus — Premier League,1,7,2020,2026,1585,27,2020-03-19,2026-09-20
+144,Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,1,7,2020,2026,1994,26,2020-08-08,2026-09-20
+1147,Brazil,Capixaba B,Brazil — Capixaba B,5,2,2025,2026,78,14,2024-09-07,2025-10-11
+71,Brazil,Serie A,Brazil — Serie A,1,7,2020,2026,2565,30,2020-08-08,2026-10-08
+72,Brazil,Serie B,Brazil — Serie B,2,7,2020,2026,2598,48,2020-08-07,2026-10-07
+172,Bulgaria,First League,Bulgaria — First League,1,7,2020,2026,1668,22,2020-08-07,2026-09-20
+265,Chile,Primera División,Chile — Primera División,1,7,2020,2026,1722,25,2020-01-24,2026-10-02
+170,China,League One,China — League One,2,7,2020,2026,1673,43,2020-09-12,2026-10-07
+929,China,League Two,China — League Two,3,5,2022,2026,1215,45,2022-07-02,2026-08-23
+169,China,Super League,China — Super League,1,7,2020,2026,1567,29,2020-07-25,2026-09-18
+345,Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,1,7,2020,2026,1774,25,2020-08-21,2026-09-20
+119,Denmark,Superliga,Denmark — Superliga,1,7,2020,2026,1203,16,2020-09-11,2026-09-20
+233,Egypt,Premier League,Egypt — Premier League,1,7,2020,2026,1813,30,2020-12-11,2026-09-17
+40,England,Championship,England — Championship,2,7,2020,2026,3417,46,2020-09-11,2026-09-20
+41,England,League One,England — League One,3,7,2020,2026,3430,52,2020-09-12,2026-10-03
+42,England,League Two,England — League Two,4,7,2020,2026,3436,46,2020-09-12,2026-10-03
+39,England,Premier League,England — Premier League,1,7,2020,2026,2320,30,2020-09-12,2026-09-20
+329,Estonia,Meistriliiga,Estonia — Meistriliiga,1,7,2020,2026,1177,16,2020-03-06,2026-09-20
+244,Finland,Veikkausliiga,Finland — Veikkausliiga,1,7,2020,2026,1110,18,2020-07-01,2026-08-31
+61,France,Ligue 1,France — Ligue 1,1,7,2020,2026,2099,28,2020-08-21,2026-09-20
+62,France,Ligue 2,France — Ligue 2,2,7,2020,2026,2208,41,2020-08-22,2026-09-19
+327,Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,1,7,2020,2026,1144,20,2020-02-29,2026-10-04
+79,Germany,2. Bundesliga,Germany — 2. Bundesliga,2,7,2020,2026,1890,35,2020-09-18,2026-09-20
+78,Germany,Bundesliga,Germany — Bundesliga,1,7,2020,2026,1872,27,2020-09-18,2026-09-20
+197,Greece,Super League 1,Greece — Super League 1,1,7,2020,2026,1471,23,2020-09-11,2026-09-20
+165,Iceland,1. Deild,Iceland — 1. Deild,2,7,2020,2026,925,26,2020-06-19,2026-09-05
+358,Ireland,First Division,Ireland — First Division,2,7,2020,2026,1103,17,2020-02-21,2026-10-02
+357,Ireland,Premier Division,Ireland — Premier Division,1,7,2020,2026,1155,15,2020-02-14,2026-10-08
+135,Italy,Serie A,Italy — Serie A,1,7,2020,2026,2324,29,2020-09-19,2026-09-20
+136,Italy,Serie B,Italy — Serie B,2,7,2020,2026,2373,47,2020-09-25,2026-09-20
+98,Japan,J1 League,Japan — J1 League,1,7,2020,2026,2206,29,2020-02-21,2026-06-06
+99,Japan,J2 League,Japan — J2 League,2,7,2020,2026,2710,41,2020-02-23,2026-10-04
+389,Kazakhstan,Premier League,Kazakhstan — Premier League,1,7,2020,2026,1204,23,2020-03-07,2026-09-18
+365,Latvia,Virsliga,Latvia — Virsliga,1,7,2020,2026,1135,18,2020-06-15,2026-09-20
+361,Lithuania,1 Lyga,Lithuania — 1 Lyga,2,7,2020,2026,1470,30,2020-06-05,2026-10-02
+362,Lithuania,A Lyga,Lithuania — A Lyga,1,7,2020,2026,1108,15,2020-03-06,2026-09-20
+262,Mexico,Liga MX,Mexico — Liga MX,1,7,2020,2026,2115,19,2020-07-25,2026-09-28
+89,Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,2,7,2020,2026,2380,29,2020-08-28,2026-10-04
+88,Netherlands,Eredivisie,Netherlands — Eredivisie,1,7,2020,2026,1952,32,2020-09-12,2026-09-20
+104,Norway,1. Division,Norway — 1. Division,2,7,2020,2026,1648,36,2020-07-03,2026-10-05
+103,Norway,Eliteserien,Norway — Eliteserien,1,7,2020,2026,1615,25,2020-06-16,2026-09-20
+106,Poland,Ekstraklasa,Poland — Ekstraklasa,1,7,2020,2026,1848,29,2020-08-21,2026-09-20
+94,Portugal,Primeira Liga,Portugal — Primeira Liga,1,7,2020,2026,1898,27,2020-09-18,2026-09-20
+283,Romania,Liga I,Romania — Liga I,1,7,2020,2026,1992,29,2020-08-21,2026-10-08
+235,Russia,Premier League,Russia — Premier League,1,7,2020,2026,1520,27,2020-08-08,2026-09-17
+179,Scotland,Premiership,Scotland — Premiership,1,7,2020,2026,1401,22,2020-08-01,2026-09-20
+286,Serbia,Super Liga,Serbia — Super Liga,1,7,2020,2026,1944,30,2020-07-31,2026-09-20
+292,South-Korea,K League 1,South-Korea — K League 1,1,7,2020,2026,1497,20,2020-05-08,2026-09-27
+293,South-Korea,K League 2,South-Korea — K League 2,2,7,2020,2026,1504,24,2020-05-09,2026-09-20
+140,Spain,La Liga,Spain — La Liga,1,7,2020,2026,2348,31,2020-09-12,2026-09-20
+141,Spain,Segunda Division,Spain — Segunda Division,2,7,2020,2026,2889,44,2020-09-12,2026-10-05
+113,Sweden,Allsvenskan,Sweden — Allsvenskan,1,7,2020,2026,1628,28,2020-06-14,2026-09-20
+595,Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,4,7,2020,2026,1199,37,2020-06-14,2026-10-04
+207,Switzerland,Super League,Switzerland — Super League,1,7,2020,2026,1289,17,2020-09-19,2026-09-20
+203,Turkey,Süper Lig,Turkey — Süper Lig,1,7,2020,2026,2218,33,2020-09-11,2026-09-20
+253,USA,Major League Soccer,USA — Major League Soccer,1,7,2020,2026,3235,30,2020-02-29,2026-10-07
+255,USA,USL Championship,USA — USL Championship,2,7,2020,2026,2799,42,2020-03-07,2026-10-04
+489,USA,USL League One,USA — USL League One,3,7,2020,2026,1217,29,2020-07-18,2026-10-08
+333,Ukraine,Premier League,Ukraine — Premier League,1,7,2020,2026,1352,29,2020-08-21,2026-10-03

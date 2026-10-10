@@ -1,0 +1,2 @@
+data_as_of,first_match,finished_fixtures,leagues,league_seasons,teams,current_rated_teams,current_rated_leagues,xg_fixtures,watchlist_teams,raw_ft_fixtures,raw_first_ft,raw_last_ft,fact_fixtures,fact_coverage,fact_last_ft,calibration
+2026-10-08,2020-01-24,113985,62,427,1506,1023,60,9797,155,113985,2020-01-24T21:30:00+00:00,2026-10-08T19:00:00+00:00,79316,0.6958,2026-10-08T19:00:00+00:00,"{'method': 'walk-forward (calibration fit/eval fold split)', 'n': 18066, 'unique_fixtures': 3691, 'n_folds': 9, 'n_fit_folds': 4, 'overall_brier': 0.1874}"

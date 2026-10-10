@@ -1,0 +1,428 @@
+country,league,league_label,api_league_id,season,attack_leader,attack_goals_per_game_eb,attack_games,defence_leader,defence_goals_allowed_per_game_eb,defence_games
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2020,Atletico Tucuman,1.706,11,Argentinos JRS,1.079,11
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2021,River Plate,1.84,38,River Plate,0.928,38
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2022,River Plate,1.576,42,Racing Club,0.946,42
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2023,River Plate,1.612,27,San Lorenzo,0.753,27
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2024,Racing Club,1.343,27,Velez Sarsfield,0.786,27
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2025,Boca Juniors,1.346,36,Rosario Central,0.681,35
+Argentina,Liga Profesional Argentina,Argentina — Liga Profesional Argentina,128,2026,Independ. Rivadavia,1.433,28,Estudiantes L.P.,0.843,28
+Austria,Bundesliga,Austria — Bundesliga,218,2020,Red Bull Salzburg,2.776,32,Austria Klagenfurt,1.009,2
+Austria,Bundesliga,Austria — Bundesliga,218,2021,Red Bull Salzburg,2.201,32,Red Bull Salzburg,0.849,32
+Austria,Bundesliga,Austria — Bundesliga,218,2022,Red Bull Salzburg,1.934,32,Red Bull Salzburg,0.886,32
+Austria,Bundesliga,Austria — Bundesliga,218,2023,Red Bull Salzburg,2.136,32,Sturm Graz,0.861,32
+Austria,Bundesliga,Austria — Bundesliga,218,2024,Sturm Graz,1.894,32,Austria Vienna,1.112,32
+Austria,Bundesliga,Austria — Bundesliga,218,2025,Lask Linz,1.568,32,Sturm Graz,1.258,32
+Austria,Bundesliga,Austria — Bundesliga,218,2026,Rapid Vienna,2.612,7,Red Bull Salzburg,1.042,7
+Belarus,1. Division,Belarus — 1. Division,117,2020,FC Gomel,2.154,26,Sputnik,0.861,26
+Belarus,1. Division,Belarus — 1. Division,117,2021,Belshina,1.94,33,Arsenal,0.789,33
+Belarus,1. Division,Belarus — 1. Division,117,2022,Shakhtyor Petrikov,2.652,24,Naftan,0.915,24
+Belarus,1. Division,Belarus — 1. Division,117,2023,Arsenal,2.546,32,FC Vitebsk,0.839,32
+Belarus,1. Division,Belarus — 1. Division,117,2024,Belshina,2.325,34,Molodechno-DYuSSh 4,0.88,34
+Belarus,1. Division,Belarus — 1. Division,117,2025,Baranovichi,2.073,34,Baranovichi,0.948,34
+Belarus,1. Division,Belarus — 1. Division,117,2026,Niva,2.255,27,FC Slutsk,1.187,27
+Belarus,Premier League,Belarus — Premier League,116,2020,Bate Borisov,2.027,30,Shakhter Soligorsk,0.833,30
+Belarus,Premier League,Belarus — Premier League,116,2021,Shakhter Soligorsk,1.924,29,Shakhter Soligorsk,0.712,29
+Belarus,Premier League,Belarus — Premier League,116,2022,Shakhter Soligorsk,1.753,30,Shakhter Soligorsk,0.692,30
+Belarus,Premier League,Belarus — Premier League,116,2023,Dinamo Minsk,2.403,28,Torpedo Zhodino,0.714,28
+Belarus,Premier League,Belarus — Premier League,116,2024,Dinamo Brest,1.877,30,Dinamo Minsk,0.547,30
+Belarus,Premier League,Belarus — Premier League,116,2025,ML Vitebsk,1.68,30,ML Vitebsk,0.74,30
+Belarus,Premier League,Belarus — Premier League,116,2026,ML Vitebsk,1.767,21,Dinamo Minsk,0.871,21
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2020,Genk,1.971,40,Club Brugge KV,1.117,40
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2021,Union St. Gilloise,1.989,40,Union St. Gilloise,0.89,40
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2022,Genk,2.05,40,Antwerp,0.967,40
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2023,Club Brugge KV,1.992,40,Club Brugge KV,0.985,40
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2024,Club Brugge KV,1.99,40,Union St. Gilloise,0.758,40
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2025,Club Brugge KV,1.982,39,Union St. Gilloise,0.911,39
+Belgium,Jupiler Pro League,Belgium — Jupiler Pro League,144,2026,Union St. Gilloise,2.524,7,Club Brugge KV,0.785,7
+Brazil,Capixaba B,Brazil — Capixaba B,1147,2025,Vilavelhense,2.868,11,Capixaba SC,0.581,11
+Brazil,Capixaba B,Brazil — Capixaba B,1147,2026,Serra Talhada,2.676,10,Forte FC,0.717,10
+Brazil,Serie A,Brazil — Serie A,71,2020,Flamengo,1.643,38,Internacional,1.05,38
+Brazil,Serie A,Brazil — Serie A,71,2021,Flamengo,1.655,38,Atletico-MG,0.984,38
+Brazil,Serie A,Brazil — Serie A,71,2022,Palmeiras,1.579,38,Palmeiras,0.842,38
+Brazil,Serie A,Brazil — Serie A,71,2023,Palmeiras,1.508,38,Atletico-MG,0.927,38
+Brazil,Serie A,Brazil — Serie A,71,2024,Flamengo,1.471,38,Botafogo,0.935,38
+Brazil,Serie A,Brazil — Serie A,71,2025,Flamengo,1.855,38,Flamengo,0.842,38
+Brazil,Serie A,Brazil — Serie A,71,2026,Flamengo,1.697,28,Palmeiras,0.961,28
+Brazil,Serie B,Brazil — Serie B,72,2020,Ponte Preta,1.289,38,Chapecoense-sc,0.72,38
+Brazil,Serie B,Brazil — Serie B,72,2021,Botafogo,1.337,38,Botafogo,0.93,38
+Brazil,Serie B,Brazil — Serie B,72,2022,Cruzeiro,1.333,38,Cruzeiro,0.78,38
+Brazil,Serie B,Brazil — Serie B,72,2023,Sport Recife,1.406,38,Novorizontino,0.887,38
+Brazil,Serie B,Brazil — Serie B,72,2024,Ceara,1.413,38,Mirassol,0.807,38
+Brazil,Serie B,Brazil — Serie B,72,2025,Atletico Paranaense,1.255,38,Coritiba,0.801,38
+Brazil,Serie B,Brazil — Serie B,72,2026,Novorizontino,1.502,31,Juventude,0.73,32
+Bulgaria,First League,Bulgaria — First League,172,2020,Ludogorets,2.077,31,Lokomotiv Plovdiv,0.881,31
+Bulgaria,First League,Bulgaria — First League,172,2021,Ludogorets,2.283,31,Cherno More Varna,0.787,31
+Bulgaria,First League,Bulgaria — First League,172,2022,Ludogorets,2.177,35,CSKA Sofia,0.596,35
+Bulgaria,First League,Bulgaria — First League,172,2023,Ludogorets,2.308,35,Ludogorets,0.794,35
+Bulgaria,First League,Bulgaria — First League,172,2024,Ludogorets,1.859,36,Ludogorets,0.692,36
+Bulgaria,First League,Bulgaria — First League,172,2025,Levski Sofia,1.805,36,Levski Sofia,0.793,36
+Bulgaria,First League,Bulgaria — First League,172,2026,CSKA Sofia,2.102,10,Levski Sofia,0.757,9
+Chile,Primera División,Chile — Primera División,265,2020,U. Catolica,1.691,34,Universidad de Chile,1.153,34
+Chile,Primera División,Chile — Primera División,265,2021,U. Catolica,1.796,32,Colo Colo,0.998,32
+Chile,Primera División,Chile — Primera División,265,2022,Colo Colo,1.612,30,Colo Colo,0.766,30
+Chile,Primera División,Chile — Primera División,265,2023,Cobresal,1.589,30,Colo Colo,1.154,30
+Chile,Primera División,Chile — Primera División,265,2024,Deportes Iquique,1.622,30,Colo Colo,0.859,30
+Chile,Primera División,Chile — Primera División,265,2025,Universidad de Chile,1.726,30,Coquimbo Unido,0.752,30
+Chile,Primera División,Chile — Primera División,265,2026,U. Catolica,1.949,23,Universidad de Chile,1.062,23
+China,League One,China — League One,170,2020,Changchun Yatai,1.61,15,Changchun Yatai,0.73,15
+China,League One,China — League One,170,2021,Chengdu Better City,2.295,34,Guangxi Baoyun,0.713,2
+China,League One,China — League One,170,2022,Kunshan,2.203,34,Kunshan,0.646,34
+China,League One,China — League One,170,2023,Sichuan Jiuniu,1.496,30,Sichuan Jiuniu,0.752,30
+China,League One,China — League One,170,2024,Yunnan Yukun,2.118,30,Yunnan Yukun,0.817,30
+China,League One,China — League One,170,2025,Shenyang Urban,1.964,30,Yanbian Longding,0.962,30
+China,League One,China — League One,170,2026,Guangzhou E-Power,1.835,25,Nantong Zhiyun,0.948,25
+China,League Two,China — League Two,929,2022,Jinan Xingzhou,1.674,15,Dongguan United,0.653,15
+China,League Two,China — League Two,929,2023,Chongqing Tongliang Long,2.058,22,Dalian Zhixing,0.658,22
+China,League Two,China — League Two,929,2024,Guangzhou E-Power,1.573,28,Guangzhou E-Power,0.734,28
+China,League Two,China — League Two,929,2025,Guangxi Hengchen,1.853,30,Guangxi Hengchen,0.693,30
+China,League Two,China — League Two,929,2026,Shenzhen 2028,1.463,22,Dalian Kewei,0.795,22
+China,Super League,China — Super League,169,2020,Beijing Guoan,1.94,20,Guangzhou Evergrande FC,0.984,20
+China,Super League,China — Super League,169,2021,Guangzhou Evergrande FC,1.969,22,SHANGHAI SIPG,0.72,22
+China,Super League,China — Super League,169,2022,Wuhan Three Towns,2.531,34,SHANGHAI SIPG,0.795,34
+China,Super League,China — Super League,169,2023,SHANGHAI SIPG,1.901,30,Shandong Luneng,0.932,30
+China,Super League,China — Super League,169,2024,SHANGHAI SIPG,3.02,30,Shanghai Shenhua,0.857,30
+China,Super League,China — Super League,169,2025,SHANGHAI SIPG,2.272,30,Chengdu Better City,1.146,30
+China,Super League,China — Super League,169,2026,Yunnan Yukun,1.881,26,Chengdu Better City,1.314,26
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2020,Slavia Praha,2.349,34,Slavia Praha,0.743,34
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2021,Slavia Praha,2.167,35,Plzen,0.756,35
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2022,Slavia Praha,2.675,35,Slavia Praha,0.99,35
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2023,Sparta Praha,2.224,35,Slavia Praha,0.87,35
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2024,Slavia Praha,2.104,35,Slavia Praha,0.597,35
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2025,Slavia Praha,2.058,34,Slavia Praha,0.87,34
+Czech-Republic,Czech Liga,Czech-Republic — Czech Liga,345,2026,Slavia Praha,2.362,9,Slovan Liberec,0.838,9
+Denmark,Superliga,Denmark — Superliga,119,2020,FC Copenhagen,1.744,32,FC Midtjylland,1.177,32
+Denmark,Superliga,Denmark — Superliga,119,2021,FC Midtjylland,1.696,32,FC Copenhagen,0.806,32
+Denmark,Superliga,Denmark — Superliga,119,2022,FC Copenhagen,1.718,32,Aarhus,1.114,32
+Denmark,Superliga,Denmark — Superliga,119,2023,FC Copenhagen,1.876,33,FC Nordsjaelland,1.202,32
+Denmark,Superliga,Denmark — Superliga,119,2024,FC Midtjylland,1.886,32,FC Copenhagen,1.198,32
+Denmark,Superliga,Denmark — Superliga,119,2025,FC Midtjylland,2.051,31,Aarhus,1.097,31
+Denmark,Superliga,Denmark — Superliga,119,2026,FC Copenhagen,2.065,9,FC Copenhagen,1.148,9
+Egypt,Premier League,Egypt — Premier League,233,2020,Al Ahly,1.909,34,Zamalek SC,0.8,34
+Egypt,Premier League,Egypt — Premier League,233,2021,Al Ahly,1.701,34,Al Ahly,0.741,34
+Egypt,Premier League,Egypt — Premier League,233,2022,Al Ahly,1.661,34,Al Ahly,0.592,34
+Egypt,Premier League,Egypt — Premier League,233,2023,Al Ahly,2.027,33,Pyramids FC,0.92,34
+Egypt,Premier League,Egypt — Premier League,233,2024,Al Ahly,1.911,25,Al Ahly,0.859,25
+Egypt,Premier League,Egypt — Premier League,233,2025,Al Ahly,1.538,26,Zamalek SC,0.798,26
+Egypt,Premier League,Egypt — Premier League,233,2026,Ceramica Cleopatra,1.621,5,Pyramids FC,0.601,5
+England,Championship,England — Championship,40,2020,Brentford,1.577,49,Watford,0.824,46
+England,Championship,England — Championship,40,2021,Fulham,2.061,46,Bournemouth,0.94,46
+England,Championship,England — Championship,40,2022,Burnley,1.703,46,Burnley,0.933,46
+England,Championship,England — Championship,40,2023,Ipswich,1.857,46,Leeds,1.044,49
+England,Championship,England — Championship,40,2024,Leeds,1.809,46,Burnley,0.523,46
+England,Championship,England — Championship,40,2025,Coventry,1.888,45,Coventry,1.123,45
+England,Championship,England — Championship,40,2026,West Ham,2.213,8,Swansea,1.167,8
+England,League One,England — League One,41,2020,Peterborough,1.644,46,Hull City,0.944,46
+England,League One,England — League One,41,2021,Oxford United,1.677,46,Rotherham,0.845,46
+England,League One,England — League One,41,2022,Ipswich,2.028,46,Ipswich,0.873,46
+England,League One,England — League One,41,2023,Peterborough,1.77,48,Derby,0.96,46
+England,League One,England — League One,41,2024,Birmingham,1.671,46,Birmingham,0.8,46
+England,League One,England — League One,41,2025,Cardiff,1.81,46,Lincoln,1.07,46
+England,League One,England — League One,41,2026,Reading,1.813,8,Bradford,1.026,8
+England,League Two,England — League Two,42,2020,Cambridge United,1.462,46,Salford City,0.894,46
+England,League Two,England — League Two,42,2021,Swindon Town,1.56,47,Northampton,0.953,48
+England,League Two,England — League Two,42,2022,Mansfield Town,1.417,46,Leyton Orient,0.867,46
+England,League Two,England — League Two,42,2023,Stockport County,1.921,46,Mansfield Town,1.173,46
+England,League Two,England — League Two,42,2024,Walsall,1.489,49,AFC Wimbledon,0.879,49
+England,League Two,England — League Two,42,2025,Milton Keynes Dons,1.695,46,Cambridge United,0.874,46
+England,League Two,England — League Two,42,2026,Barnet,1.89,7,Exeter City,1.02,9
+England,Premier League,England — Premier League,39,2020,Manchester City,2.055,38,Manchester City,0.988,38
+England,Premier League,England — Premier League,39,2021,Manchester City,2.457,38,Liverpool,0.807,38
+England,Premier League,England — Premier League,39,2022,Manchester City,2.33,38,Manchester City,1.007,38
+England,Premier League,England — Premier League,39,2023,Manchester City,2.38,38,Arsenal,0.925,38
+England,Premier League,England — Premier League,39,2024,Liverpool,2.1,38,Arsenal,1.016,38
+England,Premier League,England — Premier League,39,2025,Manchester City,1.871,37,Arsenal,0.918,37
+England,Premier League,England — Premier League,39,2026,Brighton,2.539,5,Everton,0.961,5
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2020,Paide,2.573,30,Flora Tallinn,0.66,29
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2021,Flora Tallinn,2.691,32,Flora Tallinn,0.819,32
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2022,Flora Tallinn,2.511,36,Flora Tallinn,0.654,36
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2023,Flora Tallinn,1.941,36,FC Levadia Tallinn,0.729,36
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2024,FC Levadia Tallinn,2.185,36,FC Levadia Tallinn,0.657,36
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2025,FC Levadia Tallinn,2.394,36,Flora Tallinn,0.92,36
+Estonia,Meistriliiga,Estonia — Meistriliiga,329,2026,FC Levadia Tallinn,2.615,29,FC Levadia Tallinn,0.862,29
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2020,HJK Helsinki,2.193,22,HJK Helsinki,0.87,22
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2021,KuPS,1.558,27,HJK Helsinki,0.849,27
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2022,Honka,1.815,27,KuPS,0.904,27
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2023,HJK Helsinki,1.732,27,KuPS,0.916,27
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2024,Ilves,1.884,27,KuPS,0.996,27
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2025,HJK Helsinki,2.229,32,Inter Turku,1.166,32
+Finland,Veikkausliiga,Finland — Veikkausliiga,244,2026,KuPS,1.561,22,Inter Turku,0.872,22
+France,Ligue 1,France — Ligue 1,61,2020,Paris Saint Germain,2.092,38,Lille,0.78,38
+France,Ligue 1,France — Ligue 1,61,2021,Paris Saint Germain,2.181,38,Nice,1.033,38
+France,Ligue 1,France — Ligue 1,61,2022,Paris Saint Germain,2.181,38,Lens,0.897,38
+France,Ligue 1,France — Ligue 1,61,2023,Paris Saint Germain,2.184,34,Nice,0.995,34
+France,Ligue 1,France — Ligue 1,61,2024,Paris Saint Germain,2.52,34,Paris Saint Germain,1.124,34
+France,Ligue 1,France — Ligue 1,61,2025,Paris Saint Germain,2.041,33,Paris Saint Germain,0.989,33
+France,Ligue 1,France — Ligue 1,61,2026,Lyon,1.634,5,Lyon,0.874,5
+France,Ligue 2,France — Ligue 2,62,2020,Toulouse,1.729,39,Clermont Foot,0.843,38
+France,Ligue 2,France — Ligue 2,62,2021,Toulouse,1.956,38,Ajaccio,0.62,38
+France,Ligue 2,France — Ligue 2,62,2022,Saint Etienne,1.474,38,Le Havre,0.687,38
+France,Ligue 2,France — Ligue 2,62,2023,Auxerre,1.696,38,Saint Etienne,0.99,39
+France,Ligue 2,France — Ligue 2,62,2024,Lorient,1.82,34,Lorient,1.04,34
+France,Ligue 2,France — Ligue 2,62,2025,Estac Troyes,1.637,34,Le Mans,1.023,34
+France,Ligue 2,France — Ligue 2,62,2026,Saint Etienne,2.2,7,Boulogne,0.968,7
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2020,Dinamo Tbilisi,1.7,18,Dinamo Tbilisi,0.599,18
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2021,Dinamo Batumi,1.851,36,Gagra,0.626,2
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2022,Dinamo Batumi,2.32,36,Samtredia,0.755,2
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2023,Dinamo Tbilisi,2.461,36,Torpedo Kutaisi,1.098,36
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2024,Saburtalo,1.889,36,Dila,0.961,36
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2025,Dila,1.63,36,Saburtalo,0.787,36
+Georgia,Erovnuli Liga,Georgia — Erovnuli Liga,327,2026,Dinamo Batumi,1.578,27,Rustavi,1.01,27
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2020,Hamburger SV,1.94,34,Holstein Kiel,1.228,34
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2021,FC Schalke 04,1.976,34,Hamburger SV,1.096,34
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2022,Hamburger SV,1.978,34,SV Darmstadt 98,1.089,34
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2023,Fortuna Düsseldorf,1.991,34,FC St. Pauli,1.243,34
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2024,Hamburger SV,2.17,34,Hannover 96,1.222,34
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2025,SV Elversberg,1.673,33,FC Schalke 04,1.13,33
+Germany,2. Bundesliga,Germany — 2. Bundesliga,79,2026,Hertha BSC,2.367,6,1. FC Kaiserslautern,1.197,6
+Germany,Bundesliga,Germany — Bundesliga,78,2020,Bayern München,2.726,34,RB Leipzig,1.081,34
+Germany,Bundesliga,Germany — Bundesliga,78,2021,Bayern München,2.708,34,Bayern München,1.213,34
+Germany,Bundesliga,Germany — Bundesliga,78,2022,Bayern München,2.511,34,Bayern München,1.223,34
+Germany,Bundesliga,Germany — Bundesliga,78,2023,Bayern München,2.651,34,Bayer Leverkusen,0.812,34
+Germany,Bundesliga,Germany — Bundesliga,78,2024,Bayern München,2.7,34,Bayern München,1.128,34
+Germany,Bundesliga,Germany — Bundesliga,78,2025,Bayern München,3.326,33,Borussia Dortmund,1.238,33
+Germany,Bundesliga,Germany — Bundesliga,78,2026,Bayern München,2.841,4,Bayern München,0.898,4
+Greece,Super League 1,Greece — Super League 1,197,2020,Olympiakos Piraeus,2.113,36,Olympiakos Piraeus,0.718,36
+Greece,Super League 1,Greece — Super League 1,197,2021,Olympiakos Piraeus,1.602,36,Olympiakos Piraeus,0.847,36
+Greece,Super League 1,Greece — Super League 1,197,2022,Olympiakos Piraeus,1.829,36,Panathinaikos,0.552,36
+Greece,Super League 1,Greece — Super League 1,197,2023,PAOK,2.298,36,Olympiakos Piraeus,1.051,36
+Greece,Super League 1,Greece — Super League 1,197,2024,PAOK,1.777,32,Olympiakos Piraeus,0.83,32
+Greece,Super League 1,Greece — Super League 1,197,2025,Levadiakos,1.826,32,Olympiakos Piraeus,0.659,32
+Greece,Super League 1,Greece — Super League 1,197,2026,AEK Athens FC,2.194,5,Olympiakos Piraeus,0.797,5
+Iceland,1. Deild,Iceland — 1. Deild,165,2020,Keflavik,2.776,19,Leiknir R.,1.28,20
+Iceland,1. Deild,Iceland — 1. Deild,165,2021,Fram Reykjavik,2.323,22,Fram Reykjavik,0.897,22
+Iceland,1. Deild,Iceland — 1. Deild,165,2022,Fylkir,2.668,22,Fylkir,1.258,22
+Iceland,1. Deild,Iceland — 1. Deild,165,2023,Afturelding,2.512,24,Vestri,1.281,24
+Iceland,1. Deild,Iceland — 1. Deild,165,2024,IBV Vestmannaeyjar,1.963,22,Keflavik,1.288,25
+Iceland,1. Deild,Iceland — 1. Deild,165,2025,Keflavik,2.262,25,Njardvik,1.347,24
+Iceland,1. Deild,Iceland — 1. Deild,165,2026,Afturelding,2.71,22,Throttur Reykjavik,1.295,22
+Ireland,First Division,Ireland — First Division,358,2020,UCD,2.279,18,Bray Wanderers,0.877,19
+Ireland,First Division,Ireland — First Division,358,2021,UCD,1.849,30,Shelbourne,0.961,27
+Ireland,First Division,Ireland — First Division,358,2022,Waterford,2.136,35,Cork City,0.785,32
+Ireland,First Division,Ireland — First Division,358,2023,Galway United,2.591,36,Galway United,0.619,36
+Ireland,First Division,Ireland — First Division,358,2024,Cork City,1.61,36,Cork City,0.81,36
+Ireland,First Division,Ireland — First Division,358,2025,Dundalk,1.92,36,Dundalk,1.013,36
+Ireland,First Division,Ireland — First Division,358,2026,Cork City,1.947,34,Cork City,1.145,34
+Ireland,Premier Division,Ireland — Premier Division,357,2020,Shamrock Rovers,2.208,18,Shamrock Rovers,0.613,18
+Ireland,Premier Division,Ireland — Premier Division,357,2021,Bohemians,1.597,36,Shamrock Rovers,0.891,36
+Ireland,Premier Division,Ireland — Premier Division,357,2022,Shamrock Rovers,1.626,36,Shamrock Rovers,0.705,36
+Ireland,Premier Division,Ireland — Premier Division,357,2023,Shamrock Rovers,1.761,36,Derry City,0.725,36
+Ireland,Premier Division,Ireland — Premier Division,357,2024,St Patrick's Athl.,1.305,36,Shelbourne,0.796,36
+Ireland,Premier Division,Ireland — Premier Division,357,2025,Shamrock Rovers,1.392,36,St Patrick's Athl.,0.971,36
+Ireland,Premier Division,Ireland — Premier Division,357,2026,Bohemians,1.646,32,St Patrick's Athl.,0.965,32
+Italy,Serie A,Italy — Serie A,135,2020,Atalanta,2.227,38,Inter,1.048,38
+Italy,Serie A,Italy — Serie A,135,2021,Inter,2.075,38,AC Milan,0.942,38
+Italy,Serie A,Italy — Serie A,135,2022,Napoli,1.881,38,Napoli,0.87,38
+Italy,Serie A,Italy — Serie A,135,2023,Inter,2.177,38,Inter,0.711,38
+Italy,Serie A,Italy — Serie A,135,2024,Inter,1.944,38,Napoli,0.867,38
+Italy,Serie A,Italy — Serie A,135,2025,Inter,2.16,38,Como,0.878,37
+Italy,Serie A,Italy — Serie A,135,2026,Inter,2.375,5,Cagliari,0.814,5
+Italy,Serie B,Italy — Serie B,136,2020,Empoli,1.633,38,Salernitana,0.998,38
+Italy,Serie B,Italy — Serie B,136,2021,Monza,1.498,41,Lecce,0.924,38
+Italy,Serie B,Italy — Serie B,136,2022,Frosinone,1.467,38,Frosinone,0.859,38
+Italy,Serie B,Italy — Serie B,136,2023,Venezia,1.587,42,Cremonese,0.988,42
+Italy,Serie B,Italy — Serie B,136,2024,Sassuolo,1.839,38,Spezia,1.053,42
+Italy,Serie B,Italy — Serie B,136,2025,Venezia,1.85,38,Venezia,0.961,38
+Italy,Serie B,Italy — Serie B,136,2026,Hellas Verona,1.606,5,Sudtirol,0.996,5
+Japan,J1 League,Japan — J1 League,98,2020,Kawasaki Frontale,2.347,34,Nagoya Grampus,0.981,34
+Japan,J1 League,Japan — J1 League,98,2021,Yokohama F. Marinos,1.998,38,Kawasaki Frontale,0.849,38
+Japan,J1 League,Japan — J1 League,98,2022,Yokohama F. Marinos,1.868,34,Nagoya Grampus,1.147,34
+Japan,J1 League,Japan — J1 League,98,2023,Yokohama F. Marinos,1.644,34,Urawa,0.922,34
+Japan,J1 League,Japan — J1 League,98,2024,Sanfrecce Hiroshima,1.696,38,Machida Zelvia,1.026,38
+Japan,J1 League,Japan — J1 League,98,2025,Kawasaki Frontale,1.628,38,Sanfrecce Hiroshima,0.864,38
+Japan,J1 League,Japan — J1 League,98,2026,Cerezo Osaka,1.772,14,Kashima,0.963,16
+Japan,J2 League,Japan — J2 League,99,2020,Mito Hollyhock,1.472,42,Avispa Fukuoka,0.835,42
+Japan,J2 League,Japan — J2 League,99,2021,Jubilo Iwata,1.655,42,Kyoto Sanga,0.866,42
+Japan,J2 League,Japan — J2 League,99,2022,Albirex Niigata,1.593,42,Albirex Niigata,0.951,42
+Japan,J2 League,Japan — J2 League,99,2023,Machida Zelvia,1.736,42,Tokyo Verdy,0.884,44
+Japan,J2 League,Japan — J2 League,99,2024,V-varen Nagasaki,1.781,39,Yokohama FC,0.851,38
+Japan,J2 League,Japan — J2 League,99,2025,V-varen Nagasaki,1.527,38,Tokushima Vortis,0.815,40
+Japan,J2 League,Japan — J2 League,99,2026,Kataller Toyama,1.685,9,Oita Trinita,1.04,9
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2020,Kairat Almaty,2.113,21,FK Tobol Kostanay,0.959,20
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2021,FK Tobol Kostanay,1.919,26,FK Tobol Kostanay,0.873,26
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2022,FC Astana,2.251,26,FC Astana,1.072,26
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2023,Ordabasy,1.638,26,Ordabasy,0.953,26
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2024,Aktobe,1.522,24,FC Astana,0.919,24
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2025,FC Astana,2.353,26,Kairat Almaty,0.89,26
+Kazakhstan,Premier League,Kazakhstan — Premier League,389,2026,Kairat Almaty,1.788,26,Ordabasy,0.926,26
+Latvia,Virsliga,Latvia — Virsliga,365,2020,Rīgas FS,2.337,27,Riga,0.867,27
+Latvia,Virsliga,Latvia — Virsliga,365,2021,Rīgas FS,2.088,29,Valmiera / BSS,0.723,30
+Latvia,Virsliga,Latvia — Virsliga,365,2022,Valmiera / BSS,2.707,36,Riga,0.706,36
+Latvia,Virsliga,Latvia — Virsliga,365,2023,Rīgas FS,2.544,36,Rīgas FS,0.552,36
+Latvia,Virsliga,Latvia — Virsliga,365,2024,Rīgas FS,2.774,36,Riga,0.72,36
+Latvia,Virsliga,Latvia — Virsliga,365,2025,Rīgas FS,2.686,36,Riga,0.822,36
+Latvia,Virsliga,Latvia — Virsliga,365,2026,Riga,2.645,31,Rīgas FS,0.837,30
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2020,Nevėžis,2.041,20,Hegelmann Litauen,0.746,20
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2021,Šiauliai,2.788,26,Šiauliai,1.092,26
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2022,Dainava,2.113,30,Be1 NFA,0.758,30
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2023,TransINVEST Vilnius,2.469,29,TransINVEST Vilnius,1.104,29
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2024,FK Trakai,2.176,30,FK Trakai,0.769,30
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2025,TransINVEST Vilnius,2.704,30,Tauras,0.816,30
+Lithuania,1 Lyga,Lithuania — 1 Lyga,361,2026,Minija,2.424,25,Babrungas,0.578,25
+Lithuania,A Lyga,Lithuania — A Lyga,362,2020,FK Zalgiris Vilnius,1.944,20,FK Zalgiris Vilnius,0.81,20
+Lithuania,A Lyga,Lithuania — A Lyga,362,2021,FK Zalgiris Vilnius,1.995,36,FK Zalgiris Vilnius,0.843,36
+Lithuania,A Lyga,Lithuania — A Lyga,362,2022,FK Zalgiris Vilnius,2.245,36,FK Zalgiris Vilnius,0.796,36
+Lithuania,A Lyga,Lithuania — A Lyga,362,2023,FK Zalgiris Vilnius,1.791,36,Panevėžys,0.525,36
+Lithuania,A Lyga,Lithuania — A Lyga,362,2024,FK Zalgiris Vilnius,1.987,36,FK Zalgiris Vilnius,1.022,36
+Lithuania,A Lyga,Lithuania — A Lyga,362,2025,Kauno Žalgiris,1.759,36,Kauno Žalgiris,0.818,36
+Lithuania,A Lyga,Lithuania — A Lyga,362,2026,Kauno Žalgiris,1.946,30,Kauno Žalgiris,0.784,30
+Mexico,Liga MX,Mexico — Liga MX,262,2020,Club America,1.534,38,Cruz Azul,0.927,44
+Mexico,Liga MX,Mexico — Liga MX,262,2021,Tigres UANL,1.42,42,Atlas,0.957,45
+Mexico,Liga MX,Mexico — Liga MX,262,2022,Club America,2.047,42,Monterrey,0.968,42
+Mexico,Liga MX,Mexico — Liga MX,262,2023,Tigres UANL,1.68,41,Club America,0.907,45
+Mexico,Liga MX,Mexico — Liga MX,262,2024,Toluca,1.979,42,Club America,0.998,46
+Mexico,Liga MX,Mexico — Liga MX,262,2025,Toluca,1.721,41,Tigres UANL,1.132,41
+Mexico,Liga MX,Mexico — Liga MX,262,2026,Toluca,1.932,10,Club Queretaro,1.174,9
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2020,Cambuur,2.622,38,GO Ahead Eagles,0.805,38
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2021,Excelsior,2.03,38,Emmen,0.855,38
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2022,Heracles,2.531,38,Willem II,1.192,38
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2023,Willem II,1.906,38,Groningen,0.966,38
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2024,FC Volendam,2.126,38,Excelsior,1.131,38
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2025,ADO Den Haag,2.153,38,ADO Den Haag,1.158,38
+Netherlands,Eerste Divisie,Netherlands — Eerste Divisie,89,2026,Heracles,2.555,9,Almere City FC,1.228,9
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2020,Ajax,2.869,34,Ajax,0.739,34
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2021,Ajax,2.715,34,Ajax,0.76,34
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2022,PSV Eindhoven,2.479,34,Twente,0.83,38
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2023,PSV Eindhoven,3.122,34,PSV Eindhoven,0.719,34
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2024,PSV Eindhoven,2.909,34,Den Bosch,0.948,2
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2025,PSV Eindhoven,2.687,33,Twente,1.216,33
+Netherlands,Eredivisie,Netherlands — Eredivisie,88,2026,Feyenoord,3.115,7,AZ Alkmaar,1.192,7
+Norway,1. Division,Norway — 1. Division,104,2020,Ranheim,1.884,32,Lillestrom,1.075,30
+Norway,1. Division,Norway — 1. Division,104,2021,Aalesund,2.074,30,Ham-Kam,0.988,30
+Norway,1. Division,Norway — 1. Division,104,2022,Brann,2.948,30,Brann,0.654,30
+Norway,1. Division,Norway — 1. Division,104,2023,Kristiansund BK,1.752,31,Fredrikstad,0.958,30
+Norway,1. Division,Norway — 1. Division,104,2024,Valerenga,2.473,30,Bryne,1.116,30
+Norway,1. Division,Norway — 1. Division,104,2025,Lillestrom,2.663,30,Lillestrom,0.8,30
+Norway,1. Division,Norway — 1. Division,104,2026,Haugesund,2.87,24,Bryne,1.474,24
+Norway,Eliteserien,Norway — Eliteserien,103,2020,Bodo/Glimt,3.221,30,Bodo/Glimt,1.164,30
+Norway,Eliteserien,Norway — Eliteserien,103,2021,Molde,2.107,30,Bodo/Glimt,1.088,30
+Norway,Eliteserien,Norway — Eliteserien,103,2022,Bodo/Glimt,2.656,30,Molde,1.038,30
+Norway,Eliteserien,Norway — Eliteserien,103,2023,Bodo/Glimt,2.459,30,Tromso,1.244,30
+Norway,Eliteserien,Norway — Eliteserien,103,2024,Bodo/Glimt,2.239,30,Bodo/Glimt,1.155,30
+Norway,Eliteserien,Norway — Eliteserien,103,2025,Bodo/Glimt,2.624,30,Bodo/Glimt,1.029,30
+Norway,Eliteserien,Norway — Eliteserien,103,2026,Viking,2.351,21,Bodo/Glimt,1.126,21
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2020,Legia Warszawa,1.397,30,Pogon Szczecin,0.893,30
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2021,Lech Poznan,1.781,34,Lech Poznan,0.886,34
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2022,Raków Częstochowa,1.657,34,Raków Częstochowa,0.899,34
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2023,Jagiellonia,1.986,34,Slask Wroclaw,1.05,34
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2024,Lech Poznan,1.803,34,Raków Częstochowa,0.888,34
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2025,Lech Poznan,1.638,34,Legia Warszawa,1.186,34
+Poland,Ekstraklasa,Poland — Ekstraklasa,106,2026,Legia Warszawa,1.787,9,Pogon Szczecin,1.076,8
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2020,FC Porto,2.066,34,Sporting CP,0.686,34
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2021,FC Porto,2.37,34,FC Porto,0.769,34
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2022,Benfica,2.291,34,Benfica,0.733,34
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2023,Sporting CP,2.637,34,FC Porto,0.914,34
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2024,Sporting CP,2.439,34,Sporting CP,0.898,34
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2025,Sporting CP,2.432,33,FC Porto,0.69,33
+Portugal,Primeira Liga,Portugal — Primeira Liga,94,2026,Benfica,2.678,7,FC Porto,0.775,7
+Romania,Liga I,Romania — Liga I,283,2020,FCSB,1.572,40,CFR 1907 Cluj,0.557,40
+Romania,Liga I,Romania — Liga I,283,2021,FCSB,1.838,40,CFR 1907 Cluj,0.677,40
+Romania,Liga I,Romania — Liga I,283,2022,Dinamo Bucuresti,2.568,2,AFC Hermannstadt,0.983,39
+Romania,Liga I,Romania — Liga I,283,2023,CFR 1907 Cluj,1.756,40,FCSB,1.093,40
+Romania,Liga I,Romania — Liga I,283,2024,CFR 1907 Cluj,1.689,40,FCSB,0.916,40
+Romania,Liga I,Romania — Liga I,283,2025,FC Voluntari,1.737,2,Universitatea Craiova,0.89,40
+Romania,Liga I,Romania — Liga I,283,2026,Universitatea Craiova,2.047,10,Rapid,0.858,10
+Russia,Premier League,Russia — Premier League,235,2020,Zenit,2.361,30,Zenit,1.003,30
+Russia,Premier League,Russia — Premier League,235,2021,Zenit,2.029,30,Zenit,1.075,30
+Russia,Premier League,Russia — Premier League,235,2022,Zenit,2.344,30,Zenit,0.901,30
+Russia,Premier League,Russia — Premier League,235,2023,CSKA Moscow,1.709,30,Zenit,1.085,30
+Russia,Premier League,Russia — Premier League,235,2024,Dynamo,1.919,30,Zenit,0.762,30
+Russia,Premier League,Russia — Premier League,235,2025,FC Krasnodar,1.819,29,Baltika,0.792,29
+Russia,Premier League,Russia — Premier League,235,2026,Zenit,1.736,9,FC Krasnodar,1.017,9
+Scotland,Premiership,Scotland — Premiership,179,2020,Rangers,2.314,38,Rangers,0.468,38
+Scotland,Premiership,Scotland — Premiership,179,2021,Celtic,2.316,38,Celtic,0.662,38
+Scotland,Premiership,Scotland — Premiership,179,2022,Partick,3.029,5,Partick,0.911,5
+Scotland,Premiership,Scotland — Premiership,179,2023,Celtic,2.349,38,Celtic,0.919,38
+Scotland,Premiership,Scotland — Premiership,179,2024,Celtic,2.82,38,Celtic,0.82,38
+Scotland,Premiership,Scotland — Premiership,179,2025,Rangers,1.746,32,Motherwell,0.92,32
+Scotland,Premiership,Scotland — Premiership,179,2026,Celtic,1.588,7,Celtic,0.911,7
+Serbia,Super Liga,Serbia — Super Liga,286,2020,FK Crvena Zvezda,2.848,38,FK Crvena Zvezda,0.677,38
+Serbia,Super Liga,Serbia — Super Liga,286,2021,FK Crvena Zvezda,2.392,37,FK Partizan,0.529,37
+Serbia,Super Liga,Serbia — Super Liga,286,2022,FK Crvena Zvezda,2.455,37,FK Crvena Zvezda,0.68,37
+Serbia,Super Liga,Serbia — Super Liga,286,2023,FK Crvena Zvezda,2.433,37,FK Crvena Zvezda,0.964,37
+Serbia,Super Liga,Serbia — Super Liga,286,2024,FK Crvena Zvezda,3.199,37,FK Crvena Zvezda,1.04,37
+Serbia,Super Liga,Serbia — Super Liga,286,2025,FK Crvena Zvezda,2.507,37,FK Crvena Zvezda,0.968,37
+Serbia,Super Liga,Serbia — Super Liga,286,2026,FK Crvena Zvezda,2.088,10,FK Crvena Zvezda,0.631,10
+South-Korea,K League 1,South-Korea — K League 1,292,2020,Pohang Steelers,1.919,27,Jeonbuk Motors,0.982,27
+South-Korea,K League 1,South-Korea — K League 1,292,2021,Jeonbuk Motors,1.682,38,Jeonbuk Motors,1.086,38
+South-Korea,K League 1,South-Korea — K League 1,292,2022,Daejeon Citizen,1.928,2,Ulsan Hyundai FC,0.925,38
+South-Korea,K League 1,South-Korea — K League 1,292,2023,FC Seoul,1.582,38,Gwangju FC,0.996,38
+South-Korea,K League 1,South-Korea — K League 1,292,2024,Asan Mugunghwa,2.185,1,Ulsan Hyundai FC,1.111,38
+South-Korea,K League 1,South-Korea — K League 1,292,2025,Jeonbuk Motors,1.623,38,Jeonbuk Motors,0.998,38
+South-Korea,K League 1,South-Korea — K League 1,292,2026,FC Seoul,1.672,30,FC Seoul,0.932,30
+South-Korea,K League 2,South-Korea — K League 2,293,2020,Suwon City FC,1.769,28,Jeju United FC,1.027,27
+South-Korea,K League 2,South-Korea — K League 2,293,2021,Gimcheon Sangmu FC,1.5,36,Jeonnam Dragons,1.02,37
+South-Korea,K League 2,South-Korea — K League 2,293,2022,Daejeon Citizen,1.617,40,Gwangju FC,0.938,40
+South-Korea,K League 2,South-Korea — K League 2,293,2023,Gimcheon Sangmu FC,1.774,36,Gimpo Citizen,0.82,37
+South-Korea,K League 2,South-Korea — K League 2,293,2024,Seoul E-Land FC,1.597,37,Suwon Bluewings,1.093,36
+South-Korea,K League 2,South-Korea — K League 2,293,2025,Suwon Bluewings,1.823,39,Incheon United,0.899,39
+South-Korea,K League 2,South-Korea — K League 2,293,2026,Suwon City FC,1.783,25,Suwon Bluewings,0.998,25
+Spain,La Liga,Spain — La Liga,140,2020,Barcelona,2.063,38,Atletico Madrid,0.828,38
+Spain,La Liga,Spain — La Liga,140,2021,Real Madrid,1.928,38,Sevilla,0.902,38
+Spain,La Liga,Spain — La Liga,140,2022,Real Madrid,1.82,38,Barcelona,0.695,38
+Spain,La Liga,Spain — La Liga,140,2023,Real Madrid,2.164,38,Real Madrid,0.842,38
+Spain,La Liga,Spain — La Liga,140,2024,Barcelona,2.506,38,Athletic Club,0.886,38
+Spain,La Liga,Spain — La Liga,140,2025,Barcelona,2.304,38,Real Madrid,1.092,38
+Spain,La Liga,Spain — La Liga,140,2026,Barcelona,3.772,7,Alaves,1.108,7
+Spain,Segunda Division,Spain — Segunda Division,141,2020,Espanyol,1.496,42,Espanyol,0.798,42
+Spain,Segunda Division,Spain — Segunda Division,141,2021,Valladolid,1.527,42,Almeria,0.962,42
+Spain,Segunda Division,Spain — Segunda Division,141,2022,Albacete,1.2,44,Levante,0.781,46
+Spain,Segunda Division,Spain — Segunda Division,141,2023,Eibar,1.463,44,Leganes,0.817,42
+Spain,Segunda Division,Spain — Segunda Division,141,2024,Almeria,1.582,44,Elche,0.968,42
+Spain,Segunda Division,Spain — Segunda Division,141,2025,Racing Santander,1.964,42,Burgos,0.992,42
+Spain,Segunda Division,Spain — Segunda Division,141,2026,Eibar,1.774,8,Castellón,0.714,8
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2020,Malmo FF,1.966,30,BK Hacken,1.142,30
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2021,Malmo FF,1.776,30,AIK Stockholm,0.953,30
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2022,BK Hacken,2.11,30,Djurgardens IF,0.937,30
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2023,BK Hacken,2.166,30,IF Elfsborg,0.939,30
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2024,Malmo FF,2.003,30,Hammarby FF,1.015,30
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2025,Hammarby FF,1.815,30,Mjallby AIF,0.695,30
+Sweden,Allsvenskan,Sweden — Allsvenskan,113,2026,Sirius,2.159,22,Gais,1.086,22
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2020,Assyriska FF,2.54,13,Assyriska FF,1.208,13
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2021,Nyköping,3.151,28,Motala,1.129,28
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2022,Syrianska FC,2.36,26,Assyriska FF,0.963,26
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2023,Nyköping,2.182,26,Assyriska FF,1.33,26
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2024,Haninge,2.983,26,Sylvia,1.202,26
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2025,Atvidabergs FF,2.472,26,Atvidabergs FF,0.878,26
+Sweden,Division 2 - Södra Svealand,Sweden — Division 2 - Södra Svealand,595,2026,Haninge,2.172,24,Nyköping,1.095,24
+Switzerland,Super League,Switzerland — Super League,207,2020,BSC Young Boys,1.908,36,BSC Young Boys,0.907,36
+Switzerland,Super League,Switzerland — Super League,207,2021,BSC Young Boys,2.096,36,FC Basel 1893,1.311,36
+Switzerland,Super League,Switzerland — Super League,207,2022,BSC Young Boys,2.202,36,BSC Young Boys,0.979,36
+Switzerland,Super League,Switzerland — Super League,207,2023,BSC Young Boys,1.819,38,BSC Young Boys,1.031,38
+Switzerland,Super League,Switzerland — Super League,207,2024,FC Basel 1893,2.239,38,FC Basel 1893,1.297,38
+Switzerland,Super League,Switzerland — Super League,207,2025,BSC Young Boys,2.039,38,FC Sion,1.097,38
+Switzerland,Super League,Switzerland — Super League,207,2026,BSC Young Boys,3.024,9,FC Lugano,1.288,9
+Turkey,Süper Lig,Turkey — Süper Lig,203,2020,Beşiktaş,2.029,40,Galatasaray,1.028,40
+Turkey,Süper Lig,Turkey — Süper Lig,203,2021,Fenerbahçe,1.777,38,Başakşehir,1.083,38
+Turkey,Süper Lig,Turkey — Süper Lig,203,2022,Fenerbahçe,2.287,36,Galatasaray,0.92,36
+Turkey,Süper Lig,Turkey — Süper Lig,203,2023,Fenerbahçe,2.414,38,Galatasaray,0.877,38
+Turkey,Süper Lig,Turkey — Süper Lig,203,2024,Fenerbahçe,2.325,36,Galatasaray,0.992,36
+Turkey,Süper Lig,Turkey — Süper Lig,203,2025,Galatasaray,2.179,33,Galatasaray,1.029,33
+Turkey,Süper Lig,Turkey — Süper Lig,203,2026,Fenerbahçe,2.284,6,Kocaelispor,0.999,6
+USA,Major League Soccer,USA — Major League Soccer,253,2020,Los Angeles FC,1.951,24,Columbus Crew,1.048,26
+USA,Major League Soccer,USA — Major League Soccer,253,2021,New England Revolution,1.697,34,Nashville SC,1.101,35
+USA,Major League Soccer,USA — Major League Soccer,253,2022,Philadelphia Union,1.876,36,Philadelphia Union,0.994,36
+USA,Major League Soccer,USA — Major League Soccer,253,2023,Columbus Crew,1.849,39,Seattle Sounders,1.104,38
+USA,Major League Soccer,USA — Major League Soccer,253,2024,Inter Miami,2.06,37,Seattle Sounders,1.194,35
+USA,Major League Soccer,USA — Major League Soccer,253,2025,Inter Miami,2.297,40,Philadelphia Union,1.193,36
+USA,Major League Soccer,USA — Major League Soccer,253,2026,Inter Miami,2.096,27,Nashville SC,1.015,27
+USA,USL Championship,USA — USL Championship,255,2020,Reno 1868,2.384,17,Pittsburgh Riverhounds,0.88,17
+USA,USL Championship,USA — USL Championship,255,2021,Phoenix Rising,1.91,32,Tampa Bay Rowdies,0.93,35
+USA,USL Championship,USA — USL Championship,255,2022,Tampa Bay Rowdies,1.935,36,San Antonio,0.842,37
+USA,USL Championship,USA — USL Championship,255,2023,San Antonio,1.633,36,Sacramento Republic,0.935,37
+USA,USL Championship,USA — USL Championship,255,2024,Louisville City,2.241,36,Pittsburgh Riverhounds,0.952,35
+USA,USL Championship,USA — USL Championship,255,2025,Charleston Battery,1.836,30,Louisville City,0.863,31
+USA,USL Championship,USA — USL Championship,255,2026,Charleston Battery,1.719,26,Detroit City,0.878,27
+USA,USL League One,USA — USL League One,489,2020,North Texas,1.458,16,Greenville Triumph,0.897,16
+USA,USL League One,USA — USL League One,489,2021,Union Omaha,1.525,30,Union Omaha,0.935,30
+USA,USL League One,USA — USL League One,489,2022,Richmond Kickers,1.566,31,Union Omaha,1.241,30
+USA,USL League One,USA — USL League One,489,2023,Union Omaha,1.761,32,Northern Colorado,1.303,34
+USA,USL League One,USA — USL League One,489,2024,Union Omaha,1.864,25,Forward Madison,0.908,23
+USA,USL League One,USA — USL League One,489,2025,Tormenta,1.609,30,One Knoxville,0.975,33
+USA,USL League One,USA — USL League One,489,2026,Charlotte Independence,2.042,29,Forward Madison,1.125,29
+Ukraine,Premier League,Ukraine — Premier League,333,2020,Dynamo Kyiv,2.081,26,Dynamo Kyiv,0.743,26
+Ukraine,Premier League,Ukraine — Premier League,333,2021,Shakhtar Donetsk,2.524,18,Dynamo Kyiv,0.669,18
+Ukraine,Premier League,Ukraine — Premier League,333,2022,Shakhtar Donetsk,2.159,30,Shakhtar Donetsk,0.785,30
+Ukraine,Premier League,Ukraine — Premier League,333,2023,Dynamo Kyiv,2.224,30,Shakhtar Donetsk,0.918,30
+Ukraine,Premier League,Ukraine — Premier League,333,2024,Shakhtar Donetsk,2.155,30,Dynamo Kyiv,0.689,30
+Ukraine,Premier League,Ukraine — Premier League,333,2025,Shakhtar Donetsk,2.236,30,LNZ Cherkasy,0.625,30
+Ukraine,Premier League,Ukraine — Premier League,333,2026,Karpaty,1.857,7,Livyi Bereh,0.74,6

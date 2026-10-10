@@ -1,0 +1,26 @@
+{
+  "data_as_of": "2026-10-08",
+  "first_match": "2020-01-24",
+  "finished_fixtures": 113985,
+  "leagues": 62,
+  "league_seasons": 427,
+  "teams": 1506,
+  "current_rated_teams": 1023,
+  "current_rated_leagues": 60,
+  "xg_fixtures": 9797,
+  "watchlist_teams": 155,
+  "raw_ft_fixtures": 113985,
+  "raw_first_ft": "2020-01-24T21:30:00+00:00",
+  "raw_last_ft": "2026-10-08T19:00:00+00:00",
+  "fact_fixtures": 79316,
+  "fact_coverage": 0.6958,
+  "fact_last_ft": "2026-10-08T19:00:00+00:00",
+  "calibration": {
+    "method": "walk-forward (calibration fit/eval fold split)",
+    "n": 18066,
+    "unique_fixtures": 3691,
+    "n_folds": 9,
+    "n_fit_folds": 4,
+    "overall_brier": 0.1874
+  }
+}

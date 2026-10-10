@@ -1,0 +1,5 @@
+model,predictions,brier_score,average_predicted,actual_hit_rate,calibration_gap
+bayesian,8452,0.1779,0.785,0.7642,0.0208
+dixon_coles,15128,0.1789,0.7691,0.7612,0.0079
+mismatch,2999,0.1524,0.8006,0.8076,-0.007
+poisson,6140,0.1861,0.7612,0.7485,0.0127
