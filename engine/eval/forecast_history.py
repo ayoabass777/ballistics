@@ -190,7 +190,7 @@ def capture(payload, conn=None):
             recorded_at = cur.fetchone()["ts"]
             ids = sorted({e["fixture_id"] for e in entries})
             cur.execute("""SELECT fixture_id, kickoff_utc, fixture_status
-                           FROM raw.raw_fixtures WHERE fixture_id = ANY(%s)""", (ids,))
+                           FROM raw.fact_fixtures WHERE fixture_id = ANY(%s)""", (ids,))
             fixtures = {r["fixture_id"]: dict(r) for r in cur.fetchall()}
             # Never reopen a fixture after a previously captured kickoff passes,
             # even if the provider later moves it forward or resets its status.
@@ -267,7 +267,7 @@ def settle(conn=None):
             ids = sorted({e["fixture_id"] for e in entries})
             cur.execute("""SELECT fixture_id, kickoff_utc, fixture_status,
                                   home_team_fulltime_goal, away_team_fulltime_goal
-                           FROM raw.raw_fixtures WHERE fixture_id = ANY(%s)""", (ids,))
+                           FROM raw.fact_fixtures WHERE fixture_id = ANY(%s)""", (ids,))
             fixtures = {r["fixture_id"]: dict(r) for r in cur.fetchall()}
             for entry in entries:
                 fixture = fixtures.get(entry["fixture_id"])

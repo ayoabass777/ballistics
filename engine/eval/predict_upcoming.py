@@ -103,6 +103,7 @@ def _calibrate_prob(raw_prob: float, league: str) -> float:
 
 SOURCE_TABLE = "raw.fact_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
+from engine.eval.db import FIXTURES_TABLE  # noqa: E402
 
 
 def _get_conn():
@@ -121,7 +122,7 @@ def load_historical(conn) -> pd.DataFrame:
             COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
             COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
         FROM {SOURCE_TABLE} f
-        JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+        JOIN {FIXTURES_TABLE} rf ON rf.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} eh ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} ea ON ea.team_id = f.opponent_id AND ea.fixture_id = f.fixture_id
         WHERE f.is_played AND f.is_home
@@ -139,20 +140,25 @@ def load_upcoming(conn, days: int = 7) -> pd.DataFrame:
             r.home_team_id, r.home_team_name AS home_team,
             r.away_team_id, r.away_team_name AS away_team,
             r.api_league_id
-        FROM raw.raw_fixtures r
+        FROM {FIXTURES_TABLE} r
         WHERE r.fixture_status = 'NS'
           AND r.kickoff_utc BETWEEN %s AND %s
         ORDER BY r.kickoff_utc
     """
-    return pd.read_sql(sql, conn, params=[today, end])
+    df = pd.read_sql(sql, conn, params=[today, end])
+    # Warehouse team ids (same space as fact_head_to_head and Elo); NULL when
+    # the team is not in the dimensions yet.
+    for col in ("home_team_id", "away_team_id"):
+        df[col] = df[col].astype("Int64")
+    return df
 
 
 def _load_league_map(conn) -> dict:
-    """Build api_league_id -> league_name from historical fixture join."""
-    df = pd.read_sql("""
-        SELECT DISTINCT r.api_league_id, f.league_name
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
+    """api_league_id -> league_name for leagues with played history."""
+    df = pd.read_sql(f"""
+        SELECT DISTINCT api_league_id, league_name
+        FROM {FIXTURES_TABLE}
+        WHERE is_played AND league_name IS NOT NULL
     """, conn)
     return dict(zip(df["api_league_id"], df["league_name"]))
 
@@ -164,22 +170,8 @@ def _map_league_names(upcoming: pd.DataFrame, league_map: dict) -> pd.DataFrame:
     return out
 
 
-def _build_team_id_map(conn) -> dict:
-    """Map raw_fixtures team IDs to fact_head_to_head team IDs (used by Elo)."""
-    df = pd.read_sql(f"""
-        SELECT DISTINCT r.home_team_id AS rf_id, f.team_id AS fh_id
-        FROM raw.raw_fixtures r
-        JOIN {SOURCE_TABLE} f ON f.fixture_id = r.fixture_id AND f.is_home
-        UNION
-        SELECT DISTINCT r.away_team_id, f.opponent_id
-        FROM raw.raw_fixtures r
-        JOIN {SOURCE_TABLE} f ON f.fixture_id = r.fixture_id AND f.is_home
-    """, conn)
-    return dict(zip(df["rf_id"], df["fh_id"]))
-
-
-def _get_latest_elo(conn, team_ids: list, id_map: dict = None) -> dict:
-    """Get latest Elo rating for each team, translating IDs if needed."""
+def _get_latest_elo(conn, team_ids: list) -> dict:
+    """Latest Elo rating per warehouse team_id (fixtures and Elo share ids)."""
     if not team_ids:
         return {}
     sql = f"""
@@ -189,15 +181,8 @@ def _get_latest_elo(conn, team_ids: list, id_map: dict = None) -> dict:
         ORDER BY team_id, kickoff_utc DESC
     """
     df = pd.read_sql(sql, conn)
-    elo_by_fh_id = dict(zip(df["team_id"], df["rating"]))
-    if id_map is None:
-        return elo_by_fh_id
-    result = {}
-    for rf_id in team_ids:
-        fh_id = id_map.get(rf_id, rf_id)
-        if fh_id in elo_by_fh_id:
-            result[rf_id] = elo_by_fh_id[fh_id]
-    return result
+    elo = dict(zip(df["team_id"], df["rating"]))
+    return {t: elo[t] for t in team_ids if t in elo}
 
 
 def predict_upcoming(days: int = 7, threshold: float = None) -> pd.DataFrame:
@@ -228,10 +213,10 @@ def predict_upcoming(days: int = 7, threshold: float = None) -> pd.DataFrame:
             print("  No fixtures with known leagues.")
             return pd.DataFrame()
 
-        # Get latest Elo for each team (translate raw_fixtures IDs to Elo IDs)
-        team_id_map = _build_team_id_map(conn)
-        all_teams = set(upcoming["home_team_id"].tolist() + upcoming["away_team_id"].tolist())
-        elo_map = _get_latest_elo(conn, list(all_teams), id_map=team_id_map)
+        # Latest Elo per team (fixtures already carry warehouse team ids)
+        all_teams = set(upcoming["home_team_id"].dropna().tolist()
+                        + upcoming["away_team_id"].dropna().tolist())
+        elo_map = _get_latest_elo(conn, list(all_teams))
         default_elo = 1500.0
         upcoming["home_elo"] = upcoming["home_team_id"].map(elo_map).fillna(default_elo)
         upcoming["away_elo"] = upcoming["away_team_id"].map(elo_map).fillna(default_elo)

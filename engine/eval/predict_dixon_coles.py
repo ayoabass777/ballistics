@@ -93,7 +93,8 @@ def _calibrate(raw: float, market: str = "", api_league_id: int | None = None) -
 
 def load_dc_historical(conn) -> pd.DataFrame:
     """Load historical matches for Dixon-Coles without Elo-dependent joins."""
-    sql = """
+    from engine.eval.db import FIXTURES_TABLE
+    sql = f"""
         SELECT
             f.fixture_id,
             f.kickoff_utc,
@@ -107,7 +108,7 @@ def load_dc_historical(conn) -> pd.DataFrame:
             f.goals_for AS home_goals,
             f.goals_against AS away_goals
         FROM raw.fact_head_to_head f
-        JOIN raw.raw_fixtures r
+        JOIN {FIXTURES_TABLE} r
           ON r.fixture_id = f.fixture_id
         WHERE f.is_played
           AND f.is_home
@@ -289,7 +290,7 @@ def predict_dixon_coles(days: int = 7,
                         threshold: float = CALIBRATED_THRESHOLD) -> pd.DataFrame:
     from engine.eval.predict_upcoming import (
         _get_conn, load_upcoming,
-        _load_league_map, _build_team_id_map,
+        _load_league_map,
     )
 
     conn = _get_conn()
@@ -307,7 +308,6 @@ def predict_dixon_coles(days: int = 7,
         league_map = _load_league_map(conn)
         upcoming["league"] = upcoming["api_league_id"].map(league_map)
         upcoming = upcoming[upcoming["league"].notna()].copy()
-        id_map = _build_team_id_map(conn)
     finally:
         conn.close()
 
@@ -321,10 +321,11 @@ def predict_dixon_coles(days: int = 7,
         if params is None:
             continue
         for _, row in up_lg.iterrows():
-            home_h2h = id_map.get(row["home_team_id"])
-            away_h2h = id_map.get(row["away_team_id"])
-            if home_h2h is None or away_h2h is None:
+            # Warehouse team ids, same space as the fitted history.
+            home_h2h, away_h2h = row["home_team_id"], row["away_team_id"]
+            if pd.isna(home_h2h) or pd.isna(away_h2h):
                 continue
+            home_h2h, away_h2h = int(home_h2h), int(away_h2h)
             fm = fixture_markets(params, home_h2h, away_h2h,
                                  row["home_team"], row["away_team"])
             if fm is None:

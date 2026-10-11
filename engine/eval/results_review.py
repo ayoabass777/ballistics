@@ -83,7 +83,7 @@ def build_results(days: int = 5, current_rule_only: bool = True) -> dict:
             SELECT fixture_id, home_team_name AS home, away_team_name AS away,
                    home_team_fulltime_goal AS hg, away_team_fulltime_goal AS ag,
                    kickoff_utc
-            FROM raw.raw_fixtures
+            FROM raw.fact_fixtures
             WHERE fixture_status = 'FT'
               AND home_team_fulltime_goal IS NOT NULL
               AND kickoff_utc >= now() - make_interval(days => {int(days)})

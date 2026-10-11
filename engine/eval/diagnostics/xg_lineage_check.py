@@ -34,7 +34,7 @@ def main() -> None:
         raw = pd.read_sql("SELECT fixture_id, home_xg, away_xg FROM raw.fixture_xg", conn)
         fact = pd.read_sql("SELECT fixture_id FROM raw.fact_fixture_xg", conn)
         played = pd.read_sql(
-            "SELECT fixture_id, fixture_status FROM raw.raw_fixtures", conn)
+            "SELECT fixture_id, fixture_status FROM raw.fact_fixtures", conn)
     finally:
         conn.close()
 

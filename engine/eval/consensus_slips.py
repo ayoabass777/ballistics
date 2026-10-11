@@ -167,19 +167,16 @@ def _load_bounds_1_4_league_priors(
         cur.execute("""
             SELECT
                 f.league_name AS league,
-                COALESCE(dc.country_name, '') AS country,
+                COALESCE(rf.country_name, '') AS country,
                 COUNT(*) AS matches,
                 AVG(CASE
                     WHEN f.goals_for + f.goals_against BETWEEN 1 AND 4
                     THEN 1.0 ELSE 0.0
                 END) AS hit_rate
             FROM raw.fact_head_to_head f
-            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-            LEFT JOIN dim.dim_leagues dl
-              ON dl.api_league_id = rf.api_league_id
-            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home
-            GROUP BY f.league_name, dc.country_name
+            GROUP BY f.league_name, rf.country_name
             HAVING COUNT(*) >= %s
         """, (min_matches,))
         return {
@@ -198,19 +195,16 @@ def _load_over_1_5_league_rates(
         cur.execute("""
             SELECT
                 f.league_name AS league,
-                COALESCE(dc.country_name, '') AS country,
+                COALESCE(rf.country_name, '') AS country,
                 COUNT(*) AS matches,
                 AVG(CASE
                     WHEN f.goals_for + f.goals_against >= 2
                     THEN 1.0 ELSE 0.0
                 END) AS hit_rate
             FROM raw.fact_head_to_head f
-            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-            LEFT JOIN dim.dim_leagues dl
-              ON dl.api_league_id = rf.api_league_id
-            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home
-            GROUP BY f.league_name, dc.country_name
+            GROUP BY f.league_name, rf.country_name
             HAVING COUNT(*) >= %s
         """, (min_matches,))
         return {
@@ -230,16 +224,13 @@ def _load_league_elo_volatility(
             WITH matches AS (
                 SELECT
                     f.league_name AS league,
-                    COALESCE(dc.country_name, '') AS country,
+                    COALESCE(rf.country_name, '') AS country,
                     f.goals_for AS home_goals,
                     f.goals_against AS away_goals,
                     COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
                     COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
                 FROM raw.fact_head_to_head f
-                JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-                LEFT JOIN dim.dim_leagues dl
-                  ON dl.api_league_id = rf.api_league_id
-                LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+                JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
                 JOIN elo.team_elo_history eh
                   ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
                 JOIN elo.team_elo_history ea
@@ -425,13 +416,11 @@ def _load_league_event_rates(conn) -> dict:
     # not 0-0), so count it from final scores: one home row per fixture.
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT f.league_name, COALESCE(dc.country_name, ''), COUNT(*),
+            SELECT f.league_name, COALESCE(rf.country_name, ''), COUNT(*),
                    AVG(CASE WHEN f.goals_for + f.goals_against BETWEEN 1 AND 4
                             THEN 1.0 ELSE 0.0 END)
             FROM raw.fact_head_to_head f
-            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-            LEFT JOIN dim.dim_leagues dl ON dl.api_league_id = rf.api_league_id
-            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home AND f.is_current
             GROUP BY 1, 2
         """)
@@ -570,16 +559,13 @@ def _load_elo_gap_group_record(
             WITH matches AS (
                 SELECT
                     f.league_name AS league,
-                    COALESCE(dc.country_name, '') AS country,
+                    COALESCE(rf.country_name, '') AS country,
                     f.goals_for AS home_goals,
                     f.goals_against AS away_goals,
                     COALESCE(eh.rating_before_flat, eh.rating_before)
                       - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
                 FROM raw.fact_head_to_head f
-                JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-                LEFT JOIN dim.dim_leagues dl
-                  ON dl.api_league_id = rf.api_league_id
-                LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+                JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
                 JOIN elo.team_elo_history eh
                   ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
                 JOIN elo.team_elo_history ea
@@ -1107,44 +1093,22 @@ def _load_fixture_strength_profiles(conn) -> dict[int, dict]:
         for _, row in strength_all.iterrows()
     }
 
-    rf_fixtures = pd.read_sql("""
+    # fact_fixtures carries warehouse team ids, the same space as the strength
+    # table, so no API -> warehouse translation is needed.
+    fixtures = pd.read_sql("""
         SELECT fixture_id, home_team_id, away_team_id
-        FROM raw.raw_fixtures
+        FROM raw.fact_fixtures
     """, conn)
-    if rf_fixtures.empty:
+    if fixtures.empty:
         return {}
 
-    rf_lookup = {}
-    all_rf_ids = set()
-    for _, r in rf_fixtures.iterrows():
-        fid = int(r["fixture_id"])
-        home_rf = int(r["home_team_id"])
-        away_rf = int(r["away_team_id"])
-        rf_lookup[fid] = (home_rf, away_rf)
-        all_rf_ids.add(home_rf)
-        all_rf_ids.add(away_rf)
-
-    rf_id_list = ",".join(str(i) for i in sorted(all_rf_ids))
-    id_map_df = pd.read_sql(f"""
-        SELECT DISTINCT r.home_team_id AS rf_id, h.team_id AS h2h_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND h.is_home
-        WHERE r.home_team_id IN ({rf_id_list})
-        UNION
-        SELECT DISTINCT r.away_team_id AS rf_id, h.team_id AS h2h_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND NOT h.is_home
-        WHERE r.away_team_id IN ({rf_id_list})
-    """, conn)
-    rf_to_h2h = dict(zip(id_map_df["rf_id"], id_map_df["h2h_id"]))
-
     fixture_strength = {}
-    for fid, (home_rf, away_rf) in rf_lookup.items():
-        home_h2h = rf_to_h2h.get(home_rf)
-        away_h2h = rf_to_h2h.get(away_rf)
-        fixture_strength[fid] = {
-            "home_team": strength_by_h2h.get(home_h2h) if home_h2h else None,
-            "away_team": strength_by_h2h.get(away_h2h) if away_h2h else None,
+    for fid, home_id, away_id in fixtures.itertuples(index=False):
+        fixture_strength[int(fid)] = {
+            "home_team": (strength_by_h2h.get(int(home_id))
+                          if pd.notna(home_id) else None),
+            "away_team": (strength_by_h2h.get(int(away_id))
+                          if pd.notna(away_id) else None),
         }
     return fixture_strength
 
@@ -1272,7 +1236,8 @@ def mismatch_signals(mismatch_picks) -> list[dict]:
                         "raw_probability": None,
                         "detail": {"gap": p.gap, "gap_bin": p.gap_bin,
                                    "h2h_boost": p.h2h_boost,
-                                   "api_league_id": p.api_league_id,
+                                   # league ids live on the fixture (league_id,
+                                   # warehouse); no API-Football ids in exports
                                    "country": p.country}})
     return out
 
@@ -1385,13 +1350,13 @@ def _high_scoring_fixture_ids(fixture_ids, conn=None) -> set:
         cur.execute("""
             SELECT rf.api_league_id, avg(f.goals_for + f.goals_against)
             FROM raw.fact_head_to_head f
-            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_home AND f.is_played AND rf.season IN (2025, 2026)
             GROUP BY rf.api_league_id
         """)
         high_lids = {lid for lid, ag in cur.fetchall()
                      if ag is not None and float(ag) > HIGH_SCORING_AVG_GOALS}
-        cur.execute("SELECT fixture_id, api_league_id FROM raw.raw_fixtures "
+        cur.execute("SELECT fixture_id, api_league_id FROM raw.fact_fixtures "
                     "WHERE fixture_id = ANY(%s)", (ids,))
         return {int(fid) for fid, lid in cur.fetchall() if lid in high_lids}
     except Exception:  # noqa: BLE001
@@ -1810,6 +1775,19 @@ def _league_id_country_map(conn) -> tuple[dict, dict]:
     return lmap, lid_country
 
 
+def _warehouse_ids(row) -> dict:
+    """Warehouse team/league ids for the export (None when not yet mapped).
+
+    The frontend joins standings, H2H and crests on these. API-Football ids
+    never leave the warehouse.
+    """
+    def _id(v):
+        return None if pd.isna(v) else int(v)
+    return {"home_team_id": _id(row["home_team_id"]),
+            "away_team_id": _id(row["away_team_id"]),
+            "league_id": _id(row["league_id"])}
+
+
 def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
     """{fid: {fixture_id, home, away, league, kickoff, country}} for given fixtures."""
     own = conn is None
@@ -1821,8 +1799,9 @@ def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
         lmap, lid_country = _league_id_country_map(conn)
         df = pd.read_sql("""
             SELECT fixture_id, home_team_name AS home, away_team_name AS away,
-                   kickoff_utc AS kickoff, api_league_id
-            FROM raw.raw_fixtures WHERE fixture_id = ANY(%(ids)s)
+                   kickoff_utc AS kickoff, api_league_id,
+                   home_team_id, away_team_id, league_id
+            FROM raw.fact_fixtures WHERE fixture_id = ANY(%(ids)s)
         """, conn, params={"ids": ids})
         meta = {}
         for _, r in df.iterrows():
@@ -1830,7 +1809,8 @@ def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
             lid = r["api_league_id"]
             meta[fid] = {"fixture_id": fid, "home": r["home"], "away": r["away"],
                          "league": lmap.get(lid, "Unknown"), "kickoff": str(r["kickoff"]),
-                         "country": lid_country.get(lid, "") or ""}
+                         "country": lid_country.get(lid, "") or "",
+                         **_warehouse_ids(r)}
         return meta
     finally:
         if own:
@@ -2069,7 +2049,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
     upcoming_df = pd.read_sql("""
         SELECT fixture_id, home_team_name AS home, away_team_name AS away,
                kickoff_utc AS kickoff, api_league_id
-        FROM raw.raw_fixtures
+        FROM raw.fact_fixtures
         WHERE fixture_status = 'NS'
         ORDER BY kickoff_utc
     """, conn)
@@ -2091,15 +2071,20 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
                 "kickoff": str(row["kickoff"]),
             }
 
-    # Attach country to all fixture metadata
-    # First get api_league_id for fixtures already in meta (from Poisson/Mismatch)
-    all_rf = pd.read_sql("""
-        SELECT fixture_id, api_league_id FROM raw.raw_fixtures
-    """, conn)
-    all_fid_lid = dict(zip(all_rf["fixture_id"].astype(int), all_rf["api_league_id"]))
+    # Attach country and warehouse ids to all fixture metadata
+    # (fixtures already in meta came from Poisson/Mismatch/Dixon-Coles).
+    meta_ids = [int(f) for f in fixture_meta]
+    all_ff = pd.read_sql("""
+        SELECT fixture_id, api_league_id, home_team_id, away_team_id, league_id
+        FROM raw.fact_fixtures WHERE fixture_id = ANY(%(ids)s)
+    """, conn, params={"ids": meta_ids})
+    ff_by_fid = {int(r["fixture_id"]): r for _, r in all_ff.iterrows()}
     for fid, meta in fixture_meta.items():
-        lid = all_fid_lid.get(fid)
+        r = ff_by_fid.get(fid)
+        lid = r["api_league_id"] if r is not None else None
         meta["country"] = _league_id_country.get(lid, "") if lid else ""
+        meta.update(_warehouse_ids(r) if r is not None else
+                    {"home_team_id": None, "away_team_id": None, "league_id": None})
 
     conn.close()
 

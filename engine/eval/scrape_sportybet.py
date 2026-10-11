@@ -312,7 +312,7 @@ def fixtures_from_db(days: int = 7) -> list[dict]:
         cur.execute(
             """
             SELECT fixture_id, home_team_name, away_team_name, kickoff_utc
-            FROM raw.raw_fixtures
+            FROM raw.fact_fixtures
             WHERE fixture_status = 'NS'
               AND kickoff_utc >= now()
               AND kickoff_utc <  now() + make_interval(days => %s)
@@ -375,7 +375,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if args.from_db:
-        print(f"Source: raw.raw_fixtures (NS, next {args.days}d)")
+        print(f"Source: raw.fact_fixtures (NS, next {args.days}d)")
         fixtures = fixtures_from_db(days=args.days)
     else:
         pool_path = Path(args.pool) if args.pool else _latest_pool_path()

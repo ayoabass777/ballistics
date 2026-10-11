@@ -157,9 +157,9 @@ class ForecastAPIIntegrationTests(unittest.TestCase):
         import copy
         with self.writer, self.writer.cursor() as cur:
             cur.execute("""CREATE SCHEMA raw;
-                CREATE TABLE raw.raw_fixtures (fixture_id bigint PRIMARY KEY,kickoff_utc timestamptz,
+                CREATE TABLE raw.fact_fixtures (fixture_id bigint PRIMARY KEY,kickoff_utc timestamptz,
                   fixture_status text,home_team_fulltime_goal int,away_team_fulltime_goal int);
-                INSERT INTO raw.raw_fixtures VALUES (9,clock_timestamp()+interval '1 day','NS',NULL,NULL)""")
+                INSERT INTO raw.fact_fixtures VALUES (9,clock_timestamp()+interval '1 day','NS',NULL,NULL)""")
         p = dict(run_ds=self.now.date().isoformat(),fixture_analysis=[dict(fixture_id=9,
                  home="Pipeline",away="Opponent",league="Test",country="Test",
                  kickoff=(datetime.now(timezone.utc)+timedelta(days=1)).isoformat(),
@@ -175,7 +175,7 @@ class ForecastAPIIntegrationTests(unittest.TestCase):
         frozen = self.get(team="Pipeline",as_of=before["as_of"])
         self.assertEqual(frozen["fixtures"],before["fixtures"])
         with self.writer, self.writer.cursor() as cur:
-            cur.execute("""UPDATE raw.raw_fixtures SET fixture_status='FT',
+            cur.execute("""UPDATE raw.fact_fixtures SET fixture_status='FT',
                 kickoff_utc=clock_timestamp(),home_team_fulltime_goal=2,away_team_fulltime_goal=1""")
         ledger.settle(self.writer)
         final = self.get(team="Pipeline")["fixtures"][0]["forecasts"][0]

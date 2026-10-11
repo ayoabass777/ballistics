@@ -95,41 +95,33 @@ def _actual_outcome(row: pd.Series, market: str) -> bool | None:
 
 def load_completed_fixtures(conn, months: int = 3) -> pd.DataFrame:
     cutoff = datetime.now(timezone.utc) - timedelta(days=months * 30)
+    # Warehouse team ids from dbt; fixtures with unmapped teams are skipped.
     df = pd.read_sql("""
         SELECT fixture_id, home_team_id, home_team_name,
                away_team_id, away_team_name,
                home_team_fulltime_goal AS goals_home_ft,
                away_team_fulltime_goal AS goals_away_ft,
                kickoff_utc, api_league_id, fixture_status
-        FROM raw.raw_fixtures
+        FROM raw.fact_fixtures
         WHERE fixture_status = 'FT'
           AND kickoff_utc >= %(cutoff)s
+          AND home_team_id IS NOT NULL AND away_team_id IS NOT NULL
         ORDER BY kickoff_utc
     """, conn, params={"cutoff": cutoff})
+    for col in ("home_team_id", "away_team_id"):
+        df[col] = df[col].astype(int)
     return df
 
 
 def _build_bayesian_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
     """Run Bayesian model on completed fixtures as if they were upcoming."""
     results = []
-    fh_id_map_df = pd.read_sql("""
-        SELECT DISTINCT r.home_team_id AS rf_id, f.team_id AS fh_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
-        UNION
-        SELECT DISTINCT r.away_team_id, f.opponent_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
-    """, conn)
-    id_map = dict(zip(fh_id_map_df["rf_id"], fh_id_map_df["fh_id"]))
-
-    all_rf_ids = set(fixtures["home_team_id"].tolist() + fixtures["away_team_id"].tolist())
-    all_fh_ids = {id_map.get(rf, rf) for rf in all_rf_ids}
+    all_fh_ids = set(fixtures["home_team_id"].tolist() + fixtures["away_team_id"].tolist())
 
     league_map_df = pd.read_sql("""
-        SELECT DISTINCT r.api_league_id, f.league_name AS league
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
+        SELECT DISTINCT api_league_id, league_name AS league
+        FROM raw.fact_fixtures
+        WHERE is_played AND league_name IS NOT NULL
     """, conn)
     lmap = dict(zip(league_map_df["api_league_id"], league_map_df["league"]))
 
@@ -158,7 +150,7 @@ def _build_bayesian_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
                 team_name = fix["away_team_name"]
                 opp_name = fix["home_team_name"]
 
-            target_fh = id_map.get(target_rf, target_rf)
+            target_fh = target_rf   # warehouse id
             for b in belief_by_team.get(target_fh, []):
                 if b.posterior < MIN_POSTERIOR_INTERESTING:
                     continue
@@ -212,7 +204,6 @@ def _build_poisson_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
         UNDER_COLS,
         MIN_TRAIN_PER_CLUSTER,
         _load_league_map,
-        _build_team_id_map,
         _get_latest_elo,
     )
 
@@ -221,7 +212,6 @@ def _build_poisson_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
     hist = compute_form_features(prepare_features(hist_raw))
 
     league_map = _load_league_map(conn)
-    team_id_map = _build_team_id_map(conn)
 
     test_df = fixtures.copy()
     test_df["league"] = test_df["api_league_id"].map(league_map)
@@ -231,7 +221,7 @@ def _build_poisson_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
         return results
 
     all_teams = set(test_df["home_team_id"].tolist() + test_df["away_team_id"].tolist())
-    elo_map = _get_latest_elo(conn, list(all_teams), id_map=team_id_map)
+    elo_map = _get_latest_elo(conn, list(all_teams))
     default_elo = 1500.0
     test_df["home_elo"] = test_df["home_team_id"].map(elo_map).fillna(default_elo)
     test_df["away_elo"] = test_df["away_team_id"].map(elo_map).fillna(default_elo)
@@ -321,7 +311,6 @@ def _build_mismatch_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
     from engine.eval.predict_mismatch import (
         build_hit_rates,
         _load_league_map as mm_load_league_map,
-        _build_team_id_map as mm_build_id_map,
         _get_latest_elo as mm_get_elo,
         _get_gap_bin,
         _load_h2h_records,
@@ -345,9 +334,8 @@ def _build_mismatch_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
     if test_df.empty:
         return results
 
-    id_map = mm_build_id_map(conn)
     all_teams = set(test_df["home_team_id"].tolist() + test_df["away_team_id"].tolist())
-    elo_map = mm_get_elo(conn, list(all_teams), id_map)
+    elo_map = mm_get_elo(conn, list(all_teams))
 
     fixture_info = []
     for _, row in test_df.iterrows():
@@ -368,8 +356,8 @@ def _build_mismatch_predictions(conn, fixtures: pd.DataFrame) -> list[dict]:
         return results
 
     matchups = [(f[6], f[7]) for f in fixture_info]
-    h2h_map = _load_h2h_records(conn, id_map, matchups)
-    strength_map = _load_team_strength(conn, id_map)
+    h2h_map = _load_h2h_records(conn, matchups)
+    strength_map = _load_team_strength(conn)
 
     for row, h_elo, a_elo, gap, bin_info, fav_is_home, fav_rf, dog_rf in fixture_info:
         gap_bin, _, _ = bin_info

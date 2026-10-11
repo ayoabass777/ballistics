@@ -49,6 +49,7 @@ logger = get_logger(__name__)
 EVENTS_TABLE = "raw.fact_head_to_head_events"
 H2H_TABLE = "raw.fact_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
+from engine.eval.db import FIXTURES_TABLE  # noqa: E402  (warehouse ids)
 
 # Folds record RAW model probabilities down to these floors (below the live
 # betting gates) so the calibration fit has support around the thresholds.
@@ -166,17 +167,24 @@ def _points_for(maps: dict, calibration_key: str) -> list[list[float]]:
 
 def load_all_fixtures(conn, months: int = 6) -> pd.DataFrame:
     cutoff = datetime.now(timezone.utc) - timedelta(days=months * 30)
-    return pd.read_sql("""
+    # Warehouse team ids. Fixtures whose teams are not in the dimensions are
+    # excluded: no model can score them (previously their API ids were looked
+    # up as warehouse ids and picked up unrelated clubs' history).
+    df = pd.read_sql(f"""
         SELECT fixture_id, home_team_id, home_team_name,
                away_team_id, away_team_name,
                home_team_fulltime_goal AS goals_home_ft,
                away_team_fulltime_goal AS goals_away_ft,
                kickoff_utc, api_league_id, fixture_status
-        FROM raw.raw_fixtures
+        FROM {FIXTURES_TABLE}
         WHERE fixture_status = 'FT'
           AND kickoff_utc >= %(cutoff)s
+          AND home_team_id IS NOT NULL AND away_team_id IS NOT NULL
         ORDER BY kickoff_utc
     """, conn, params={"cutoff": cutoff})
+    for col in ("home_team_id", "away_team_id"):
+        df[col] = df[col].astype(int)
+    return df
 
 
 # Season-at-cutoff scoping: the live model filters events to is_current,
@@ -228,26 +236,14 @@ def _load_base_rates_before(conn, cutoff_dt, context: str) -> pd.DataFrame:
     """, conn, params={"context": context, "cutoff": cutoff_dt})
 
 
-def _load_id_maps(conn) -> tuple[dict, dict]:
-    """Load raw_fixtures team ID → fact_head_to_head team ID mapping."""
-    fh_id_map_df = pd.read_sql("""
-        SELECT DISTINCT r.home_team_id AS rf_id, f.team_id AS fh_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
-        UNION
-        SELECT DISTINCT r.away_team_id, f.opponent_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
+def _load_league_map(conn) -> dict:
+    """api_league_id -> league_name for leagues with played history."""
+    league_map_df = pd.read_sql(f"""
+        SELECT DISTINCT api_league_id, league_name AS league
+        FROM {FIXTURES_TABLE}
+        WHERE is_played AND league_name IS NOT NULL
     """, conn)
-    id_map = dict(zip(fh_id_map_df["rf_id"], fh_id_map_df["fh_id"]))
-
-    league_map_df = pd.read_sql("""
-        SELECT DISTINCT r.api_league_id, f.league_name AS league
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head f ON f.fixture_id = r.fixture_id AND f.is_home
-    """, conn)
-    league_map = dict(zip(league_map_df["api_league_id"], league_map_df["league"]))
-    return id_map, league_map
+    return dict(zip(league_map_df["api_league_id"], league_map_df["league"]))
 
 
 def _load_historical_h2h_before(conn, cutoff_dt) -> pd.DataFrame:
@@ -261,7 +257,7 @@ def _load_historical_h2h_before(conn, cutoff_dt) -> pd.DataFrame:
                COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
                COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
         FROM {H2H_TABLE} f
-        JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+        JOIN {FIXTURES_TABLE} rf ON rf.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} eh ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
         JOIN {ELO_TABLE} ea ON ea.team_id = f.opponent_id AND ea.fixture_id = f.fixture_id
         WHERE f.is_played AND f.is_home
@@ -270,9 +266,9 @@ def _load_historical_h2h_before(conn, cutoff_dt) -> pd.DataFrame:
     """, conn, params={"cutoff": cutoff_dt})
 
 
-def _load_elo_before(conn, cutoff_dt, team_ids: list, id_map: dict) -> dict:
-    """Get latest Elo for each team using only data before cutoff."""
-    mapped = [id_map.get(t, t) for t in team_ids]
+def _load_elo_before(conn, cutoff_dt, team_ids: list) -> dict:
+    """Latest Elo per warehouse team_id using only data before cutoff."""
+    mapped = [int(t) for t in team_ids]
     if not mapped:
         return {}
     placeholders = ",".join(["%s"] * len(mapped))
@@ -287,12 +283,7 @@ def _load_elo_before(conn, cutoff_dt, team_ids: list, id_map: dict) -> dict:
     """, conn, params=params)
 
     elo_map = dict(zip(df["team_id"], df["elo"]))
-    result = {}
-    for rf_id in team_ids:
-        fh_id = id_map.get(rf_id, rf_id)
-        if fh_id in elo_map:
-            result[rf_id] = float(elo_map[fh_id])
-    return result
+    return {t: float(elo_map[t]) for t in mapped if t in elo_map}
 
 
 def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
@@ -304,7 +295,7 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
             SELECT f.fixture_id,
                    rf.api_league_id,
                    f.league_name,
-                   c.country_name,
+                   rf.country_name,
                    f.goals_for + f.goals_against AS total,
                    ABS(COALESCE(eh.rating_before_flat, eh.rating_before)
                      - COALESCE(ea.rating_before_flat, ea.rating_before)) AS gap,
@@ -315,9 +306,8 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
                            > COALESCE(ea.rating_before_flat, ea.rating_before)
                         THEN f.goals_against ELSE f.goals_for END AS dog_goals
             FROM {H2H_TABLE} f
-            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-            JOIN dim.dim_leagues l ON l.api_league_id = rf.api_league_id
-            JOIN dim.dim_countries c ON c.country_id = l.country_id
+            JOIN {FIXTURES_TABLE} rf
+              ON rf.fixture_id = f.fixture_id AND rf.country_name IS NOT NULL
             JOIN {ELO_TABLE} eh ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
             JOIN {ELO_TABLE} ea ON ea.team_id = f.opponent_id AND ea.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home
@@ -378,8 +368,7 @@ def _build_mismatch_hit_rates_before(conn, cutoff_dt) -> pd.DataFrame:
 
 # ── Per-fold model runners ─────────────────────────────────────────────
 
-def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
-                   id_map: dict) -> list[dict]:
+def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt) -> list[dict]:
     """Bayesian predictions using only events before cutoff.
 
     Mirrors the live model: season-at-cutoff history, per-event selection of
@@ -390,9 +379,8 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
     from engine.eval.bayesian_streaks import _index_latest_by_event, VENUE_PREFER_MIN
 
     results = []
-    all_rf_ids = set(test_fixtures["home_team_id"].tolist() +
+    all_fh_ids = set(test_fixtures["home_team_id"].tolist() +
                      test_fixtures["away_team_id"].tolist())
-    all_fh_ids = {id_map.get(rf, rf) for rf in all_rf_ids}
 
     idx_by_ctx: dict[str, dict] = {}
     for ctx in ("home", "away", "all"):
@@ -420,7 +408,7 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
                 team_name = fix["away_team_name"]
                 opp_name = fix["home_team_name"]
 
-            target_fh = id_map.get(target_rf, target_rf)
+            target_fh = target_rf   # warehouse id
             venue = idx_by_ctx.get(side, {}).get(target_fh, {})
             overall = idx_by_ctx.get("all", {}).get(target_fh, {})
 
@@ -466,7 +454,7 @@ def _bayesian_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
 
 def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
-                  id_map: dict, league_map: dict) -> list[dict]:
+                  league_map: dict) -> list[dict]:
     """Poisson predictions trained only on fixtures before cutoff.
 
     Mirrors live predict_upcoming exactly: per-cluster Poisson on OVER_COLS
@@ -496,7 +484,7 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
     all_teams = set(test_df["home_team_id"].tolist() +
                     test_df["away_team_id"].tolist())
-    elo_map = _load_elo_before(conn, cutoff_dt, list(all_teams), id_map)
+    elo_map = _load_elo_before(conn, cutoff_dt, list(all_teams))
 
     test_df["home_elo"] = test_df["home_team_id"].map(elo_map).fillna(1500.0)
     test_df["away_elo"] = test_df["away_team_id"].map(elo_map).fillna(1500.0)
@@ -569,7 +557,7 @@ def _poisson_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
 
 def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
-                   id_map: dict, league_map: dict) -> list[dict]:
+                   league_map: dict) -> list[dict]:
     """Mismatch predictions using hit rates computed only from pre-cutoff data."""
     from engine.eval.predict_mismatch import (
         _get_gap_bin, _load_h2h_records, _load_team_strength,
@@ -591,7 +579,7 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
     all_teams = set(test_df["home_team_id"].tolist() +
                     test_df["away_team_id"].tolist())
-    elo_map = _load_elo_before(conn, cutoff_dt, list(all_teams), id_map)
+    elo_map = _load_elo_before(conn, cutoff_dt, list(all_teams))
 
     fixture_info = []
     for _, row in test_df.iterrows():
@@ -613,8 +601,8 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         return results
 
     matchups = [(f[6], f[7]) for f in fixture_info]
-    h2h_map = _load_h2h_records(conn, id_map, matchups, cutoff=cutoff_dt)
-    strength_map = _load_team_strength(conn, id_map, cutoff=cutoff_dt)
+    h2h_map = _load_h2h_records(conn, matchups, cutoff=cutoff_dt)
+    strength_map = _load_team_strength(conn, cutoff=cutoff_dt)
 
     for row, h_elo, a_elo, gap, bin_info, fav_is_home, fav_rf, dog_rf in fixture_info:
         gap_bin, _, _ = bin_info
@@ -686,7 +674,7 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
 
 
 def _dixon_coles_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
-                      id_map: dict, league_map: dict) -> list[dict]:
+                      league_map: dict) -> list[dict]:
     """Dixon-Coles predictions from per-league fits on pre-cutoff matches."""
     from engine.eval.predict_dixon_coles import fit_league_dc, fixture_markets, blend_xg
 
@@ -713,10 +701,7 @@ def _dixon_coles_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         if params is None:
             continue
         for _, fix in te_lg.iterrows():
-            home_h2h = id_map.get(fix["home_team_id"])
-            away_h2h = id_map.get(fix["away_team_id"])
-            if home_h2h is None or away_h2h is None:
-                continue
+            home_h2h, away_h2h = fix["home_team_id"], fix["away_team_id"]
             fm = fixture_markets(params, home_h2h, away_h2h,
                                  fix["home_team_name"], fix["away_team_name"])
             if fm is None:
@@ -911,7 +896,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
         print(f"  {len(all_fixtures)} fixtures loaded")
 
         print("Loading ID maps...")
-        id_map, league_map = _load_id_maps(conn)
+        league_map = _load_league_map(conn)
 
         # Build folds: first 50% of the period is min training data,
         # then test in fold_days blocks
@@ -957,7 +942,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
             # Bayesian
             try:
-                bp = _bayesian_fold(conn, test_fix, cutoff_dt, id_map)
+                bp = _bayesian_fold(conn, test_fix, cutoff_dt)
                 fold_preds.extend(bp)
                 print(f"    Bayesian: {len(bp)} raw predictions")
             except Exception as e:
@@ -965,7 +950,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
             # Poisson
             try:
-                pp = _poisson_fold(conn, test_fix, cutoff_dt, id_map, league_map)
+                pp = _poisson_fold(conn, test_fix, cutoff_dt, league_map)
                 fold_preds.extend(pp)
                 print(f"    Poisson:  {len(pp)} raw predictions")
             except Exception as e:
@@ -973,7 +958,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
             # Mismatch
             try:
-                mp = _mismatch_fold(conn, test_fix, cutoff_dt, id_map, league_map)
+                mp = _mismatch_fold(conn, test_fix, cutoff_dt, league_map)
                 fold_preds.extend(mp)
                 print(f"    Mismatch: {len(mp)} raw predictions")
             except Exception as e:
@@ -981,7 +966,7 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
 
             # Dixon-Coles
             try:
-                dcp = _dixon_coles_fold(conn, test_fix, cutoff_dt, id_map, league_map)
+                dcp = _dixon_coles_fold(conn, test_fix, cutoff_dt, league_map)
                 fold_preds.extend(dcp)
                 print(f"    DixonColes: {len(dcp)} raw predictions")
             except Exception as e:

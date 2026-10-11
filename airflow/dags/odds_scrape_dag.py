@@ -2,7 +2,7 @@
 Odds Scrape DAG — pull live SportyBet pre-match odds for upcoming fixtures.
 
 Runs independently of the consensus engine: it reads not-started fixtures
-straight from `raw.raw_fixtures`, matches them to SportyBet events (country/date
+straight from `raw.fact_fixtures` (dbt), matches them to SportyBet events (country/date
 + fuzzy team names), and upserts decimal odds into `raw.sportybet_odds` (plus a
 best-effort raw land to S3). The consensus engine later joins these odds for EV
 filtering. See engine/eval/scrape_sportybet.py.

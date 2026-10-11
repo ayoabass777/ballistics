@@ -54,7 +54,7 @@ def load_match_df(conn) -> pd.DataFrame:
             f.goals_against AS away_goals,
             f.fulltime_result
         FROM {SOURCE_TABLE} f
-        JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+        JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
         WHERE f.is_played AND f.is_home
         ORDER BY f.kickoff_utc
     """
