@@ -27,8 +27,18 @@ def test_refresh_removes_started_fixture_and_has_no_cap_or_duplicates():
 
 
 def test_dst_uses_calendar_days_not_168_hours():
-    result=select_rolling_standouts([], now=datetime.fromisoformat('2026-10-31T12:00:00-07:00'), timezone_name='America/Vancouver')
+    # Los Angeles falls back on 2026-11-01, so this week is 169 hours long.
+    # The window must end at local midnight on day 7; now + 168h would end
+    # at 23:00 on Nov 6 and drop late kickoffs.
+    result=select_rolling_standouts([], now=datetime.fromisoformat('2026-10-31T12:00:00-07:00'), timezone_name='America/Los_Angeles')
     assert result['end_exclusive'] == '2026-11-07T00:00:00-08:00'
+
+
+def test_vancouver_stays_on_utc_minus_7_after_november_2026():
+    # BC stops changing clocks after 2026-11-01 (tzdata 2026c+). Fails on
+    # older tz data, which would show BC kickoffs an hour off.
+    result=select_rolling_standouts([], now=datetime.fromisoformat('2026-10-31T12:00:00-07:00'), timezone_name='America/Vancouver')
+    assert result['end_exclusive'] == '2026-11-07T00:00:00-07:00'
 
 
 def test_naive_reference_time_rejected():
