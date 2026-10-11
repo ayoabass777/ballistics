@@ -29,3 +29,12 @@ CLAUDE.md
 
 AGENTS.md
 blog-draft.md
+
+# Local tooling and runtime state
+logs/
+.claude/worktrees/
+.claude/launch.json
+engine/eval/big_dog_leagues_state.json
+
+# Large experiment data: regenerate from each experiment's source query
+docs/product/experiments/**/*.gz
