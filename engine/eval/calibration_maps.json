@@ -1,0 +1,1469 @@
+{
+  "generated": "2026-10-04 23:50 UTC",
+  "method": "walk-forward equal-count bins + PAVA, refit on all folds",
+  "months": 6,
+  "fold_days": 14,
+  "n_folds": 9,
+  "validation": "fit on folds 1-4, evaluated on folds 5-9",
+  "models": {
+    "bayesian": [
+      [
+        0.6147,
+        0.6237
+      ],
+      [
+        0.6426,
+        0.6619
+      ],
+      [
+        0.6697,
+        0.6898
+      ],
+      [
+        0.695,
+        0.7055
+      ],
+      [
+        0.7208,
+        0.7253
+      ],
+      [
+        0.7457,
+        0.7307
+      ],
+      [
+        0.7716,
+        0.7621
+      ],
+      [
+        0.7991,
+        0.7643
+      ],
+      [
+        0.831,
+        0.787
+      ],
+      [
+        0.8794,
+        0.8263
+      ]
+    ],
+    "poisson": [
+      [
+        0.5632,
+        0.542
+      ],
+      [
+        0.5946,
+        0.596
+      ],
+      [
+        0.6261,
+        0.6092
+      ],
+      [
+        0.6681,
+        0.6674
+      ],
+      [
+        0.7015,
+        0.7234
+      ],
+      [
+        0.7242,
+        0.7284
+      ],
+      [
+        0.7467,
+        0.7284
+      ],
+      [
+        0.7683,
+        0.7358
+      ],
+      [
+        0.7976,
+        0.784
+      ],
+      [
+        0.8455,
+        0.8213
+      ]
+    ],
+    "mismatch": [
+      [
+        0.6145,
+        0.5961
+      ],
+      [
+        0.6517,
+        0.6416
+      ],
+      [
+        0.6982,
+        0.6864
+      ],
+      [
+        0.7414,
+        0.7756
+      ],
+      [
+        0.7722,
+        0.7903
+      ],
+      [
+        0.7983,
+        0.7957
+      ],
+      [
+        0.8247,
+        0.8276
+      ],
+      [
+        0.8486,
+        0.8324
+      ],
+      [
+        0.879,
+        0.8324
+      ],
+      [
+        0.9365,
+        0.8871
+      ]
+    ],
+    "dixon_coles": [
+      [
+        0.5651,
+        0.5566
+      ],
+      [
+        0.5952,
+        0.5967
+      ],
+      [
+        0.6267,
+        0.6273
+      ],
+      [
+        0.6584,
+        0.65
+      ],
+      [
+        0.6911,
+        0.6881
+      ],
+      [
+        0.7248,
+        0.7156
+      ],
+      [
+        0.7591,
+        0.7426
+      ],
+      [
+        0.7961,
+        0.7668
+      ],
+      [
+        0.8396,
+        0.7912
+      ],
+      [
+        0.9087,
+        0.8477
+      ]
+    ],
+    "dixon_coles_over_1_5": [
+      [
+        0.6015,
+        0.69
+      ],
+      [
+        0.6585,
+        0.7438
+      ],
+      [
+        0.6963,
+        0.7438
+      ],
+      [
+        0.7275,
+        0.7675
+      ],
+      [
+        0.754,
+        0.7856
+      ],
+      [
+        0.7804,
+        0.7964
+      ],
+      [
+        0.8057,
+        0.8228
+      ],
+      [
+        0.8343,
+        0.8228
+      ],
+      [
+        0.8668,
+        0.8352
+      ],
+      [
+        0.9233,
+        0.8623
+      ]
+    ],
+    "dixon_coles_over_2_5": [
+      [
+        0.557,
+        0.6053
+      ],
+      [
+        0.5731,
+        0.6126
+      ],
+      [
+        0.5905,
+        0.6186
+      ],
+      [
+        0.6102,
+        0.6186
+      ],
+      [
+        0.6308,
+        0.6186
+      ],
+      [
+        0.652,
+        0.6186
+      ],
+      [
+        0.6801,
+        0.6283
+      ],
+      [
+        0.7129,
+        0.644
+      ],
+      [
+        0.7597,
+        0.6649
+      ],
+      [
+        0.8492,
+        0.733
+      ]
+    ],
+    "dixon_coles_over_3_5": [
+      [
+        0.584,
+        0.5016
+      ],
+      [
+        0.7136,
+        0.5016
+      ]
+    ],
+    "dixon_coles_under_2_5": [
+      [
+        0.5569,
+        0.3937
+      ],
+      [
+        0.5706,
+        0.441
+      ],
+      [
+        0.5863,
+        0.5031
+      ],
+      [
+        0.6015,
+        0.5239
+      ],
+      [
+        0.62,
+        0.5239
+      ],
+      [
+        0.6395,
+        0.5239
+      ],
+      [
+        0.6632,
+        0.5239
+      ],
+      [
+        0.6923,
+        0.5239
+      ],
+      [
+        0.7393,
+        0.5239
+      ],
+      [
+        0.8299,
+        0.6584
+      ]
+    ],
+    "dixon_coles_under_3_5": [
+      [
+        0.5781,
+        0.602
+      ],
+      [
+        0.6239,
+        0.603
+      ],
+      [
+        0.6607,
+        0.6272
+      ],
+      [
+        0.6925,
+        0.6935
+      ],
+      [
+        0.7213,
+        0.6935
+      ],
+      [
+        0.7499,
+        0.7019
+      ],
+      [
+        0.778,
+        0.7019
+      ],
+      [
+        0.8081,
+        0.7409
+      ],
+      [
+        0.8448,
+        0.7409
+      ],
+      [
+        0.9109,
+        0.7814
+      ]
+    ],
+    "dixon_coles_btts": [
+      [
+        0.5562,
+        0.5312
+      ],
+      [
+        0.5685,
+        0.5312
+      ],
+      [
+        0.581,
+        0.5537
+      ],
+      [
+        0.5929,
+        0.5909
+      ],
+      [
+        0.6071,
+        0.6181
+      ],
+      [
+        0.6251,
+        0.6181
+      ],
+      [
+        0.6442,
+        0.6181
+      ],
+      [
+        0.6653,
+        0.6441
+      ],
+      [
+        0.6974,
+        0.6534
+      ],
+      [
+        0.7733,
+        0.6723
+      ]
+    ],
+    "dixon_coles_bounds_1_4": [
+      [
+        0.6322,
+        0.6886
+      ],
+      [
+        0.7068,
+        0.752
+      ],
+      [
+        0.7412,
+        0.752
+      ],
+      [
+        0.7638,
+        0.752
+      ],
+      [
+        0.7788,
+        0.7724
+      ],
+      [
+        0.7901,
+        0.7724
+      ],
+      [
+        0.7972,
+        0.7812
+      ],
+      [
+        0.8034,
+        0.7954
+      ],
+      [
+        0.8112,
+        0.7954
+      ],
+      [
+        0.8238,
+        0.8162
+      ]
+    ],
+    "dixon_coles_team_score": [
+      [
+        0.5805,
+        0.6635
+      ],
+      [
+        0.6298,
+        0.6842
+      ],
+      [
+        0.6677,
+        0.7341
+      ],
+      [
+        0.7017,
+        0.75
+      ],
+      [
+        0.7334,
+        0.75
+      ],
+      [
+        0.7635,
+        0.7828
+      ],
+      [
+        0.7935,
+        0.7828
+      ],
+      [
+        0.8269,
+        0.8084
+      ],
+      [
+        0.8658,
+        0.8505
+      ],
+      [
+        0.9267,
+        0.9043
+      ]
+    ],
+    "dixon_coles_team_over_1_5": [
+      [
+        0.5576,
+        0.5115
+      ],
+      [
+        0.5732,
+        0.5115
+      ],
+      [
+        0.5894,
+        0.5374
+      ],
+      [
+        0.6081,
+        0.5374
+      ],
+      [
+        0.6289,
+        0.6379
+      ],
+      [
+        0.6531,
+        0.6379
+      ],
+      [
+        0.6849,
+        0.6686
+      ],
+      [
+        0.72,
+        0.6686
+      ],
+      [
+        0.765,
+        0.6686
+      ],
+      [
+        0.8599,
+        0.7257
+      ]
+    ],
+    "dixon_coles_team_win": [
+      [
+        0.5571,
+        0.5029
+      ],
+      [
+        0.5729,
+        0.5029
+      ],
+      [
+        0.59,
+        0.5146
+      ],
+      [
+        0.6074,
+        0.5819
+      ],
+      [
+        0.6288,
+        0.5819
+      ],
+      [
+        0.654,
+        0.5877
+      ],
+      [
+        0.6801,
+        0.5877
+      ],
+      [
+        0.7161,
+        0.6959
+      ],
+      [
+        0.7652,
+        0.7076
+      ],
+      [
+        0.8549,
+        0.7485
+      ]
+    ]
+  },
+  "league_adjustments": {
+    "mismatch": {
+      "293": {
+        "n": 89,
+        "expected_rate": 0.78,
+        "actual_rate": 0.7978,
+        "shrunk_rate": 0.7855,
+        "logit_delta": 0.032177,
+        "prior_strength": 200
+      },
+      "117": {
+        "n": 214,
+        "expected_rate": 0.7495,
+        "actual_rate": 0.6963,
+        "shrunk_rate": 0.722,
+        "logit_delta": -0.141713,
+        "prior_strength": 200
+      },
+      "595": {
+        "n": 136,
+        "expected_rate": 0.7449,
+        "actual_rate": 0.7132,
+        "shrunk_rate": 0.7321,
+        "logit_delta": -0.066373,
+        "prior_strength": 200
+      },
+      "104": {
+        "n": 154,
+        "expected_rate": 0.7364,
+        "actual_rate": 0.7857,
+        "shrunk_rate": 0.7578,
+        "logit_delta": 0.11365,
+        "prior_strength": 200
+      },
+      "72": {
+        "n": 174,
+        "expected_rate": 0.731,
+        "actual_rate": 0.7586,
+        "shrunk_rate": 0.7439,
+        "logit_delta": 0.066286,
+        "prior_strength": 200
+      },
+      "333": {
+        "n": 85,
+        "expected_rate": 0.7644,
+        "actual_rate": 0.7529,
+        "shrunk_rate": 0.761,
+        "logit_delta": -0.018818,
+        "prior_strength": 200
+      },
+      "361": {
+        "n": 319,
+        "expected_rate": 0.7462,
+        "actual_rate": 0.6677,
+        "shrunk_rate": 0.6979,
+        "logit_delta": -0.240772,
+        "prior_strength": 200
+      },
+      "489": {
+        "n": 160,
+        "expected_rate": 0.7603,
+        "actual_rate": 0.7125,
+        "shrunk_rate": 0.739,
+        "logit_delta": -0.113189,
+        "prior_strength": 200
+      },
+      "116": {
+        "n": 148,
+        "expected_rate": 0.7441,
+        "actual_rate": 0.7297,
+        "shrunk_rate": 0.738,
+        "logit_delta": -0.031917,
+        "prior_strength": 200
+      },
+      "327": {
+        "n": 44,
+        "expected_rate": 0.7829,
+        "actual_rate": 0.7955,
+        "shrunk_rate": 0.7851,
+        "logit_delta": 0.013392,
+        "prior_strength": 200
+      },
+      "365": {
+        "n": 182,
+        "expected_rate": 0.7918,
+        "actual_rate": 0.6923,
+        "shrunk_rate": 0.7444,
+        "logit_delta": -0.266875,
+        "prior_strength": 200
+      },
+      "362": {
+        "n": 46,
+        "expected_rate": 0.7679,
+        "actual_rate": 0.8261,
+        "shrunk_rate": 0.7788,
+        "logit_delta": 0.062081,
+        "prior_strength": 200
+      },
+      "357": {
+        "n": 50,
+        "expected_rate": 0.8035,
+        "actual_rate": 0.86,
+        "shrunk_rate": 0.8148,
+        "logit_delta": 0.073208,
+        "prior_strength": 200
+      },
+      "358": {
+        "n": 74,
+        "expected_rate": 0.7959,
+        "actual_rate": 0.8784,
+        "shrunk_rate": 0.8182,
+        "logit_delta": 0.143192,
+        "prior_strength": 200
+      },
+      "170": {
+        "n": 88,
+        "expected_rate": 0.7705,
+        "actual_rate": 0.7955,
+        "shrunk_rate": 0.7781,
+        "logit_delta": 0.043589,
+        "prior_strength": 200
+      },
+      "244": {
+        "n": 107,
+        "expected_rate": 0.7648,
+        "actual_rate": 0.7196,
+        "shrunk_rate": 0.7491,
+        "logit_delta": -0.08561,
+        "prior_strength": 200
+      },
+      "389": {
+        "n": 123,
+        "expected_rate": 0.7681,
+        "actual_rate": 0.8699,
+        "shrunk_rate": 0.8069,
+        "logit_delta": 0.23215,
+        "prior_strength": 200
+      },
+      "165": {
+        "n": 113,
+        "expected_rate": 0.7978,
+        "actual_rate": 0.8407,
+        "shrunk_rate": 0.8133,
+        "logit_delta": 0.098975,
+        "prior_strength": 200
+      },
+      "265": {
+        "n": 60,
+        "expected_rate": 0.795,
+        "actual_rate": 0.8167,
+        "shrunk_rate": 0.8,
+        "logit_delta": 0.030932,
+        "prior_strength": 200
+      },
+      "255": {
+        "n": 130,
+        "expected_rate": 0.7745,
+        "actual_rate": 0.8385,
+        "shrunk_rate": 0.7997,
+        "logit_delta": 0.150438,
+        "prior_strength": 200
+      },
+      "329": {
+        "n": 178,
+        "expected_rate": 0.7742,
+        "actual_rate": 0.8034,
+        "shrunk_rate": 0.7879,
+        "logit_delta": 0.080473,
+        "prior_strength": 200
+      },
+      "169": {
+        "n": 87,
+        "expected_rate": 0.7977,
+        "actual_rate": 0.7471,
+        "shrunk_rate": 0.7824,
+        "logit_delta": -0.092411,
+        "prior_strength": 200
+      },
+      "113": {
+        "n": 132,
+        "expected_rate": 0.742,
+        "actual_rate": 0.7348,
+        "shrunk_rate": 0.7392,
+        "logit_delta": -0.014838,
+        "prior_strength": 200
+      },
+      "292": {
+        "n": 49,
+        "expected_rate": 0.7838,
+        "actual_rate": 0.7959,
+        "shrunk_rate": 0.7861,
+        "logit_delta": 0.01418,
+        "prior_strength": 200
+      },
+      "103": {
+        "n": 175,
+        "expected_rate": 0.7508,
+        "actual_rate": 0.7943,
+        "shrunk_rate": 0.7711,
+        "logit_delta": 0.111684,
+        "prior_strength": 200
+      },
+      "253": {
+        "n": 129,
+        "expected_rate": 0.7939,
+        "actual_rate": 0.7907,
+        "shrunk_rate": 0.7926,
+        "logit_delta": -0.007617,
+        "prior_strength": 200
+      },
+      "172": {
+        "n": 115,
+        "expected_rate": 0.7403,
+        "actual_rate": 0.8261,
+        "shrunk_rate": 0.7716,
+        "logit_delta": 0.170013,
+        "prior_strength": 200
+      },
+      "286": {
+        "n": 127,
+        "expected_rate": 0.7673,
+        "actual_rate": 0.685,
+        "shrunk_rate": 0.7354,
+        "logit_delta": -0.171215,
+        "prior_strength": 200
+      },
+      "283": {
+        "n": 65,
+        "expected_rate": 0.7439,
+        "actual_rate": 0.8,
+        "shrunk_rate": 0.7576,
+        "logit_delta": 0.073585,
+        "prior_strength": 200
+      },
+      "71": {
+        "n": 78,
+        "expected_rate": 0.799,
+        "actual_rate": 0.859,
+        "shrunk_rate": 0.8158,
+        "logit_delta": 0.108312,
+        "prior_strength": 200
+      },
+      "262": {
+        "n": 126,
+        "expected_rate": 0.7841,
+        "actual_rate": 0.7143,
+        "shrunk_rate": 0.7571,
+        "logit_delta": -0.152791,
+        "prior_strength": 200
+      },
+      "128": {
+        "n": 88,
+        "expected_rate": 0.7384,
+        "actual_rate": 0.7273,
+        "shrunk_rate": 0.735,
+        "logit_delta": -0.017519,
+        "prior_strength": 200
+      },
+      "235": {
+        "n": 122,
+        "expected_rate": 0.7952,
+        "actual_rate": 0.7131,
+        "shrunk_rate": 0.7641,
+        "logit_delta": -0.181355,
+        "prior_strength": 200
+      },
+      "106": {
+        "n": 52,
+        "expected_rate": 0.7999,
+        "actual_rate": 0.8269,
+        "shrunk_rate": 0.8055,
+        "logit_delta": 0.035173,
+        "prior_strength": 200
+      },
+      "345": {
+        "n": 125,
+        "expected_rate": 0.7666,
+        "actual_rate": 0.744,
+        "shrunk_rate": 0.7579,
+        "logit_delta": -0.047952,
+        "prior_strength": 200
+      },
+      "119": {
+        "n": 100,
+        "expected_rate": 0.7495,
+        "actual_rate": 0.75,
+        "shrunk_rate": 0.7497,
+        "logit_delta": 0.000884,
+        "prior_strength": 200
+      },
+      "207": {
+        "n": 50,
+        "expected_rate": 0.7824,
+        "actual_rate": 0.82,
+        "shrunk_rate": 0.7899,
+        "logit_delta": 0.044755,
+        "prior_strength": 200
+      },
+      "218": {
+        "n": 38,
+        "expected_rate": 0.7926,
+        "actual_rate": 0.8684,
+        "shrunk_rate": 0.8047,
+        "logit_delta": 0.075328,
+        "prior_strength": 200
+      },
+      "179": {
+        "n": 102,
+        "expected_rate": 0.7734,
+        "actual_rate": 0.7059,
+        "shrunk_rate": 0.7506,
+        "logit_delta": -0.125804,
+        "prior_strength": 200
+      },
+      "144": {
+        "n": 71,
+        "expected_rate": 0.7678,
+        "actual_rate": 0.8028,
+        "shrunk_rate": 0.777,
+        "logit_delta": 0.052189,
+        "prior_strength": 200
+      },
+      "94": {
+        "n": 120,
+        "expected_rate": 0.7842,
+        "actual_rate": 0.8583,
+        "shrunk_rate": 0.812,
+        "logit_delta": 0.172697,
+        "prior_strength": 200
+      },
+      "99": {
+        "n": 46,
+        "expected_rate": 0.7477,
+        "actual_rate": 0.6304,
+        "shrunk_rate": 0.7258,
+        "logit_delta": -0.113137,
+        "prior_strength": 200
+      },
+      "88": {
+        "n": 91,
+        "expected_rate": 0.7998,
+        "actual_rate": 0.9011,
+        "shrunk_rate": 0.8315,
+        "logit_delta": 0.211049,
+        "prior_strength": 200
+      },
+      "89": {
+        "n": 45,
+        "expected_rate": 0.8029,
+        "actual_rate": 0.8,
+        "shrunk_rate": 0.8023,
+        "logit_delta": -0.003334,
+        "prior_strength": 200
+      },
+      "62": {
+        "n": 46,
+        "expected_rate": 0.7924,
+        "actual_rate": 0.8696,
+        "shrunk_rate": 0.8068,
+        "logit_delta": 0.090065,
+        "prior_strength": 200
+      },
+      "141": {
+        "n": 52,
+        "expected_rate": 0.7307,
+        "actual_rate": 0.6923,
+        "shrunk_rate": 0.7228,
+        "logit_delta": -0.039872,
+        "prior_strength": 200
+      },
+      "203": {
+        "n": 94,
+        "expected_rate": 0.7653,
+        "actual_rate": 0.6702,
+        "shrunk_rate": 0.7349,
+        "logit_delta": -0.162301,
+        "prior_strength": 200
+      },
+      "40": {
+        "n": 61,
+        "expected_rate": 0.7429,
+        "actual_rate": 0.7869,
+        "shrunk_rate": 0.7531,
+        "logit_delta": 0.054593,
+        "prior_strength": 200
+      },
+      "41": {
+        "n": 66,
+        "expected_rate": 0.7737,
+        "actual_rate": 0.7273,
+        "shrunk_rate": 0.7622,
+        "logit_delta": -0.064711,
+        "prior_strength": 200
+      },
+      "140": {
+        "n": 77,
+        "expected_rate": 0.755,
+        "actual_rate": 0.9091,
+        "shrunk_rate": 0.7979,
+        "logit_delta": 0.247322,
+        "prior_strength": 200
+      },
+      "233": {
+        "n": 64,
+        "expected_rate": 0.7539,
+        "actual_rate": 0.7188,
+        "shrunk_rate": 0.7454,
+        "logit_delta": -0.045382,
+        "prior_strength": 200
+      },
+      "39": {
+        "n": 70,
+        "expected_rate": 0.7702,
+        "actual_rate": 0.7,
+        "shrunk_rate": 0.752,
+        "logit_delta": -0.10008,
+        "prior_strength": 200
+      },
+      "61": {
+        "n": 49,
+        "expected_rate": 0.7562,
+        "actual_rate": 0.7959,
+        "shrunk_rate": 0.764,
+        "logit_delta": 0.042852,
+        "prior_strength": 200
+      },
+      "135": {
+        "n": 64,
+        "expected_rate": 0.762,
+        "actual_rate": 0.8281,
+        "shrunk_rate": 0.778,
+        "logit_delta": 0.090582,
+        "prior_strength": 200
+      },
+      "78": {
+        "n": 67,
+        "expected_rate": 0.7526,
+        "actual_rate": 0.8806,
+        "shrunk_rate": 0.7848,
+        "logit_delta": 0.180811,
+        "prior_strength": 200
+      }
+    },
+    "dixon_coles_bounds_1_4": {
+      "72": {
+        "n": 198,
+        "expected_rate": 0.7922,
+        "actual_rate": 0.8636,
+        "shrunk_rate": 0.8277,
+        "logit_delta": 0.2314,
+        "prior_strength": 200
+      },
+      "104": {
+        "n": 90,
+        "expected_rate": 0.7338,
+        "actual_rate": 0.6,
+        "shrunk_rate": 0.6922,
+        "logit_delta": -0.203129,
+        "prior_strength": 200
+      },
+      "116": {
+        "n": 97,
+        "expected_rate": 0.7754,
+        "actual_rate": 0.8144,
+        "shrunk_rate": 0.7881,
+        "logit_delta": 0.074826,
+        "prior_strength": 200
+      },
+      "117": {
+        "n": 150,
+        "expected_rate": 0.7437,
+        "actual_rate": 0.7267,
+        "shrunk_rate": 0.7364,
+        "logit_delta": -0.037915,
+        "prior_strength": 200
+      },
+      "165": {
+        "n": 68,
+        "expected_rate": 0.748,
+        "actual_rate": 0.6029,
+        "shrunk_rate": 0.7112,
+        "logit_delta": -0.186771,
+        "prior_strength": 200
+      },
+      "170": {
+        "n": 111,
+        "expected_rate": 0.7627,
+        "actual_rate": 0.7658,
+        "shrunk_rate": 0.7638,
+        "logit_delta": 0.006048,
+        "prior_strength": 200
+      },
+      "244": {
+        "n": 74,
+        "expected_rate": 0.7665,
+        "actual_rate": 0.7568,
+        "shrunk_rate": 0.7639,
+        "logit_delta": -0.014709,
+        "prior_strength": 200
+      },
+      "255": {
+        "n": 188,
+        "expected_rate": 0.7739,
+        "actual_rate": 0.7394,
+        "shrunk_rate": 0.7571,
+        "logit_delta": -0.093166,
+        "prior_strength": 200
+      },
+      "265": {
+        "n": 71,
+        "expected_rate": 0.7821,
+        "actual_rate": 0.7746,
+        "shrunk_rate": 0.7802,
+        "logit_delta": -0.011496,
+        "prior_strength": 200
+      },
+      "293": {
+        "n": 98,
+        "expected_rate": 0.7716,
+        "actual_rate": 0.8265,
+        "shrunk_rate": 0.7897,
+        "logit_delta": 0.105512,
+        "prior_strength": 200
+      },
+      "327": {
+        "n": 54,
+        "expected_rate": 0.7649,
+        "actual_rate": 0.7778,
+        "shrunk_rate": 0.7676,
+        "logit_delta": 0.015322,
+        "prior_strength": 200
+      },
+      "329": {
+        "n": 72,
+        "expected_rate": 0.7725,
+        "actual_rate": 0.75,
+        "shrunk_rate": 0.7665,
+        "logit_delta": -0.033548,
+        "prior_strength": 200
+      },
+      "357": {
+        "n": 64,
+        "expected_rate": 0.7615,
+        "actual_rate": 0.75,
+        "shrunk_rate": 0.7587,
+        "logit_delta": -0.015334,
+        "prior_strength": 200
+      },
+      "358": {
+        "n": 80,
+        "expected_rate": 0.7859,
+        "actual_rate": 0.775,
+        "shrunk_rate": 0.7828,
+        "logit_delta": -0.01839,
+        "prior_strength": 200
+      },
+      "361": {
+        "n": 109,
+        "expected_rate": 0.7777,
+        "actual_rate": 0.7982,
+        "shrunk_rate": 0.7849,
+        "logit_delta": 0.042271,
+        "prior_strength": 200
+      },
+      "362": {
+        "n": 64,
+        "expected_rate": 0.7674,
+        "actual_rate": 0.7344,
+        "shrunk_rate": 0.7594,
+        "logit_delta": -0.044364,
+        "prior_strength": 200
+      },
+      "365": {
+        "n": 69,
+        "expected_rate": 0.7693,
+        "actual_rate": 0.7971,
+        "shrunk_rate": 0.7764,
+        "logit_delta": 0.040683,
+        "prior_strength": 200
+      },
+      "389": {
+        "n": 109,
+        "expected_rate": 0.7782,
+        "actual_rate": 0.8257,
+        "shrunk_rate": 0.7949,
+        "logit_delta": 0.099874,
+        "prior_strength": 200
+      },
+      "489": {
+        "n": 142,
+        "expected_rate": 0.7696,
+        "actual_rate": 0.7535,
+        "shrunk_rate": 0.7629,
+        "logit_delta": -0.037324,
+        "prior_strength": 200
+      },
+      "595": {
+        "n": 80,
+        "expected_rate": 0.7567,
+        "actual_rate": 0.825,
+        "shrunk_rate": 0.7762,
+        "logit_delta": 0.109092,
+        "prior_strength": 200
+      },
+      "113": {
+        "n": 92,
+        "expected_rate": 0.7533,
+        "actual_rate": 0.8043,
+        "shrunk_rate": 0.7694,
+        "logit_delta": 0.088613,
+        "prior_strength": 200
+      },
+      "169": {
+        "n": 88,
+        "expected_rate": 0.7609,
+        "actual_rate": 0.6591,
+        "shrunk_rate": 0.7298,
+        "logit_delta": -0.164137,
+        "prior_strength": 200
+      },
+      "292": {
+        "n": 90,
+        "expected_rate": 0.776,
+        "actual_rate": 0.7444,
+        "shrunk_rate": 0.7662,
+        "logit_delta": -0.05555,
+        "prior_strength": 200
+      },
+      "71": {
+        "n": 102,
+        "expected_rate": 0.7768,
+        "actual_rate": 0.7843,
+        "shrunk_rate": 0.7793,
+        "logit_delta": 0.014762,
+        "prior_strength": 200
+      },
+      "103": {
+        "n": 78,
+        "expected_rate": 0.7626,
+        "actual_rate": 0.7308,
+        "shrunk_rate": 0.7536,
+        "logit_delta": -0.048664,
+        "prior_strength": 200
+      },
+      "172": {
+        "n": 68,
+        "expected_rate": 0.7793,
+        "actual_rate": 0.8235,
+        "shrunk_rate": 0.7905,
+        "logit_delta": 0.066529,
+        "prior_strength": 200
+      },
+      "253": {
+        "n": 184,
+        "expected_rate": 0.7638,
+        "actual_rate": 0.75,
+        "shrunk_rate": 0.7572,
+        "logit_delta": -0.03621,
+        "prior_strength": 200
+      },
+      "262": {
+        "n": 87,
+        "expected_rate": 0.7682,
+        "actual_rate": 0.7356,
+        "shrunk_rate": 0.7583,
+        "logit_delta": -0.054675,
+        "prior_strength": 200
+      },
+      "283": {
+        "n": 73,
+        "expected_rate": 0.7735,
+        "actual_rate": 0.7671,
+        "shrunk_rate": 0.7718,
+        "logit_delta": -0.009642,
+        "prior_strength": 200
+      },
+      "286": {
+        "n": 65,
+        "expected_rate": 0.7658,
+        "actual_rate": 0.7846,
+        "shrunk_rate": 0.7704,
+        "logit_delta": 0.025891,
+        "prior_strength": 200
+      },
+      "106": {
+        "n": 72,
+        "expected_rate": 0.7814,
+        "actual_rate": 0.7083,
+        "shrunk_rate": 0.762,
+        "logit_delta": -0.109803,
+        "prior_strength": 200
+      },
+      "119": {
+        "n": 54,
+        "expected_rate": 0.7719,
+        "actual_rate": 0.8333,
+        "shrunk_rate": 0.785,
+        "logit_delta": 0.075717,
+        "prior_strength": 200
+      },
+      "128": {
+        "n": 156,
+        "expected_rate": 0.7834,
+        "actual_rate": 0.8269,
+        "shrunk_rate": 0.8024,
+        "logit_delta": 0.116331,
+        "prior_strength": 200
+      },
+      "179": {
+        "n": 42,
+        "expected_rate": 0.7745,
+        "actual_rate": 0.881,
+        "shrunk_rate": 0.7929,
+        "logit_delta": 0.109082,
+        "prior_strength": 200
+      },
+      "207": {
+        "n": 50,
+        "expected_rate": 0.75,
+        "actual_rate": 0.6,
+        "shrunk_rate": 0.72,
+        "logit_delta": -0.154108,
+        "prior_strength": 200
+      },
+      "218": {
+        "n": 42,
+        "expected_rate": 0.769,
+        "actual_rate": 0.8095,
+        "shrunk_rate": 0.776,
+        "logit_delta": 0.040059,
+        "prior_strength": 200
+      },
+      "235": {
+        "n": 68,
+        "expected_rate": 0.7707,
+        "actual_rate": 0.7794,
+        "shrunk_rate": 0.7729,
+        "logit_delta": 0.012482,
+        "prior_strength": 200
+      },
+      "333": {
+        "n": 49,
+        "expected_rate": 0.7607,
+        "actual_rate": 0.7551,
+        "shrunk_rate": 0.7596,
+        "logit_delta": -0.006032,
+        "prior_strength": 200
+      },
+      "345": {
+        "n": 69,
+        "expected_rate": 0.7631,
+        "actual_rate": 0.8551,
+        "shrunk_rate": 0.7867,
+        "logit_delta": 0.135382,
+        "prior_strength": 200
+      },
+      "40": {
+        "n": 86,
+        "expected_rate": 0.7802,
+        "actual_rate": 0.8023,
+        "shrunk_rate": 0.7868,
+        "logit_delta": 0.039242,
+        "prior_strength": 200
+      },
+      "41": {
+        "n": 81,
+        "expected_rate": 0.7727,
+        "actual_rate": 0.7407,
+        "shrunk_rate": 0.7635,
+        "logit_delta": -0.051657,
+        "prior_strength": 200
+      },
+      "62": {
+        "n": 61,
+        "expected_rate": 0.7649,
+        "actual_rate": 0.7377,
+        "shrunk_rate": 0.7585,
+        "logit_delta": -0.034975,
+        "prior_strength": 200
+      },
+      "79": {
+        "n": 44,
+        "expected_rate": 0.7483,
+        "actual_rate": 0.8182,
+        "shrunk_rate": 0.7609,
+        "logit_delta": 0.068026,
+        "prior_strength": 200
+      },
+      "88": {
+        "n": 51,
+        "expected_rate": 0.7409,
+        "actual_rate": 0.6863,
+        "shrunk_rate": 0.7298,
+        "logit_delta": -0.057088,
+        "prior_strength": 200
+      },
+      "89": {
+        "n": 76,
+        "expected_rate": 0.7481,
+        "actual_rate": 0.6974,
+        "shrunk_rate": 0.7342,
+        "logit_delta": -0.072883,
+        "prior_strength": 200
+      },
+      "94": {
+        "n": 59,
+        "expected_rate": 0.7724,
+        "actual_rate": 0.8475,
+        "shrunk_rate": 0.7895,
+        "logit_delta": 0.099991,
+        "prior_strength": 200
+      },
+      "99": {
+        "n": 75,
+        "expected_rate": 0.7686,
+        "actual_rate": 0.76,
+        "shrunk_rate": 0.7663,
+        "logit_delta": -0.013183,
+        "prior_strength": 200
+      },
+      "140": {
+        "n": 62,
+        "expected_rate": 0.7738,
+        "actual_rate": 0.6935,
+        "shrunk_rate": 0.7548,
+        "logit_delta": -0.105467,
+        "prior_strength": 200
+      },
+      "141": {
+        "n": 71,
+        "expected_rate": 0.7664,
+        "actual_rate": 0.7887,
+        "shrunk_rate": 0.7723,
+        "logit_delta": 0.032956,
+        "prior_strength": 200
+      },
+      "144": {
+        "n": 58,
+        "expected_rate": 0.7682,
+        "actual_rate": 0.7759,
+        "shrunk_rate": 0.7699,
+        "logit_delta": 0.009709,
+        "prior_strength": 200
+      },
+      "203": {
+        "n": 49,
+        "expected_rate": 0.7774,
+        "actual_rate": 0.7347,
+        "shrunk_rate": 0.769,
+        "logit_delta": -0.047936,
+        "prior_strength": 200
+      },
+      "39": {
+        "n": 47,
+        "expected_rate": 0.7711,
+        "actual_rate": 0.6809,
+        "shrunk_rate": 0.7539,
+        "logit_delta": -0.094853,
+        "prior_strength": 200
+      },
+      "61": {
+        "n": 40,
+        "expected_rate": 0.7659,
+        "actual_rate": 0.825,
+        "shrunk_rate": 0.7758,
+        "logit_delta": 0.055745,
+        "prior_strength": 200
+      },
+      "78": {
+        "n": 30,
+        "expected_rate": 0.7416,
+        "actual_rate": 0.5667,
+        "shrunk_rate": 0.7188,
+        "logit_delta": -0.115842,
+        "prior_strength": 200
+      },
+      "135": {
+        "n": 50,
+        "expected_rate": 0.7789,
+        "actual_rate": 0.82,
+        "shrunk_rate": 0.7871,
+        "logit_delta": 0.048431,
+        "prior_strength": 200
+      },
+      "136": {
+        "n": 42,
+        "expected_rate": 0.7712,
+        "actual_rate": 0.881,
+        "shrunk_rate": 0.7902,
+        "logit_delta": 0.111319,
+        "prior_strength": 200
+      },
+      "233": {
+        "n": 44,
+        "expected_rate": 0.7659,
+        "actual_rate": 0.8409,
+        "shrunk_rate": 0.7795,
+        "logit_delta": 0.076995,
+        "prior_strength": 200
+      }
+    }
+  },
+  "league_adjustment_method": "empirical-Bayes league logit intercept over global PAVA; min_n=30, prior=200"
+}

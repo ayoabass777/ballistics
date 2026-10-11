@@ -3,6 +3,9 @@ __pycache__/
 venv/
 .venv/
 .env
+.env.*
+!.env.example
+.claude/settings.local.json
 .pytest_cache/
 .coverage
 htmlcov/
@@ -17,6 +20,10 @@ dbt/football_pipeline/logs/
 .mypy_cache/
 .ruff_cache/
 .DS_Store
+
+# Generated engine outputs (dated) — regenerate locally, don't version-control
+engine/eval/*_20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].json
+engine/eval/*_20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].yaml
 node_modules/
 CLAUDE.md
 

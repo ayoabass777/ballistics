@@ -1,0 +1,2845 @@
+"""
+Consensus slip generator — weighted multi-model accumulator slips.
+
+Runs all four engines (Poisson GLM, Mismatch Elo, Bayesian Streaks,
+Dixon-Coles), maps every qualifying pick to a unified SportyBet market,
+scores each pick by how many models agree, and uses a weighted conflict graph
+to assemble repeat-aware accumulator slips targeting approximately 50x.
+
+Model-to-market mapping:
+    Poisson  OVER 2.5 / UNDER 3.5       →  Match Over 2.5 / Under 3.5
+    Mismatch fav_to_score                →  Team Over 0.5 (fav side)
+    Mismatch over_1.5 / over_2.5         →  Match Over 1.5 / Over 2.5
+    Bayesian Over_1_5 / Over_2_5 / etc.  →  Match Over 1.5 / Over 2.5
+    Bayesian score_1goal                 →  Team Over 0.5
+    Bayesian concede_1                   →  Opponent Over 0.5
+    Bayesian Under_2_5 / Under_3_5       →  Match Under 2.5 / Under 3.5
+    Dixon-Coles (markets already unified) →  Match/Team O/U, BTTS Yes, Win
+
+Consensus tiers (n = distinct models agreeing, 1-4):
+    3+ models →  backbone (trio+ — three or more agree)
+    2-model  →  strong (two independent signals)
+    1-model  →  solo (only if P >= solo_threshold)
+
+Goal-model rules (walk-forward validated, folds 5-9):
+    - Match Over 1.5 requires BOTH Dixon-Coles AND Poisson to agree,
+      with calibrated consensus P >= 78%.
+    - Match Over 2.5 has no model-combination restriction; any contributing
+      model can qualify it through the normal consensus thresholds.
+    - Under selections require BOTH Dixon-Coles AND Poisson to agree.
+    - Other solo goal-model match-total picks are dropped (DC solo unders 53.3%).
+    - BTTS Yes is sourced from Dixon-Coles only; Bayesian BTTS is ignored.
+
+Usage:
+    python -m engine.eval.consensus_slips
+    python -m engine.eval.consensus_slips --days 10 --target-odds 50
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
+from collections import defaultdict
+from datetime import datetime, timezone, timedelta, time
+from zoneinfo import ZoneInfo
+from pathlib import Path
+
+import pandas as pd
+
+from engine.eval.predict_upcoming import predict_upcoming, _tier
+from engine.eval.predict_mismatch import predict_mismatch, _market_label
+from engine.eval.predict_dixon_coles import predict_dixon_coles
+from engine.eval.scrape_sportybet import odds_for_pick
+from engine.eval.db import get_conn
+from engine.eval.team_strength import load_team_df, compute_team_strength
+from engine.eval.bayesian_streaks import (
+    get_fixture_beliefs,
+    load_event_history,
+    compute_league_base_rates,
+    compute_beliefs,
+    BETTING_EVENTS,
+    PRIOR_STRENGTH,
+    MIN_POSTERIOR_INTERESTING,
+)
+
+SOLO_THRESHOLD = 0.80
+BOUNDS_SOLO_THRESHOLD = 0.78
+BOUNDS_NEAR_THRESHOLD_FLOOR = 0.70
+DUO_THRESHOLD = 0.72
+TRIO_THRESHOLD = 0.70
+OVER15_DC_POISSON_THRESHOLD = 0.78
+UNDER35_MAX_AVG_ATTACK_PCT = 55.0
+UNDER35_MAX_SINGLE_ATTACK_PCT = 75.0
+UNDER35_MIN_AVG_DEFENSE_PCT = 55.0
+UNDER35_MIN_SINGLE_DEFENSE_PCT = 35.0
+UNDER35_TIER_A_THRESHOLD = 0.80
+UNDER35_TIER_B_THRESHOLD = 0.75
+UNDER35_TIER_C_THRESHOLD = 0.72
+
+# Conservative ranking-only priors for the most dependable Goal Bounds 1-4
+# leagues in the 2020-2025 history.  These do not alter model probability,
+# EV, or eligibility gates: they only break ties/order already-qualified picks.
+# The score bonus is the league's excess hit rate over the global rate, shrunk
+# toward zero with a 1,000-match prior so thin or volatile samples cannot
+# dominate the model consensus.
+BOUNDS_1_4_GLOBAL_RATE = 0.7839
+BOUNDS_1_4_PRIOR_STRENGTH = 1_000
+BOUNDS_1_4_MAX_SCORE_BOOST = 0.04
+BOUNDS_1_4_MIN_HISTORY = 50
+BOUNDS_1_4_TOP_RATE = 0.80
+BOUNDS_1_4_SHORTLIST_LIMIT = 40
+BOUNDS_1_4_PER_LEAGUE_LIMIT = 7
+BOUNDS_1_4_MIN_ODDS = 1.17
+OVER_1_5_MIN_HISTORY = 50
+OVER_1_5_TOP_RATE = 0.80
+OVER_1_5_MIN_BELIEF = 0.75
+OVER_1_5_MIN_ODDS = 1.17
+OVER_1_5_SHORTLIST_LIMIT = 40
+OVER_1_5_PER_LEAGUE_LIMIT = 7
+ELO_HUGE_GAP_MIN = 250  # Big dog: gap strictly above this (D27/D44, 2026-10-02; was >= 300)
+ELO_LOW_VOLATILITY_MAX = 0.27
+ELO_VOLATILITY_MIN_HISTORY = 50
+ELO_GAP_SHORTLIST_LIMIT = 40
+ELO_GAP_PER_LEAGUE_LIMIT = 7
+BOUNDS_1_4_LEAGUE_PRIORS = {
+    ("Serie B", "Brazil"): {"rate": 0.8460, "matches": 1_156},
+    ("Serie A", "Brazil"): {"rate": 0.8298, "matches": 2_280},
+    ("Premier Division", "Ireland"): {"rate": 0.8270, "matches": 994},
+    ("Championship", "England"): {"rate": 0.8206, "matches": 2_469},
+    ("Premiership", "Scotland"): {"rate": 0.8036, "matches": 1_110},
+}
+
+# In high-scoring leagues Poisson overpredicts unders (+4.4% walk-forward gap,
+# because its per-cluster fit pools lower-scoring leagues) while Dixon-Coles —
+# fit per league — stays calibrated (+0.6%). So Match Under markets in these
+# leagues are priced off DC alone instead of the equal DC+Poisson blend.
+HIGH_SCORING_AVG_GOALS = 3.1     # league goals/game above which to favour DC on unders
+UNDER_HIGH_DC_WEIGHT = 1.0       # weight on DC's prob there (1.0 = DC-only)
+
+TARGET_ODDS = 50.0
+MAX_LEGS = 15
+MIN_LEGS = 8
+MIN_EST_ODDS = 1.15
+MIN_EV = 1.0            # slip legs must clear break-even EV (model_prob × real_odds)
+
+MAX_SLIPS = 6
+CORE_REPEAT_LIMIT = 3
+SUPPORT_REPEAT_LIMIT = 2
+FILLER_REPEAT_LIMIT = 1
+MAX_CORE_PER_SLIP = 2
+MAX_FILLERS_PER_SLIP = 2
+
+# Recognisable top-flight clubs receive a modest core-node boost, never a gate
+# bypass. They still need real odds, positive EV and the normal consensus rules.
+CORE_TEAM_ALIASES = (
+    "real madrid", "barcelona", "atletico madrid",
+    "manchester city", "manchester united", "liverpool", "arsenal", "chelsea",
+    "bayern munich", "borussia dortmund", "paris saint germain", "psg",
+    "juventus", "ac milan", "inter milan", "napoli",
+    "benfica", "porto", "sporting cp", "ajax", "psv", "celtic", "rangers",
+)
+
+# Leagues SportyBet-NG does not carry — cut from the bettable pool so the
+# engine only optimises markets that can actually be booked. Verified against
+# the odds API on July 3 2026 by mapping each (league, country) to SportyBet's
+# own tournament name (which often differs, e.g. our "League One"/China is
+# SportyBet "China League 1", "Premier League"/Belarus is "Vysshaya Liga"),
+# so exact league-name matching is NOT reliable — match on (league, country).
+# Only the Belarusian 2nd tier (our "1. Division"/Belarus) had no SportyBet
+# equivalent; everything else is carried under a renamed tournament.
+# TODO: once scrape_sportybet lands, drive bookability from actual odds
+# presence instead of this static list. See memory sportybet-odds-coverage.
+UNBOOKABLE_LEAGUES = {
+    ("1. Division", "Belarus"),
+}
+
+
+def _is_bookable(league: str, country: str = "") -> bool:
+    """True unless the (league, country) is one SportyBet-NG does not offer."""
+    return (league, country or "") not in UNBOOKABLE_LEAGUES
+
+
+def _load_bounds_1_4_league_priors(
+        conn, min_matches: int = BOUNDS_1_4_MIN_HISTORY) -> dict:
+    """Fresh 1–4 hit rates by league, using one home row per played fixture."""
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT
+                f.league_name AS league,
+                COALESCE(dc.country_name, '') AS country,
+                COUNT(*) AS matches,
+                AVG(CASE
+                    WHEN f.goals_for + f.goals_against BETWEEN 1 AND 4
+                    THEN 1.0 ELSE 0.0
+                END) AS hit_rate
+            FROM raw.fact_head_to_head f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            LEFT JOIN dim.dim_leagues dl
+              ON dl.api_league_id = rf.api_league_id
+            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            WHERE f.is_played AND f.is_home
+            GROUP BY f.league_name, dc.country_name
+            HAVING COUNT(*) >= %s
+        """, (min_matches,))
+        return {
+            (league, country or ""): {
+                "rate": float(rate),
+                "matches": int(matches),
+            }
+            for league, country, matches, rate in cur.fetchall()
+        }
+
+
+def _load_over_1_5_league_rates(
+        conn, min_matches: int = OVER_1_5_MIN_HISTORY) -> dict:
+    """Fresh Over 1.5 hit rates by league, one row per completed fixture."""
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT
+                f.league_name AS league,
+                COALESCE(dc.country_name, '') AS country,
+                COUNT(*) AS matches,
+                AVG(CASE
+                    WHEN f.goals_for + f.goals_against >= 2
+                    THEN 1.0 ELSE 0.0
+                END) AS hit_rate
+            FROM raw.fact_head_to_head f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            LEFT JOIN dim.dim_leagues dl
+              ON dl.api_league_id = rf.api_league_id
+            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            WHERE f.is_played AND f.is_home
+            GROUP BY f.league_name, dc.country_name
+            HAVING COUNT(*) >= %s
+        """, (min_matches,))
+        return {
+            (league, country or ""): {
+                "rate": float(rate),
+                "matches": int(matches),
+            }
+            for league, country, matches, rate in cur.fetchall()
+        }
+
+
+def _load_league_elo_volatility(
+        conn, min_matches: int = ELO_VOLATILITY_MIN_HISTORY) -> dict:
+    """League upset rates keyed by league and country using pre-match flat Elo."""
+    with conn.cursor() as cur:
+        cur.execute("""
+            WITH matches AS (
+                SELECT
+                    f.league_name AS league,
+                    COALESCE(dc.country_name, '') AS country,
+                    f.goals_for AS home_goals,
+                    f.goals_against AS away_goals,
+                    COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
+                    COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
+                FROM raw.fact_head_to_head f
+                JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+                LEFT JOIN dim.dim_leagues dl
+                  ON dl.api_league_id = rf.api_league_id
+                LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+                JOIN elo.team_elo_history eh
+                  ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
+                JOIN elo.team_elo_history ea
+                  ON ea.fixture_id = f.fixture_id AND ea.team_id = f.opponent_id
+                WHERE f.is_played AND f.is_home
+            )
+            SELECT
+                league,
+                country,
+                COUNT(*) AS matches,
+                AVG(CASE
+                    WHEN home_elo < away_elo AND home_goals > away_goals THEN 1.0
+                    WHEN away_elo < home_elo AND away_goals > home_goals THEN 1.0
+                    ELSE 0.0
+                END) AS upset_rate
+            FROM matches
+            WHERE home_elo != away_elo
+            GROUP BY league, country
+            HAVING COUNT(*) >= %s
+        """, (min_matches,))
+        return {
+            (league, country or ""): {
+                "upset_rate": float(upset_rate),
+                "matches": int(matches),
+            }
+            for league, country, matches, upset_rate in cur.fetchall()
+        }
+
+
+def _bounds_1_4_league_prior(unified_market: str, league: str,
+                             country: str = "",
+                             league_priors: dict | None = None) -> dict | None:
+    """Return a transparent, reliability-shrunk ranking prior when eligible."""
+    if unified_market != "Match Goals 1-4":
+        return None
+    prior = (league_priors or BOUNDS_1_4_LEAGUE_PRIORS).get(
+        (league, country or ""))
+    if not prior:
+        return None
+    excess = max(0.0, prior["rate"] - BOUNDS_1_4_GLOBAL_RATE)
+    reliability = prior["matches"] / (prior["matches"] + BOUNDS_1_4_PRIOR_STRENGTH)
+    boost = min(excess * reliability, BOUNDS_1_4_MAX_SCORE_BOOST)
+    return {
+        "rate": prior["rate"],
+        "matches": prior["matches"],
+        "boost": boost,
+    }
+
+IMPLIED_ODDS_MAP = {
+    (0.90, 1.00): 1.08,
+    (0.85, 0.90): 1.12,
+    (0.80, 0.85): 1.18,
+    (0.75, 0.80): 1.25,
+    (0.70, 0.75): 1.35,
+    (0.65, 0.70): 1.48,
+}
+
+
+MARKET_ODDS_BOOST = {
+    "Win": 0.30,
+    "Double Chance": 0.15,
+    "Over 2.5": 0.20,
+    "Over 1.5": 0.08,
+    "Under 2.5": 0.15,
+    "BTTS": 0.20,
+}
+
+
+def _est_odds(prob: float, market: str = "") -> float:
+    boost = 0.0
+    for pattern, b in MARKET_ODDS_BOOST.items():
+        if pattern in market:
+            boost = b
+            break
+    base = None
+    for (lo, hi), odds in IMPLIED_ODDS_MAP.items():
+        if lo <= prob < hi:
+            base = odds
+            break
+    if base is None:
+        if prob >= 1.0:
+            base = 1.02
+        elif prob < 0.65:
+            base = 1.60
+        else:
+            base = 1.10
+    return round(base + boost, 2)
+
+
+# ── League comparison (D57) ─────────────────────────────────────────────
+# Each user-facing number is compared with how often the same event happened
+# in the same league this season. Rates come from the Bayesian league table
+# (raw.fact_head_to_head_events, current season). For match events every
+# fixture appears once per team in context "all", so fixtures = rows // 2.
+LEAGUE_RATE_MIN_MATCHES = 20      # fewer fixtures → "too_few_matches"
+PATTERN_COMPARE_MIN_N = 6         # team record needs this many matches
+LEAGUE_GAP_WELL = 0.15            # ≥ +15 pts → well_above
+LEAGUE_GAP_SOME = 0.05            # ≥ +5 pts → above; within ±5 → typical
+
+# D71 Discover pick: one card per fixture. Every candidate from the three
+# lists is scored in the same unit, points above what is normal in its league:
+#   goals    = (calibrated DC probability − league rate) × DISCOVER_GOALS_WEIGHT
+#   patterns = record shrunk toward the league rate with a 15-match prior,
+#              minus the league rate (so 9 of 9 counts for less than 28 of 30)
+# Weights come from the walk-forward check (diagnostics/discover_weight_check.py,
+# Jun–Oct 2026, 4,828 fixtures): goals gaps came true at 0.76 of their claimed
+# size; patterns with a 10-match prior at 0.47, and with 20 the top decile
+# claimed +11.7 pts against +11.1 realised. D77 subsequently selects 15;
+# that earlier validation does not establish performance for the new setting.
+#   strength = Big dog win rate for its gap band − league win rate for the
+#              favourite's venue (all-games rate when the venue split is missing)
+DISCOVER_DC_MIN_PROB = 0.70  # standouts only (owner, 2026-10-07); the Goals outlook section still shows ≥ 65%
+DISCOVER_PATTERN_PRIOR_MATCHES = 15  # D77: historical ranking; separate from prediction rating
+DISCOVER_GOALS_WEIGHT = 0.76
+STANDOUT_MIN_SCORE = 0.15  # D78: inclusive adjusted percentage-point gap
+ELO_GAP_BANDS = ((250, 300), (300, 400), (400, None))   # (lower excl., upper incl.)
+ELO_BAND_MIN_MATCHES = 100        # thinner band → fall back to the overall group rate
+# Strength trust (2026-10-05 trial): each league is scored on its OWN past Big dog
+# record (gap > 250, all seasons in the DB), never the pooled 30-league rate. A
+# league needs this many past Big dog matches before its Big dogs get a score,
+# and the score uses the pessimistic end of its win rate (Wilson 90% lower bound)
+# so a thin record cannot take the top slot.
+ELO_LEAGUE_MIN_MATCHES = 30
+ELO_LEAGUE_Z = 1.645
+# A "Big dog" label is a claim the user sees, so a league only gets Big dogs
+# (Strength section and standouts) when its own record's lower bound is at least
+# this. Owner decision 2026-10-05; drops Belgium, Finland, Austria, Ireland
+# Premier Division on the Oct 5 records.
+ELO_LEAGUE_MIN_LOW = 0.60
+# D81 (trial): the 27% league upset-rate rule no longer gates Big dogs; each league's
+# own Big dog record decides, with a buffer so leagues on the line don't flip daily:
+# a league JOINS at lower bound ≥ 60% and, once in, only LEAVES below 57%.
+# Big dogs are top-flight only (tier 1). Membership is remembered between runs in
+# BIG_DOG_STATE_PATH.
+ELO_LEAGUE_STAY_LOW = 0.57
+BIG_DOG_STATE_PATH = Path(__file__).parent / "big_dog_leagues_state.json"
+# Tier for leagues whose dim.dim_leagues.tier is empty (not in data/metadata.yaml).
+# Unknown tier → no Big dogs.
+LEAGUE_TIER_OVERRIDES = {
+    ("Virsliga", "Latvia"): 1, ("Meistriliiga", "Estonia"): 1,
+    ("A Lyga", "Lithuania"): 1, ("Super League", "China"): 1,
+    ("Premier Division", "Ireland"): 1, ("Veikkausliiga", "Finland"): 1,
+    ("Superliga", "Denmark"): 1, ("Liga I", "Romania"): 1,
+    ("Erovnuli Liga", "Georgia"): 1, ("Premier League", "Kazakhstan"): 1,
+    ("Bundesliga", "Austria"): 1, ("Jupiler Pro League", "Belgium"): 1,
+    ("Allsvenskan", "Sweden"): 1, ("Major League Soccer", "USA"): 1,
+    ("Primera División", "Chile"): 1, ("Liga Profesional Argentina", "Argentina"): 1,
+    ("Ekstraklasa", "Poland"): 1, ("Super League", "Switzerland"): 1,
+    ("1 Lyga", "Lithuania"): 2, ("First Division", "Ireland"): 2,
+    ("1. Division", "Norway"): 2, ("1. Deild", "Iceland"): 2,
+    ("League One", "China"): 2, ("USL Championship", "USA"): 2,
+    ("USL League One", "USA"): 3, ("Division 2 - Södra Svealand", "Sweden"): 4,
+    ("League Two", "China"): 3, ("Capixaba B", "Brazil"): 5,
+}
+_DISCOVER_PRIORITY = {"strength": 0, "goals": 1, "patterns": 2}  # tie-break order
+_NO_COMPARISON = {None, "unavailable", "too_few_matches"}
+
+_DC_MATCH_EVENTS = {
+    "Match Over 1.5": "Over_1_5",
+    "Match Over 2.5": "Over_2_5",
+    "Match Over 3.5": "Over_3_5",
+    "Match Under 2.5": "Under_2_5",
+    "Match Under 3.5": "Under_3_5",
+    "BTTS Yes": "BTTS",
+}
+_DC_TEAM_EVENTS = (
+    (" Over 0.5", "score_1goal"),
+    (" Over 1.5", "score_2goals"),
+    (" Win", "win"),
+)
+
+
+def _load_league_event_rates(conn) -> dict:
+    """{(league_key, event_name, context): {rate, rows}} for the current season."""
+    rates = {}
+    for context in ("all", "home", "away"):
+        df = compute_league_base_rates(conn, context=context,
+                                       current_season_only=True)
+        for r in df.itertuples(index=False):
+            rates[(r.league, r.event_name, context)] = {
+                "rate": float(r.base_rate), "rows": int(r.n)}
+    # Goals 1–4 has no event flag ("goalless" means a team failed to score,
+    # not 0-0), so count it from final scores: one home row per fixture.
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT f.league_name, COALESCE(dc.country_name, ''), COUNT(*),
+                   AVG(CASE WHEN f.goals_for + f.goals_against BETWEEN 1 AND 4
+                            THEN 1.0 ELSE 0.0 END)
+            FROM raw.fact_head_to_head f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            LEFT JOIN dim.dim_leagues dl ON dl.api_league_id = rf.api_league_id
+            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            WHERE f.is_played AND f.is_home AND f.is_current
+            GROUP BY 1, 2
+        """)
+        for league, country, n, rate in cur.fetchall():
+            rates[(f"{league} ({country or ''})", "goals_1_4", "fixtures")] = {
+                "rate": float(rate), "rows": int(n)}
+    return rates
+
+
+def league_comparison_label(gap: float | None) -> str:
+    """Plain-language label for a gap (team or estimate minus league rate)."""
+    if gap is None:
+        return "unavailable"
+    if gap >= LEAGUE_GAP_WELL:
+        return "well_above"
+    if gap >= LEAGUE_GAP_SOME:
+        return "above"
+    if gap > -LEAGUE_GAP_SOME:
+        return "typical"
+    if gap > -LEAGUE_GAP_WELL:
+        return "below"
+    return "well_below"
+
+
+def _league_key(fixture: dict) -> str:
+    return f"{fixture.get('league')} ({fixture.get('country') or ''})"
+
+
+def dc_league_rate(market: str, fixture: dict, rates: dict) -> dict | None:
+    """League rate for the same event as a DC market, or None if unsupported."""
+    league = _league_key(fixture)
+    if market == "Match Goals 1-4":
+        row = rates.get((league, "goals_1_4", "fixtures"))  # one row per fixture
+        return row and {"event": "goals_1_4", "context": "all",
+                        "rate": row["rate"], "matches": row["rows"]}
+    if market in _DC_MATCH_EVENTS:
+        event = _DC_MATCH_EVENTS[market]
+        row = rates.get((league, event, "all"))
+        return row and {"event": event, "context": "all",
+                        "rate": row["rate"], "matches": row["rows"] // 2}
+    for suffix, event in _DC_TEAM_EVENTS:
+        if not market.endswith(suffix):
+            continue
+        team = market[: -len(suffix)]
+        context = ("home" if team == fixture.get("home")
+                   else "away" if team == fixture.get("away") else None)
+        if context is None:
+            return None
+        row = rates.get((league, event, context))
+        return row and {"event": event, "context": context,
+                        "rate": row["rate"], "matches": row["rows"]}
+    return None
+
+
+def attach_league_comparisons(analysis: list[dict], rates: dict) -> None:
+    """Add league_rate / league_gap / league_comparison to DC and pattern rows."""
+    for fixture in analysis:
+        for row in fixture.get("dixon_coles", []):
+            ref = dc_league_rate(row.get("market", ""), fixture, rates)
+            if not ref:
+                row.update(league_rate=None, league_rate_matches=None,
+                           league_rate_context=None, league_gap=None,
+                           league_comparison="unavailable")
+                continue
+            gap = float(row["probability"]) - ref["rate"]
+            row.update(
+                league_rate=round(ref["rate"], 4),
+                league_rate_matches=ref["matches"],
+                league_rate_context=ref["context"],
+                league_gap=round(gap, 4),
+                league_comparison=(
+                    league_comparison_label(gap)
+                    if ref["matches"] >= LEAGUE_RATE_MIN_MATCHES
+                    else "too_few_matches"),
+            )
+        for row in fixture.get("bayesian", []):
+            k, n, base = row.get("k"), row.get("n"), row.get("base_rate")
+            if not n or k is None or base is None:
+                row.update(league_gap=None, league_comparison="unavailable")
+                continue
+            gap = k / n - float(base)
+            row.update(
+                league_gap=round(gap, 4),
+                league_comparison=(
+                    league_comparison_label(gap)
+                    if n >= PATTERN_COMPARE_MIN_N else "too_few_matches"),
+            )
+
+
+def _load_comparison_context(conn, league_volatility: dict) -> tuple[dict, dict | None]:
+    """League event rates + Strength group record, never fatal to the export.
+
+    These feed display copy only. A failure leaves comparisons "unavailable"
+    rather than stopping the daily run.
+    """
+    try:
+        rates = _load_league_event_rates(conn)
+    except Exception as exc:  # pragma: no cover - logged, export continues
+        conn.rollback()
+        print(f"  WARN league event rates unavailable: {exc}")
+        rates = {}
+    try:
+        # D81: every league's own record (no upset-rate pre-filter), then classify.
+        group = _load_elo_gap_group_record(conn, league_volatility, max_upset=1.0)
+        group["big_dog_leagues"] = classify_big_dog_leagues(
+            group["by_league"], _load_league_tiers(conn), load_big_dog_state())
+        n_in = sum(r["status"] == "in" for r in group["big_dog_leagues"])
+        n_held = sum(r["held"] for r in group["big_dog_leagues"])
+        print(f"  Big dog leagues: {n_in} in ({n_held} held by buffer)")
+    except Exception as exc:  # pragma: no cover
+        conn.rollback()
+        print(f"  WARN elo gap group record unavailable: {exc}")
+        group = None
+    return rates, group
+
+
+# ── Strength group record ────────────────────────────────────────────────
+def _load_elo_gap_group_record(
+        conn, league_volatility: dict, gap_min: int | None = None,
+        max_upset: float | None = None) -> dict:
+    """How favourites like the Strength shortlist actually finished.
+
+    Same population rules as _build_elo_gap_shortlist: pre-match flat Elo gap
+    strictly above gap_min, in leagues whose upset rate is ≤ max_upset over
+    enough history. Used for "favourites like this won X in 10" copy instead
+    of a per-match win %, which did not separate stronger from weaker
+    favourites (numbers audit §5).
+    """
+    gap_min = ELO_HUGE_GAP_MIN if gap_min is None else gap_min
+    max_upset = ELO_LOW_VOLATILITY_MAX if max_upset is None else max_upset
+    eligible = {k for k, v in league_volatility.items()
+                if v["matches"] >= ELO_VOLATILITY_MIN_HISTORY
+                and v["upset_rate"] <= max_upset}
+    with conn.cursor() as cur:
+        cur.execute("""
+            WITH matches AS (
+                SELECT
+                    f.league_name AS league,
+                    COALESCE(dc.country_name, '') AS country,
+                    f.goals_for AS home_goals,
+                    f.goals_against AS away_goals,
+                    COALESCE(eh.rating_before_flat, eh.rating_before)
+                      - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
+                FROM raw.fact_head_to_head f
+                JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+                LEFT JOIN dim.dim_leagues dl
+                  ON dl.api_league_id = rf.api_league_id
+                LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+                JOIN elo.team_elo_history eh
+                  ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
+                JOIN elo.team_elo_history ea
+                  ON ea.fixture_id = f.fixture_id AND ea.team_id = f.opponent_id
+                WHERE f.is_played AND f.is_home
+            )
+            SELECT league, country,
+                   COUNT(*) AS matches,
+                   SUM(CASE WHEN (diff > 0 AND home_goals > away_goals)
+                              OR (diff < 0 AND away_goals > home_goals)
+                            THEN 1 ELSE 0 END) AS won,
+                   SUM(CASE WHEN home_goals = away_goals THEN 1 ELSE 0 END) AS drew,
+                   _ELO_BAND_SQL AS band
+            FROM matches
+            WHERE ABS(diff) > %s
+            GROUP BY league, country, band
+        """.replace("_ELO_BAND_SQL", _elo_band_sql()), (gap_min,))
+        rows = cur.fetchall()
+    return aggregate_elo_gap_group(rows, eligible, gap_min, max_upset)
+
+
+def _elo_band_label(lo: int, hi: int | None) -> str:
+    return f"{lo}-{hi}" if hi is not None else f"{lo}+"
+
+
+def _elo_band_sql() -> str:
+    parts = [f"WHEN ABS(diff) <= {hi} THEN '{_elo_band_label(lo, hi)}'"
+             for lo, hi in ELO_GAP_BANDS if hi is not None]
+    lo, hi = ELO_GAP_BANDS[-1]
+    return f"CASE {' '.join(parts)} ELSE '{_elo_band_label(lo, hi)}' END"
+
+
+def aggregate_elo_gap_group(rows, eligible: set, gap_min: int,
+                            max_upset: float) -> dict:
+    """Overall + per-gap-band record from (league, country, n, won, drew, band)."""
+    def rec(n, w, d):
+        return {"matches": n, "won": w, "drew": d, "lost": n - w - d,
+                "win_rate": round(w / n, 4) if n else None}
+    total = [0, 0, 0]
+    bands = {_elo_band_label(lo, hi): [0, 0, 0] for lo, hi in ELO_GAP_BANDS}
+    for league, country, n, w, d, band in rows:
+        if (league, country or "") not in eligible:
+            continue
+        for acc in (total, bands.setdefault(band, [0, 0, 0])):
+            acc[0] += int(n); acc[1] += int(w); acc[2] += int(d)
+    out = {"gap_min": gap_min, "max_league_upset_rate": max_upset,
+           "leagues": len(eligible), **rec(*total)}
+    out["bands"] = [dict(band=_elo_band_label(lo, hi), min=lo, max=hi,
+                         **rec(*bands[_elo_band_label(lo, hi)]))
+                    for lo, hi in ELO_GAP_BANDS]
+    per = defaultdict(lambda: [0, 0, 0])
+    for league, country, n, w, d, _band in rows:
+        key = (league, country or "")
+        if key in eligible:
+            acc = per[key]; acc[0] += int(n); acc[1] += int(w); acc[2] += int(d)
+    out["by_league"] = sorted((
+        dict(league=lg, country=ct, **rec(*v),
+             win_rate_low=round(wilson_lower(v[1], v[0]), 4) if v[0] else None,
+             meets_min=v[0] >= ELO_LEAGUE_MIN_MATCHES)
+        for (lg, ct), v in per.items()), key=lambda r: -r["matches"])
+    return out
+
+
+def wilson_lower(won: int, n: int, z: float = ELO_LEAGUE_Z) -> float:
+    """Pessimistic end of a win rate's range (Wilson score interval)."""
+    if n <= 0:
+        return 0.0
+    p = won / n
+    centre = p + z * z / (2 * n)
+    margin = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return max(0.0, (centre - margin) / (1 + z * z / n))
+
+
+def elo_league_record(group: dict | None, league: str | None,
+                      country: str | None) -> dict | None:
+    """This league's own past Big dog record from the group export, or None."""
+    for r in (group or {}).get("by_league") or []:
+        if r["league"] == league and r["country"] == (country or ""):
+            return r
+    return None
+
+
+def league_big_dogs_trusted(rec: dict | None) -> bool:
+    """Enough past Big dog matches AND favourites reliably won them (join bar)."""
+    return bool(rec and rec.get("meets_min")
+                and (rec.get("win_rate_low") or 0) >= ELO_LEAGUE_MIN_LOW)
+
+
+def classify_big_dog_leagues(by_league: list[dict], tiers: dict,
+                             previously_in: set) -> list[dict]:
+    """D81: which leagues get Big dogs this run, and why (in / out, held by buffer)."""
+    out = []
+    for r in by_league:
+        key = (r["league"], r["country"])
+        tier = tiers.get(key) or LEAGUE_TIER_OVERRIDES.get(key)
+        low = r.get("win_rate_low") or 0
+        was_in = f"{key[0]} ({key[1]})" in previously_in
+        held = False
+        if tier is None:
+            status, reason = "out", "tier unknown"
+        elif tier != 1:
+            status, reason = "out", f"tier {tier} (top flight only)"
+        elif not r.get("meets_min"):
+            status, reason = "out", f"< {ELO_LEAGUE_MIN_MATCHES} Big dog matches"
+        elif low >= ELO_LEAGUE_MIN_LOW:
+            status, reason = "in", f"low ≥ {ELO_LEAGUE_MIN_LOW:.0%}"
+        elif was_in and low >= ELO_LEAGUE_STAY_LOW:
+            status, reason, held = "in", f"held by buffer (low ≥ {ELO_LEAGUE_STAY_LOW:.0%})", True
+        else:
+            status = "out"
+            reason = (f"fell below {ELO_LEAGUE_STAY_LOW:.0%}" if was_in
+                      else f"low < {ELO_LEAGUE_MIN_LOW:.0%}")
+        out.append({"league": key[0], "country": key[1], "tier": tier,
+                    "status": status, "reason": reason, "held": held,
+                    "was_in": was_in, "matches": r.get("matches"),
+                    "won": r.get("won"), "win_rate": r.get("win_rate"),
+                    "win_rate_low": r.get("win_rate_low")})
+    return out
+
+
+def big_dog_league_in(group: dict | None, league: str | None,
+                      country: str | None) -> bool:
+    """League gets Big dogs this run (D81 classification; D74 rule if absent)."""
+    rows = (group or {}).get("big_dog_leagues")
+    if rows is None:
+        return league_big_dogs_trusted(elo_league_record(group, league, country))
+    return any(r["league"] == league and r["country"] == (country or "")
+               and r["status"] == "in" for r in rows)
+
+
+def load_big_dog_state(path: Path = BIG_DOG_STATE_PATH) -> set:
+    try:
+        return set(json.loads(path.read_text()).get("leagues", []))
+    except (OSError, ValueError):
+        return set()
+
+
+def save_big_dog_state(group: dict | None, path: Path = BIG_DOG_STATE_PATH) -> None:
+    rows = (group or {}).get("big_dog_leagues")
+    if rows is None:
+        return
+    leagues = sorted(f"{r['league']} ({r['country']})" for r in rows if r["status"] == "in")
+    path.write_text(json.dumps({
+        "updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "join_low": ELO_LEAGUE_MIN_LOW, "stay_low": ELO_LEAGUE_STAY_LOW,
+        "leagues": leagues}, indent=2))
+
+
+def _load_league_tiers(conn) -> dict:
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT dl.league_name, COALESCE(dc.country_name, ''), dl.tier
+            FROM dim.dim_leagues dl
+            LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+            WHERE dl.tier IS NOT NULL
+        """)
+        return {(lg, ct): int(t) for lg, ct, t in cur.fetchall()}
+
+
+def elo_group_win_rate(gap: float, group: dict | None) -> tuple[float | None, str]:
+    """Win rate for favourites in this gap's band; overall rate if the band is thin."""
+    if not group:
+        return None, "unavailable"
+    for b in group.get("bands") or []:
+        if gap > b["min"] and (b["max"] is None or gap <= b["max"]):
+            if b["matches"] >= ELO_BAND_MIN_MATCHES and b["win_rate"] is not None:
+                return b["win_rate"], f"band {b['band']}"
+            break
+    return group.get("win_rate"), "all big dogs"
+
+
+def league_win_rate(fixture: dict, team: str, rates: dict) -> dict | None:
+    """League win rate at the team's venue; all-games rate if the split is missing."""
+    league = _league_key(fixture)
+    side = ("home" if team == fixture.get("home")
+            else "away" if team == fixture.get("away") else None)
+    for ctx in ([side] if side else []) + ["all"]:
+        row = rates.get((league, "win", ctx))
+        if row and row.get("rows"):
+            return {"rate": row["rate"], "context": ctx, "rows": row["rows"]}
+    return None
+
+
+def _fixture_favourite(fixture: dict, strength: dict | None) -> str | None:
+    if strength:
+        return strength.get("favourite")
+    for m in fixture.get("mismatch") or []:
+        for team in (fixture.get("home"), fixture.get("away")):
+            if team and str(m.get("market", "")).startswith(f"{team} "):
+                return team
+    return None
+
+
+def discover_candidates(fixture: dict, strength: dict | None,
+                        group: dict | None, rates: dict) -> list[dict]:
+    """Every Discover-eligible event for one fixture, scored on one scale (D71)."""
+    out = []
+    for r in fixture.get("dixon_coles") or []:
+        market = r.get("market", "")
+        if (market.endswith(" Win") or r.get("league_gap") is None
+                or (r.get("probability") or 0) < DISCOVER_DC_MIN_PROB
+                or r.get("league_comparison") in _NO_COMPARISON):
+            continue
+        out.append({"list": "goals",
+                    "score": float(r["league_gap"]) * DISCOVER_GOALS_WEIGHT,
+                    "market": market, "probability": r["probability"],
+                    "league_rate": r.get("league_rate"),
+                    "league_comparison": r.get("league_comparison")})
+    m = DISCOVER_PATTERN_PRIOR_MATCHES
+    for p in fixture.get("bayesian") or []:
+        k, n, base = p.get("k"), p.get("n"), p.get("base_rate")
+        if (not n or k is None or base is None
+                or n < PATTERN_COMPARE_MIN_N
+                or p.get("league_comparison") in _NO_COMPARISON):
+            continue
+        shrunk = (k + m * float(base)) / (n + m)
+        out.append({"list": "patterns", "score": shrunk - float(base),
+                    "team": p.get("team"), "event": p.get("event"),
+                    "context": p.get("context"), "k": k, "n": n,
+                    "base_rate": base, "shrunk_rate": round(shrunk, 4),
+                    "league_comparison": p.get("league_comparison")})
+    if strength:
+        rec = elo_league_record(group, fixture.get("league"), fixture.get("country"))
+        league = league_win_rate(fixture, strength.get("favourite"), rates)
+        if big_dog_league_in(group, fixture.get("league"), fixture.get("country")) \
+                and rec and league:
+            group_rate = rec["win_rate_low"]
+            source = f"league record {rec['won']}/{rec['matches']} (lower bound)"
+            out.append({"list": "strength", "score": group_rate - league["rate"],
+                        "favourite": strength.get("favourite"),
+                        "underdog": strength.get("underdog"),
+                        "elo_gap": strength.get("elo_gap"),
+                        "group_win_rate": group_rate, "group_rate_source": source,
+                        "league_win_rate": round(league["rate"], 4),
+                        "league_win_context": league["context"]})
+    return out
+
+
+def attach_discover_picks(analysis: list[dict], shortlist: list[dict],
+                          group: dict | None, rates: dict) -> None:
+    """Pick one Discover card per fixture: the highest score above its league.
+
+    Ties go strength > goals > patterns, then to the favourite's side, so a
+    mirrored pair (Zlin winless 9/9 vs Slavia unbeaten 9/9) is told about the
+    stronger team. No standout below 15 adjusted percentage points. A shortlisted
+    favourite is carried as `big_dog` so any winning card can show the badge.
+    """
+    by_fid = {s["fixture_id"]: s for s in shortlist}
+    for fixture in analysis:
+        strength = by_fid.get(fixture.get("fixture_id"))
+        fav = _fixture_favourite(fixture, strength)
+        cands = discover_candidates(fixture, strength, group, rates)
+        if strength:
+            s = next((c for c in cands if c["list"] == "strength"), None)
+            rec = elo_league_record(group, fixture.get("league"),
+                                    fixture.get("country"))
+            strength.update(
+                league_big_dog_matches=rec and rec["matches"],
+                league_big_dog_won=rec and rec["won"],
+                league_big_dog_win_rate=rec and rec["win_rate"],
+                league_big_dog_win_rate_low=rec and rec["win_rate_low"],
+                league_record_ok=big_dog_league_in(
+                    group, fixture.get("league"), fixture.get("country")),
+                group_win_rate=s and s["group_win_rate"],
+                group_rate_source=s and s["group_rate_source"],
+                league_win_rate=s and s["league_win_rate"],
+                league_win_context=s and s["league_win_context"],
+                discover_score=round(s["score"], 4) if s else None)
+        ranked = sorted(cands, key=lambda c: (
+            c["score"], -_DISCOVER_PRIORITY[c["list"]],
+            c.get("team") == fav), reverse=True)
+        # Apply the threshold before presentation rounding; tolerate only float noise.
+        best = ranked[0] if ranked and (
+            ranked[0]["score"] >= STANDOUT_MIN_SCORE
+            or math.isclose(ranked[0]["score"], STANDOUT_MIN_SCORE,
+                            rel_tol=0, abs_tol=1e-12)) else None
+        fixture["discover_pick"] = best and {
+            **best, "score": round(best["score"], 4), "big_dog": strength.get("favourite") if strength else None,
+            "runner_up": ({"list": ranked[1]["list"], "score": round(ranked[1]["score"], 4)}
+                          if len(ranked) > 1 else None),
+            "candidates": len(ranked)}
+
+
+def select_rolling_standouts(analysis: list[dict], *,
+                            now: datetime | None = None,
+                            timezone_name: str = "UTC") -> dict:
+    """Upcoming standouts through the end of the sixth following local day.
+
+    Call on read as well as export to remove started fixtures between refreshes.
+    The export defaults to UTC; user-facing callers pass their IANA timezone.
+    """
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("now must include a timezone")
+    zone = ZoneInfo(timezone_name)
+    first_day = now.astimezone(zone).date()
+    end = datetime.combine(first_day + timedelta(days=7), time.min, tzinfo=zone)
+    unique = {}
+    for fixture in analysis:
+        pick = fixture.get("discover_pick")
+        if not pick or pick.get("score", 0) < STANDOUT_MIN_SCORE:
+            continue
+        try:
+            kickoff = datetime.fromisoformat(str(fixture.get("kickoff", "")).replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if kickoff.tzinfo is None or kickoff.utcoffset() is None:
+            continue
+        if not now < kickoff < end or fixture.get("fixture_id") is None:
+            continue
+        local = kickoff.astimezone(zone)
+        row = {**{key: fixture.get(key) for key in
+                  ("fixture_id", "home", "away", "league", "country", "kickoff")},
+               "fixture_date": local.date().isoformat(),
+               "kickoff_local": local.isoformat(), "pick": dict(pick)}
+        old = unique.get(row["fixture_id"])
+        if old is None or pick["score"] > old["pick"]["score"]:
+            unique[row["fixture_id"]] = row
+    items = sorted(unique.values(), key=lambda r: (
+        -r["pick"]["score"], -1 * (r["pick"]["list"] == "strength"),
+        -1 * (r["pick"]["list"] == "goals"), r["kickoff"], str(r["fixture_id"])))
+    return {"timezone": timezone_name, "as_of": now.isoformat(),
+            "start_date": first_day.isoformat(),
+            "end_date": (first_day + timedelta(days=6)).isoformat(),
+            "end_exclusive": end.isoformat(), "minimum_score": STANDOUT_MIN_SCORE,
+            "count": len(items), "items": items}
+
+
+def _load_sportybet_odds() -> dict:
+    """Read raw.sportybet_odds into {fixture_id: markets} for odds_for_pick().
+
+    markets = {"OU": {line: {Over,Under}}, "HOME_OU": ..., "AWAY_OU": ...,
+               "1X2": {Home,Draw,Away}, "DC": {...}, "BTTS": {...}}.
+    Returns {} if the table is absent or empty (engine then uses est_odds).
+    """
+    from engine.eval.bayesian_streaks import _get_conn
+    from collections import defaultdict
+    conn = _get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT to_regclass('raw.sportybet_odds')")
+        if cur.fetchone()[0] is None:
+            return {}
+        cur.execute("""
+            SELECT fixture_id, market, line, selection, decimal_odds
+            FROM raw.sportybet_odds
+        """)
+        tiered: dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+        flat: dict = defaultdict(lambda: defaultdict(dict))
+        for fid, market, line, sel, od in cur.fetchall():
+            fid = int(fid)
+            od = float(od)
+            if market in ("OU", "HOME_OU", "AWAY_OU"):
+                tiered[fid][market][line or ""][sel] = od
+            else:
+                flat[fid][market][sel] = od
+    except Exception:  # noqa: BLE001
+        return {}
+    finally:
+        conn.close()
+
+    out = {}
+    for fid in set(tiered) | set(flat):
+        m = {k: {ln: dict(v) for ln, v in d.items()} for k, d in tiered.get(fid, {}).items()}
+        m.update({k: dict(v) for k, v in flat.get(fid, {}).items()})
+        out[fid] = m
+    return out
+
+
+def _normalise_market(model: str, raw_market: str, side: str = "",
+                      team: str = "", favourite: str = "") -> str | None:
+    """Map model-specific market labels to a unified SportyBet market key."""
+    if model == "poisson":
+        parts = raw_market.split()
+        direction = parts[0].capitalize()
+        line = parts[1]
+        return f"Match {direction} {line}"
+
+    if model == "mismatch":
+        if "over_1.5" in raw_market or "Over 1.5" in raw_market:
+            return "Match Over 1.5"
+        if "over_2.5" in raw_market or "Over 2.5" in raw_market:
+            return "Match Over 2.5"
+        if raw_market == "fav_to_score":
+            return f"{favourite} Over 0.5"
+        if raw_market == "fav_over_1.5":
+            return f"{favourite} Over 1.5"
+        if raw_market == "fav_win":
+            return f"{favourite} Win"
+        return None
+
+    if model == "bayesian":
+        event = raw_market.split()[-1] if " " in raw_market else raw_market
+        if event == "Over_1_5":
+            return "Match Over 1.5"
+        if event == "Over_2_5":
+            return "Match Over 2.5"
+        if event == "Over_3_5":
+            return "Match Over 3.5"
+        if event == "Under_2_5":
+            return "Match Under 2.5"
+        if event == "Under_3_5":
+            return "Match Under 3.5"
+        if event == "score_1goal":
+            return f"{team} Over 0.5"
+        if event == "score_2goals":
+            return f"{team} Over 1.5"
+        if event == "win":
+            return f"{team} Win"
+        if event == "unbeaten":
+            return f"{team} Double Chance"
+        if event == "concede_1":
+            opp_side = "away" if side == "home" else "home"
+            return f"OPP_{opp_side} Over 0.5"
+        if event == "BTTS":
+            return "BTTS Yes"
+        if event == "clean_sheet":
+            return f"{team} Clean Sheet"
+        return None
+
+    if model == "dixon_coles":
+        return raw_market
+
+    return None
+
+
+def _sportify_market(unified: str, home: str, away: str) -> dict:
+    """Convert a unified market key into SportyBet-bookable description."""
+    if unified == "Match Goals 1-4":
+        return {"market": "Goal Bounds", "selection": "1-4", "line": None}
+    if unified.startswith("Match Over"):
+        line = unified.split()[-1]
+        return {"market": "Over/Under", "selection": f"Over {line}", "line": float(line)}
+    if unified.startswith("Match Under"):
+        line = unified.split()[-1]
+        return {"market": "Over/Under", "selection": f"Under {line}", "line": float(line)}
+    if "Over 0.5" in unified:
+        if unified.startswith("OPP_home"):
+            return {"market": "Home Team Over/Under", "selection": f"{home} Over 0.5", "line": 0.5}
+        if unified.startswith("OPP_away"):
+            return {"market": "Away Team Over/Under", "selection": f"{away} Over 0.5", "line": 0.5}
+        for team_name in (home, away):
+            if team_name.lower() in unified.lower() or unified.startswith(team_name.split()[0]):
+                is_home = team_name == home
+                mkt = "Home Team Over/Under" if is_home else "Away Team Over/Under"
+                return {"market": mkt, "selection": f"{team_name} Over 0.5", "line": 0.5}
+        return {"market": "Team Over/Under", "selection": unified, "line": 0.5}
+    if "Over 1.5" in unified and not unified.startswith("Match"):
+        for team_name in (home, away):
+            if team_name.lower() in unified.lower():
+                is_home = team_name == home
+                mkt = "Home Team Over/Under" if is_home else "Away Team Over/Under"
+                return {"market": mkt, "selection": f"{team_name} Over 1.5", "line": 1.5}
+    if "Win" in unified:
+        return {"market": "1X2", "selection": unified, "line": None}
+    if "Double Chance" in unified:
+        for team_name in (home, away):
+            if team_name.lower() in unified.lower():
+                if team_name == home:
+                    return {"market": "Double Chance", "selection": "1X", "line": None}
+                else:
+                    return {"market": "Double Chance", "selection": "X2", "line": None}
+        return {"market": "Double Chance", "selection": unified, "line": None}
+    if "BTTS" in unified:
+        return {"market": "Both Teams to Score", "selection": "Yes", "line": None}
+    return {"market": "Other", "selection": unified, "line": None}
+
+
+def _is_match_total_market(unified: str) -> bool:
+    return unified.startswith("Match Over") or unified.startswith("Match Under")
+
+
+def _passes_goal_model_rules(unified: str, models: set[str]) -> bool:
+    if unified == "Match Over 1.5":
+        return {"poisson", "dixon_coles"}.issubset(models)
+    if unified == "Match Over 2.5":
+        return True
+    if unified.startswith("Match Under"):
+        return {"poisson", "dixon_coles"}.issubset(models)
+    if _is_match_total_market(unified) and len(models) == 1:
+        return False
+    if unified == "BTTS Yes":
+        return "dixon_coles" in models
+    return True
+
+
+def _strength_profile(row: pd.Series) -> dict:
+    profile = {
+        "overall": {
+            "attack_rate": round(float(row["attack_rate"]), 2),
+            "defense_rate": round(float(row["defense_rate"]), 2),
+            "attack_shrunk": round(float(row["attack_shrunk"]), 3),
+            "defense_shrunk": round(float(row["defense_shrunk"]), 3),
+            "attack_pct": round(float(row["attack_percentile"]), 1),
+            "defense_pct": round(float(row["defense_percentile"]), 1),
+            "attack_rank": int(row["attack_rank"]),
+            "defense_rank": int(row["defense_rank"]),
+            "league_size": int(row["league_size"]),
+        },
+    }
+    for ctx in ("home", "away"):
+        col_atk = f"{ctx}_attack_shrunk"
+        if col_atk in row.index and pd.notna(row.get(col_atk)):
+            profile[ctx] = {
+                "attack_rate": round(float(row[f"{ctx}_attack_rate"]), 2) if pd.notna(row.get(f"{ctx}_attack_rate")) else None,
+                "defense_rate": round(float(row[f"{ctx}_defense_rate"]), 2) if pd.notna(row.get(f"{ctx}_defense_rate")) else None,
+                "attack_shrunk": round(float(row[f"{ctx}_attack_shrunk"]), 3),
+                "defense_shrunk": round(float(row[f"{ctx}_defense_shrunk"]), 3),
+                "attack_pct": round(float(row[f"{ctx}_attack_percentile"]), 1),
+                "defense_pct": round(float(row[f"{ctx}_defense_percentile"]), 1),
+                "attack_rank": int(row[f"{ctx}_attack_rank"]) if pd.notna(row.get(f"{ctx}_attack_rank")) else None,
+                "defense_rank": int(row[f"{ctx}_defense_rank"]) if pd.notna(row.get(f"{ctx}_defense_rank")) else None,
+                "league_size": int(row[f"{ctx}_league_size"]) if pd.notna(row.get(f"{ctx}_league_size")) else None,
+            }
+        else:
+            profile[ctx] = None
+    return profile
+
+
+def _load_fixture_strength_profiles(conn) -> dict[int, dict]:
+    strength_df = load_team_df(conn)
+    strength_all = compute_team_strength(strength_df)
+    strength_by_h2h = {
+        row["team_id"]: _strength_profile(row)
+        for _, row in strength_all.iterrows()
+    }
+
+    rf_fixtures = pd.read_sql("""
+        SELECT fixture_id, home_team_id, away_team_id
+        FROM raw.raw_fixtures
+    """, conn)
+    if rf_fixtures.empty:
+        return {}
+
+    rf_lookup = {}
+    all_rf_ids = set()
+    for _, r in rf_fixtures.iterrows():
+        fid = int(r["fixture_id"])
+        home_rf = int(r["home_team_id"])
+        away_rf = int(r["away_team_id"])
+        rf_lookup[fid] = (home_rf, away_rf)
+        all_rf_ids.add(home_rf)
+        all_rf_ids.add(away_rf)
+
+    rf_id_list = ",".join(str(i) for i in sorted(all_rf_ids))
+    id_map_df = pd.read_sql(f"""
+        SELECT DISTINCT r.home_team_id AS rf_id, h.team_id AS h2h_id
+        FROM raw.raw_fixtures r
+        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND h.is_home
+        WHERE r.home_team_id IN ({rf_id_list})
+        UNION
+        SELECT DISTINCT r.away_team_id AS rf_id, h.team_id AS h2h_id
+        FROM raw.raw_fixtures r
+        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND NOT h.is_home
+        WHERE r.away_team_id IN ({rf_id_list})
+    """, conn)
+    rf_to_h2h = dict(zip(id_map_df["rf_id"], id_map_df["h2h_id"]))
+
+    fixture_strength = {}
+    for fid, (home_rf, away_rf) in rf_lookup.items():
+        home_h2h = rf_to_h2h.get(home_rf)
+        away_h2h = rf_to_h2h.get(away_rf)
+        fixture_strength[fid] = {
+            "home_team": strength_by_h2h.get(home_h2h) if home_h2h else None,
+            "away_team": strength_by_h2h.get(away_h2h) if away_h2h else None,
+        }
+    return fixture_strength
+
+
+def _ctx_strength(team_profile: dict | None, ctx: str) -> dict | None:
+    if not team_profile:
+        return None
+    return team_profile.get(ctx) or team_profile.get("overall")
+
+
+def _rank_summary(ctx: dict | None) -> dict | None:
+    if not ctx:
+        return None
+    return {
+        "attack_rank": ctx.get("attack_rank"),
+        "defense_rank": ctx.get("defense_rank"),
+        "league_size": ctx.get("league_size"),
+        "attack_pct": ctx.get("attack_pct"),
+        "defense_pct": ctx.get("defense_pct"),
+    }
+
+
+def _fixture_strength_rank(strength: dict | None) -> dict | None:
+    if not strength:
+        return None
+    home_profile = strength.get("home_team")
+    away_profile = strength.get("away_team")
+    home_ctx = _ctx_strength(home_profile, "home")
+    away_ctx = _ctx_strength(away_profile, "away")
+    home_overall = _ctx_strength(home_profile, "overall")
+    away_overall = _ctx_strength(away_profile, "overall")
+    if not home_ctx and not away_ctx and not home_overall and not away_overall:
+        return None
+    return {
+        "home": {
+            "context": "home",
+            "split": _rank_summary(home_ctx),
+            "overall": _rank_summary(home_overall),
+        },
+        "away": {
+            "context": "away",
+            "split": _rank_summary(away_ctx),
+            "overall": _rank_summary(away_overall),
+        },
+    }
+
+
+def _under35_strength_gate(strength: dict | None) -> tuple[bool, dict | None]:
+    if not strength:
+        return False, None
+    home = _ctx_strength(strength.get("home_team"), "home")
+    away = _ctx_strength(strength.get("away_team"), "away")
+    if not home or not away:
+        return False, None
+
+    attack_pcts = [home["attack_pct"], away["attack_pct"]]
+    defense_pcts = [home["defense_pct"], away["defense_pct"]]
+    avg_attack = sum(attack_pcts) / 2
+    avg_defense = sum(defense_pcts) / 2
+    detail = {
+        "avg_attack_pct": round(avg_attack, 1),
+        "max_attack_pct": round(max(attack_pcts), 1),
+        "avg_defense_pct": round(avg_defense, 1),
+        "min_defense_pct": round(min(defense_pcts), 1),
+    }
+    ok = (
+        avg_attack <= UNDER35_MAX_AVG_ATTACK_PCT
+        and max(attack_pcts) <= UNDER35_MAX_SINGLE_ATTACK_PCT
+        and avg_defense >= UNDER35_MIN_AVG_DEFENSE_PCT
+        and min(defense_pcts) >= UNDER35_MIN_SINGLE_DEFENSE_PCT
+    )
+    return ok, detail
+
+
+def _market_tier(unified_market: str, avg_confidence: float,
+                 strength_gate: dict | None = None) -> str | None:
+    """Market-specific quality tier from walk-forward calibration."""
+    if unified_market != "Match Under 3.5" or not strength_gate:
+        return None
+    if avg_confidence >= UNDER35_TIER_A_THRESHOLD:
+        return "A"
+    if avg_confidence >= UNDER35_TIER_B_THRESHOLD:
+        return "B"
+    if avg_confidence >= UNDER35_TIER_C_THRESHOLD:
+        return "C"
+    return None
+
+
+def _f(v):
+    """Coerce numpy/NaN/None to a plain float or None (JSON/DB safe)."""
+    if v is None:
+        return None
+    try:
+        return float(v) if pd.notna(v) else None
+    except (TypeError, ValueError):
+        return None
+
+
+# ── per-model signal extraction (shared by run_consensus and run_model) ───────
+# Each returns a list of normalised picks:
+#   {fixture_id, model, unified_market, probability, raw_probability, detail}
+
+def poisson_signals(poisson_picks) -> list[dict]:
+    out = []
+    if poisson_picks is None or poisson_picks.empty:
+        return out
+    for _, row in poisson_picks.iterrows():
+        unified = _normalise_market("poisson", f"{row['direction']} {row['line']}")
+        if unified:
+            out.append({"fixture_id": int(row["fixture_id"]), "model": "poisson",
+                        "unified_market": unified, "probability": _f(row["probability"]),
+                        "raw_probability": _f(row.get("raw_probability")),
+                        "detail": {"tier": _tier(row["probability"]),
+                                   "raw": _f(row.get("raw_probability"))}})
+    return out
+
+
+def mismatch_signals(mismatch_picks) -> list[dict]:
+    out = []
+    for p in mismatch_picks:
+        unified = _normalise_market("mismatch", p.market, favourite=p.favourite)
+        if unified:
+            out.append({"fixture_id": int(p.fixture_id), "model": "mismatch",
+                        "unified_market": unified, "probability": _f(p.confidence),
+                        "raw_probability": None,
+                        "detail": {"gap": p.gap, "gap_bin": p.gap_bin,
+                                   "h2h_boost": p.h2h_boost,
+                                   "api_league_id": p.api_league_id,
+                                   "country": p.country}})
+    return out
+
+
+def _bayesian_signal_decision(b: dict, side: str,
+                              home_away: tuple[str, str] | None) -> tuple[str | None, str]:
+    """Return (unified_market, eligibility_reason) for one Bayesian belief.
+
+    The reason is persisted with fixture analysis so rejected beliefs remain
+    auditable without entering the betting consensus pool.
+    """
+    if not b.get("display_eligible", True):
+        return None, "below_display_threshold"
+    if b.get("primary") is False:
+        return None, "secondary_context"
+    if b["event"] == "BTTS":
+        return None, "btts_disabled"
+    if b["event"] not in BETTING_EVENTS:
+        return None, "not_betting_allowlist"
+
+    unified = _normalise_market(
+        "bayesian", f"{b['team']} {b['event']}", side=side, team=b["team"]
+    )
+    if not unified:
+        return None, "no_market_mapping"
+    if unified.startswith("OPP_"):
+        if not home_away:
+            return None, "missing_fixture_mapping"
+        opp_side = "home" if side == "away" else "away"
+        unified = f"{home_away[0] if opp_side == 'home' else home_away[1]} Over 0.5"
+    return unified, "included"
+
+
+def annotate_bayesian_analysis(bayesian_by_fixture: dict,
+                               home_away: dict) -> dict:
+    """Add stable consensus eligibility metadata to every Bayesian belief."""
+    annotated = {}
+    for fid, sides in bayesian_by_fixture.items():
+        fixture_entry = {"home": [], "away": []}
+        for side in ("home", "away"):
+            for belief in sides.get(side, []):
+                market, reason = _bayesian_signal_decision(
+                    belief, side, home_away.get(fid)
+                )
+                row = {
+                    **belief,
+                    "side": side,
+                    "consensus_eligible": reason == "included",
+                    "eligibility_reason": reason,
+                    "unified_market": market,
+                }
+                fixture_entry[side].append(row)
+        if fixture_entry["home"] or fixture_entry["away"]:
+            annotated[int(fid)] = fixture_entry
+    return annotated
+
+
+def bayesian_signals(bayesian_by_fixture, home_away: dict) -> list[dict]:
+    """home_away: {fixture_id: (home_name, away_name)} — for the concede→OPP remap."""
+    out = []
+    for fid, sides in bayesian_by_fixture.items():
+        ha = home_away.get(fid)
+        for side in ("home", "away"):
+            for b in sides.get(side, []):
+                unified, reason = _bayesian_signal_decision(b, side, ha)
+                if reason != "included":
+                    continue
+                out.append({"fixture_id": int(fid), "model": "bayesian",
+                            "unified_market": unified, "probability": _f(b["posterior"]),
+                            "raw_probability": None,
+                            "detail": {"streak": b["streak"], "trend": b["trend"],
+                                       "n": b["n"], "k": b.get("k"),
+                                       "context": b.get("context"),
+                                       "boost": b.get("boost"),
+                                       "base_rate": b["base_rate"],
+                                       "team": b["team"], "side": side,
+                                       "event": b["event"]}})
+    return out
+
+
+def dixon_signals(dixon_picks) -> list[dict]:
+    out = []
+    if dixon_picks is None or dixon_picks.empty:
+        return out
+    for _, row in dixon_picks.iterrows():
+        unified = _normalise_market("dixon_coles", row["market"])
+        if unified:
+            out.append({"fixture_id": int(row["fixture_id"]), "model": "dixon_coles",
+                        "unified_market": unified, "probability": _f(row["probability"]),
+                        "raw_probability": _f(row.get("raw_probability")),
+                        "detail": {"raw": _f(row.get("raw_probability")),
+                                   "global_calibrated": _f(row.get("global_calibrated_probability")),
+                                   "calibration_scope": row.get("calibration_scope", "global"),
+                                   "calibration_map": row.get("calibration_map"),
+                                   "league_adjustment": _f(row.get("league_adjustment")),
+                                   "lambda_home": _f(row.get("lambda_home")),
+                                   "lambda_away": _f(row.get("lambda_away"))}})
+    return out
+
+
+def _high_scoring_fixture_ids(fixture_ids, conn=None) -> set:
+    """fixture_ids whose league averages > HIGH_SCORING_AVG_GOALS goals/game."""
+    ids = [int(f) for f in fixture_ids]
+    if not ids:
+        return set()
+    own = conn is None
+    conn = conn or get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT rf.api_league_id, avg(f.goals_for + f.goals_against)
+            FROM raw.fact_head_to_head f
+            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
+            WHERE f.is_home AND f.is_played AND rf.season IN (2025, 2026)
+            GROUP BY rf.api_league_id
+        """)
+        high_lids = {lid for lid, ag in cur.fetchall()
+                     if ag is not None and float(ag) > HIGH_SCORING_AVG_GOALS}
+        cur.execute("SELECT fixture_id, api_league_id FROM raw.raw_fixtures "
+                    "WHERE fixture_id = ANY(%s)", (ids,))
+        return {int(fid) for fid, lid in cur.fetchall() if lid in high_lids}
+    except Exception:  # noqa: BLE001
+        return set()
+    finally:
+        if own:
+            conn.close()
+
+
+def _score_pool(consensus: dict, fixture_meta: dict,
+                fixture_strength_all: dict, odds_map: dict,
+                high_scoring_fids: set = frozenset(),
+                bounds_league_priors: dict | None = None
+                ) -> tuple[list[dict], dict, list[dict]]:
+    """Apply gates, tiers, odds/EV and rank the consensus dict into a pool.
+
+    Pure function of its inputs — shared by the in-process `run_consensus`
+    and the fan-in `build_consensus_from_signals` (DAG) path.
+    """
+    ranked = []
+    near_threshold = []
+    gate_status = {}   # (fid, unified_market) -> {"in_pool": bool, "reason": str}
+    for key, pick in consensus.items():
+        fid = pick["fixture_id"]
+        um = pick["unified_market"]
+        meta = fixture_meta.get(fid)
+        if not meta:
+            continue
+
+        def _reject(reason):
+            gate_status[key] = {"in_pool": False, "reason": reason}
+
+        # Drop leagues SportyBet-NG cannot book — keep the pool to bettable markets
+        if not _is_bookable(meta["league"], meta.get("country", "")):
+            _reject("not on SportyBet"); continue
+
+        models = set(pick["models"])
+        n_models = len(models)
+        max_conf = max(pick["confidences"])
+        avg_conf = sum(pick["confidences"]) / len(pick["confidences"])
+        solo_threshold = (
+            BOUNDS_SOLO_THRESHOLD
+            if um == "Match Goals 1-4"
+            else SOLO_THRESHOLD
+        )
+
+        # DC-favoured unders in high-scoring leagues: Poisson overpredicts unders
+        # there while DC stays calibrated, so price off DC's probability.
+        if (um.startswith("Match Under")
+                and fid in high_scoring_fids and "dixon_coles" in pick["models"]):
+            dc_conf = pick["confidences"][pick["models"].index("dixon_coles")]
+            avg_conf = UNDER_HIGH_DC_WEIGHT * dc_conf + (1 - UNDER_HIGH_DC_WEIGHT) * avg_conf
+
+        strength_rank = _fixture_strength_rank(fixture_strength_all.get(fid))
+
+        if not _passes_goal_model_rules(um, models):
+            if um == "BTTS Yes":
+                _reject("needs Dixon-Coles")
+            elif um == "Match Over 1.5" or um.startswith("Match Under"):
+                _reject("needs DC + Poisson")
+            else:
+                _reject("solo goal-model pick")
+            continue
+        if um == "Match Over 1.5" and avg_conf < OVER15_DC_POISSON_THRESHOLD:
+            _reject(f"below Over 1.5 floor ({avg_conf:.0%} < {OVER15_DC_POISSON_THRESHOLD:.0%})")
+            continue
+        strength_gate = None
+        if um == "Match Under 3.5":
+            passes_strength, strength_gate = _under35_strength_gate(
+                fixture_strength_all.get(fid))
+            if not passes_strength:
+                _reject("fails Under 3.5 strength gate"); continue
+        market_tier = _market_tier(um, avg_conf, strength_gate)
+        if um == "Match Under 3.5" and not market_tier:
+            _reject("below Under 3.5 tier"); continue
+
+        # Filter by tier thresholds
+        if n_models >= 3 and avg_conf < TRIO_THRESHOLD:
+            _reject(f"below trio threshold ({avg_conf:.0%} < {TRIO_THRESHOLD:.0%})"); continue
+        if n_models == 2 and avg_conf < DUO_THRESHOLD:
+            _reject(f"below duo threshold ({avg_conf:.0%} < {DUO_THRESHOLD:.0%})"); continue
+        if n_models == 1 and max_conf < solo_threshold:
+            if (um == "Match Goals 1-4"
+                    and max_conf >= BOUNDS_NEAR_THRESHOLD_FLOOR):
+                sportify = _sportify_market(um, meta["home"], meta["away"])
+                real_odds = odds_for_pick(
+                    odds_map.get(fid, {}), sportify["market"],
+                    sportify["selection"], sportify.get("line"),
+                    meta["home"], meta["away"])
+                has_odds = real_odds is not None
+                est_odds = _est_odds(avg_conf, um)
+                detail = next(
+                    (d for d in pick.get("details", [])
+                     if isinstance(d, dict) and "calibration_scope" in d),
+                    {},
+                )
+                near_threshold.append({
+                    "fixture_id": fid,
+                    "match": f"{meta['home']} vs {meta['away']}",
+                    "home": meta["home"],
+                    "away": meta["away"],
+                    "league": meta["league"],
+                    "kickoff": meta["kickoff"],
+                    "unified_market": um,
+                    "sportybet_market": sportify["market"],
+                    "sportybet_selection": sportify["selection"],
+                    "line": sportify.get("line"),
+                    "n_models": n_models,
+                    "models": sorted(models),
+                    "max_confidence": round(max_conf, 4),
+                    "avg_confidence": round(avg_conf, 4),
+                    "est_odds": est_odds,
+                    "real_odds": round(real_odds, 2) if has_odds else None,
+                    "has_odds": has_odds,
+                    "ev": round(avg_conf * real_odds, 4) if has_odds else None,
+                    "odds": round(real_odds if has_odds else est_odds, 2),
+                    "country": meta.get("country", ""),
+                    "strength_rank": strength_rank,
+                    "market_tier": None,
+                    "decision_status": "watch",
+                    "gate_reason": (
+                        f"{max_conf:.2%} is within "
+                        f"{solo_threshold - max_conf:.2%} of the {solo_threshold:.0%} gate"
+                    ),
+                    "global_calibrated_probability": detail.get("global_calibrated"),
+                    "calibration_scope": detail.get("calibration_scope", "global"),
+                    "league_adjustment": detail.get("league_adjustment"),
+                })
+            _reject(
+                f"below solo threshold ({max_conf:.0%} < {solo_threshold:.0%})")
+            continue
+
+        est_odds = _est_odds(avg_conf, um)
+        if est_odds < MIN_EST_ODDS:
+            _reject("est odds too short"); continue
+
+        gate_status[key] = {"in_pool": True, "reason": "in pool"}
+        sportify = _sportify_market(um, meta["home"], meta["away"])
+
+        # Real SportyBet odds + EV where available (else fall back to est_odds)
+        real_odds = odds_for_pick(
+            odds_map.get(fid, {}), sportify["market"], sportify["selection"],
+            sportify.get("line"), meta["home"], meta["away"])
+        has_odds = real_odds is not None
+        book_odds = real_odds if has_odds else est_odds
+        ev = round(avg_conf * real_odds, 4) if has_odds else None
+
+        # Score by consensus strength then EV (real edge), not fabricated odds.
+        # No odds yet → neutral EV proxy of 1.0 so it ranks below priced +EV legs.
+        base_score = n_models * 1.0 + avg_conf + (ev - 1.0 if has_odds else 0.0)
+        league_prior = _bounds_1_4_league_prior(
+            um, meta["league"], meta.get("country", ""),
+            bounds_league_priors)
+        league_prior_boost = league_prior["boost"] if league_prior else 0.0
+        score = base_score + league_prior_boost
+
+        ranked.append({
+            "fixture_id": fid,
+            "match": f"{meta['home']} vs {meta['away']}",
+            "home": meta["home"],
+            "away": meta["away"],
+            "league": meta["league"],
+            "kickoff": meta["kickoff"],
+            "unified_market": pick["unified_market"],
+            "sportybet_market": sportify["market"],
+            "sportybet_selection": sportify["selection"],
+            "line": sportify.get("line"),
+            "n_models": n_models,
+            "models": sorted(set(pick["models"])),
+            "max_confidence": round(max_conf, 4),
+            "avg_confidence": round(avg_conf, 4),
+            "consensus_base_score": round(base_score, 4),
+            "consensus_score": round(score, 4),
+            "league_prior_boost": round(league_prior_boost, 4),
+            "league_prior_rate": (
+                round(league_prior["rate"], 4) if league_prior else None),
+            "league_prior_matches": (
+                league_prior["matches"] if league_prior else None),
+            "est_odds": est_odds,
+            "real_odds": round(real_odds, 2) if has_odds else None,
+            "has_odds": has_odds,
+            "ev": ev,
+            "odds": round(book_odds, 2),
+            "country": meta.get("country", ""),
+            "details": pick["details"],
+            "strength_gate": strength_gate,
+            "strength_rank": strength_rank,
+            "market_tier": market_tier,
+        })
+
+    ranked.sort(key=lambda x: (-x["n_models"], -x["consensus_score"]))
+
+    print(f"  {len(ranked)} consensus picks after filtering")
+    by_tier = {4: 0, 3: 0, 2: 0, 1: 0}
+    for r in ranked:
+        by_tier[r["n_models"]] = by_tier.get(r["n_models"], 0) + 1
+    print(f"  4-model: {by_tier.get(4,0)} | 3-model: {by_tier.get(3,0)} | "
+          f"2-model: {by_tier.get(2,0)} | "
+          f"1-model qualified: {by_tier.get(1,0)}")
+    near_threshold.sort(key=lambda x: -x["avg_confidence"])
+    return ranked, gate_status, near_threshold
+
+
+def _build_bounds_1_4_shortlist(
+        ranked: list[dict], limit: int = BOUNDS_1_4_SHORTLIST_LIMIT,
+        per_league_limit: int = BOUNDS_1_4_PER_LEAGUE_LIMIT,
+        end_date: str | None = None) -> list[dict]:
+    """Top priced 1–4 events, capped so one league cannot dominate."""
+    candidates = [dict(p) for p in ranked if (
+        p.get("sportybet_market") == "Goal Bounds"
+        and p.get("sportybet_selection") == "1-4"
+        and (p.get("league_prior_matches") or 0) >= BOUNDS_1_4_MIN_HISTORY
+        and (p.get("league_prior_rate") or 0) >= BOUNDS_1_4_TOP_RATE
+        and (
+            not p.get("has_odds")
+            or (p.get("real_odds") or 0) >= BOUNDS_1_4_MIN_ODDS
+        )
+        and _within_shortlist_end_date(p.get("kickoff"), end_date)
+    )]
+    candidates.sort(key=lambda p: (
+        -p["league_prior_rate"],
+        -p["avg_confidence"],
+        -p["n_models"],
+        p.get("kickoff", ""),
+    ))
+    shortlist = []
+    league_counts = defaultdict(int)
+    for pick in candidates:
+        league_key = (pick.get("league"), pick.get("country"))
+        if league_counts[league_key] >= per_league_limit:
+            continue
+        league_counts[league_key] += 1
+        shortlist.append(pick)
+        if len(shortlist) >= limit:
+            break
+
+    for rank, pick in enumerate(shortlist, 1):
+        pick["bounds_rank"] = rank
+        pick["odds_status"] = (
+            "priced" if pick.get("has_odds") else "awaiting_goal_bounds_odds"
+        )
+    return shortlist
+
+
+def _build_over_1_5_shortlist(
+        ranked: list[dict], league_rates: dict,
+        limit: int = OVER_1_5_SHORTLIST_LIMIT,
+        per_league_limit: int = OVER_1_5_PER_LEAGUE_LIMIT,
+        end_date: str | None = None) -> list[dict]:
+    """Top priced Over 1.5 events from historically strong leagues."""
+    candidates = []
+    for source in ranked:
+        if not (
+            source.get("sportybet_market") == "Over/Under"
+            and source.get("sportybet_selection") == "Over 1.5"
+            and (source.get("avg_confidence") or 0) >= OVER_1_5_MIN_BELIEF
+            and source.get("has_odds")
+            and (source.get("real_odds") or 0) >= OVER_1_5_MIN_ODDS
+            and _within_shortlist_end_date(source.get("kickoff"), end_date)
+        ):
+            continue
+        league_key = (source.get("league"), source.get("country") or "")
+        history = league_rates.get(league_key)
+        if not history or history["matches"] < OVER_1_5_MIN_HISTORY:
+            continue
+        if history["rate"] < OVER_1_5_TOP_RATE:
+            continue
+        pick = dict(source)
+        pick["league_over_1_5_rate"] = history["rate"]
+        pick["league_over_1_5_matches"] = history["matches"]
+        candidates.append(pick)
+
+    candidates.sort(key=lambda p: (
+        -p["league_over_1_5_rate"],
+        -p["avg_confidence"],
+        -p["n_models"],
+        p.get("kickoff", ""),
+    ))
+    shortlist = []
+    league_counts = defaultdict(int)
+    for pick in candidates:
+        league_key = (pick.get("league"), pick.get("country") or "")
+        if league_counts[league_key] >= per_league_limit:
+            continue
+        league_counts[league_key] += 1
+        shortlist.append(pick)
+        if len(shortlist) >= limit:
+            break
+
+    for rank, pick in enumerate(shortlist, 1):
+        pick["over_1_5_rank"] = rank
+        pick["odds_status"] = "priced"
+    return shortlist
+
+
+def _build_elo_gap_shortlist(
+        fixture_analysis: list[dict], league_volatility: dict,
+        limit: int = ELO_GAP_SHORTLIST_LIMIT,
+        per_league_limit: int = ELO_GAP_PER_LEAGUE_LIMIT,
+        end_date: str | None = None,
+        group: dict | None = None) -> list[dict]:
+    """Large-Elo-gap fixtures from leagues whose historical upset rate is low.
+
+    With `group` (the Big dog record), a league also needs its own trusted
+    record (league_big_dogs_trusted). Without it (record failed to load) the
+    old volatility-only rule applies and a warning is printed by the caller.
+    """
+    candidates = []
+    for fixture in fixture_analysis:
+        if group is not None and not big_dog_league_in(
+                group, fixture.get("league"), fixture.get("country")):
+            continue
+        if not _within_shortlist_end_date(fixture.get("kickoff"), end_date):
+            continue
+        league_key = (fixture.get("league"), fixture.get("country") or "")
+        volatility = league_volatility.get(league_key)
+        if not volatility:
+            continue
+        if group is None:   # D81: upset rule only as fallback when no record loaded
+            if volatility["matches"] < ELO_VOLATILITY_MIN_HISTORY:
+                continue
+            if volatility["upset_rate"] > ELO_LOW_VOLATILITY_MAX:
+                continue
+
+        mismatch = [m for m in fixture.get("mismatch", [])
+                    if (m.get("gap") or 0) > ELO_HUGE_GAP_MIN]
+        if not mismatch:
+            continue
+        gap = max(m["gap"] for m in mismatch)
+        favourite = None
+        favourite_rows = []
+        for team in (fixture.get("home", ""), fixture.get("away", "")):
+            team_rows = [m for m in mismatch
+                         if str(m.get("market", "")).startswith(f"{team} ")]
+            if team_rows:
+                favourite = team
+                favourite_rows = team_rows
+                break
+        if not favourite:
+            continue
+        underdog = (fixture.get("away") if favourite == fixture.get("home")
+                    else fixture.get("home"))
+        best_signal = max(favourite_rows, key=lambda m: m.get("probability", 0))
+        win_signal = next(
+            (m for m in favourite_rows
+             if m.get("market") == f"{favourite} Win"),
+            None,
+        )
+        candidates.append({
+            "fixture_id": fixture["fixture_id"],
+            "match": f"{fixture.get('home')} vs {fixture.get('away')}",
+            "home": fixture.get("home"),
+            "away": fixture.get("away"),
+            "kickoff": fixture.get("kickoff"),
+            "league": fixture.get("league"),
+            "country": fixture.get("country", ""),
+            "favourite": favourite,
+            "underdog": underdog,
+            "elo_gap": gap,
+            "gap_bin": f">{ELO_HUGE_GAP_MIN}",
+            "league_upset_rate": volatility["upset_rate"],
+            "league_matches": volatility["matches"],
+            "best_signal": best_signal.get("market"),
+            "best_signal_confidence": best_signal.get("probability"),
+            "win_confidence": win_signal.get("probability") if win_signal else None,
+        })
+
+    candidates.sort(key=lambda p: (
+        -p["elo_gap"],
+        p["league_upset_rate"],
+        -(p["best_signal_confidence"] or 0),
+        p.get("kickoff", ""),
+    ))
+    shortlist = []
+    league_counts = defaultdict(int)
+    for pick in candidates:
+        league_key = (pick["league"], pick["country"])
+        if league_counts[league_key] >= per_league_limit:
+            continue
+        league_counts[league_key] += 1
+        shortlist.append(pick)
+        if len(shortlist) >= limit:
+            break
+    for rank, pick in enumerate(shortlist, 1):
+        pick["elo_gap_rank"] = rank
+    return shortlist
+
+
+def _within_shortlist_end_date(kickoff, end_date: str | None) -> bool:
+    """Inclusive Vancouver-local date cutoff for curated report sections."""
+    if not end_date:
+        return True
+    if not kickoff:
+        return False
+    try:
+        timestamp = pd.Timestamp(kickoff)
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.tz_localize("UTC")
+        local_date = timestamp.tz_convert("America/Vancouver").date().isoformat()
+        return local_date <= end_date
+    except (TypeError, ValueError):
+        return False
+
+
+def _league_id_country_map(conn) -> tuple[dict, dict]:
+    """(api_league_id→league_name, api_league_id→country_name) from the dim
+    tables — dim.dim_leagues and dim.dim_countries are the source of truth
+    (replaces the old metadata.yaml name-matching + hardcoded overrides)."""
+    df = pd.read_sql("""
+        SELECT l.api_league_id, l.league_name, c.country_name
+        FROM dim.dim_leagues l
+        JOIN dim.dim_countries c ON c.country_id = l.country_id
+    """, conn)
+    lmap = dict(zip(df["api_league_id"], df["league_name"]))
+    lid_country = dict(zip(df["api_league_id"], df["country_name"]))
+    return lmap, lid_country
+
+
+def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
+    """{fid: {fixture_id, home, away, league, kickoff, country}} for given fixtures."""
+    own = conn is None
+    conn = conn or get_conn()
+    try:
+        ids = [int(f) for f in fixture_ids]
+        if not ids:
+            return {}
+        lmap, lid_country = _league_id_country_map(conn)
+        df = pd.read_sql("""
+            SELECT fixture_id, home_team_name AS home, away_team_name AS away,
+                   kickoff_utc AS kickoff, api_league_id
+            FROM raw.raw_fixtures WHERE fixture_id = ANY(%(ids)s)
+        """, conn, params={"ids": ids})
+        meta = {}
+        for _, r in df.iterrows():
+            fid = int(r["fixture_id"])
+            lid = r["api_league_id"]
+            meta[fid] = {"fixture_id": fid, "home": r["home"], "away": r["away"],
+                         "league": lmap.get(lid, "Unknown"), "kickoff": str(r["kickoff"]),
+                         "country": lid_country.get(lid, "") or ""}
+        return meta
+    finally:
+        if own:
+            conn.close()
+
+
+def _gates_by_fixture(gate_status: dict) -> dict:
+    """(fid, market)->status  ==>  {fid: [{market, in_pool, reason}, ...]}."""
+    out = {}
+    for (fid, market), gs in gate_status.items():
+        out.setdefault(fid, []).append({"market": market, **gs})
+    for lst in out.values():
+        lst.sort(key=lambda g: (not g["in_pool"], g["market"]))  # in-pool first
+    return out
+
+
+def _analysis_from_signals(signals: list[dict], fixture_meta: dict,
+                           fixture_strength_all: dict,
+                           gate_status: dict | None = None,
+                           bayesian_analysis: dict[int, dict] | None = None) -> list[dict]:
+    """Best-effort per-fixture analysis rebuilt from stored signals (for the JSON feed)."""
+    gates = _gates_by_fixture(gate_status or {})
+    fa = {}
+    for fid, meta in fixture_meta.items():
+        fa[fid] = {**meta,
+                   "bookable": _is_bookable(meta["league"], meta.get("country", "")),
+                   "poisson": [], "mismatch": [], "bayesian": [], "dixon_coles": [],
+                   "gates": gates.get(fid, []),
+                   "strength": fixture_strength_all.get(fid)}
+    for s in signals:
+        entry = fa.get(s["fixture_id"])
+        if not entry or s["model"] not in entry:
+            continue
+        entry[s["model"]].append({"market": s["unified_market"],
+                                  "probability": s["probability"],
+                                  **(s.get("detail") or {})})
+
+    # The scheduled fan-in report is normally reconstructed from model_picks,
+    # which intentionally contains only consensus-eligible rows. Replace that
+    # lean Bayesian signal view with the full persisted belief audit when the
+    # Bayesian task supplied it.
+    for fid, sides in (bayesian_analysis or {}).items():
+        entry = fa.get(int(fid))
+        if not entry:
+            continue
+        entry["bayesian"] = []
+        for side in ("home", "away"):
+            for belief in sides.get(side, []):
+                entry["bayesian"].append({"side": side, **belief})
+    out = [v for v in fa.values()
+           if v["poisson"] or v["mismatch"] or v["bayesian"] or v["dixon_coles"]]
+    out.sort(key=lambda x: x.get("kickoff", ""))
+    return out
+
+
+def build_consensus_from_signals(signals: list[dict],
+                                 target_odds: float = TARGET_ODDS,
+                                 bankroll: float = 0, run_ds: str | None = None,
+                                 bayesian_analysis: dict[int, dict] | None = None,
+                                 shortlist_end_date: str | None = None) -> dict:
+    """Fan-in path: build the consensus pool/slips from already-computed model
+    signals (read from raw.model_picks), with no model imports. Writes
+    raw.consensus_pool when run_ds is given. See docs/engine_orchestration.md.
+    """
+    consensus = {}
+    for s in signals:
+        if s.get("probability") is None:
+            continue
+        key = (s["fixture_id"], s["unified_market"])
+        c = consensus.setdefault(key, {"fixture_id": s["fixture_id"],
+                                       "unified_market": s["unified_market"],
+                                       "models": [], "confidences": [], "details": []})
+        c["models"].append(s["model"])
+        c["confidences"].append(s["probability"])
+        if s.get("detail"):
+            c["details"].append(s["detail"])
+
+    fids = {s["fixture_id"] for s in signals}
+    fids.update(int(fid) for fid in (bayesian_analysis or {}))
+    conn = get_conn()
+    try:
+        fixture_meta = fixture_meta_from_db(fids, conn)
+        fixture_strength_all = _load_fixture_strength_profiles(conn)
+        bounds_league_priors = _load_bounds_1_4_league_priors(conn)
+        over_1_5_league_rates = _load_over_1_5_league_rates(conn)
+        league_elo_volatility = _load_league_elo_volatility(conn)
+        league_event_rates, elo_gap_group = _load_comparison_context(
+            conn, league_elo_volatility)
+    finally:
+        conn.close()
+
+    odds_map = _load_sportybet_odds()
+    high_scoring_fids = _high_scoring_fixture_ids(fixture_meta.keys())
+    ranked, gate_status, near_threshold = _score_pool(
+        consensus, fixture_meta, fixture_strength_all, odds_map,
+        high_scoring_fids, bounds_league_priors)
+    analysis = _analysis_from_signals(signals, fixture_meta, fixture_strength_all,
+                                      gate_status, bayesian_analysis)
+    attach_league_comparisons(analysis, league_event_rates)
+    slips = _build_slips(ranked, target_odds, bankroll=bankroll)
+    bounds_shortlist = _build_bounds_1_4_shortlist(
+        ranked, end_date=shortlist_end_date)
+    over_1_5_shortlist = _build_over_1_5_shortlist(
+        ranked, over_1_5_league_rates, end_date=shortlist_end_date)
+    if elo_gap_group is None:
+        print("  WARN Big dog record unavailable: Strength uses volatility rule only")
+    elo_gap_shortlist = _build_elo_gap_shortlist(
+        analysis, league_elo_volatility, end_date=shortlist_end_date,
+        group=elo_gap_group)
+    attach_discover_picks(analysis, elo_gap_shortlist, elo_gap_group,
+                          league_event_rates)
+
+    if run_ds:
+        from engine.eval.picks_store import write_consensus_pool
+        n = write_consensus_pool(run_ds, ranked)
+        print(f"  wrote {n} rows to raw.consensus_pool (run_ds={run_ds})")
+
+    return {"pool": ranked, "near_threshold": near_threshold,
+            "shortlist_end_date": shortlist_end_date,
+            "bounds_1_4_shortlist": bounds_shortlist,
+            "over_1_5_shortlist": over_1_5_shortlist,
+            "elo_gap_shortlist": elo_gap_shortlist,
+            "elo_gap_group": elo_gap_group,
+            "slips": slips, "fixture_analysis": analysis}
+
+
+def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
+                  bankroll: float = 0,
+                  shortlist_end_date: str | None = None) -> dict:
+    """Run all four models and build consensus picks."""
+
+    # ── 1. Poisson GLM ──────────────────────────────────────────────────
+    print("=" * 60)
+    print("  [1/4] POISSON GLM")
+    print("=" * 60)
+    poisson_picks = predict_upcoming(days=days)
+
+    # ── 2. Mismatch Elo ─────────────────────────────────────────────────
+    print()
+    print("=" * 60)
+    print("  [2/4] MISMATCH ELO")
+    print("=" * 60)
+    mismatch_picks, fixture_strength = predict_mismatch(days=days)
+
+    # ── 3. Bayesian Streaks ──────────────────────────────────────────────
+    print()
+    print("=" * 60)
+    print("  [3/4] BAYESIAN STREAKS")
+    print("=" * 60)
+    from engine.eval.bayesian_streaks import _get_conn
+    conn = _get_conn()
+    bayesian_by_fixture = get_fixture_beliefs(
+        conn, days=days, include_below_threshold=True
+    )
+    conn.close()
+    print(f"  {len(bayesian_by_fixture)} fixtures with Bayesian beliefs")
+
+    # ── 4. Dixon-Coles ───────────────────────────────────────────────────
+    print()
+    print("=" * 60)
+    print("  [4/4] DIXON-COLES")
+    print("=" * 60)
+    dixon_coles_picks = predict_dixon_coles(days=days)
+    print(f"  {len(dixon_coles_picks)} Dixon-Coles picks")
+
+    # ── 5. Build unified pick pool ───────────────────────────────────────
+    print()
+    print("=" * 60)
+    print("  BUILDING CONSENSUS")
+    print("=" * 60)
+
+    # Collect fixture metadata
+    fixture_meta = {}
+
+    # From Poisson
+    if not poisson_picks.empty:
+        for _, row in poisson_picks.iterrows():
+            fid = int(row["fixture_id"])
+            if fid not in fixture_meta:
+                fixture_meta[fid] = {
+                    "fixture_id": fid,
+                    "home": row["home"],
+                    "away": row["away"],
+                    "league": row["league"],
+                    "kickoff": str(row["kickoff"]),
+                }
+
+    # From Mismatch
+    for p in mismatch_picks:
+        fid = p.fixture_id
+        if fid not in fixture_meta:
+            fixture_meta[fid] = {
+                "fixture_id": fid,
+                "home": p.home_team,
+                "away": p.away_team,
+                "league": p.league,
+                "kickoff": str(p.kickoff),
+            }
+
+    # From Dixon-Coles
+    if not dixon_coles_picks.empty:
+        for _, row in dixon_coles_picks.iterrows():
+            fid = int(row["fixture_id"])
+            if fid not in fixture_meta:
+                fixture_meta[fid] = {
+                    "fixture_id": fid,
+                    "home": row["home"],
+                    "away": row["away"],
+                    "league": row["league"],
+                    "kickoff": str(row["kickoff"]),
+                }
+
+    # From Bayesian (need fixture info from DB)
+    conn = _get_conn()
+    if bayesian_by_fixture:
+        fids = list(bayesian_by_fixture.keys())
+        fid_str = ",".join(str(f) for f in fids)
+        fix_df = pd.read_sql(f"""
+            SELECT fixture_id, team_name AS home, opponent_name AS away,
+                   league_name AS league, kickoff_utc AS kickoff
+            FROM raw.fact_head_to_head
+            WHERE fixture_id IN ({fid_str}) AND is_home
+        """, conn)
+        for _, row in fix_df.iterrows():
+            fid = int(row["fixture_id"])
+            if fid not in fixture_meta:
+                fixture_meta[fid] = {
+                    "fixture_id": fid,
+                    "home": row["home"],
+                    "away": row["away"],
+                    "league": row["league"],
+                    "kickoff": str(row["kickoff"]),
+                }
+
+    # Also load upcoming unplayed fixtures for Bayesian-only matches
+    upcoming_df = pd.read_sql("""
+        SELECT fixture_id, home_team_name AS home, away_team_name AS away,
+               kickoff_utc AS kickoff, api_league_id
+        FROM raw.raw_fixtures
+        WHERE fixture_status = 'NS'
+        ORDER BY kickoff_utc
+    """, conn)
+    # league name + country from the dim tables (single source of truth)
+    lmap, _league_id_country = _league_id_country_map(conn)
+
+    # Map fixture_id -> api_league_id for country lookup
+    fid_league_id = dict(zip(upcoming_df["fixture_id"].astype(int),
+                             upcoming_df["api_league_id"]))
+
+    for _, row in upcoming_df.iterrows():
+        fid = int(row["fixture_id"])
+        if fid not in fixture_meta and fid in bayesian_by_fixture:
+            fixture_meta[fid] = {
+                "fixture_id": fid,
+                "home": row["home"],
+                "away": row["away"],
+                "league": lmap.get(row.get("api_league_id", ""), "Unknown"),
+                "kickoff": str(row["kickoff"]),
+            }
+
+    # Attach country to all fixture metadata
+    # First get api_league_id for fixtures already in meta (from Poisson/Mismatch)
+    all_rf = pd.read_sql("""
+        SELECT fixture_id, api_league_id FROM raw.raw_fixtures
+    """, conn)
+    all_fid_lid = dict(zip(all_rf["fixture_id"].astype(int), all_rf["api_league_id"]))
+    for fid, meta in fixture_meta.items():
+        lid = all_fid_lid.get(fid)
+        meta["country"] = _league_id_country.get(lid, "") if lid else ""
+
+    conn.close()
+
+    conn = _get_conn()
+    try:
+        fixture_strength_all = _load_fixture_strength_profiles(conn)
+        bounds_league_priors = _load_bounds_1_4_league_priors(conn)
+        over_1_5_league_rates = _load_over_1_5_league_rates(conn)
+        league_elo_volatility = _load_league_elo_volatility(conn)
+        league_event_rates, elo_gap_group = _load_comparison_context(
+            conn, league_elo_volatility)
+    finally:
+        conn.close()
+
+    # ── Build per-fixture, per-market pick objects ───────────────────────
+    # Key: (fixture_id, unified_market) → {models: [...], max_conf, ...}
+    consensus = {}
+
+    def _add_pick(fid, unified, model, confidence, detail=None):
+        key = (fid, unified)
+        if key not in consensus:
+            consensus[key] = {
+                "fixture_id": fid,
+                "unified_market": unified,
+                "models": [],
+                "confidences": [],
+                "details": [],
+            }
+        consensus[key]["models"].append(model)
+        consensus[key]["confidences"].append(confidence)
+        if detail:
+            consensus[key]["details"].append(detail)
+
+    # Collect normalised signals from every model (shared with run_model)
+    _home_away = {fid: (m["home"], m["away"]) for fid, m in fixture_meta.items()}
+    bayesian_by_fixture = annotate_bayesian_analysis(
+        bayesian_by_fixture, _home_away
+    )
+    _signals = (poisson_signals(poisson_picks)
+                + mismatch_signals(mismatch_picks)
+                + bayesian_signals(bayesian_by_fixture, _home_away)
+                + dixon_signals(dixon_coles_picks))
+    for sig in _signals:
+        _add_pick(sig["fixture_id"], sig["unified_market"], sig["model"],
+                  sig["probability"], sig["detail"])
+
+    # ── Load real SportyBet odds (populated by scrape_sportybet) ─────────
+    odds_map = _load_sportybet_odds()
+    if odds_map:
+        print(f"  loaded real odds for {len(odds_map)} fixtures from raw.sportybet_odds")
+    else:
+        print("  no SportyBet odds in DB — run scrape_sportybet; falling back to est_odds")
+
+    # ── Score and rank ──────────────────────────────────────────────────
+    high_scoring_fids = _high_scoring_fixture_ids(fixture_meta.keys())
+    ranked, gate_status, near_threshold = _score_pool(
+        consensus, fixture_meta, fixture_strength_all, odds_map,
+        high_scoring_fids, bounds_league_priors)
+    gates_by_fid = _gates_by_fixture(gate_status)
+
+    # ── Per-fixture analysis (all raw model signals) ──────────────────
+    fixture_analysis = {}
+    for fid, meta in fixture_meta.items():
+        fixture_analysis[fid] = {
+            **meta,
+            "bookable": _is_bookable(meta["league"], meta.get("country", "")),
+            "gates": gates_by_fid.get(fid, []),
+            "poisson": [],
+            "mismatch": [],
+            "bayesian": [],
+            "dixon_coles": [],
+        }
+
+    if not poisson_picks.empty:
+        for _, row in poisson_picks.iterrows():
+            fid = int(row["fixture_id"])
+            if fid in fixture_analysis:
+                fixture_analysis[fid]["poisson"].append({
+                    "market": f"{row['direction']} {row['line']}",
+                    "probability": round(float(row["probability"]), 4),
+                    "tier": _tier(row["probability"]),
+                })
+
+    for p in mismatch_picks:
+        fid = p.fixture_id
+        if fid in fixture_analysis:
+            entry = {
+                "market": p.market,
+                "label": _market_label(p.market, p.favourite),
+                "confidence": round(p.confidence, 4),
+                "favourite": p.favourite,
+                "gap": p.gap,
+                "gap_bin": p.gap_bin,
+            }
+            if p.h2h_boost:
+                entry["h2h"] = p.h2h_boost
+            if hasattr(p, "fav_attack_pct") and p.fav_attack_pct:
+                entry["fav_atk"] = p.fav_attack_pct
+            if hasattr(p, "dog_defense_pct") and p.dog_defense_pct:
+                entry["dog_def"] = p.dog_defense_pct
+            fixture_analysis[fid]["mismatch"].append(entry)
+
+    for fid, sides in bayesian_by_fixture.items():
+        if fid not in fixture_analysis:
+            continue
+        for side in ("home", "away"):
+            for b in sides.get(side, []):
+                fixture_analysis[fid]["bayesian"].append({
+                    **b,
+                    "side": side,
+                    "posterior": round(b["posterior"], 4),
+                    "posterior_raw": round(b["posterior_raw"], 4),
+                    "posterior_calibrated": round(
+                        b["posterior_calibrated"], 4
+                    ),
+                    "base_rate": round(b["base_rate"], 4),
+                })
+
+    if not dixon_coles_picks.empty:
+        for _, row in dixon_coles_picks.iterrows():
+            fid = int(row["fixture_id"])
+            if fid in fixture_analysis:
+                fixture_analysis[fid]["dixon_coles"].append({
+                    "market": row["market"],
+                    "probability": round(float(row["probability"]), 4),
+                    "raw_probability": round(float(row["raw_probability"]), 4),
+                    "tier": _tier(row["probability"]),
+                    "lambda_home": row["lambda_home"],
+                    "lambda_away": row["lambda_away"],
+                })
+
+    for fid, fa in fixture_analysis.items():
+        fa["strength"] = fixture_strength_all.get(fid)
+
+    analysis_list = [v for v in fixture_analysis.values()
+                     if v["poisson"] or v["mismatch"] or v["bayesian"]
+                     or v["dixon_coles"]]
+    analysis_list.sort(key=lambda x: x.get("kickoff", ""))
+    attach_league_comparisons(analysis_list, league_event_rates)
+
+    # ── Assemble slips ──────────────────────────────────────────────────
+    slips = _build_slips(ranked, target_odds, bankroll=bankroll)
+    bounds_shortlist = _build_bounds_1_4_shortlist(
+        ranked, end_date=shortlist_end_date)
+    over_1_5_shortlist = _build_over_1_5_shortlist(
+        ranked, over_1_5_league_rates, end_date=shortlist_end_date)
+    if elo_gap_group is None:
+        print("  WARN Big dog record unavailable: Strength uses volatility rule only")
+    elo_gap_shortlist = _build_elo_gap_shortlist(
+        analysis_list, league_elo_volatility, end_date=shortlist_end_date,
+        group=elo_gap_group)
+    attach_discover_picks(analysis_list, elo_gap_shortlist, elo_gap_group,
+                          league_event_rates)
+    return {"pool": ranked, "near_threshold": near_threshold,
+            "shortlist_end_date": shortlist_end_date,
+            "bounds_1_4_shortlist": bounds_shortlist,
+            "over_1_5_shortlist": over_1_5_shortlist,
+            "elo_gap_shortlist": elo_gap_shortlist,
+            "elo_gap_group": elo_gap_group,
+            "slips": slips, "fixture_analysis": analysis_list}
+
+
+def _normalise_club(value: str) -> str:
+    return " ".join("".join(
+        ch if ch.isalnum() else " " for ch in (value or "").casefold()
+    ).split())
+
+
+def _core_team_for_pick(pick: dict) -> str | None:
+    """Return an elite club only when the selection supports it or is neutral."""
+    clubs = {
+        "home": _normalise_club(pick.get("home", "")),
+        "away": _normalise_club(pick.get("away", "")),
+    }
+    matched = [(side, alias) for side, club in clubs.items()
+               for alias in CORE_TEAM_ALIASES if alias in club]
+    if not matched:
+        return None
+
+    selection = _normalise_club(pick.get("sportybet_selection", ""))
+    for _side, alias in matched:
+        if alias in selection:
+            return alias
+
+    # Match totals describe the elite club's fixture without opposing it.
+    if selection.startswith(("over ", "under ")) or selection in {
+        "yes", "no", "1 4",
+    }:
+        return matched[0][1]
+    if selection in {"1", "1x"}:
+        return next((alias for side, alias in matched if side == "home"), None)
+    if selection in {"2", "x2"}:
+        return next((alias for side, alias in matched if side == "away"), None)
+    return None
+
+
+def _pick_graph_key(pick: dict) -> tuple:
+    return (pick["fixture_id"], pick.get("sportybet_selection", ""),
+            pick.get("line"))
+
+
+def _prepare_slip_nodes(ranked: list[dict], min_ev: float) -> list[dict]:
+    """Attach graph weight, node role and cross-slip exposure capacity."""
+    nodes = []
+    for source in ranked:
+        if (not source.get("has_odds") or source.get("ev") is None
+                or source["ev"] < min_ev):
+            continue
+        pick = dict(source)
+        n_models = int(pick.get("n_models", 0))
+        avg_conf = float(pick.get("avg_confidence", 0))
+        max_conf = float(pick.get("max_confidence", avg_conf))
+        elite_team = _core_team_for_pick(pick)
+
+        evidence_core = n_models >= 3 and avg_conf >= 0.75
+        elite_core = bool(elite_team) and (
+            n_models >= 2 or max_conf >= 0.82
+        ) and avg_conf >= 0.75
+        top_bounds_core = (
+            pick.get("sportybet_market") == "Goal Bounds"
+            and pick.get("sportybet_selection") == "1-4"
+            and (pick.get("league_prior_matches") or 0) >= BOUNDS_1_4_MIN_HISTORY
+            and (pick.get("league_prior_rate") or 0) >= BOUNDS_1_4_TOP_RATE
+            and avg_conf >= BOUNDS_SOLO_THRESHOLD
+        )
+        if evidence_core or elite_core or top_bounds_core:
+            role, repeat_limit, role_bonus = "core", CORE_REPEAT_LIMIT, 0.55
+        elif n_models >= 2:
+            role, repeat_limit, role_bonus = "support", SUPPORT_REPEAT_LIMIT, 0.18
+        else:
+            role, repeat_limit, role_bonus = "filler", FILLER_REPEAT_LIMIT, 0.0
+
+        base = float(pick.get("consensus_score", n_models + avg_conf))
+        elite_bonus = 0.30 if elite_team else 0.0
+        odds_progress = 0.65 * math.log(max(float(pick["odds"]), 1.0001))
+        pick.update({
+            "slip_role": role,
+            "repeat_limit": repeat_limit,
+            "core_team": elite_team,
+            "graph_weight": round(base + role_bonus + elite_bonus + odds_progress, 4),
+        })
+        nodes.append(pick)
+    return nodes
+
+
+def _build_conflict_graph(nodes: list[dict]) -> dict[tuple, set[tuple]]:
+    """Build hard-conflict edges: one market per fixture on any single slip."""
+    graph = {_pick_graph_key(node): set() for node in nodes}
+    by_fixture: dict[int, list[tuple]] = defaultdict(list)
+    for node in nodes:
+        by_fixture[node["fixture_id"]].append(_pick_graph_key(node))
+    for fixture_nodes in by_fixture.values():
+        for key in fixture_nodes:
+            graph[key].update(other for other in fixture_nodes if other != key)
+    return graph
+
+
+def _build_slips(ranked: list[dict], target_odds: float,
+                 bankroll: float = 0, max_legs: int = MAX_LEGS,
+                 min_ev: float = MIN_EV) -> list[dict]:
+    """Build repeat-aware slips as weighted independent sets.
+
+    Picks are graph nodes; selections from the same fixture share conflict
+    edges and cannot coexist on one slip. Core nodes may appear three times,
+    supporting nodes twice and fillers once. Reuse is penalised during greedy
+    selection so the shared core remains visible without producing six clones.
+    """
+    nodes = _prepare_slip_nodes(ranked, min_ev)
+    if not nodes:
+        return []
+    graph = _build_conflict_graph(nodes)
+    usage: dict[tuple, int] = defaultdict(int)
+    prior_signatures: list[set[tuple]] = []
+    raw_slips = []
+
+    def _slip_tier(selections):
+        avg_models = sum(s["n_models"] for s in selections) / len(selections)
+        avg_conf = sum(s["avg_confidence"] for s in selections) / len(selections)
+        if avg_models >= 2.5 and avg_conf >= 0.80:
+            return "A"
+        if avg_models >= 2.0 and avg_conf >= 0.75:
+            return "B"
+        return "C"
+
+    for _slip_index in range(MAX_SLIPS):
+        selected: list[dict] = []
+        selected_keys: set[tuple] = set()
+        cum_odds = 1.0
+        core_count = 0
+        filler_count = 0
+
+        while len(selected) < max_legs:
+            if len(selected) >= MIN_LEGS and cum_odds >= target_odds:
+                break
+            candidates = []
+            for node in nodes:
+                key = _pick_graph_key(node)
+                if usage[key] >= node["repeat_limit"]:
+                    continue
+                if key in selected_keys or graph[key].intersection(selected_keys):
+                    continue
+                if (node["slip_role"] == "filler"
+                        and filler_count >= MAX_FILLERS_PER_SLIP):
+                    continue
+                if (node["slip_role"] == "core"
+                        and core_count >= MAX_CORE_PER_SLIP):
+                    continue
+
+                previous_presence = sum(key in sig for sig in prior_signatures)
+                reuse_penalty = {
+                    "core": 0.10,
+                    "support": 0.50,
+                    "filler": 1.00,
+                }[node["slip_role"]] * usage[key]
+                diversity_penalty = {
+                    "core": 0.06,
+                    "support": 0.30,
+                    "filler": 0.60,
+                }[node["slip_role"]] * previous_presence
+                remaining_odds = max(target_odds / cum_odds, 1.0)
+                odds_fit = min(math.log(max(node["odds"], 1.0001)),
+                               math.log(remaining_odds))
+                allocation_score = (
+                    node["graph_weight"] + 0.35 * odds_fit
+                    - reuse_penalty - diversity_penalty
+                )
+                candidates.append((allocation_score, node,
+                                   cum_odds * node["odds"]))
+
+            if not candidates:
+                break
+            finishers = [item for item in candidates
+                         if len(selected) + 1 >= MIN_LEGS
+                         and item[2] >= target_odds]
+            candidate_pool = finishers or candidates
+            _, chosen, _ = max(candidate_pool, key=lambda item: (
+                item[0] - (4.0 * math.log(item[2] / target_odds)
+                           if finishers else 0.0),
+                item[1]["avg_confidence"],
+                -abs(item[2] - target_odds),
+            ))
+            selected.append(chosen)
+            chosen_key = _pick_graph_key(chosen)
+            selected_keys.add(chosen_key)
+            if chosen["slip_role"] == "core":
+                core_count += 1
+            if chosen["slip_role"] == "filler":
+                filler_count += 1
+            cum_odds *= chosen["odds"]
+
+        if len(selected) < MIN_LEGS:
+            break
+        signature = set(selected_keys)
+        if signature in prior_signatures:
+            break
+        for key in selected_keys:
+            usage[key] += 1
+        prior_signatures.append(signature)
+        tier = _slip_tier(selected)
+        role_counts = {
+            role: sum(p["slip_role"] == role for p in selected)
+            for role in ("core", "support", "filler")
+        }
+        raw_slips.append((selected, cum_odds, tier, role_counts))
+
+    final_usage = defaultdict(int)
+    for selections, _, _, _ in raw_slips:
+        for pick in selections:
+            final_usage[_pick_graph_key(pick)] += 1
+    for selections, _, _, _ in raw_slips:
+        for pick in selections:
+            pick["slip_repeat_count"] = final_usage[_pick_graph_key(pick)]
+
+    tier_weight = {"A": 3, "B": 2, "C": 1}
+    total_weight = sum(tier_weight[t] for _, _, t, _ in raw_slips) or 1
+    slips = []
+    for i, (selections, odds, tier, role_counts) in enumerate(raw_slips):
+        stake = (round(bankroll * tier_weight[tier] / total_weight)
+                 if bankroll > 0 else 0)
+        slips.append({
+            "name": f"Slip {i+1} (Tier {tier})",
+            "selections": selections,
+            "est_total_odds": round(odds, 2),
+            "target_odds": target_odds,
+            "legs": len(selections),
+            "tier": tier,
+            "role_counts": role_counts,
+            "stake": stake,
+            "potential_return": round(stake * odds),
+        })
+    return slips
+
+
+def print_slips(result: dict) -> None:
+    """Pretty-print the consensus slips."""
+    pool = result["pool"]
+    slips = result["slips"]
+
+    print(f"\n{'='*120}")
+    print(f"  CONSENSUS SLIPS — Weighted graph accumulators (~{TARGET_ODDS:.0f}x target)")
+    print(f"  Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
+    print(f"  Pool: {len(pool)} qualified picks → {len(slips)} slips")
+    print(f"{'='*120}")
+
+    total_stake = sum(s.get("stake", 0) for s in slips)
+    total_potential = sum(s.get("potential_return", 0) for s in slips)
+    if total_stake > 0:
+        print(f"  Total stake: ₦{total_stake:,.0f}  |  Max potential: ₦{total_potential:,.0f}")
+
+    for slip in slips:
+        sels = slip["selections"]
+        print(f"\n{'─'*120}")
+        roles = slip.get("role_counts", {})
+        role_summary = "/".join(str(roles.get(r, 0)) for r in ("core", "support", "filler"))
+        header = (f"  {slip['name']}  |  {slip['legs']} legs  |  "
+                  f"odds: {slip['est_total_odds']:.1f}x  |  "
+                  f"core/support/filler: {role_summary}")
+        if slip.get("stake"):
+            header += f"  |  stake: ₦{slip['stake']:,.0f}  →  ₦{slip['potential_return']:,.0f}"
+        print(header)
+        print(f"{'─'*120}")
+        print(f"  {'#':>2s}  {'Models':>6s}  {'Conf':>5s}  {'Odds':>5s}  {'EV':>5s}  {'Kickoff':>18s}  {'Match':<40s}  {'Selection':<28s}  League")
+        print(f"  {'─'*2}  {'─'*6}  {'─'*5}  {'─'*5}  {'─'*5}  {'─'*18}  {'─'*40}  {'─'*28}  {'─'*20}")
+
+        for i, sel in enumerate(sels, 1):
+            models_str = "+".join(m[0].upper() for m in sel["models"])
+            try:
+                dt = pd.Timestamp(sel["kickoff"]).strftime("%a %b %d %H:%M")
+            except Exception:
+                dt = sel["kickoff"][:16]
+            ev_str = f"{sel['ev']:.2f}" if sel.get("ev") is not None else "  —"
+            print(f"  {i:>2d}  {models_str:>6s}  {sel['avg_confidence']:>4.0%}  {sel['odds']:>5.2f}  {ev_str:>5s}  "
+                  f"{dt:>18s}  {sel['match']:<40s}  {sel['sportybet_selection']:<28s}  {sel['league']}")
+
+        print()
+
+
+def save_slips(
+    result: dict,
+    run_ds: str | None = None,
+    output_dir: Path | None = None,
+    record_history: bool = False,
+    standout_timezone: str = "UTC",
+) -> str:
+    # Name by an explicit run date fixed at the start of the run, not now(), so a
+    # single run that straddles UTC midnight can't split output across two files.
+    ds = run_ds or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    out_path = (output_dir or Path(__file__).parent) / f"consensus_slips_{ds}.json"
+
+    pool_items = []
+    for p in result["pool"]:
+        pool_items.append({
+            "fixture_id": p["fixture_id"],
+            "match": p["match"],
+            "home": p["home"],
+            "away": p["away"],
+            "kickoff": p["kickoff"],
+            "league": p["league"],
+            "sportybet_market": p["sportybet_market"],
+            "sportybet_selection": p["sportybet_selection"],
+            "line": p.get("line"),
+            "n_models": p["n_models"],
+            "models": p["models"],
+            "avg_confidence": p["avg_confidence"],
+            "max_confidence": p["max_confidence"],
+            "est_odds": p["est_odds"],
+            "real_odds": p.get("real_odds"),
+            "odds": p.get("odds"),
+            "has_odds": p.get("has_odds", False),
+            "ev": p.get("ev"),
+            "country": p.get("country", ""),
+            "strength_gate": p.get("strength_gate"),
+            "strength_rank": p.get("strength_rank"),
+            "market_tier": p.get("market_tier"),
+            "consensus_base_score": p.get("consensus_base_score"),
+            "consensus_score": p.get("consensus_score"),
+            "league_prior_boost": p.get("league_prior_boost", 0.0),
+            "league_prior_rate": p.get("league_prior_rate"),
+            "league_prior_matches": p.get("league_prior_matches"),
+        })
+
+    near_threshold_items = []
+    for p in result.get("near_threshold", []):
+        near_threshold_items.append({
+            "fixture_id": p["fixture_id"],
+            "match": p["match"],
+            "home": p["home"],
+            "away": p["away"],
+            "kickoff": p["kickoff"],
+            "league": p["league"],
+            "country": p.get("country", ""),
+            "sportybet_market": p["sportybet_market"],
+            "sportybet_selection": p["sportybet_selection"],
+            "line": p.get("line"),
+            "n_models": p["n_models"],
+            "models": p["models"],
+            "avg_confidence": p["avg_confidence"],
+            "max_confidence": p["max_confidence"],
+            "est_odds": p["est_odds"],
+            "real_odds": p.get("real_odds"),
+            "odds": p.get("odds"),
+            "has_odds": p.get("has_odds", False),
+            "ev": p.get("ev"),
+            "strength_rank": p.get("strength_rank"),
+            "decision_status": "watch",
+            "gate_reason": p.get("gate_reason"),
+            "global_calibrated_probability": p.get("global_calibrated_probability"),
+            "calibration_scope": p.get("calibration_scope", "global"),
+            "league_adjustment": p.get("league_adjustment"),
+        })
+
+    generated_at = datetime.now(timezone.utc)
+    generated_at_iso = generated_at.isoformat().replace("+00:00", "Z")
+    output = {
+        "run_ds": ds,
+        "generated": generated_at.strftime("%Y-%m-%d %H:%M UTC"),
+        "shortlist_end_date": result.get("shortlist_end_date"),
+        "models": ["poisson_glm", "mismatch_elo", "bayesian_streaks",
+                   "dixon_coles"],
+        "thresholds": {
+            "solo": SOLO_THRESHOLD,
+            "bounds_solo": BOUNDS_SOLO_THRESHOLD,
+            "bounds_near_threshold_floor": BOUNDS_NEAR_THRESHOLD_FLOOR,
+            "bounds_min_odds": BOUNDS_1_4_MIN_ODDS,
+            "over_1_5_min_belief": OVER_1_5_MIN_BELIEF,
+            "over_1_5_min_odds": OVER_1_5_MIN_ODDS,
+            "elo_huge_gap_min": ELO_HUGE_GAP_MIN,
+            "elo_low_volatility_max": ELO_LOW_VOLATILITY_MAX,
+            "duo": DUO_THRESHOLD,
+            "trio": TRIO_THRESHOLD,
+            "over15_dc_poisson": OVER15_DC_POISSON_THRESHOLD,
+            "under35_strength": {
+                "max_avg_attack_pct": UNDER35_MAX_AVG_ATTACK_PCT,
+                "max_single_attack_pct": UNDER35_MAX_SINGLE_ATTACK_PCT,
+                "min_avg_defense_pct": UNDER35_MIN_AVG_DEFENSE_PCT,
+                "min_single_defense_pct": UNDER35_MIN_SINGLE_DEFENSE_PCT,
+            },
+            "under35_tiers": {
+                "A": UNDER35_TIER_A_THRESHOLD,
+                "B": UNDER35_TIER_B_THRESHOLD,
+                "C": UNDER35_TIER_C_THRESHOLD,
+            },
+        },
+        "pool_size": len(result["pool"]),
+        "pool": pool_items,
+        "near_threshold_size": len(near_threshold_items),
+        "near_threshold": near_threshold_items,
+        "bounds_1_4_shortlist": [{
+            "bounds_rank": p["bounds_rank"],
+            "fixture_id": p["fixture_id"],
+            "match": p["match"],
+            "home": p["home"],
+            "away": p["away"],
+            "kickoff": p["kickoff"],
+            "league": p["league"],
+            "country": p.get("country", ""),
+            "sportybet_market": p["sportybet_market"],
+            "sportybet_selection": p["sportybet_selection"],
+            "n_models": p["n_models"],
+            "models": p["models"],
+            "avg_confidence": p["avg_confidence"],
+            "max_confidence": p["max_confidence"],
+            "league_hit_rate": p["league_prior_rate"],
+            "league_matches": p["league_prior_matches"],
+            "has_odds": p.get("has_odds", False),
+            "real_odds": p.get("real_odds"),
+            "odds_status": p["odds_status"],
+        } for p in result.get("bounds_1_4_shortlist", [])],
+        "over_1_5_shortlist": [{
+            "over_1_5_rank": p["over_1_5_rank"],
+            "fixture_id": p["fixture_id"],
+            "match": p["match"],
+            "home": p["home"],
+            "away": p["away"],
+            "kickoff": p["kickoff"],
+            "league": p["league"],
+            "country": p.get("country", ""),
+            "sportybet_market": p["sportybet_market"],
+            "sportybet_selection": p["sportybet_selection"],
+            "n_models": p["n_models"],
+            "models": p["models"],
+            "avg_confidence": p["avg_confidence"],
+            "max_confidence": p["max_confidence"],
+            "league_hit_rate": p["league_over_1_5_rate"],
+            "league_matches": p["league_over_1_5_matches"],
+            "has_odds": p.get("has_odds", False),
+            "real_odds": p.get("real_odds"),
+            "odds_status": p["odds_status"],
+        } for p in result.get("over_1_5_shortlist", [])],
+        "elo_gap_shortlist": [{
+            "elo_gap_rank": p["elo_gap_rank"],
+            "fixture_id": p["fixture_id"],
+            "match": p["match"],
+            "home": p["home"],
+            "away": p["away"],
+            "kickoff": p["kickoff"],
+            "league": p["league"],
+            "country": p.get("country", ""),
+            "favourite": p["favourite"],
+            "underdog": p["underdog"],
+            "elo_gap": p["elo_gap"],
+            "gap_bin": p["gap_bin"],
+            "league_upset_rate": p["league_upset_rate"],
+            "league_matches": p["league_matches"],
+            "best_signal": p["best_signal"],
+            "best_signal_confidence": p["best_signal_confidence"],
+            "win_confidence": p.get("win_confidence"),
+            "group_win_rate": p.get("group_win_rate"),
+            "group_rate_source": p.get("group_rate_source"),
+            "league_win_rate": p.get("league_win_rate"),
+            "league_win_context": p.get("league_win_context"),
+            "discover_score": p.get("discover_score"),
+            "league_big_dog_matches": p.get("league_big_dog_matches"),
+            "league_big_dog_won": p.get("league_big_dog_won"),
+            "league_big_dog_win_rate": p.get("league_big_dog_win_rate"),
+            "league_big_dog_win_rate_low": p.get("league_big_dog_win_rate_low"),
+            "league_record_ok": p.get("league_record_ok"),
+        } for p in result.get("elo_gap_shortlist", [])],
+        "elo_gap_group": result.get("elo_gap_group"),
+        "slips": [],
+    }
+
+    for slip in result["slips"]:
+        slip_data = {
+            "name": slip["name"],
+            "legs": slip["legs"],
+            "est_total_odds": slip["est_total_odds"],
+            "tier": slip.get("tier", ""),
+            "target_odds": slip.get("target_odds", TARGET_ODDS),
+            "role_counts": slip.get("role_counts", {}),
+            "stake": slip.get("stake", 0),
+            "potential_return": slip.get("potential_return", 0),
+            "selections": [],
+        }
+        for sel in slip["selections"]:
+            slip_data["selections"].append({
+                "fixture_id": sel["fixture_id"],
+                "match": sel["match"],
+                "home": sel["home"],
+                "away": sel["away"],
+                "kickoff": sel["kickoff"],
+                "league": sel["league"],
+                "sportybet_market": sel["sportybet_market"],
+                "sportybet_selection": sel["sportybet_selection"],
+                "line": sel.get("line"),
+                "n_models": sel["n_models"],
+                "models": sel["models"],
+                "avg_confidence": sel["avg_confidence"],
+                "est_odds": sel["est_odds"],
+                "real_odds": sel.get("real_odds"),
+                "odds": sel.get("odds"),
+                "ev": sel.get("ev"),
+                "strength_gate": sel.get("strength_gate"),
+                "strength_rank": sel.get("strength_rank"),
+                "market_tier": sel.get("market_tier"),
+                "consensus_base_score": sel.get("consensus_base_score"),
+                "consensus_score": sel.get("consensus_score"),
+                "league_prior_boost": sel.get("league_prior_boost", 0.0),
+                "league_prior_rate": sel.get("league_prior_rate"),
+                "league_prior_matches": sel.get("league_prior_matches"),
+                "slip_role": sel.get("slip_role"),
+                "repeat_limit": sel.get("repeat_limit"),
+                "slip_repeat_count": sel.get("slip_repeat_count", 1),
+                "core_team": sel.get("core_team"),
+                "graph_weight": sel.get("graph_weight"),
+            })
+        output["slips"].append(slip_data)
+
+    output["fixture_analysis"] = result.get("fixture_analysis", [])
+    output["standouts"] = select_rolling_standouts(
+        output["fixture_analysis"], now=generated_at, timezone_name=standout_timezone)
+    # Each curated section is rebuilt from the current run's ranked pool and
+    # fixture analysis. Persist an auditable refresh marker even when a section
+    # legitimately has zero qualifying events.
+    output["shortlist_refresh"] = {
+        "run_ds": ds,
+        "generated_at": generated_at_iso,
+        "sections": {
+            key: {
+                "count": len(output[key]),
+                "updated_at": generated_at_iso,
+            }
+            for key in (
+                "bounds_1_4_shortlist",
+                "over_1_5_shortlist",
+                "elo_gap_shortlist",
+            )
+        },
+    }
+
+    # CLI publications are captured before the mutable dashboard feed is replaced.
+    # Tests/offline callers opt in explicitly; archive failures stop publication.
+    if record_history:
+        from engine.eval.forecast_history import capture, init_schema
+        init_schema()
+        capture(output)
+
+    # Publish atomically so the dashboard never reads a half-written daily file.
+    temp_path = out_path.with_suffix(out_path.suffix + ".tmp")
+    with open(temp_path, "w") as f:
+        json.dump(output, f, indent=2, ensure_ascii=False, default=str)
+    temp_path.replace(out_path)
+
+    print(f"\nConsensus slips saved to {out_path}")
+    return str(out_path)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Multi-model consensus slip generator")
+    parser.add_argument("--days", type=int, default=10, help="Days ahead to scan")
+    parser.add_argument("--target-odds", type=float, default=TARGET_ODDS,
+                        help="Target total odds per slip")
+    parser.add_argument("--bankroll", type=float, default=0,
+                        help="Total bankroll for stake sizing (e.g. 300000)")
+    parser.add_argument("--from-picks", action="store_true",
+                        help="Fan-in mode: build from raw.model_picks (set by run_model) "
+                             "instead of running the 4 models in-process")
+    parser.add_argument("--run-ds", default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                        help="Run date; used for --from-picks and the output filename "
+                             "(fixed once, so a midnight rollover can't split output)")
+    parser.add_argument("--shortlist-end-date", default=None,
+                        help="Inclusive Vancouver-local cutoff for curated lists (YYYY-MM-DD)")
+    args = parser.parse_args()
+
+    if args.from_picks:
+        from engine.eval.picks_store import read_model_analysis, read_model_picks
+        signals = read_model_picks(args.run_ds)
+        bayesian_analysis = read_model_analysis(args.run_ds, "bayesian")
+        print(f"Fan-in: {len(signals)} signals from raw.model_picks (run_ds={args.run_ds})")
+        print(f"Fan-in: {len(bayesian_analysis)} Bayesian fixture audit payloads")
+        result = build_consensus_from_signals(
+            signals, target_odds=args.target_odds, bankroll=args.bankroll,
+            run_ds=args.run_ds, bayesian_analysis=bayesian_analysis,
+            shortlist_end_date=args.shortlist_end_date)
+    else:
+        result = run_consensus(days=args.days, target_odds=args.target_odds,
+                               bankroll=args.bankroll,
+                               shortlist_end_date=args.shortlist_end_date)
+    print_slips(result)
+    # Always persist: the dashboard reads pool + fixture_analysis from this file,
+    # which are useful even on days when no accumulator slips clear the filters.
+    save_slips(result, run_ds=args.run_ds, record_history=True)
+    save_big_dog_state(result.get("elo_gap_group"))
