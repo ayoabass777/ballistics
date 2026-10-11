@@ -33,6 +33,8 @@ These branches were deleted after merging. Test suite on `a597f2d`: 236 passed, 
 | `engine-v1` | `5afcee1` | Consensus engine v1 snapshot (three-model system + calibration) |
 | `engine-v2` | `da5ea47` | Last commit of the engine v2 branch before it merged |
 
+Tags exist locally; push them from your machine with `git push origin --tags`.
+
 ## Open
 
 | Branch | Content | Notes |
@@ -43,7 +45,15 @@ Uncommitted in the working tree: refreshed `engine/eval/calibration_maps.json` a
 
 ## Deleted as stale (2026-10-11)
 
-All fully contained in `main`: `engine-v1` (now a tag), `list`, `codex/data-flow-detector`, `claude/elastic-hawking-c31c84`, `local/data-detector-skipped-runs` (local and origin), `origin/local/data-flow-detector`. Prunable worktrees were pruned.
+Local branches, all fully contained in `main`: `engine-v1` (now a tag), `list`, `codex/data-flow-detector`, `claude/elastic-hawking-c31c84`, `local/data-detector-skipped-runs`.
+
+Still on GitHub (also contained in `main`), delete from your machine:
+
+```bash
+git push origin --delete local/data-detector-skipped-runs local/data-flow-detector
+```
+
+Worktree records for `.claude/worktrees/elastic-hawking-c31c84` (no uncommitted work) and four `~/.codex/worktrees/` folders were pruned. Those folders are no longer git worktrees; delete them if unused.
 
 ## Safety refs
 
