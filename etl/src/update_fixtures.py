@@ -19,6 +19,11 @@ from etl.src.logger import get_logger
 
 logger = get_logger(__name__, log_path=UPDATE_FIXTURES_LOG)
 
+# Keep recently ended seasons eligible for result catch-up. Without a grace
+# window, an outage on the final matchday becomes permanent as soon as
+# stg_dim_league_seasons.is_current flips to false.
+FIXTURE_CATCHUP_GRACE_DAYS = int(os.getenv("FIXTURE_CATCHUP_GRACE_DAYS", "14"))
+
 
 def _write_updates_json(updates: List[Dict[str, Any]], output_path: str) -> None:
     """
@@ -59,8 +64,11 @@ def to_update_fixture_ids() -> List[Tuple[Optional[int], str]]:
              AND ls.season = srf.season
             WHERE srf.kickoff_utc < NOW() - INTERVAL '2 hour'
               AND (srf.home_team_fulltime_goal IS NULL OR srf.away_team_fulltime_goal IS NULL)
-              AND ls.is_current
-        """)
+              AND (
+                ls.is_current
+                OR ls.end_date >= CURRENT_DATE - (%s * INTERVAL '1 day')
+              )
+        """, (FIXTURE_CATCHUP_GRACE_DAYS,))
         rows = cur.fetchall()
         ids = [(row[0], str(row[1])) for row in rows]
         logger.info(f"Identified {len(ids)} fixture IDs needing updates.")
@@ -109,9 +117,12 @@ def batch_update_fixtures(
             WHERE
               srf.kickoff_utc < NOW() - INTERVAL '2 hour'
               AND (srf.home_team_fulltime_goal IS NULL OR srf.away_team_fulltime_goal IS NULL)
-                And ls.is_current
+              AND (
+                ls.is_current
+                OR ls.end_date >= CURRENT_DATE - (%s * INTERVAL '1 day')
+              )
             GROUP BY ls.league_season_id, l.api_league_id, ls.season
-        """)
+        """, (FIXTURE_CATCHUP_GRACE_DAYS,))
         to_update = cur.fetchall()
         if not to_update:
             logger.info("No fixtures need updating; exiting early.")
@@ -224,11 +235,15 @@ def update_by_ids(ids: List[Union[str, Tuple[Optional[int], str]]]) -> List[Dict
     logger.info("Starting update_by_ids for %d fixture IDs", len(api_ids))
     ptr = 0
     batch_size = 20  # Adjust batch size as needed
+    n_batches = 0
+    failed_batches = 0
+    last_error: Optional[Exception] = None
     while ptr < len(api_ids):
         batch_ids = api_ids[ptr : ptr + batch_size]
         batch_ids_str = "-".join(str(batch_id) for batch_id in batch_ids)
         logger.info(batch_ids_str)
         start_req = time.time()
+        n_batches += 1
         try:
             batch_fixtures = fetch_fixtures(
                 FIXTURES_ENDPOINT,
@@ -244,6 +259,8 @@ def update_by_ids(ids: List[Union[str, Tuple[Optional[int], str]]]) -> List[Dict
             )
             fixtures.extend(batch_fixtures)
         except Exception as e:
+            failed_batches += 1
+            last_error = e
             logger.error(
                 "Error fetching fixtures for provided IDs: %s in batch %d",
                 e,
@@ -252,6 +269,15 @@ def update_by_ids(ids: List[Union[str, Tuple[Optional[int], str]]]) -> List[Dict
             )
         finally:
             ptr += batch_size
+
+    # If every batch failed, the API is broken (bad key, lapsed plan, outage) —
+    # fail the task loudly rather than reporting a quiet "no updates" success.
+    if n_batches > 0 and failed_batches == n_batches:
+        raise RuntimeError(
+            f"All {n_batches} fixture-update batches failed; last error: {last_error}"
+        ) from last_error
+    if failed_batches:
+        logger.warning("%d/%d fixture-update batches failed", failed_batches, n_batches)
 
     try:
         extracted_batch = extract_fixtures_field(fixtures)

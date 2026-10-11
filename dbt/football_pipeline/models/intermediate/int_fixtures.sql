@@ -8,6 +8,15 @@
 -- Incrementally builds the fixtures dimension by upserting from staging models
 --------------------------------------------------------------------------------
 
+-- dim_teams is grained team x league_season (it carries standings), so a team
+-- playing in two seasons has two rows. int_fixtures only needs the surrogate
+-- key and name, so join a distinct lookup — joining dim_teams directly on
+-- api_team_id fans every fixture out by (home copies x away copies).
+WITH teams AS (
+    SELECT DISTINCT api_team_id, team_id, team_name
+    FROM {{ ref('dim_teams') }}
+)
+
 SELECT
     rf.fixture_id,
     lc.league_season_id,
@@ -34,9 +43,9 @@ FROM {{ ref('stg_raw_fixtures') }} AS rf
 JOIN {{ ref('int_league_context') }} AS lc
   ON rf.api_league_id = lc.api_league_id
   AND lc.season = rf.season
-JOIN {{ref('dim_teams')}} AS home_team
+JOIN teams AS home_team
   ON rf.home_team_id = home_team.api_team_id
-JOIN {{ref('dim_teams')}} AS away_team
+JOIN teams AS away_team
   ON rf.away_team_id = away_team.api_team_id
 {% if is_incremental() %}
     WHERE rf.updated_at > (SELECT MAX(updated_at) FROM {{ this }})
