@@ -1,7 +1,10 @@
 # Expected Goals (xG) Integration
 
-Status: **built** (July 4 2026). xG is ingested from API-Football and blended into the
-Dixon-Coles goals model for the leagues that have coverage.
+2026-10-08 — **Lineage: the engine reads xG through dbt.** `raw.fixture_xg` (ETL, unchanged) is a dbt source → `stg_raw_fixture_xg` (view, rename/cast) → `fact_fixture_xg` (table in `raw`, fixture grain, played fixtures with both sides' xG, warehouse team ids from `int_fixtures`). `predict_dixon_coles.blend_xg` (also used by `calibration_wf`) reads `raw.fact_fixture_xg` (`XG_TABLE`). The fact is a full rebuild, not incremental: xG lands after the result without touching `raw_fixtures.updated_at`. Tests: unique/not-null `fixture_id`, relationship to `stg_raw_fixtures`, non-negative xG, source freshness warn at 72 h on `captured_at`. `engine_predict` now waits for `fixture_update_dag.run_dbt` (was `extract_xg_task`), so xG and all dbt facts are same-night. Switch check: `python -m engine.eval.diagnostics.xg_lineage_check`.
+
+Status: **scheduled** (updated August 6 2026). xG is ingested from API-Football after
+the daily fixture-result update and blended into the Dixon-Coles goals model for the
+leagues that have verified coverage.
 
 ## Why (and why it's narrow)
 
@@ -14,18 +17,19 @@ top-5 only; FBref/StatsBomb would add a couple more but not the smallest divisio
 So xG is a **per-fixture, opt-in enhancement for a handful of leagues**, not a
 foundation. Non-covered fixtures are untouched and stay on actual goals.
 
-### Coverage (API-Football, probe July 4 2026)
+### Coverage (API-Football, re-probed August 6 2026)
 
-| League (api_league_id) | xG coverage |
+| League group | Ten-fixture probe |
 |---|---|
-| Eliteserien (103) | ~100% |
-| Brazil Serie B (72) | ~88% |
-| Chinese Super League (169) | ~75% |
-| Allsvenskan (113) | ~38% |
-| Ireland Premier Division (357) | ~38% |
-| everything else in the pool | ~0% (often no stats at all) |
+| 100% complete | Premier League and Championship (England), Ligue 1, Brazil Serie A/B, Bundesliga and 2. Bundesliga, Primeira Liga, Eliteserien, Ekstraklasa, Danish Superliga, Italy Serie A/B, La Liga, Jupiler Pro League, Scottish Premiership, Süper Lig, Swiss Super League, Egypt Premier League, Czech Liga, Ireland Premier Division |
+| 80% complete | Segunda Division (Spain), Major League Soccer |
+| 50% complete | Eredivisie recent sample; full-season warehouse coverage is 89–98% across 2023–2025, and provider delivery can lag on the newest fixtures |
+| Historical/intermittent | Allsvenskan and Chinese Super League retain useful 2025–2026 xG already in the warehouse, although the latest three-fixture probe returned none |
+| No xG in sample | Remaining 25 tracked leagues; they stay on actual goals |
 
-These five are the `XG_LEAGUES` allowlist. See memory `xg-data-coverage`.
+The 26 verified or historically useful league ids are the explicit `XG_LEAGUES`
+allowlist. A league is not promoted solely because the endpoint returns other match
+statistics.
 
 ## Data ingestion — `etl/src/extract_xg.py`
 
@@ -46,15 +50,46 @@ raw.fixture_xg (
   `raw_fixtures.home_team_id` (both API-team-id space) to assign home vs away xG.
 - Only FT fixtures in `XG_LEAGUES`, and by default only those **missing** xG (idempotent
   backfill). `--all` re-fetches; `--limit N` caps a batch.
-- **Recent seasons only** (`RECENT_SEASONS = [2025, 2026]`). Dixon-Coles time-decays
+- **Recent seasons by default** (`RECENT_SEASONS = [2025, 2026]`). Dixon-Coles time-decays
   history (half-life ~107 days), so older seasons contribute ~nothing to the fit and just
   burn API calls — no reason to pull 2020–2024. Override with `--seasons 2024,2025,2026`.
 - Must run where the API and DB are reachable (the Airflow container):
 
 ```bash
-docker exec -w /opt/airflow ballistics_airflow_scheduler \
+  docker exec -w /opt/airflow ballistics_airflow_scheduler \
     python -m etl.src.extract_xg          # backfill missing, recent seasons
 ```
+
+Eredivisie was added after a direct provider check found xG for PSV's 2023/24,
+2024/25, and 2025/26 opening fixtures. The two older opening fixtures returned
+statistics but no `expected_goals` values. To run that historical backfill only:
+
+```bash
+python -m etl.src.extract_xg --leagues 88 --seasons 2023,2024,2025
+```
+
+## Coverage discovery and monitoring
+
+The production allowlist stays explicit, but provider support can be rediscovered
+without editing it first:
+
+```bash
+# Sample three recent completed fixtures from every tracked league.
+python -m etl.src.extract_xg --probe-all-leagues --probe-sample-size 3
+
+# Optionally keep valid xG returned by those probe calls.
+python -m etl.src.extract_xg --probe-all-leagues --probe-sample-size 3 --store-probe-xg
+
+# Report warehouse completeness at league-season grain.
+python -m etl.src.extract_xg --coverage-report
+```
+
+Probe results are stored in `raw.xg_league_probes`. Current warehouse coverage is
+exposed by `raw.xg_league_coverage`, including completed fixtures, complete xG rows,
+coverage percentage, missing/error attempts, and the last xG capture/attempt time for
+every league-season. `raw.fixture_xg_attempts` prevents fixtures with no provider xG
+from consuming the same API calls every day: missing values retry after 30 days and
+errors retry after one day.
 
 ## Model blending — `predict_dixon_coles.blend_xg()`
 
@@ -94,12 +129,16 @@ keep integer goals for the rho mask while using blended goals only for the Poiss
 
 ## Operations
 
-- **Re-run calibration after any xG change** (`python -m engine.eval.calibration_wf`):
+- **Re-run calibration after any material historical xG backfill**
+  (`python -m engine.eval.calibration_wf`):
   the blend affects DC's fitted probabilities, so its PAVA map must be refit on the blended
   signal. Live DC auto-loads the refreshed `calibration_maps.json`.
-- **Not yet on a schedule.** Ingestion is manual/one-off today. To keep xG fresh, add an
-  `extract_xg` step to the fixture pipeline (after results load) or a small standalone DAG,
-  the same way `odds_scrape` runs.
+- **Scheduled daily.** `fixture_update_dag.extract_xg_task` runs after fixture results and
+  corrections load, then records a `raw.fixture_xg` table snapshot and logs configured
+  league-season coverage. The task processes at most 250 missing fixtures per run by
+  default (`XG_INGEST_LIMIT`) so a historical backlog cannot monopolize the daily DAG.
+- **Safe partial coverage.** Fixtures without xG remain on actual goals because the
+  Dixon-Coles blend is a LEFT JOIN and only changes rows with available xG.
 
 ## Validation
 

@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: fact_fixture_xg
+    description: >
+      Expected goals per played fixture (covered leagues only), with warehouse team ids.
+      Read by the engine (Dixon-Coles xG blend) instead of raw.fixture_xg.
+    columns:
+      - name: fixture_id
+        tests: [not_null, unique]
+      - name: league_season_id
+        tests: [not_null]
+      - name: kickoff_utc
+        tests: [not_null]
+      - name: home_team_id
+        tests: [not_null]
+      - name: away_team_id
+        tests: [not_null]
+      - name: home_xg
+        tests: [not_null]
+      - name: away_xg
+        tests: [not_null]
