@@ -7,7 +7,8 @@ Also corrects rescheduled kickoff times and updates league standings.
 
 Task graph:
 
-  extract_updates ──► load_updates ──► fixture_corrections ──► update_standings ──► dbt_seed ──► dbt_run
+  extract_updates ──► load_updates ──► fixture_corrections ──► extract_xg
+      ──► update_standings ──► data_quality_checks ──► dbt_seed ──► dbt_run
 """
 
 import os
@@ -44,6 +45,8 @@ if not PROJECT_ROOT:
         "DockerOperator can bind-mount dbt files. Set PROJECT_ROOT in .env to "
         "the output of `pwd` from the repository root."
     )
+
+XG_INGEST_LIMIT = int(os.getenv("XG_INGEST_LIMIT", "250"))
 
 DBT_MOUNTS = [
     Mount(
@@ -242,6 +245,34 @@ def fixture_update_dag():
         logger.info("Fixture corrections applied: %d updates", count_of_corrected_fixtures)
 
     # ------------------------------------------------------------------
+    # Expected goals: fill xG for newly completed supported fixtures
+    # ------------------------------------------------------------------
+
+    @task
+    def extract_xg_task(**context):
+        """Backfill missing recent xG and publish a freshness snapshot."""
+        from etl.src.extract_xg import ingest, log_coverage_summary
+        from etl.src.logger import get_logger
+        from etl.src.config import UPDATE_FIXTURES_LOG
+        from etl.src.data_detector import record_table_snapshot_from_context
+
+        logger = get_logger(__name__, log_path=UPDATE_FIXTURES_LOG)
+        stored = ingest(limit=XG_INGEST_LIMIT)
+        coverage = log_coverage_summary()
+        record_table_snapshot_from_context(
+            context,
+            table_schema="raw",
+            table_name="fixture_xg",
+            details={
+                "new_xg_rows": stored,
+                "coverage_rows": len(coverage),
+                "configured_leagues": sorted({row["api_league_id"] for row in coverage}),
+            },
+        )
+        logger.info("xG refresh stored %d new fixtures", stored)
+        return stored
+
+    # ------------------------------------------------------------------
     # Standings: refresh league standings from API
     # ------------------------------------------------------------------
 
@@ -299,10 +330,11 @@ def fixture_update_dag():
     s3_key = extract_updates()
     loaded = load_updates(s3_key)
     corrections = fixture_corrections()
+    xg = extract_xg_task()
     standings = update_standings_task()
     quality_checks = run_data_quality_checks()
 
-    loaded >> corrections >> standings >> quality_checks >> dbt_seed >> dbt_run
+    loaded >> corrections >> xg >> standings >> quality_checks >> dbt_seed >> dbt_run
 
 
 fixture_update_dag()

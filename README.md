@@ -124,7 +124,8 @@ docker compose up -d
 ### First Run
 
 1. Trigger `bootstrap_dag` in the Airflow UI — this creates schemas, loads metadata, and full-loads all fixtures.
-2. Once bootstrap completes, `fixture_update_dag` runs daily on schedule.
+2. Once bootstrap completes, `fixture_update_dag` runs daily on schedule, including
+   bounded xG ingestion after completed-fixture updates and league-level coverage tracking.
 
 ### dbt
 

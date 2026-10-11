@@ -451,8 +451,8 @@ class DagWiringTests(unittest.TestCase):
         self.assertIn("from etl.src.data_detector import (", load_task_source)
 
         correction_task_start = source.index("    def fixture_corrections")
-        standings_task_start = source.index("    def update_standings_task")
-        correction_task_source = source[correction_task_start:standings_task_start]
+        xg_task_start = source.index("    def extract_xg_task")
+        correction_task_source = source[correction_task_start:xg_task_start]
 
         self.assertIn('movement_type="raw_correction"', correction_task_source)
         self.assertIn("count_of_corrected_fixtures", correction_task_source)
@@ -463,6 +463,13 @@ class DagWiringTests(unittest.TestCase):
         self.assertNotIn("record_data_quality_event_from_context", correction_task_source)
 
         standings_task_start = source.index("    def update_standings_task")
+        xg_task_source = source[xg_task_start:standings_task_start]
+
+        self.assertIn("stored = ingest(limit=XG_INGEST_LIMIT)", xg_task_source)
+        self.assertIn("log_coverage_summary()", xg_task_source)
+        self.assertIn('table_name="fixture_xg"', xg_task_source)
+        self.assertIn("record_table_snapshot_from_context", xg_task_source)
+
         quality_task_start = source.index("    @task\n    def run_data_quality_checks")
         standings_task_source = source[standings_task_start:quality_task_start]
 
