@@ -14,6 +14,8 @@ from etl.src.data_detector.quality_events import (
     check_standings_stale_from_context,
     record_data_quality_event,
     record_data_quality_event_from_context,
+    resolve_data_quality_events,
+    resolve_data_quality_events_from_context,
 )
 from etl.src.data_detector.table_snapshots import record_table_snapshot, record_table_snapshot_from_context
 from etl.src.data_detector.watermarks import fixture_kickoff_watermark
@@ -30,6 +32,8 @@ __all__ = [
     "record_data_movement_from_context",
     "record_data_quality_event",
     "record_data_quality_event_from_context",
+    "resolve_data_quality_events",
+    "resolve_data_quality_events_from_context",
     "record_pipeline_run",
     "record_table_snapshot",
     "record_table_snapshot_from_context",

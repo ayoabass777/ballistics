@@ -118,12 +118,20 @@ def replay_dag():
         from etl.src.s3_landing import list_dlq_entries
         from etl.src.logger import get_logger
         from etl.src.config import EXTRACT_FIXTURES_LOG
-        from etl.src.data_detector import record_data_quality_event_from_context
+        from etl.src.data_detector import (
+            record_data_quality_event_from_context,
+            resolve_data_quality_events_from_context,
+        )
 
         logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
 
         entries = list_dlq_entries()
         if not entries:
+            resolve_data_quality_events_from_context(
+                context,
+                check_name="dlq_not_empty",
+                reason="DLQ check passed with no remaining entries",
+            )
             logger.info("DLQ is clear. All league-seasons processed.")
             return
 

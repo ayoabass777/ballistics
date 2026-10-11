@@ -48,6 +48,7 @@ class FakeCursor:
         self.fetchone_values = list(fetchone_values or [])
         self.fetchall_values = list(fetchall_values or [])
         self.executions = []
+        self.rowcount = 0
 
     def execute(self, query, params=None):
         self.executions.append((str(query), params))
@@ -263,6 +264,37 @@ class TableSnapshotDetectorTests(unittest.TestCase):
 
 
 class QualityDetectorTests(unittest.TestCase):
+    def test_resolve_quality_events_preserves_rows_and_records_resolution(self):
+        cursor = FakeCursorContext()
+        cursor.rowcount = 3
+        connection = FakeConnection(cursor)
+
+        with (
+            patch.object(quality_events, "get_db_connection", return_value=connection),
+            patch.object(
+                quality_events,
+                "utc_now",
+                return_value=datetime(2026, 5, 22, tzinfo=timezone.utc),
+            ),
+        ):
+            resolved = quality_events.resolve_data_quality_events(
+                check_name="standings_stale",
+                run_id="manual__repair",
+                dag_id="fixture_update_dag",
+                task_id="update_standings_task",
+                table_schema="raw",
+                table_name="raw_league_standings",
+                reason="freshness check passed",
+            )
+
+        self.assertEqual(resolved, 3)
+        self.assertEqual(connection.commits, 1)
+        query, params = cursor.executions[0]
+        self.assertIn("SET status = 'resolved'", query)
+        self.assertIn("check_name = %s", query)
+        self.assertEqual(params[1:], ("standings_stale", "raw", "raw_league_standings"))
+        self.assertEqual(params[0].adapted["resolution"]["reason"], "freshness check passed")
+
     def test_raw_fixture_stale_requires_current_seasons_unresolved_past_and_stale_table(self):
         cursor = FakeCursorContext(
             fetchone_values=[
@@ -277,6 +309,7 @@ class QualityDetectorTests(unittest.TestCase):
         with (
             patch.object(quality_events, "get_db_connection", return_value=connection),
             patch.object(quality_events, "record_data_quality_event") as record,
+            patch.object(quality_events, "resolve_data_quality_events") as resolve,
         ):
             quality_events.check_raw_fixture_stale_from_context(airflow_context())
 
@@ -289,6 +322,7 @@ class QualityDetectorTests(unittest.TestCase):
         self.assertEqual(payload["details"]["stale_hours"], quality_events.RAW_FIXTURE_STALE_HOURS)
         self.assertEqual(payload["details"]["current_season_count"], 1)
         self.assertEqual(payload["details"]["unresolved_past_fixture_count"], 3)
+        resolve.assert_not_called()
 
     def test_raw_fixture_stale_does_not_warn_without_unresolved_past_fixtures(self):
         cursor = FakeCursorContext(
@@ -304,10 +338,20 @@ class QualityDetectorTests(unittest.TestCase):
         with (
             patch.object(quality_events, "get_db_connection", return_value=connection),
             patch.object(quality_events, "record_data_quality_event") as record,
+            patch.object(quality_events, "resolve_data_quality_events") as resolve,
         ):
             quality_events.check_raw_fixture_stale_from_context(airflow_context())
 
         record.assert_not_called()
+        resolve.assert_called_once_with(
+            check_name="raw_fixture_stale",
+            run_id="scheduled__2026-05-21",
+            dag_id="fixture_update_dag",
+            task_id="load_updates",
+            table_schema="raw",
+            table_name="raw_fixtures",
+            reason="raw fixture freshness check passed",
+        )
 
     def test_standings_stale_records_warning_when_updated_at_is_old(self):
         cursor = FakeCursorContext(
@@ -328,6 +372,7 @@ class QualityDetectorTests(unittest.TestCase):
         with (
             patch.object(quality_events, "get_db_connection", return_value=connection),
             patch.object(quality_events, "record_data_quality_event") as record,
+            patch.object(quality_events, "resolve_data_quality_events") as resolve,
         ):
             quality_events.check_standings_stale_from_context(airflow_context(), stale_days=7)
 
@@ -350,6 +395,7 @@ class QualityDetectorTests(unittest.TestCase):
                 }
             ],
         )
+        resolve.assert_not_called()
 
     def test_standings_stale_does_not_warn_when_no_current_leagues_are_stale(self):
         cursor = FakeCursorContext(fetchall_values=[[]])
@@ -358,10 +404,20 @@ class QualityDetectorTests(unittest.TestCase):
         with (
             patch.object(quality_events, "get_db_connection", return_value=connection),
             patch.object(quality_events, "record_data_quality_event") as record,
+            patch.object(quality_events, "resolve_data_quality_events") as resolve,
         ):
             quality_events.check_standings_stale_from_context(airflow_context(), stale_days=7)
 
         record.assert_not_called()
+        resolve.assert_called_once_with(
+            check_name="standings_stale",
+            run_id="scheduled__2026-05-21",
+            dag_id="fixture_update_dag",
+            task_id="load_updates",
+            table_schema="raw",
+            table_name="raw_league_standings",
+            reason="standings freshness check passed",
+        )
 
 
 class DagWiringTests(unittest.TestCase):
