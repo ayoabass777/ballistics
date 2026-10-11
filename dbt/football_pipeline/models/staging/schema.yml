@@ -172,3 +172,18 @@ models:
         tests: [not_null]
       - name: detected_at
         tests: [not_null]
+
+  # ── stg_raw_fixture_xg ──────────────────────────────────────────────
+  - name: stg_raw_fixture_xg
+    description: "Expected goals per fixture (view over raw.fixture_xg). Covered leagues only."
+    columns:
+      - name: fixture_id
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('stg_raw_fixtures')
+                field: fixture_id
+      - name: captured_at
+        tests: [not_null]

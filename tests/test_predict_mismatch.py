@@ -99,6 +99,11 @@ class MismatchDagWiringTests(unittest.TestCase):
         self.assertIn('external_task_id="run_dbt"', source)
         self.assertNotIn('external_task_id="extract_xg_task"', source)
 
+    def test_dixon_coles_reads_xg_from_dbt_fact(self):
+        source = Path("engine/eval/predict_dixon_coles.py").read_text()
+        self.assertIn('XG_TABLE = "raw.fact_fixture_xg"', source)
+        self.assertNotIn("FROM raw.fixture_xg", source)
+
     def test_daily_dag_verifies_all_shortlists_after_consensus(self):
         source = Path("airflow/dags/engine_predict_dag.py").read_text()
 

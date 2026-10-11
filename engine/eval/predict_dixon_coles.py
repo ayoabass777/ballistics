@@ -119,10 +119,14 @@ def load_dc_historical(conn) -> pd.DataFrame:
 # ── fitting ─────────────────────────────────────────────────────────────────
 
 XG_WEIGHT = 0.5   # blend weight for xG where available: (1-w)*goals + w*xg
+XG_TABLE = "raw.fact_fixture_xg"   # dbt fact (fixture grain); see docs/xg_integration.md
 
 
 def blend_xg(matches: pd.DataFrame, conn, weight: float = XG_WEIGHT) -> pd.DataFrame:
-    """Blend expected goals into home_goals/away_goals where raw.fixture_xg has it.
+    """Blend expected goals into home_goals/away_goals where dbt's fact_fixture_xg has it.
+
+    Source: raw.fact_fixture_xg (dbt: raw.fixture_xg -> stg_raw_fixture_xg ->
+    fact_fixture_xg). The engine reads dbt facts only, never ETL raw tables.
 
     xG is a lower-variance signal than raw scorelines, but only a few leagues carry
     it (see memory xg-data-coverage), so this is a per-fixture, opt-in blend: rows
@@ -133,10 +137,10 @@ def blend_xg(matches: pd.DataFrame, conn, weight: float = XG_WEIGHT) -> pd.DataF
         return matches
     try:
         cur = conn.cursor()
-        cur.execute("SELECT to_regclass('raw.fixture_xg')")
+        cur.execute(f"SELECT to_regclass('{XG_TABLE}')")
         if cur.fetchone()[0] is None:
             return matches
-        xg = pd.read_sql("SELECT fixture_id, home_xg, away_xg FROM raw.fixture_xg", conn)
+        xg = pd.read_sql(f"SELECT fixture_id, home_xg, away_xg FROM {XG_TABLE}", conn)
     except Exception:  # noqa: BLE001
         return matches
     if xg.empty:

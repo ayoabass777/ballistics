@@ -118,6 +118,26 @@ sources:
           - name: created_at
           - name: updated_at
 
+      - name: fixture_xg
+        description: >
+          Expected goals per fixture, loaded by etl/src/extract_xg.py from API-Football
+          fixtures/statistics. Only leagues on the XG_LEAGUES allowlist; most fixtures
+          have no row. Keyed by the warehouse fixture_id shared with raw_fixtures.
+        loaded_at_field: captured_at
+        freshness:
+          warn_after: {count: 72, period: hour}
+          error_after: null
+        columns:
+          - name: fixture_id
+            description: "Warehouse fixture surrogate key (same as raw_fixtures.fixture_id)."
+            tests:
+              - not_null
+              - unique
+          - name: api_fixture_id
+          - name: home_xg
+          - name: away_xg
+          - name: captured_at
+
   - name: etl
     schema: dim
     tables:
