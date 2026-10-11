@@ -17,9 +17,11 @@ models:
         tests: [not_null]
       - name: fixture_status
         tests: [not_null]
-      - name: home_team_id
+      - name: home_api_team_id
+        description: "API-Football team id (raw home_team_id). Translate via stg_dim_teams; never use past staging."
         tests: [not_null]
-      - name: away_team_id
+      - name: away_api_team_id
+        description: "API-Football team id (raw away_team_id)."
         tests: [not_null]
       - name: is_played
         description: "True when fixture_status = 'FT'."

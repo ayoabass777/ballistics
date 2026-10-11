@@ -20,3 +20,37 @@ models:
         tests: [not_null]
       - name: away_xg
         tests: [not_null]
+
+  - name: fact_fixtures
+    description: >
+      Every fixture (all statuses) with warehouse team and league ids. The engine reads
+      fixtures from here, never from raw.raw_fixtures. api_league_id is transitional.
+    columns:
+      - name: fixture_id
+        tests: [not_null, unique]
+      - name: api_league_id
+        tests: [not_null]
+      - name: kickoff_utc
+        tests: [not_null]
+      - name: fixture_status
+        tests: [not_null]
+      - name: home_team_id
+        tests:
+          - not_null:
+              config: {severity: warn}
+          - relationships:
+              arguments:
+                to: ref('stg_dim_teams')
+                field: team_id
+      - name: away_team_id
+        tests:
+          - not_null:
+              config: {severity: warn}
+          - relationships:
+              arguments:
+                to: ref('stg_dim_teams')
+                field: team_id
+      - name: league_season_id
+        tests:
+          - not_null:
+              config: {severity: warn}

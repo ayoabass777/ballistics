@@ -44,9 +44,9 @@ JOIN {{ ref('int_league_context') }} AS lc
   ON rf.api_league_id = lc.api_league_id
   AND lc.season = rf.season
 JOIN teams AS home_team
-  ON rf.home_team_id = home_team.api_team_id
+  ON rf.home_api_team_id = home_team.api_team_id
 JOIN teams AS away_team
-  ON rf.away_team_id = away_team.api_team_id
+  ON rf.away_api_team_id = away_team.api_team_id
 {% if is_incremental() %}
     WHERE rf.updated_at > (SELECT MAX(updated_at) FROM {{ this }})
 {% endif %}

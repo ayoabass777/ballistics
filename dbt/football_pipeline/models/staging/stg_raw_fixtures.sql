@@ -10,9 +10,9 @@ SELECT
     season,
     kickoff_utc,
     fixture_status,
-    home_team_id,
+    home_team_id AS home_api_team_id,   -- API-Football id, not the warehouse team_id
     home_team_name,
-    away_team_id,
+    away_team_id AS away_api_team_id,
     away_team_name,
     home_team_halftime_goal,
     away_team_halftime_goal,
