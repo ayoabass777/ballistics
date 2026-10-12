@@ -56,3 +56,38 @@ def test_exact_repeat_in_the_same_group_is_deduped_last_wins():
 def test_upsert_conflict_and_columns_include_group():
     assert us.UPSERT_CONFLICT == "(league_season_id, group_name, api_team_id)"
     assert {"group_name", "group_order", "description"} <= set(us.COLUMNS)
+
+
+def test_repeated_label_across_tables_gets_table_suffix():
+    rows = us.extract_standings(_payload(
+        [_row(1, 1, "USL Championship"), _row(2, 2, "USL Championship")],
+        [_row(3, 1, "USL Championship")],
+    ))
+    assert [r["group_name"] for r in rows] == [
+        "USL Championship - Table 1", "USL Championship - Table 1",
+        "USL Championship - Table 2"]
+
+
+class _Cur:
+    def __init__(self):
+        self.calls = []
+        self.rowcount = 2
+
+    def execute(self, sql, params):
+        self.calls.append((sql, params))
+
+
+def test_prune_deletes_only_refreshed_seasons_keys_not_in_payload():
+    cur = _Cur()
+    rows = [{"league_season_id": 6, "group_name": "Group A", "api_team_id": 1},
+            {"league_season_id": 6, "group_name": "Group B", "api_team_id": 2}]
+    assert us.prune_stale_rows(cur, rows) == 2
+    (sql, params), = cur.calls
+    assert "DELETE" in sql and "NOT IN" in sql
+    assert params == (6, (("Group A", 1), ("Group B", 2)))
+
+
+def test_prune_does_nothing_for_empty_payload():
+    cur = _Cur()
+    assert us.prune_stale_rows(cur, []) == 0
+    assert cur.calls == []
