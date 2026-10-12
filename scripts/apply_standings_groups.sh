@@ -15,8 +15,8 @@ psql_run() { docker exec -i ballistics_postgres psql -U "$DB_USER" -d "$DB_NAME"
   echo "== 2. standings refresh (keeps groups now)"
   docker exec -w /opt/airflow ballistics_airflow_scheduler python -m etl.src.update_standings || exit 1
   echo "== 3. dbt build"
-  docker compose run --rm dbt dbt build -s stg_raw_league_standings stg_dim_leagues \
-    int_league_context dim_teams mart_league_standings || exit 1
+  docker compose run --rm dbt dbt build -s stg_raw_league_standings \
+    dim_teams mart_league_standings || exit 1
   echo "== 4. leagues with more than one group"
   psql_run < etl/sql/diagnostics/standings_groups.sql
   echo "== done"

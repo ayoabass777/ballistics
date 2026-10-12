@@ -8,10 +8,14 @@
 -- updated_at; rows from older refreshes (teams the API no longer returns, or
 -- pre-2026-10-11 rows without a group) are left out.
 --
--- Warehouse ids only. group_name is the API table label: one group for most
--- leagues, parallel conferences (MLS, USL), or split rounds (regular season,
--- championship / relegation round). standings_format comes from the league
--- definition; format_check flags leagues whose data disagrees with it.
+-- Warehouse ids only. group_name is the API table label (or "Table N").
+-- standings_format is derived here, per league season, from the standings
+-- themselves (no league config), so a league that changes format between
+-- seasons is handled:
+--   single       one group
+--   split        several groups and some team appears in more than one
+--                (regular season + championship / relegation rounds)
+--   conferences  several groups, each team in exactly one (MLS, USL)
 
 with standings as (
     select * from {{ ref('stg_raw_league_standings') }}
@@ -41,7 +45,14 @@ group_stats as (
 ),
 
 season_stats as (
-    select league_season_id, count(distinct group_name) as n_groups
+    select
+        league_season_id,
+        count(distinct group_name) as n_groups,
+        case
+            when count(distinct group_name) = 1 then 'single'
+            when count(*) > count(distinct api_team_id) then 'split'
+            else 'conferences'
+        end as standings_format
     from current_rows
     group by league_season_id
 ),
@@ -55,7 +66,7 @@ with_context as (
     select
         c.*,
         lc.league_id,
-        lc.standings_format,
+        ss.standings_format,
         ss.n_groups,
         gs.ranks_repeat,
         t.team_id,
@@ -95,13 +106,6 @@ select
     standings_format,
     n_groups,
     ranks_repeat,
-    case
-        when standings_format is null and n_groups > 1 then 'undeclared_groups'
-        when standings_format = 'single' and n_groups > 1 then 'single_has_groups'
-        when standings_format in ('conferences', 'split') and n_groups = 1
-            then 'declared_groups_has_one'
-        else 'ok'
-    end as format_check,
     -- The table to show for this team: its only group, or in a split season
     -- the latest round it appears in (last table in the API response).
     (group_order = team_last_group_order

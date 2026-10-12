@@ -11,6 +11,5 @@ select
   league_name,
   country_id,
   tier,
-  standings_format,   -- single | conferences | split; NULL = not declared
   logo_file_id
 from {{ source ('etl', 'dim_leagues') }}

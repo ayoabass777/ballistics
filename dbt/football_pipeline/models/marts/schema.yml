@@ -372,8 +372,10 @@ models:
         tests: [not_null]
       - name: standings_updated_at
         tests: [not_null]
-      - name: format_check
+      - name: standings_format
+        description: "Derived per league season from the standings: single | conferences | split."
         tests:
+          - not_null
           - accepted_values:
               arguments:
-                values: ['ok', 'undeclared_groups', 'single_has_groups', 'declared_groups_has_one']
+                values: ['single', 'conferences', 'split']

@@ -7,7 +7,6 @@ WITH base as (
         l.league_id,
         api_league_id,
         l.tier,
-        l.standings_format,
         season,
         ls.league_season_id,
         is_current,
