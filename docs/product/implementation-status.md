@@ -1,5 +1,7 @@
 # Implementation status
 
+2026-10-12 — D118 navigation repair, Figma-only: Two destination changes. Post-edit traversal from teaser 1030:57675 and current Discover 592:54464 visited 577 destination nodes, queue exhausted, zero references to legacy 16:359 / 22:642 / 22:722 or review 990:57646 in visible reachable reactions, including nested conditional actions. Browser visibly confirmed canonical Discover 592:54464. Exhaustive browser click-through not performed; archived/off-flow routes retained. No frontend changes.
+
 2026-10-12 — D117: Updated info control I1033:57896;841:57437 and icon I1033:57896;841:57438. Quick explanation 1099:58002 reuses existing tip layout; full Methodology action retains prior destination 239:36044 and return-origin variable. Header and dialog screenshots checked; browser-tested info opening. Back to match CLOSE action wired and exercised; full Methodology destination structurally verified. No frontend accessibility or desktop tooltip implementation claimed.
 
 2026-10-12 — D116 Figma-only: Callout 1068:58009, visibility boolean VariableID:1068:58015, added to saved-layout teaser detail. Browser verified initial display, Got it dismissal, Back → re-entry keeping it dismissed. Section buttons also dismiss via variable action; structural verification only. Screenshots checked. Prototype restart resets first-visit state; no persistent user/account onboarding tracking. No teaser content changes.

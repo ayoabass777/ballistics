@@ -1,5 +1,7 @@
 # Decision log
 
+2026-10-12 — D118 (requested): Active mobile flow uses canonical Discover 592:54464 (Goals 592:55227, Patterns 592:56017). Repaired Sign in 325:48306 and older onboarding completion 324:48031 to canonical Strength. Older Discover frames retained as reference, unreachable from current teaser/Discover roots. Owner teaser edits preserved.
+
 2026-10-12 — D117 (requested; Figma-only): Teaser-detail info control now uses a muted 18px ⓘ with no outer stroke, retaining its 44×44 hit area. Opens short explanation 1099:58002 with Read full Methodology and Back to match. Scope is teaser clone 1033:57869; shared source and owner-edited teaser preserved. Design label: How these numbers work; production accessible name and desktop tooltip remain implementation requirements.
 
 2026-10-12 — D116 (prototype for review): Reuse the existing first-detail tip on teaser detail 1033:57869. A floating callout under the section menu introduces the card entry and Context/Strength/Patterns/Goals. Got it or selecting a section dismisses it for the prototype session. Owner-edited section-style teaser cards 1046:58035 / 1046:58059 / 1046:58083 and their links preserved. Original shared detail 841:57932 unchanged.
