@@ -1,0 +1,53 @@
+"""Standings keep API groups (conferences, split rounds) as separate tables."""
+from etl.src import update_standings as us
+
+
+def _row(team_id, rank, group, description=None):
+    return {"rank": rank, "team": {"id": team_id, "name": f"T{team_id}"},
+            "points": 10, "goalsDiff": 1, "form": "WWD", "group": group,
+            "description": description,
+            "all": {"played": 5, "win": 3, "draw": 1, "lose": 1,
+                    "goals": {"for": 8, "against": 7}}}
+
+
+def _payload(*tables):
+    return [{"league": {"standings": list(tables)}}]
+
+
+def test_conferences_keep_their_group_and_order():
+    rows = us.extract_standings(_payload(
+        [_row(1, 1, "Eastern Conference"), _row(2, 2, "Eastern Conference")],
+        [_row(3, 1, "Western Conference")],
+    ))
+    assert [(r["api_team_id"], r["rank"], r["group_name"], r["group_order"])
+            for r in rows] == [(1, 1, "Eastern Conference", 0),
+                               (2, 2, "Eastern Conference", 0),
+                               (3, 1, "Western Conference", 1)]
+
+
+def test_split_season_team_is_kept_in_both_tables():
+    rows = us.extract_standings(_payload(
+        [_row(7, 1, "Regular Season"), _row(8, 2, "Regular Season")],
+        [_row(7, 1, "Championship Round", "Promotion - Champions League")],
+    ))
+    for r in rows:
+        r["league_season_id"] = 42
+    kept = us.dedupe_rows(rows)
+    assert len(kept) == 3          # team 7 appears in both groups
+    assert kept[2]["description"] == "Promotion - Champions League"
+
+
+def test_missing_group_label_becomes_empty_string():
+    (row,) = us.extract_standings(_payload([_row(5, 1, None)]))
+    assert row["group_name"] == ""
+
+
+def test_exact_repeat_in_the_same_group_is_deduped_last_wins():
+    a = {"league_season_id": 1, "group_name": "G", "api_team_id": 9, "rank": 3}
+    b = dict(a, rank=2)
+    assert us.dedupe_rows([a, b]) == [b]
+
+
+def test_upsert_conflict_and_columns_include_group():
+    assert us.UPSERT_CONFLICT == "(league_season_id, group_name, api_team_id)"
+    assert {"group_name", "group_order", "description"} <= set(us.COLUMNS)
