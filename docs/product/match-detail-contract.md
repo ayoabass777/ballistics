@@ -1,16 +1,18 @@
 # Match detail — data contract (v2)
 
-Status: **proposal for the frontend build** (2026-10-07). Design: Figma section "Match detail v2 · fixes 1–6" (668:57671) and "Match detail v2 · weak states" (698:57342); decisions D102–D104. Nothing here is deployed. Field names below are the real engine/database names unless marked **NEW**.
+Status: **proposal for the frontend build** (2026-10-07; sources and IDs updated 2026-10-11). Design: Figma section "Match detail v2 · fixes 1–6" (668:57671) and "Match detail v2 · weak states" (698:57342); decisions D102–D104. Nothing here is deployed. Field names below are the real engine/database names unless marked **NEW**.
 
 ## 1. Sources
 
 | Source | What it gives | Where |
 |---|---|---|
-| Engine run export | Strength splits, patterns, goal estimates, Big dog label and league record | `engine/eval/consensus_slips_<run_ds>.json` → `fixture_analysis[]`, `elo_gap_shortlist[]`, `elo_gap_group.big_dog_leagues[]` |
-| League standings | Position, played, goal difference, points | `raw.raw_league_standings` (rule: D69 `display_standings`, latest refresh cohort) |
-| Head-to-head | Completed meetings between the two teams | `raw.raw_fixtures` (D69: both team IDs, either venue, FT only, kickoff before the export cutoff, newest 5) |
-| Crests | Team badge image | `https://media.api-sports.io/football/teams/{api_team_id}.png` (D76); initials if missing |
+| Engine run export | Strength splits, patterns, goal estimates, Big dog label and league record; warehouse `home_team_id`, `away_team_id`, `league_id` | `engine/eval/consensus_slips_<run_ds>.json` → `fixture_analysis[]`, `elo_gap_shortlist[]`, `elo_gap_group.big_dog_leagues[]` |
+| League standings | Position, played, W/D/L, goal difference, points, form | dbt, warehouse ids: today `raw_int.dim_teams` (team × league season). **NEW** `mart_league_standings` needed for D69 (see §6) |
+| Head-to-head | Completed meetings between the two teams | dbt `raw.fact_head_to_head` (warehouse ids, played only): rows where `team_id` = one team and `opponent_id` = the other, either venue, `kickoff_utc` before the export cutoff, newest 5 |
+| Crests | Team badge image | API returns `crest_url` per team; the frontend never builds provider URLs. Backed by `logo_file_id` (see §6); initials if missing |
 | User state | Saved, followed leagues, venue preference | Account (not built) |
+
+**ID rule** (`docs/contracts/ids.md`): everything this page receives uses warehouse ids (`fixture_id`, `team_id`, `league_id`). No API-Football ids reach the frontend, and no source here reads `raw.raw_fixtures` or `raw.raw_league_standings` directly.
 
 One page = one `fixture_id`. Every value on the page must come from **one engine run** (`run_ds`) plus **one standings/H2H snapshot** (`standings_updated_at`). Both dates are shown on the page.
 
@@ -19,8 +21,9 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 ```jsonc
 {
   "fixture": { "fixture_id": 90863, "home": "Zlin", "away": "Slavia Praha",
-               "home_team_id": "<id>", "away_team_id": 560,   // NEW in export (ids exist in DB)
-               "league": "Czech Liga", "country": "Czech-Republic", "api_league_id": 345,
+               "home_team_id": "<team_id>", "away_team_id": "<team_id>",   // warehouse ids (in export since 2026-10-11)
+               "home_crest_url": "/api/crest/<team_id>", "away_crest_url": "/api/crest/<team_id>",   // NEW
+               "league": "Czech Liga", "country": "Czech-Republic", "league_id": "<league_id>",
                "kickoff_utc": "2026-10-09T16:00:00Z", "run_ds": "2026-10-07",
                "standings_updated_at": "2026-10-05T00:09:10Z" },
   "entry":    { "from": "discover|standouts|matches|saved", "section": "strength|goals|patterns|null",
@@ -37,7 +40,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 | UI | Field | Rule |
 |---|---|---|
 | Teams, league, kickoff | `home`, `away`, `league`, `country`, `kickoff` | Kickoff rendered in the user's timezone (browser). |
-| Crest | `api_team_id` | Initials badge when no image. |
+| Crest | `home_crest_url` / `away_crest_url` | Initials badge when no image. Never an API-Football id or URL. |
 | Save | `user.saved` | Toggle; toast on save only. Saved list shows values frozen at save time (D93/D98). |
 | Follow league | `user.league_followed` | Same component as elsewhere. |
 | "Why it's here" | `entry.why` | Only when `entry.from` is discover/standouts. Built from `discover_pick` (`list`, `big_dog`, rank in that list). |
@@ -57,8 +60,8 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 - Shade the better side per row (higher scored, lower conceded, lower rank number, higher position). Equal → no shade.
 - Show rates to 2 decimals. Do not use `*_shrunk` or `*_pct` on this page.
 
-**Head-to-head summary** (from `raw.raw_fixtures`, newest 5):
-- Tally: wins per team and draws, from `home_team_fulltime_goal` / `away_team_fulltime_goal`.
+**Head-to-head summary** (from `raw.fact_head_to_head`, newest 5):
+- Tally: wins per team and draws, from `goals_for` / `goals_against` on the row where `team_id` is today's home team (`is_home` gives the venue of that meeting).
 - Sheet (3+ meetings): goals per game (1 decimal), over 2.5 count, both-scored count, "At {home team}" split (meetings where today's home team was at home), list of meetings with date, home, score, away; winner bold.
 - 1–2 meetings: tally + list only, no goal stats ("too few for goal stats").
 - 0 meetings: "No previous meetings in our records" — not tappable; not the same as "never played".
@@ -116,12 +119,14 @@ Never show the rating gap number or a win percentage (D61).
 | No DC rows | Hide Goals card |
 
 ## 6. Gaps to close before build
-1. ~~W/D/L~~ — already stored: `raw.raw_league_standings` has `wins`, `draws`, `losses`, `goals_for`, `goals_against`, `form` (etl/src/update_standings.py). Only the 2026-10-05 mock export omitted them. No ETL change needed.
-2. **Team IDs in the engine export** — standings and H2H currently join by team name; add `home_team_id` / `away_team_id` to `fixture_analysis[]`.
+1. ~~W/D/L~~ — already stored (`wins`, `draws`, `losses`, `goals_for`, `goals_against`, `form`). No ETL change needed.
+2. ~~Team IDs in the engine export~~ — done 2026-10-11: `fixture_analysis[]` carries warehouse `home_team_id`, `away_team_id`, `league_id` (engine reads dbt `fact_fixtures`).
 3. **Pattern league sample size** — `bayesian[]` has `base_rate` but no league match count (DC rows have `league_rate_matches`). Needed to apply the 20-match rule to patterns.
-4. **H2H stats** — computed on read from the meeting list; no stored table. Fine for 5 rows; document the cutoff (`kickoff < export cutoff`).
-5. **One snapshot rule** — standings/H2H are a current DB snapshot, not point-in-time with the forecast (D69); page must show both dates.
-6. **API** — no match endpoint exists; `engine/api/` only serves the Forecast record.
+4. **Standings mart** — `dim_teams` has the numbers but not what D69 needs: `standings_updated_at`, the latest-refresh-cohort filter, and conference/group detection (USL repeats ranks). Add dbt `mart_league_standings` (warehouse `team_id`, `league_season_id`, rank, played, W/D/L, GD, points, form, `updated_at`, `is_display_row`, `group_unresolved`).
+5. **Crests** — `logo_file_id` exists in the dimensions but the loader that fills it is not in the repo, so coverage is unknown. Until it is, the API resolves `crest_url` server-side (it may proxy the provider image); the frontend contract does not change when storage does.
+6. **H2H stats** — computed on read from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
+7. **One snapshot rule** — standings/H2H are a current DB snapshot, not point-in-time with the forecast (D69); page must show both dates.
+8. **API** — no match endpoint exists; `engine/api/` only serves the Forecast record.
 
 ## 7. Worked example — Zlin v Slavia Praha (90863), run 2026-10-07
 - Context (Home/Away): Zlin 0.40 / 1.80, #16 / #13 of 16; Slavia 2.50 / 0.25, #1 / #1. All venues: Zlin 0.89 / 2.11, #12 / #16; Slavia 2.78 / 0.67, #1 / #2. Position 16th 1 pt vs 1st 23 pts (snapshot 2026-10-05).
