@@ -2,13 +2,15 @@
 
 Date: 2026-09-29. Status: requirements and draft copy, not an implemented page.
 
+**2026-10-11 — D115 (overrides anything below): nothing on the public Methodology page (or anywhere user-facing) may help a competitor rebuild the engine.** Never name models or algorithms (Elo, Dixon–Coles, Bayesian, Poisson, etc.), inputs (e.g. xG), thresholds (rating gaps, 60% league record, sample floors), weights, scoring formulas, calibration mechanics (shared/per-league maps, bins, fallbacks) or evaluation internals. Public copy explains what each number means, how to read it and its limits; public evidence is the Forecast record (estimates next to results, misses included). Sections below that call for model names, thresholds or calibration provenance in "optional technical detail" now describe **internal** documentation only. The Technical notes topic is retired.
+
 2026-10-01 update: revised desktop/mobile Figma screens now exist (overview plus seven topics), with contextual links from 112 saved-data detail states and a mobile-browser-tested return path. See prototype-links.md. This supersedes the earlier Figma-pending status only; source-definition verification, provenance fields, evaluation evidence, persistent navigation approval, accessibility implementation and frontend delivery remain pending. Content deliberately labels unknown calibration status and unfinished performance evidence. Technical model names and numeric strength thresholds appear only in the optional technical topic.
 
 Update: Brooklyn and Detroit Overall run labels were subsequently verified from cutoff-filtered DB event history and now show 11 and 12, not 10+. See data-contract.md for provenance. The legacy-cap explanation below applies only to records not yet recomputed; exact verified counts should be preferred.
 
 ## Purpose and agreed boundary
 
-Explain what the numbers mean, where they come from, how they are evaluated and where they can fail. Lead with football language; technical model names belong in optional detail, never in a model picker. Calibration provenance belongs here, not as a Global badge in match details. Projected home/away goals stay out of the main experience.
+Explain what the numbers mean, where they come from, how they are evaluated and where they can fail. Lead with football language; technical model names stay internal (D115), never on the page or in a model picker. Calibration provenance is internal only (D115); the page says estimates are checked against results and points to the Forecast record. Projected home/away goals stay out of the main experience.
 
 The 52 calibration rows in current saved-data Figma detail states were hidden on this date. Original design page is preserved. Methodology navigation, revised Figma screen and frontend remain to be built; this document does not claim those are complete.
 
@@ -22,7 +24,7 @@ Use a short introduction and independently expandable sections, with one readabl
 4. **How estimates are checked and adjusted:** calibration and supporting evaluation.
 5. **Data coverage and freshness:** included competitions, missing fields and update times.
 6. **Forecast record:** link to timestamped historical evidence when implemented.
-7. **Technical details and changes:** versions, assumptions, calibration status and changelog.
+7. ~~**Technical details and changes**~~ — retired by D115. A public changelog may say *that* estimates changed and when, never how.
 
 ### Reading the numbers
 
@@ -44,7 +46,7 @@ Explain hit/total and observed percentage with a clearly identified example; nev
 
 - Goals scored/conceded per match are observed rates, not forecast goals. Explain selected split and season.
 - Attack/defence ranks must state league population, scope, direction (#1 best), calculation and tie rules. Verify the ranking implementation before publishing a formula or claiming it ranks the displayed raw rate directly.
-- Product goal estimates use Dixon–Coles under the agreed design. Keep that name in optional technical detail; explain the public-facing purpose first.
+- Product goal estimates use Dixon–Coles under the agreed design. Internal only (D115): never name it publicly; explain the public-facing purpose.
 - Explain event-specific probabilities and supplied/unavailable forecasts. Missing output is not 0%.
 - Do not expose projected home/away goals as predicted scores. Retain internal lambda fields for diagnostics; public technical disclosure of individual values is not required by this brief.
 - Document actual input coverage; do not claim lineup, injury, corners or cards inputs without source evidence.
