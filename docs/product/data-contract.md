@@ -1,5 +1,7 @@
 # UI data contract
 
+2026-10-12 — D116 onboarding adds only session-local visibility state for a first-detail tip. Existing saved fixture evidence unchanged. No account persistence or production first-visit tracking added.
+
 2026-10-11 — D112 teaser samples: Radnicki detail clones D107 frozen evidence unchanged. Fortaleza/Nautico uses D53 saved 1–4 goals estimate 83.2% and league rate 84.4% (difference −1.2 percentage points); Cuiaba/Ponte Preta uses D53 observed 14/15 away losses and league rate 45.0%. Dates and sample status are visible. Brazilian previews explicitly limit coverage to supplied findings; no additional evidence or current forecasts inferred. Save opens membership, with no save action performed.
 
 2026-10-09 — D107 first-fixture v2 sample: Radnicki 1923/FK Crvena Zvezda, fixture 126487, retains frozen Oct 10 source. Context rates 1.89/1.00 vs 2.40/0.30 are all-venue season averages. Patterns pair unbeaten 7/9 vs 10/10 and under-4.5 7/9 vs 9/10, with additional home under-3.5 and away scored-1+ records. Goals retain 78%, 78%, 76%. Missing league counts/rates, current runs, venue splits, standings/H2H and ranks stay explicitly unavailable; no unrelated fixture values substituted. The Big dog label is inherited from the saved shortlist, not recalculated. Shared Save remains prototype-session only.

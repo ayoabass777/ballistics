@@ -1,5 +1,9 @@
 # Prototype links and versions
 
+2026-10-12 — D117: [Teaser detail info preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1033-57869&starting-point-node-id=1030%3A57675). Tap muted ⓘ beside Save for the short explanation; Read full Methodology opens existing methodology.
+
+2026-10-12 — D116 [Match-detail onboarding preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1030-57675&starting-point-node-id=1030%3A57675): Open Explore a sample match from the owner-edited teaser. First-visit tip appears below the section menu; Got it dismisses. Restart prototype to see it again.
+
 2026-10-11 — D112 saved-detail correction: [Teaser entry](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1030-57675&starting-point-node-id=1030%3A57675) now opens the established saved-detail layout at 1033:57869 for Strength. Supersedes custom 1030:57748 on this route.
 
 2026-10-11 — D112 [Explorable teaser review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1030-57675&starting-point-node-id=1030%3A57675). Three sample cards → corresponding evidence → membership for Save/Browse more. Strength includes section jumps. Original D111 preserved; separate mobile review, pending owner approval.

@@ -1,5 +1,9 @@
 # Implementation status
 
+2026-10-12 — D117: Updated info control I1033:57896;841:57437 and icon I1033:57896;841:57438. Quick explanation 1099:58002 reuses existing tip layout; full Methodology action retains prior destination 239:36044 and return-origin variable. Header and dialog screenshots checked; browser-tested info opening. Back to match CLOSE action wired and exercised; full Methodology destination structurally verified. No frontend accessibility or desktop tooltip implementation claimed.
+
+2026-10-12 — D116 Figma-only: Callout 1068:58009, visibility boolean VariableID:1068:58015, added to saved-layout teaser detail. Browser verified initial display, Got it dismissal, Back → re-entry keeping it dismissed. Section buttons also dismiss via variable action; structural verification only. Screenshots checked. Prototype restart resets first-visit state; no persistent user/account onboarding tracking. No teaser content changes.
+
 2026-10-11 — D112 reuse verification: Browser-tested teaser entry → saved-layout detail with only Strength active; selecting Goals scrolls to Goals and makes only Goals active. Screenshot checked in both states. Teaser Back/member actions structurally wired; not re-tested in browser this pass.
 
 2026-10-11 — D112 saved-detail reuse: New 1033:57869 clones established 841:57932 with internal destinations remapped and existing entry-state actions copied. Replaces only teaser Strength route and main Explore sample action; other sample routes unchanged. Figma-only; no production changes.
