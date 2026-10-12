@@ -474,6 +474,20 @@ def dc_league_rate(market: str, fixture: dict, rates: dict) -> dict | None:
     return None
 
 
+def pattern_league_matches(row: dict, rates: dict) -> int | None:
+    """Fixtures behind a pattern row's league base rate (current season).
+
+    Rates come from the same query as the beliefs' base_rate. Home/away
+    contexts have one row per fixture; "all" has one per team, so halve it.
+    None when the league rate is not available.
+    """
+    context = row.get("context") or "all"
+    ref = rates.get((row.get("league"), row.get("event"), context))
+    if not ref:
+        return None
+    return ref["rows"] // 2 if context == "all" else ref["rows"]
+
+
 def attach_league_comparisons(analysis: list[dict], rates: dict) -> None:
     """Add league_rate / league_gap / league_comparison to DC and pattern rows."""
     for fixture in analysis:
@@ -497,15 +511,22 @@ def attach_league_comparisons(analysis: list[dict], rates: dict) -> None:
             )
         for row in fixture.get("bayesian", []):
             k, n, base = row.get("k"), row.get("n"), row.get("base_rate")
-            if not n or k is None or base is None:
-                row.update(league_gap=None, league_comparison="unavailable")
+            league_n = pattern_league_matches(row, rates)
+            if not n or k is None or base is None or league_n is None:
+                row.update(league_gap=None, league_rate_matches=league_n,
+                           league_comparison="unavailable")
                 continue
             gap = k / n - float(base)
+            # Same floors as goals: the team needs PATTERN_COMPARE_MIN_N
+            # matches and the league rate LEAGUE_RATE_MIN_MATCHES fixtures,
+            # or the comparison is noise.
+            enough = (n >= PATTERN_COMPARE_MIN_N
+                      and league_n >= LEAGUE_RATE_MIN_MATCHES)
             row.update(
                 league_gap=round(gap, 4),
+                league_rate_matches=league_n,
                 league_comparison=(
-                    league_comparison_label(gap)
-                    if n >= PATTERN_COMPARE_MIN_N else "too_few_matches"),
+                    league_comparison_label(gap) if enough else "too_few_matches"),
             )
 
 
