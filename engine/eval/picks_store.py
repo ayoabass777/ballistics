@@ -21,7 +21,7 @@ from psycopg2.extras import Json, execute_values
 
 from engine.eval.db import get_conn
 
-MODELS = ("poisson", "mismatch", "bayesian", "dixon_coles")
+MODELS = ("mismatch", "bayesian", "dixon_coles")   # Poisson retired 2026-10-11
 
 
 # ── DDL ──────────────────────────────────────────────────────────────────────

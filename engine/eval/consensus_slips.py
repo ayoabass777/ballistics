@@ -1,13 +1,12 @@
 """
 Consensus slip generator — weighted multi-model accumulator slips.
 
-Runs all four engines (Poisson GLM, Mismatch Elo, Bayesian Streaks,
-Dixon-Coles), maps every qualifying pick to a unified SportyBet market,
+Runs three engines (Mismatch Elo, Bayesian Streaks, Dixon-Coles; the Poisson
+GLM was retired 2026-10-11), maps every qualifying pick to a unified SportyBet market,
 scores each pick by how many models agree, and uses a weighted conflict graph
 to assemble repeat-aware accumulator slips targeting approximately 50x.
 
 Model-to-market mapping:
-    Poisson  OVER 2.5 / UNDER 3.5       →  Match Over 2.5 / Under 3.5
     Mismatch fav_to_score                →  Team Over 0.5 (fav side)
     Mismatch over_1.5 / over_2.5         →  Match Over 1.5 / Over 2.5
     Bayesian Over_1_5 / Over_2_5 / etc.  →  Match Over 1.5 / Over 2.5
@@ -22,11 +21,11 @@ Consensus tiers (n = distinct models agreeing, 1-4):
     1-model  →  solo (only if P >= solo_threshold)
 
 Goal-model rules (walk-forward validated, folds 5-9):
-    - Match Over 1.5 requires BOTH Dixon-Coles AND Poisson to agree,
+    - Match Over 1.5 requires Dixon-Coles (previously DC AND Poisson),
       with calibrated consensus P >= 78%.
     - Match Over 2.5 has no model-combination restriction; any contributing
       model can qualify it through the normal consensus thresholds.
-    - Under selections require BOTH Dixon-Coles AND Poisson to agree.
+    - Under selections require Dixon-Coles (previously DC AND Poisson).
     - Other solo goal-model match-total picks are dropped (DC solo unders 53.3%).
     - BTTS Yes is sourced from Dixon-Coles only; Bayesian BTTS is ignored.
 
@@ -47,7 +46,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from engine.eval.predict_upcoming import predict_upcoming, _tier
+from engine.eval.predict_upcoming import _tier
 from engine.eval.predict_mismatch import predict_mismatch, _market_label
 from engine.eval.predict_dixon_coles import predict_dixon_coles
 from engine.eval.scrape_sportybet import odds_for_pick
@@ -1039,12 +1038,14 @@ def _is_match_total_market(unified: str) -> bool:
 
 
 def _passes_goal_model_rules(unified: str, models: set[str]) -> bool:
+    # Poisson retired 2026-10-11: Over 1.5 and unders now need Dixon-Coles
+    # alone (they used to need DC and Poisson to agree).
     if unified == "Match Over 1.5":
-        return {"poisson", "dixon_coles"}.issubset(models)
+        return "dixon_coles" in models
     if unified == "Match Over 2.5":
         return True
     if unified.startswith("Match Under"):
-        return {"poisson", "dixon_coles"}.issubset(models)
+        return "dixon_coles" in models
     if _is_match_total_market(unified) and len(models) == 1:
         return False
     if unified == "BTTS Yes":
@@ -1416,7 +1417,7 @@ def _score_pool(consensus: dict, fixture_meta: dict,
             if um == "BTTS Yes":
                 _reject("needs Dixon-Coles")
             elif um == "Match Over 1.5" or um.startswith("Match Under"):
-                _reject("needs DC + Poisson")
+                _reject("needs Dixon-Coles")
             else:
                 _reject("solo goal-model pick")
             continue
@@ -1942,11 +1943,8 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
                   shortlist_end_date: str | None = None) -> dict:
     """Run all four models and build consensus picks."""
 
-    # ── 1. Poisson GLM ──────────────────────────────────────────────────
-    print("=" * 60)
-    print("  [1/4] POISSON GLM")
-    print("=" * 60)
-    poisson_picks = predict_upcoming(days=days)
+    # Poisson GLM retired 2026-10-11; empty frame keeps the merge code simple.
+    poisson_picks = pd.DataFrame()
 
     # ── 2. Mismatch Elo ─────────────────────────────────────────────────
     print()

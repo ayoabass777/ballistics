@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from engine.eval import picks_store as ps
 from engine.eval.db import get_conn
 from engine.eval.consensus_slips import (
-    poisson_signals, mismatch_signals, bayesian_signals, dixon_signals,
+    mismatch_signals, bayesian_signals, dixon_signals,
     annotate_bayesian_analysis,
 )
 
@@ -41,11 +41,6 @@ def _home_away_map(fixture_ids) -> dict:
             return {int(r[0]): (r[1], r[2]) for r in cur.fetchall()}
     finally:
         conn.close()
-
-
-def _run_poisson(days: int) -> list[dict]:
-    from engine.eval.predict_upcoming import predict_upcoming
-    return poisson_signals(predict_upcoming(days=days))
 
 
 def _run_mismatch(days: int) -> list[dict]:
@@ -76,7 +71,6 @@ def _run_dixon(days: int) -> list[dict]:
 
 
 RUNNERS = {
-    "poisson": _run_poisson,
     "mismatch": _run_mismatch,
     "bayesian": _run_bayesian,
     "dixon_coles": _run_dixon,
