@@ -22,14 +22,12 @@ from engine.eval.consensus_slips import (
     ELO_HUGE_GAP_MIN, ELO_LEAGUE_MIN_LOW, ELO_LEAGUE_MIN_MATCHES, wilson_lower)
 
 SQL = """
-    SELECT f.league_name, COALESCE(dc.country_name, ''), rf.kickoff_utc,
+    SELECT f.league_name, COALESCE(rf.country_name, ''), rf.kickoff_utc,
            f.goals_for, f.goals_against,
            COALESCE(eh.rating_before_flat, eh.rating_before)
              - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
     FROM raw.fact_head_to_head f
-    JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-    LEFT JOIN dim.dim_leagues dl ON dl.api_league_id = rf.api_league_id
-    LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+    JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
     JOIN elo.team_elo_history eh ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
     JOIN elo.team_elo_history ea ON ea.fixture_id = f.fixture_id AND ea.team_id = f.opponent_id
     WHERE f.is_played AND f.is_home

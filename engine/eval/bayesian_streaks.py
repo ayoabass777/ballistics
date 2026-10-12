@@ -38,6 +38,7 @@ logger = get_logger(__name__)
 
 EVENTS_TABLE = "raw.fact_head_to_head_events"
 H2H_TABLE = "raw.fact_head_to_head"
+from engine.eval.db import FIXTURES_TABLE  # noqa: E402  (warehouse team ids)
 
 PRIOR_STRENGTH = 15.0
 MIN_MATCHES = 3
@@ -288,36 +289,24 @@ def get_upcoming_beliefs(
     """Compute beliefs for teams with upcoming unplayed fixtures."""
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     cutoff = today + timedelta(days=days)
-    upcoming_sql = """
+    upcoming_sql = f"""
         SELECT DISTINCT team_id FROM (
-            SELECT home_team_id AS team_id FROM raw.raw_fixtures
+            SELECT home_team_id AS team_id FROM {FIXTURES_TABLE}
             WHERE fixture_status NOT IN ('FT','AET','PEN')
               AND kickoff_utc BETWEEN %(today)s AND %(cutoff)s
             UNION
-            SELECT away_team_id AS team_id FROM raw.raw_fixtures
+            SELECT away_team_id AS team_id FROM {FIXTURES_TABLE}
             WHERE fixture_status NOT IN ('FT','AET','PEN')
               AND kickoff_utc BETWEEN %(today)s AND %(cutoff)s
         ) t
+        WHERE team_id IS NOT NULL
     """
     upcoming_teams = pd.read_sql(upcoming_sql, conn, params={"today": today, "cutoff": cutoff})
     if upcoming_teams.empty:
         logger.warning("No upcoming fixtures in the next %d days", days)
         return pd.DataFrame()
 
-    rf_ids = upcoming_teams["team_id"].tolist()
-    rf_id_list = ",".join(str(i) for i in rf_ids)
-    id_map_df = pd.read_sql(f"""
-        SELECT DISTINCT r.home_team_id AS rf_id, h.team_id AS h2h_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND h.is_home
-        WHERE r.home_team_id IN ({rf_id_list})
-        UNION
-        SELECT DISTINCT r.away_team_id AS rf_id, h.team_id AS h2h_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND NOT h.is_home
-        WHERE r.away_team_id IN ({rf_id_list})
-    """, conn)
-    h2h_ids = set(id_map_df["h2h_id"].tolist())
+    h2h_ids = set(int(t) for t in upcoming_teams["team_id"].tolist())
 
     event_df = load_event_history(conn, context=context)
     event_df = event_df[event_df["team_id"].isin(h2h_ids)]
@@ -367,7 +356,7 @@ def get_fixture_beliefs(
     """
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     cutoff = today + timedelta(days=days)
-    fixture_sql = """
+    fixture_sql = f"""
         SELECT DISTINCT
             f.fixture_id,
             f.home_team_id  AS team_id,
@@ -375,7 +364,7 @@ def get_fixture_beliefs(
             f.home_team_name AS team_name,
             f.away_team_name AS opponent_name,
             f.kickoff_utc
-        FROM raw.raw_fixtures f
+        FROM {FIXTURES_TABLE} f
         WHERE f.fixture_status NOT IN ('FT','AET','PEN')
           AND f.kickoff_utc BETWEEN %(today)s AND %(cutoff)s
     """
@@ -383,25 +372,13 @@ def get_fixture_beliefs(
     if fixtures.empty:
         return {}
 
-    # raw_fixtures and fact_head_to_head use different team ID spaces.
-    # Build a mapping: rf_team_id -> h2h_team_id
-    rf_ids = set(fixtures["team_id"].tolist() + fixtures["opponent_id"].tolist())
-    rf_id_list = ",".join(str(i) for i in rf_ids)
-    id_map_df = pd.read_sql(f"""
-        SELECT DISTINCT r.home_team_id AS rf_id, h.team_id AS h2h_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND h.is_home
-        WHERE r.home_team_id IN ({rf_id_list})
-        UNION
-        SELECT DISTINCT r.away_team_id AS rf_id, h.team_id AS h2h_id
-        FROM raw.raw_fixtures r
-        JOIN raw.fact_head_to_head h ON h.fixture_id = r.fixture_id AND NOT h.is_home
-        WHERE r.away_team_id IN ({rf_id_list})
-    """, conn)
-    rf_to_h2h = dict(zip(id_map_df["rf_id"], id_map_df["h2h_id"]))
-    h2h_team_ids = set(rf_to_h2h.values())
-    logger.info("ID map: %d rf_ids -> %d h2h_ids (%d unmapped)",
-                len(rf_ids), len(h2h_team_ids), len(rf_ids) - len(rf_to_h2h))
+    # fact_fixtures carries warehouse team ids (same space as the event
+    # history); NULL means the team is not in the dimensions yet.
+    team_cols = fixtures[["team_id", "opponent_id"]]
+    h2h_team_ids = {int(t) for t in team_cols.stack().dropna().tolist()}
+    n_unmapped = int(team_cols.isna().sum().sum())
+    if n_unmapped:
+        logger.info("%d fixture sides have no warehouse team id", n_unmapped)
 
     # All event types are included; consumers that feed the consensus pool
     # filter to BETTING_EVENTS themselves. Streak/trend are scoped to each
@@ -427,10 +404,10 @@ def get_fixture_beliefs(
         entry = {"home": [], "away": []}
 
         for side in ("home", "away"):
-            rf_col = "team_id" if side == "home" else "opponent_id"
-            h2h_tid = rf_to_h2h.get(int(fix[rf_col]))
-            if h2h_tid is None:
+            team_col = "team_id" if side == "home" else "opponent_id"
+            if pd.isna(fix[team_col]):
                 continue
+            h2h_tid = int(fix[team_col])
 
             venue = idx_by_ctx[side].get(h2h_tid, {})
             overall = idx_by_ctx["all"].get(h2h_tid, {})

@@ -101,14 +101,14 @@ class ForecastPostgresTests(unittest.TestCase):
             cls.conn.close()
             raise RuntimeError("Integration tests require a forecast_test* database")
         with cls.conn, cls.conn.cursor() as cur:
-            cur.execute("SELECT to_regnamespace('forecast'), to_regclass('raw.raw_fixtures')")
+            cur.execute("SELECT to_regnamespace('forecast'), to_regclass('raw.fact_fixtures')")
             if any(cur.fetchone()):
                 raise RuntimeError("Integration tests require a fresh empty database")
             cur.execute("""CREATE SCHEMA raw;
-                CREATE TABLE raw.raw_fixtures (
+                CREATE TABLE raw.fact_fixtures (
                   fixture_id bigint PRIMARY KEY, kickoff_utc timestamptz,
                   fixture_status text, home_team_fulltime_goal int, away_team_fulltime_goal int);
-                INSERT INTO raw.raw_fixtures VALUES (1, clock_timestamp() + interval '1 day', 'NS', NULL, NULL);""")
+                INSERT INTO raw.fact_fixtures VALUES (1, clock_timestamp() + interval '1 day', 'NS', NULL, NULL);""")
         fh.init_schema(cls.conn)
 
     @classmethod
@@ -130,15 +130,15 @@ class ForecastPostgresTests(unittest.TestCase):
         self.assertEqual(fh.settle(self.conn), 1)
         self.assertEqual(fh.settle(self.conn), 0)
         with self.conn, self.conn.cursor() as cur:
-            cur.execute("UPDATE raw.raw_fixtures SET fixture_status='FT', kickoff_utc=clock_timestamp(), home_team_fulltime_goal=1, away_team_fulltime_goal=1")
+            cur.execute("UPDATE raw.fact_fixtures SET fixture_status='FT', kickoff_utc=clock_timestamp(), home_team_fulltime_goal=1, away_team_fulltime_goal=1")
         self.assertEqual(fh.settle(self.conn), 1)
         self.assertEqual(fh.report(self.conn)["counts"]["hit"], 1)
         with self.conn, self.conn.cursor() as cur:
-            cur.execute("UPDATE raw.raw_fixtures SET away_team_fulltime_goal=0")
+            cur.execute("UPDATE raw.fact_fixtures SET away_team_fulltime_goal=0")
         self.assertEqual(fh.settle(self.conn), 1)
         self.assertEqual(fh.report(self.conn)["counts"]["miss"], 1)
         with self.conn, self.conn.cursor() as cur:
-            cur.execute("UPDATE raw.raw_fixtures SET away_team_fulltime_goal=1")
+            cur.execute("UPDATE raw.fact_fixtures SET away_team_fulltime_goal=1")
         self.assertEqual(fh.settle(self.conn), 1)  # Reversal is not incorrectly deduplicated.
         self.assertEqual([r["status"] for r in fh.report(self.conn)["records"][0]["outcome_history"]],
                          ["pending", "hit", "miss", "hit"])
@@ -163,7 +163,7 @@ class ForecastPostgresTests(unittest.TestCase):
 
     def test_no_reopening_after_captured_kickoff_and_policy_isolation(self):
         with self.conn, self.conn.cursor() as cur:
-            cur.execute("""INSERT INTO raw.raw_fixtures VALUES
+            cur.execute("""INSERT INTO raw.fact_fixtures VALUES
                            (2, clock_timestamp() + interval '1 day', 'NS', NULL, NULL)""")
         p = payload(datetime.now(timezone.utc) + timedelta(days=1))
         p["fixture_analysis"][0]["fixture_id"] = 2

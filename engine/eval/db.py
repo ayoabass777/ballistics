@@ -21,6 +21,10 @@ except Exception:  # noqa: BLE001 — dotenv optional; env may already be set
     pass
 
 
+# The engine reads fixtures from dbt only (warehouse ids), never raw.raw_fixtures.
+FIXTURES_TABLE = "raw.fact_fixtures"
+
+
 def get_conn():
     """psycopg2 connection using env-provided credentials."""
     return psycopg2.connect(

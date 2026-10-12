@@ -21,12 +21,10 @@ SQL = """
            COALESCE(eh.rating_before_flat, eh.rating_before)
              - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
     FROM raw.fact_head_to_head f
-    JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-    LEFT JOIN dim.dim_leagues dl ON dl.api_league_id = rf.api_league_id
-    LEFT JOIN dim.dim_countries dc ON dc.country_id = dl.country_id
+    JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
     JOIN elo.team_elo_history eh ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
     JOIN elo.team_elo_history ea ON ea.fixture_id = f.fixture_id AND ea.team_id = f.opponent_id
-    WHERE f.is_played AND f.is_home AND f.league_name = %s AND COALESCE(dc.country_name, '') = %s
+    WHERE f.is_played AND f.is_home AND f.league_name = %s AND COALESCE(rf.country_name, '') = %s
 """
 _SUFFIX = re.compile(r"\s+(II|B|U\d{2}|Reserves?)$", re.I)
 _PREFIX = re.compile(r"^Jong\s+", re.I)

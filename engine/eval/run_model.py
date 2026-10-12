@@ -35,7 +35,7 @@ def _home_away_map(fixture_ids) -> dict:
         with conn.cursor() as cur:
             cur.execute(
                 """SELECT fixture_id, home_team_name, away_team_name
-                   FROM raw.raw_fixtures WHERE fixture_id = ANY(%s)""",
+                   FROM raw.fact_fixtures WHERE fixture_id = ANY(%s)""",
                 (ids,),
             )
             return {int(r[0]): (r[1], r[2]) for r in cur.fetchall()}

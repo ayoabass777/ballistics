@@ -57,6 +57,7 @@ def _calibrate_conf(raw: float, api_league_id: int | None = None) -> float:
 
 SOURCE_TABLE = "raw.fact_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
+from engine.eval.db import FIXTURES_TABLE  # noqa: E402
 
 GAP_BINS = [
     (100, 200, "100-200"),
@@ -105,20 +106,9 @@ def _get_conn():
     return get_conn()
 
 
-def _build_team_id_map(conn) -> dict:
-    df = pd.read_sql(f"""
-        SELECT DISTINCT r.home_team_id AS rf_id, f.team_id AS fh_id
-        FROM raw.raw_fixtures r
-        JOIN {SOURCE_TABLE} f ON f.fixture_id = r.fixture_id AND f.is_home
-        UNION
-        SELECT DISTINCT r.away_team_id, f.opponent_id
-        FROM raw.raw_fixtures r
-        JOIN {SOURCE_TABLE} f ON f.fixture_id = r.fixture_id AND f.is_home
-    """, conn)
-    return dict(zip(df["rf_id"], df["fh_id"]))
-
-
-def _get_latest_elo(conn, team_ids: list, id_map: dict) -> dict:
+def _get_latest_elo(conn, team_ids: list) -> dict:
+    """Latest Elo per warehouse team_id. Teams with no rating are absent; the
+    caller applies the 1500 default."""
     if not team_ids:
         return {}
     df = pd.read_sql(f"""
@@ -127,17 +117,8 @@ def _get_latest_elo(conn, team_ids: list, id_map: dict) -> dict:
         FROM {ELO_TABLE}
         ORDER BY team_id, kickoff_utc DESC
     """, conn)
-    elo_by_fh = dict(zip(df["team_id"], df["rating"]))
-    result = {}
-    for rf_id in team_ids:
-        # No `, rf_id` fallback: raw_fixtures and fact_head_to_head are disjoint
-        # id spaces, so reusing an rf_id as an fh_id silently borrows an
-        # unrelated club's rating (Le Mans 1298 -> an Eliteserien side at 1689).
-        # Unmapped teams are simply absent; the caller applies the 1500 default.
-        fh_id = id_map.get(rf_id)
-        if fh_id is not None and fh_id in elo_by_fh:
-            result[rf_id] = elo_by_fh[fh_id]
-    return result
+    elo = dict(zip(df["team_id"], df["rating"]))
+    return {t: elo[t] for t in team_ids if t in elo}
 
 
 def _load_league_map(conn) -> dict:
@@ -166,7 +147,7 @@ def build_hit_rates(conn) -> pd.DataFrame:
                 f.fixture_id,
                 rf.api_league_id,
                 f.league_name,
-                c.country_name,
+                rf.country_name,
                 f.goals_for + f.goals_against AS total,
                 ABS(
                     COALESCE(eh.rating_before_flat, eh.rating_before)
@@ -183,9 +164,8 @@ def build_hit_rates(conn) -> pd.DataFrame:
                     THEN f.goals_against ELSE f.goals_for
                 END AS dog_goals
             FROM {SOURCE_TABLE} f
-            JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
-            JOIN dim.dim_leagues l ON l.api_league_id = rf.api_league_id
-            JOIN dim.dim_countries c ON c.country_id = l.country_id
+            JOIN {FIXTURES_TABLE} rf
+                ON rf.fixture_id = f.fixture_id AND rf.country_name IS NOT NULL
             JOIN {ELO_TABLE} eh
                 ON eh.team_id = f.team_id AND eh.fixture_id = f.fixture_id
             JOIN {ELO_TABLE} ea
@@ -309,34 +289,27 @@ def _lookup_hit_rate(
     return 0.0, 0
 
 
-def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]],
+def _load_h2h_records(conn, matchups: list[tuple[int, int]],
                       cutoff=None) -> dict:
     """Load H2H win/draw/loss for favourite vs underdog pairs.
 
-    matchups: list of (fav_rf_id, dog_rf_id).
+    matchups: list of (fav_team_id, dog_team_id), warehouse ids.
     `cutoff` restricts to matches before that datetime (walk-forward safety).
-    Returns {(fav_rf_id, dog_rf_id): (wins, draws, losses)}.
+    Returns {(fav_team_id, dog_team_id): (wins, draws, losses)}; pairs with a
+    missing id or no meetings get (0, 0, 0).
     """
     if not matchups:
         return {}
-    # Unmapped ids stay None rather than falling back to the rf_id, which would
-    # query another club's H2H record (disjoint id spaces).  Those pairs fall
-    # through to the (0, 0, 0) "no history" default below.
-    fav_fh_ids = {rf: id_map.get(rf) for rf, _ in matchups}
-    dog_fh_ids = {rf: id_map.get(rf) for _, rf in matchups}
-    pairs_to_query = set()
-    for fav_rf, dog_rf in matchups:
-        fav_fh, dog_fh = fav_fh_ids[fav_rf], dog_fh_ids[dog_rf]
-        if fav_fh is None or dog_fh is None:
-            continue
-        pairs_to_query.add((fav_fh, dog_fh))
+    pairs_to_query = {(f, d) for f, d in matchups
+                      if f is not None and d is not None
+                      and not pd.isna(f) and not pd.isna(d)}
     if not pairs_to_query:
         return {(f, d): (0, 0, 0) for f, d in matchups}
 
     all_fh = set()
     for a, b in pairs_to_query:
-        all_fh.add(a)
-        all_fh.add(b)
+        all_fh.add(int(a))
+        all_fh.add(int(b))
 
     cutoff_filter = "AND kickoff_utc < %(cutoff)s" if cutoff is not None else ""
     df = pd.read_sql(f"""
@@ -355,37 +328,24 @@ def _load_h2h_records(conn, id_map: dict, matchups: list[tuple[int, int]],
         l = int((games["goals_for"] < games["goals_against"]).sum())
         pair_results[(fav_fh, dog_fh)] = (w, d, l)
 
-    result = {}
-    for fav_rf, dog_rf in matchups:
-        key = (fav_fh_ids[fav_rf], dog_fh_ids[dog_rf])
-        result[(fav_rf, dog_rf)] = pair_results.get(key, (0, 0, 0))
-    return result
+    return {(f, d): pair_results.get((f, d), (0, 0, 0)) for f, d in matchups}
 
 
-def _load_team_strength(conn, id_map: dict, cutoff=None) -> dict:
-    """Load attack/defense shrunk rates keyed by rf_id.
+def _load_team_strength(conn, cutoff=None) -> dict:
+    """Load attack/defense shrunk rates keyed by warehouse team_id.
 
     `cutoff` restricts to matches before that datetime (walk-forward safety);
     an empty window yields no strength data and therefore no adjustments.
-    Returns {rf_id: {"attack": float, "defense": float, "league": str}}.
+    Returns {team_id: {"attack": float, "defense": float, "league": str}}.
     """
     df = load_team_df(conn, cutoff=cutoff)
     if df.empty:
         return {}
     strength = compute_team_strength(df)
-    # strength is keyed by fh team_id — invert id_map for lookup
-    fh_to_rf = {}
-    for rf_id, fh_id in id_map.items():
-        fh_to_rf.setdefault(fh_id, rf_id)
 
     result = {}
     for _, row in strength.iterrows():
-        fh_id = row["team_id"]
-        # Same disjoint-id-space rule in reverse: an fh_id with no rf mapping
-        # must not be keyed as though it were an rf_id.
-        rf_id = fh_to_rf.get(fh_id)
-        if rf_id is None:
-            continue
+        team_id = row["team_id"]
         entry = {
             "attack": row["attack_shrunk"],
             "defense": row["defense_shrunk"],
@@ -410,7 +370,7 @@ def _load_team_strength(conn, id_map: dict, cutoff=None) -> dict:
                         entry[col] = round(float(row[col]), 1)
                 else:
                     entry[col] = None
-        result[rf_id] = entry
+        result[team_id] = entry
     return result
 
 
@@ -491,14 +451,16 @@ def predict_mismatch(
         print("Loading upcoming fixtures...")
         today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
         end = today + timedelta(days=days)
-        upcoming = pd.read_sql("""
+        upcoming = pd.read_sql(f"""
             SELECT fixture_id, kickoff_utc, home_team_id, home_team_name,
                    away_team_id, away_team_name, api_league_id
-            FROM raw.raw_fixtures
+            FROM {FIXTURES_TABLE}
             WHERE fixture_status = 'NS'
               AND kickoff_utc BETWEEN %s AND %s
             ORDER BY kickoff_utc
         """, conn, params=[today, end])
+        for col in ("home_team_id", "away_team_id"):   # warehouse ids
+            upcoming[col] = upcoming[col].astype("Int64")
 
         if upcoming.empty:
             print("  No upcoming fixtures.")
@@ -510,9 +472,9 @@ def predict_mismatch(
         upcoming["country"] = upcoming["api_league_id"].map(country_map)
         upcoming = upcoming[upcoming["league"].notna()].copy()
 
-        id_map = _build_team_id_map(conn)
-        all_teams = set(upcoming["home_team_id"].tolist() + upcoming["away_team_id"].tolist())
-        elo_map = _get_latest_elo(conn, list(all_teams), id_map)
+        all_teams = set(upcoming["home_team_id"].dropna().tolist()
+                        + upcoming["away_team_id"].dropna().tolist())
+        elo_map = _get_latest_elo(conn, list(all_teams))
 
         # Pre-compute which fixtures have a gap above threshold
         fixture_info = []
@@ -533,11 +495,11 @@ def predict_mismatch(
         # Batch-load H2H for all matchups
         matchups = [(fav_rf, dog_rf) for (_, _, _, _, _, _, fav_rf, dog_rf) in fixture_info]
         print(f"  Loading H2H for {len(matchups)} matchups...")
-        h2h_map = _load_h2h_records(conn, id_map, matchups)
+        h2h_map = _load_h2h_records(conn, matchups)
 
         # Load team strength (attack/defense)
         print("  Loading team strength...")
-        strength_map = _load_team_strength(conn, id_map)
+        strength_map = _load_team_strength(conn)
         teams_with_strength = sum(1 for fi in fixture_info if fi[6] in strength_map)
         print(f"  {teams_with_strength}/{len(fixture_info)} favourites have strength data")
 
