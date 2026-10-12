@@ -15,6 +15,39 @@
 with teams as (
     select api_team_id, team_id
     from {{ ref('stg_dim_teams') }}
+),
+
+-- Format of each competition phase (round without matchday number): the most
+-- games any team plays in it within the league season. 3+ means round-robin
+-- (regular season, split rounds, play-off groups); 1-2 means single games or
+-- two-legged ties.
+phase_games as (
+    select api_league_id, season, phase, max(n) as max_games_per_team
+    from (
+        select api_league_id, season, {{ fixture_phase('round') }} as phase,
+               team, count(*) as n
+        from {{ ref('stg_raw_fixtures') }}
+        cross join lateral (values (home_api_team_id), (away_api_team_id)) as t(team)
+        where round is not null
+        group by 1, 2, 3, 4
+    ) per_team
+    group by 1, 2, 3
+),
+
+fixtures as (
+    select rf.*,
+           {{ fixture_phase('rf.round') }} as phase,
+           case
+               when rf.round is null then null
+               when {{ fixture_knockout_name('rf.round') }} then 'knockout'
+               when pg.max_games_per_team >= 3 then 'league'
+               else 'knockout'
+           end as stage
+    from {{ ref('stg_raw_fixtures') }} as rf
+    left join phase_games as pg
+      on pg.api_league_id = rf.api_league_id
+     and pg.season = rf.season
+     and pg.phase = {{ fixture_phase('rf.round') }}
 )
 
 select
@@ -41,10 +74,14 @@ select
     rf.home_fulltime_result,
     rf.away_fulltime_result,
     rf.round,
-    {{ fixture_stage('rf.round') }}            as stage,
-    {{ fixture_stage('rf.round') }} = 'knockout' as is_knockout,
+    rf.phase,
+    rf.stage,
+    rf.stage = 'knockout'           as is_knockout,
+    -- Post-season: any knockout game, or a phase named as play-offs
+    -- (e.g. Belgium's Conference League play-off group).
+    (rf.stage = 'knockout' or rf.phase ~* 'play-?offs?') as is_playoff,
     rf.updated_at
-from {{ ref('stg_raw_fixtures') }} as rf
+from fixtures as rf
 left join {{ ref('int_league_context') }} as lc
   on lc.api_league_id = rf.api_league_id
  and lc.season = rf.season

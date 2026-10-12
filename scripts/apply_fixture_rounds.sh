@@ -14,10 +14,12 @@ etl() { docker exec -w /opt/airflow ballistics_airflow_scheduler python -m "$@";
   git switch feat/fixture-rounds || exit 1
   echo "== 1. migration"
   psql_run -v ON_ERROR_STOP=1 < etl/sql/migrations_2026-10-12_fixture_rounds.sql || exit 1
+  if [ "${SKIP_BACKFILL:-0}" != 1 ]; then
   echo "== 2. pending seasons (no API calls)"
   etl etl.src.backfill_fixture_rounds --dry-run 2>&1 | tail -1
   echo "== 3. backfill rounds"
   etl etl.src.backfill_fixture_rounds 2>&1 | grep -v "pending:" | tail -5 || exit 1
+  fi
   echo "== 4. dbt: staging appends round (backfilled rows carry a new updated_at),"
   echo "   then everything downstream rebuilds"
   docker compose run --rm dbt dbt run -s stg_raw_fixtures+ \

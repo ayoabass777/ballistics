@@ -48,7 +48,8 @@ def test_staging_renames_api_team_ids():
 
 def test_fact_fixtures_outputs_warehouse_team_ids_only():
     sql = (DBT_MODELS / "facts/fact_fixtures.sql").read_text()
-    select_list = sql.split("from {{ ref('stg_raw_fixtures') }}")[0].split("\nselect\n")[1]
+    # The final select (CTEs above it read staging for phase / stage).
+    select_list = sql.split("\nfrom fixtures as rf")[0].split("\nselect\n")[-1]
     assert "ht.team_id                      as home_team_id" in select_list
     assert "at.team_id                      as away_team_id" in select_list
     assert "api_team_id" not in select_list

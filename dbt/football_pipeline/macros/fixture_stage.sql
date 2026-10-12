@@ -1,27 +1,22 @@
 {#
-  Competition stage from API-Football league.round. Returns 'league' or
-  'knockout' (NULL when the round is unknown, i.e. not yet backfilled).
+  Fixture stage helpers over API-Football league.round.
 
-    league   : round-robin play. Rounds numbered "<phase> - <n>"
-               ("Regular Season - 12", "Championship Round - 3",
-               "Group A - 2", "Apertura - 5", "League Stage - 8"), or named
-               regular season / group / league stage.
-    knockout : single games or ties: anything with play-off / final /
-               knockout in the name ("Play-offs", "Semi-finals",
-               "Knockout Round Play-offs", "8th Finals"), and remaining cup
-               rounds ("Round of 16", "1st Round", "Round One",
-               "3rd Qualifying Round").
+  fixture_phase(round): the round without its matchday number
+    "Regular Season - 12" -> "Regular Season", "Relegation Group - 3" ->
+    "Relegation Group", "Semi-finals" -> "Semi-finals". NULL if no round.
 
-  Order matters: play-off/final wins over a trailing matchday number
-  ("Relegation Play-offs - 1" is knockout). Review new labels with
-  etl/sql/diagnostics/fixture_rounds.sql.
+  fixture_knockout_name(round): TRUE when the label itself names a tie or
+    one-off game (finals, semis, quarters, "Round of 16", "MLS Cup - Round 1",
+    "1st Round", play-in, deciders, place games, reclassification,
+    qualification). Other phases are decided by format in fact_fixtures:
+    round-robin when a team plays 3+ games in the phase, knockout otherwise.
+    Labels reviewed 2026-10-12 against all 465 distinct rounds:
+    etl/sql/diagnostics/fixture_rounds.sql.
 #}
-{% macro fixture_stage(round_col) -%}
-case
-    when {{ round_col }} is null or btrim({{ round_col }}) = '' then null
-    when {{ round_col }} ~* '(play-?offs?|final|knock-?out)' then 'knockout'
-    when {{ round_col }} ~ ' - [0-9]+$' then 'league'
-    when {{ round_col }} ~* '(regular season|group|league stage|league phase)' then 'league'
-    else 'knockout'
-end
+{% macro fixture_phase(round_col) -%}
+nullif(regexp_replace(btrim({{ round_col }}), '\s+-\s+[0-9]+$', ''), '')
+{%- endmacro %}
+
+{% macro fixture_knockout_name(round_col) -%}
+({{ round_col }} ~* '(final|semi|quarter|round of [0-9]|round [0-9]|[0-9](st|nd|rd|th) round|play-?in|decider|[0-9](st|nd|rd|th) place|reclasifica|qualif|relegation/promotion)')
 {%- endmacro %}
