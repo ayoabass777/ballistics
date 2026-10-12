@@ -80,7 +80,8 @@ Never show the rating gap number or a win percentage (D61).
 
 ### 3.4 Team patterns (`bayesian[]`)
 - Use rows with `primary: true` (the engine's context for that team: home team at home or all venues, away team away or all) and `n ≥ 6`.
-- Record: `k / n` (large). Team rate: `round(100·k/n)%`. League rate: `round(100·base_rate)%`.
+- Record: `k / n` (large). Team rate: `round(100·k/n)%`. League rate: `round(100·base_rate)%`, from `league_rate_matches` current-season fixtures.
+- The engine sets `league_comparison: too_few_matches` when the team has `n < 6` **or** the league rate has `league_rate_matches < 20` (same floor as goals). Either way: keep the record, hide the comparison line.
 - Label from `league_comparison` (bands: |gap| < 5 pts typical, 5–15 above/below, ≥ 15 much; `LEAGUE_GAP_SOME` / `LEAGUE_GAP_WELL`):
 
 | `league_comparison` | Patterns text (D104) | Goals text (D62) |
@@ -121,7 +122,7 @@ Never show the rating gap number or a win percentage (D61).
 ## 6. Gaps to close before build
 1. ~~W/D/L~~ — already stored (`wins`, `draws`, `losses`, `goals_for`, `goals_against`, `form`). No ETL change needed.
 2. ~~Team IDs in the engine export~~ — done 2026-10-11: `fixture_analysis[]` carries warehouse `home_team_id`, `away_team_id`, `league_id` (engine reads dbt `fact_fixtures`).
-3. **Pattern league sample size** — `bayesian[]` has `base_rate` but no league match count (DC rows have `league_rate_matches`). Needed to apply the 20-match rule to patterns.
+3. ~~Pattern league sample size~~ — done 2026-10-11: `bayesian[]` rows carry `league_rate_matches`; under 20 → `too_few_matches`. Follow-up idea: blend last season into thin early-season league rates.
 4. **Standings mart** — `dim_teams` has the numbers but not what D69 needs: `standings_updated_at`, the latest-refresh-cohort filter, and conference/group detection (USL repeats ranks). Add dbt `mart_league_standings` (warehouse `team_id`, `league_season_id`, rank, played, W/D/L, GD, points, form, `updated_at`, `is_display_row`, `group_unresolved`).
 5. **Crests** — `logo_file_id` exists in the dimensions but the loader that fills it is not in the repo, so coverage is unknown. Until it is, the API resolves `crest_url` server-side (it may proxy the provider image); the frontend contract does not change when storage does.
 6. **H2H stats** — computed on read from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
