@@ -37,7 +37,9 @@ def test_no_team_id_translation_maps_left():
 
 
 def test_fixtures_table_is_the_dbt_fact():
-    assert db.FIXTURES_TABLE == "raw.fact_fixtures"
+    # League play only (knockouts excluded); full table kept for id lookups.
+    assert db.FIXTURES_TABLE == "raw.engine_fixtures"
+    assert db.ALL_FIXTURES_TABLE == "raw.fact_fixtures"
 
 
 def test_staging_renames_api_team_ids():

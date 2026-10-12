@@ -29,7 +29,7 @@ from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
 
-SOURCE_TABLE = "raw.fact_head_to_head"
+SOURCE_TABLE = "raw.engine_head_to_head"
 MIN_GAMES_CONFIDENT: int = 6
 
 

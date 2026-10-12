@@ -36,8 +36,8 @@ from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
 
-EVENTS_TABLE = "raw.fact_head_to_head_events"
-H2H_TABLE = "raw.fact_head_to_head"
+EVENTS_TABLE = "raw.engine_head_to_head_events"
+H2H_TABLE = "raw.engine_head_to_head"
 from engine.eval.db import FIXTURES_TABLE  # noqa: E402  (warehouse team ids)
 
 PRIOR_STRENGTH = 15.0

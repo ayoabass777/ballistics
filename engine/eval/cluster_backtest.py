@@ -53,7 +53,7 @@ from etl.src.logger import get_logger
 logger = get_logger(__name__)
 
 # ── config ──────────────────────────────────────────────────────────────────
-SOURCE_TABLE = "raw.fact_head_to_head"
+SOURCE_TABLE = "raw.engine_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
 
 FOLD_MONTHS: int = 3

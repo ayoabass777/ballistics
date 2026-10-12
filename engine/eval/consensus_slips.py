@@ -172,7 +172,7 @@ def _load_bounds_1_4_league_priors(
                     WHEN f.goals_for + f.goals_against BETWEEN 1 AND 4
                     THEN 1.0 ELSE 0.0
                 END) AS hit_rate
-            FROM raw.fact_head_to_head f
+            FROM raw.engine_head_to_head f
             JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home
             GROUP BY f.league_name, rf.country_name
@@ -200,7 +200,7 @@ def _load_over_1_5_league_rates(
                     WHEN f.goals_for + f.goals_against >= 2
                     THEN 1.0 ELSE 0.0
                 END) AS hit_rate
-            FROM raw.fact_head_to_head f
+            FROM raw.engine_head_to_head f
             JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home
             GROUP BY f.league_name, rf.country_name
@@ -228,7 +228,7 @@ def _load_league_elo_volatility(
                     f.goals_against AS away_goals,
                     COALESCE(eh.rating_before_flat, eh.rating_before) AS home_elo,
                     COALESCE(ea.rating_before_flat, ea.rating_before) AS away_elo
-                FROM raw.fact_head_to_head f
+                FROM raw.engine_head_to_head f
                 JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
                 JOIN elo.team_elo_history eh
                   ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
@@ -419,7 +419,7 @@ def _load_league_event_rates(conn) -> dict:
             SELECT f.league_name, COALESCE(rf.country_name, ''), COUNT(*),
                    AVG(CASE WHEN f.goals_for + f.goals_against BETWEEN 1 AND 4
                             THEN 1.0 ELSE 0.0 END)
-            FROM raw.fact_head_to_head f
+            FROM raw.engine_head_to_head f
             JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_played AND f.is_home AND f.is_current
             GROUP BY 1, 2
@@ -585,7 +585,7 @@ def _load_elo_gap_group_record(
                     f.goals_against AS away_goals,
                     COALESCE(eh.rating_before_flat, eh.rating_before)
                       - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
-                FROM raw.fact_head_to_head f
+                FROM raw.engine_head_to_head f
                 JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
                 JOIN elo.team_elo_history eh
                   ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
@@ -1445,7 +1445,7 @@ def _high_scoring_fixture_ids(fixture_ids, conn=None) -> set:
         cur = conn.cursor()
         cur.execute("""
             SELECT rf.api_league_id, avg(f.goals_for + f.goals_against)
-            FROM raw.fact_head_to_head f
+            FROM raw.engine_head_to_head f
             JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
             WHERE f.is_home AND f.is_played AND rf.season IN (2025, 2026)
             GROUP BY rf.api_league_id
@@ -2124,7 +2124,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         fix_df = pd.read_sql(f"""
             SELECT fixture_id, team_name AS home, opponent_name AS away,
                    league_name AS league, kickoff_utc AS kickoff
-            FROM raw.fact_head_to_head
+            FROM raw.engine_head_to_head
             WHERE fixture_id IN ({fid_str}) AND is_home
         """, conn)
         for _, row in fix_df.iterrows():
@@ -2142,7 +2142,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
     upcoming_df = pd.read_sql("""
         SELECT fixture_id, home_team_name AS home, away_team_name AS away,
                kickoff_utc AS kickoff, api_league_id
-        FROM raw.fact_fixtures
+        FROM raw.engine_fixtures
         WHERE fixture_status = 'NS'
         ORDER BY kickoff_utc
     """, conn)

@@ -101,7 +101,7 @@ def _calibrate_prob(raw_prob: float, league: str) -> float:
     return max(capped - penalty, 0.0)
 
 
-SOURCE_TABLE = "raw.fact_head_to_head"
+SOURCE_TABLE = "raw.engine_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
 from engine.eval.db import FIXTURES_TABLE  # noqa: E402
 

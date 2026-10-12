@@ -46,8 +46,8 @@ from etl.src.logger import get_logger
 
 logger = get_logger(__name__)
 
-EVENTS_TABLE = "raw.fact_head_to_head_events"
-H2H_TABLE = "raw.fact_head_to_head"
+EVENTS_TABLE = "raw.engine_head_to_head_events"
+H2H_TABLE = "raw.engine_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
 from engine.eval.db import FIXTURES_TABLE  # noqa: E402  (warehouse ids)
 

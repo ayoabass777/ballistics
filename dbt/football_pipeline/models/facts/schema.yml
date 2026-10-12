@@ -74,3 +74,22 @@ models:
         description: "stage = 'knockout'. Single games / ties where extra time and penalties can decide."
       - name: is_playoff
         description: "Post-season: knockout games plus phases named play-offs (round-robin play-off groups)."
+
+  - name: engine_fixtures
+    description: >
+      Engine fixture input: fact_fixtures minus knockout games (is_knockout). Training data and
+      prediction targets for the engine; lookups by fixture_id use fact_fixtures.
+    columns:
+      - name: fixture_id
+        tests: [not_null, unique]
+      - name: is_knockout
+        tests:
+          - accepted_values:
+              arguments:
+                values: [false]
+
+  - name: engine_head_to_head
+    description: "Engine team-match history: fact_head_to_head minus knockout games."
+
+  - name: engine_head_to_head_events
+    description: "Engine event flags: fact_head_to_head_events minus knockout games."

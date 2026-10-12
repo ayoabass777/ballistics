@@ -1,11 +1,11 @@
 """
-Elo service: walks played fixtures from raw.fact_head_to_head chronologically,
+Elo service: walks played league fixtures from raw.engine_head_to_head chronologically,
 applies Elo updates, and writes per-team rating history to elo.team_elo_history.
 
 Idempotent: re-runs only process fixtures not already in history.
 Use --reset to wipe and rebuild from scratch.
 
-Source contract (raw.fact_head_to_head):
+Source contract (raw.engine_head_to_head = fact_head_to_head minus knockout games):
     Two rows per fixture — one per team. We filter `is_home=true` to get a
     single canonical row per match containing both teams' identities and the
     final score.
@@ -38,7 +38,7 @@ logger = get_logger(__name__)
 
 ELO_SCHEMA = "elo"
 HISTORY_TABLE = f"{ELO_SCHEMA}.team_elo_history"
-SOURCE_TABLE = "raw.fact_head_to_head"
+SOURCE_TABLE = "raw.engine_head_to_head"
 
 
 # --------------------------------------------------------------------------- #
@@ -346,7 +346,7 @@ def get_latest_rating(cur, team_id: int) -> float:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Compute Elo ratings from played fixtures in raw.fact_head_to_head."
+        description="Compute Elo ratings from played league fixtures in raw.engine_head_to_head."
     )
     parser.add_argument(
         "--reset",

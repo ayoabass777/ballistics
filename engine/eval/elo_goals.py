@@ -43,7 +43,7 @@ GAP_EDGES: List[int] = [0, 50, 100, 200]
 MIN_RELIABLE_N: int = 30
 GAP_SCALE: float = 100.0  # report coefficient per +100 Elo
 
-SOURCE_TABLE = "raw.fact_head_to_head"
+SOURCE_TABLE = "raw.engine_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
 
 

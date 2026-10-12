@@ -102,7 +102,7 @@ def load_completed_fixtures(conn, months: int = 3) -> pd.DataFrame:
                home_team_fulltime_goal AS goals_home_ft,
                away_team_fulltime_goal AS goals_away_ft,
                kickoff_utc, api_league_id, fixture_status
-        FROM raw.fact_fixtures
+        FROM raw.engine_fixtures
         WHERE fixture_status = 'FT'
           AND kickoff_utc >= %(cutoff)s
           AND home_team_id IS NOT NULL AND away_team_id IS NOT NULL

@@ -107,7 +107,7 @@ def load_dc_historical(conn) -> pd.DataFrame:
             f.opponent_name AS away_team,
             f.goals_for AS home_goals,
             f.goals_against AS away_goals
-        FROM raw.fact_head_to_head f
+        FROM raw.engine_head_to_head f
         JOIN {FIXTURES_TABLE} r
           ON r.fixture_id = f.fixture_id
         WHERE f.is_played

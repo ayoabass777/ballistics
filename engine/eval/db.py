@@ -22,7 +22,10 @@ except Exception:  # noqa: BLE001 — dotenv optional; env may already be set
 
 
 # The engine reads fixtures from dbt only (warehouse ids), never raw.raw_fixtures.
-FIXTURES_TABLE = "raw.fact_fixtures"
+FIXTURES_TABLE = "raw.engine_fixtures"
+# engine_fixtures = fact_fixtures minus knockout games (2026-10-12). Lookups of
+# specific fixtures by id (scoring, match API) use the full table:
+ALL_FIXTURES_TABLE = "raw.fact_fixtures"
 
 
 def get_conn():

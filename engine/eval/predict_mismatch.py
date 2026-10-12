@@ -57,7 +57,7 @@ def _calibrate_conf(raw: float, api_league_id: int | None = None) -> float:
         calibrated = apply_logit_adjustment(calibrated, adjustment)
     return calibrated
 
-SOURCE_TABLE = "raw.fact_head_to_head"
+SOURCE_TABLE = "raw.engine_head_to_head"
 ELO_TABLE = "elo.team_elo_history"
 from engine.eval.db import FIXTURES_TABLE  # noqa: E402
 
