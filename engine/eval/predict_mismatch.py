@@ -1,5 +1,5 @@
 """
-Mismatch predictor — team-level market picks driven by Elo gaps + H2H.
+Mismatch predictor — team-level market picks driven by Elo gaps.
 
 Separate from the Poisson GLM over/under model. This predicts:
   - Favourite to win (1X2 result)
@@ -9,8 +9,10 @@ Separate from the Poisson GLM over/under model. This predicts:
   - Over 2.5 match goals
 
 Confidence for goals markets is derived from league-specific empirical hit
-rates at each Elo gap bracket. Win/draw confidence combines league-level
-gap rates with a per-matchup H2H adjustment.
+rates at each Elo gap bracket. Win/draw confidence uses league-level gap
+rates only. The head-to-head record is carried as context, not used to adjust
+confidence (removed 2026-10-11: the +/-0.05 boost made win estimates more
+overconfident).
 
 Usage:
     python -m engine.eval.predict_mismatch
@@ -70,7 +72,6 @@ MIN_CONFIDENCE = 0.70
 
 
 H2H_MIN_MATCHES = 3
-H2H_DOMINANCE_THRESHOLD = 0.6
 
 
 @dataclass
@@ -95,7 +96,6 @@ class MismatchPick:
     h2h_wins: int = 0
     h2h_draws: int = 0
     h2h_losses: int = 0
-    h2h_boost: str = ""
     strength_adj: float = 0.0
     fav_attack_pct: float = 0.0
     dog_defense_pct: float = 0.0
@@ -416,24 +416,6 @@ def _strength_adjustment(
     return 0.0
 
 
-def _h2h_adjustment(wins: int, draws: int, losses: int) -> tuple[float, str]:
-    """Return (win_boost, label) based on H2H record.
-
-    H2H dominant (>=60% wins in 3+ games): +0.05 to fav_win confidence.
-    H2H mixed: no adjustment.
-    H2H underdog-dominant: -0.05 penalty.
-    """
-    total = wins + draws + losses
-    if total < H2H_MIN_MATCHES:
-        return 0.0, ""
-    win_rate = wins / total
-    if win_rate >= H2H_DOMINANCE_THRESHOLD:
-        return 0.05, "H2H+"
-    if win_rate <= 0.3:
-        return -0.05, "H2H-"
-    return 0.0, "H2H~"
-
-
 def predict_mismatch(
     days: int = 7, min_gap: int = 100,
 ) -> tuple[list[MismatchPick], dict]:
@@ -512,7 +494,6 @@ def predict_mismatch(
             dog_elo = min(h_elo, a_elo)
 
             h2h_w, h2h_d, h2h_l = h2h_map.get((fav_rf, dog_rf), (0, 0, 0))
-            h2h_boost, h2h_label = _h2h_adjustment(h2h_w, h2h_d, h2h_l)
 
             fav_strength = strength_map.get(fav_rf)
             dog_strength = strength_map.get(dog_rf)
@@ -559,7 +540,7 @@ def predict_mismatch(
                         dog_defense_pct=dog_strength["defense_pct"] if dog_strength else 0,
                     ))
 
-            # Win market (with H2H adjustment)
+            # Win market
             win_conf, win_n = _lookup_hit_rate(
                 hit_rates,
                 row["league"],
@@ -567,7 +548,7 @@ def predict_mismatch(
                 "fav_win",
                 api_league_id=int(row["api_league_id"]),
             )
-            adjusted_win = min(win_conf + h2h_boost, 0.95)
+            adjusted_win = min(win_conf, 0.95)
             if adjusted_win >= MIN_CONFIDENCE and win_n >= MIN_SAMPLE:
                 picks.append(MismatchPick(
                     fixture_id=int(row["fixture_id"]),
@@ -592,7 +573,6 @@ def predict_mismatch(
                     h2h_wins=h2h_w,
                     h2h_draws=h2h_d,
                     h2h_losses=h2h_l,
-                    h2h_boost=h2h_label,
                 ))
 
             # Draw market — only for gap bins where draw rate is notable (100-200)
@@ -603,7 +583,7 @@ def predict_mismatch(
                 "draw",
                 api_league_id=int(row["api_league_id"]),
             )
-            draw_adj = draw_conf - h2h_boost
+            draw_adj = draw_conf
             if draw_adj >= 0.25 and draw_n >= MIN_SAMPLE and gap < 200:
                 picks.append(MismatchPick(
                     fixture_id=int(row["fixture_id"]),
@@ -626,7 +606,6 @@ def predict_mismatch(
                     h2h_wins=h2h_w,
                     h2h_draws=h2h_d,
                     h2h_losses=h2h_l,
-                    h2h_boost=h2h_label,
                 ))
 
         picks.sort(key=lambda p: (-p.confidence, p.kickoff))
@@ -730,9 +709,8 @@ def print_picks(picks: list[MismatchPick]) -> None:
             seen.add(key)
             h2h_total = p.h2h_wins + p.h2h_draws + p.h2h_losses
             h2h_str = f"{p.h2h_wins}W{p.h2h_draws}D{p.h2h_losses}L" if h2h_total > 0 else "  -  "
-            boost_str = f" {p.h2h_boost}" if p.h2h_boost else ""
             str_str = f"{p.strength_adj:+.0%}" if p.strength_adj != 0 else "  -"
-            print(f"  {dt:>12s}  {match:<40s}  {market_str:<22s}  {p.confidence:>4.0%}  {str_str:>5s}  {h2h_str:>7s}{boost_str}  {p.gap:>4.0f}  {p.league}")
+            print(f"  {dt:>12s}  {match:<40s}  {market_str:<22s}  {p.confidence:>4.0%}  {str_str:>5s}  {h2h_str:>7s}  {p.gap:>4.0f}  {p.league}")
 
 
 def save_picks_yaml(picks: list[MismatchPick]) -> str:
@@ -766,8 +744,6 @@ def save_picks_yaml(picks: list[MismatchPick]) -> str:
         h2h_total = p.h2h_wins + p.h2h_draws + p.h2h_losses
         if h2h_total > 0:
             entry["h2h"] = f"{p.h2h_wins}W-{p.h2h_draws}D-{p.h2h_losses}L"
-        if p.h2h_boost:
-            entry["h2h_boost"] = p.h2h_boost
         if p.strength_adj != 0:
             entry["strength_adj"] = p.strength_adj
         data["picks"].append(entry)

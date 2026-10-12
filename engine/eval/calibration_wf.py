@@ -561,7 +561,7 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
     """Mismatch predictions using hit rates computed only from pre-cutoff data."""
     from engine.eval.predict_mismatch import (
         _get_gap_bin, _load_h2h_records, _load_team_strength,
-        _h2h_adjustment, _lookup_hit_rate, _strength_adjustment,
+        _lookup_hit_rate, _strength_adjustment,
         MIN_CONFIDENCE, MIN_SAMPLE,
     )
 
@@ -610,7 +610,6 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
         dog_name = row["away_team_name"] if fav_is_home else row["home_team_name"]
 
         h2h_w, h2h_d, h2h_l = h2h_map.get((fav_rf, dog_rf), (0, 0, 0))
-        h2h_boost, _ = _h2h_adjustment(h2h_w, h2h_d, h2h_l)
         fav_strength = strength_map.get(fav_rf)
         dog_strength = strength_map.get(dog_rf)
 
@@ -658,7 +657,7 @@ def _mismatch_fold(conn, test_fixtures: pd.DataFrame, cutoff_dt,
             "fav_win",
             api_league_id=int(row["api_league_id"]),
         )
-        adjusted_win = min(win_conf + h2h_boost, 0.95)
+        adjusted_win = min(win_conf, 0.95)
         if adjusted_win >= RECORD_FLOOR_MISMATCH and win_n >= MIN_SAMPLE:
             market = f"{fav_name} Win"
             outcome = _actual_outcome(fix_row, market)

@@ -1257,7 +1257,6 @@ def mismatch_signals(mismatch_picks) -> list[dict]:
                         "unified_market": unified, "probability": _f(p.confidence),
                         "raw_probability": None,
                         "detail": {"gap": p.gap, "gap_bin": p.gap_bin,
-                                   "h2h_boost": p.h2h_boost,
                                    # league ids live on the fixture (league_id,
                                    # warehouse); no API-Football ids in exports
                                    "country": p.country}})
@@ -2198,8 +2197,6 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
                 "gap": p.gap,
                 "gap_bin": p.gap_bin,
             }
-            if p.h2h_boost:
-                entry["h2h"] = p.h2h_boost
             if hasattr(p, "fav_attack_pct") and p.fav_attack_pct:
                 entry["fav_atk"] = p.fav_attack_pct
             if hasattr(p, "dog_defense_pct") and p.dog_defense_pct:

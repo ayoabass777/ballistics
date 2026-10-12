@@ -98,7 +98,6 @@ def run_combined(days: int = 7, min_gap: int = 100) -> pd.DataFrame:
             "label": _market_label(p.market, p.favourite),
             "confidence": p.confidence,
             "sample_size": p.sample_size,
-            "h2h_boost": p.h2h_boost,
         })
 
     # Bayesian streak beliefs
@@ -241,8 +240,7 @@ def _print_fixture(c: dict) -> None:
 
     if c["mismatch_picks"]:
         for m in c["mismatch_picks"]:
-            boost = f" {m['h2h_boost']}" if m.get("h2h_boost") else ""
-            print(f"    Mismatch:  {m['label']:<28s}  →  {m['confidence']:.0%} (n={m['sample_size']}){boost}")
+            print(f"    Mismatch:  {m['label']:<28s}  →  {m['confidence']:.0%} (n={m['sample_size']})")
 
     bayes = c.get("bayesian_beliefs", {})
     for side in ("home", "away"):
@@ -306,8 +304,6 @@ def _build_output_data(combined: list[dict]) -> dict:
                 "confidence": m["confidence"],
                 "sample_size": m["sample_size"],
             }
-            if m.get("h2h_boost"):
-                pick_entry["h2h_boost"] = m["h2h_boost"]
             picks.append(pick_entry)
 
         bayes = c.get("bayesian_beliefs", {})
