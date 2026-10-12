@@ -40,7 +40,7 @@ class ExtractMetadataTierTests(unittest.TestCase):
         self.assertEqual(league_id, 123)
         sql, params = cursor.calls[0]
         self.assertIn("tier = EXCLUDED.tier", sql)
-        self.assertEqual(params, (10, "League One", 41, 3))
+        self.assertEqual(params, (10, "League One", 41, 3, None))
 
     @patch("etl.src.extract_metadata.upsert_league", return_value=123)
     @patch("etl.src.extract_metadata.fetch_league_info")
@@ -58,7 +58,26 @@ class ExtractMetadataTierTests(unittest.TestCase):
         )
 
         upsert_league_mock.assert_called_once_with(
-            ANY, 10, "League One", 41, tier=3)
+            ANY, 10, "League One", 41, tier=3, standings_format=None)
+
+    def test_upsert_league_persists_standings_format(self):
+        cursor = _Cursor()
+        upsert_league(cursor, 10, "Major League Soccer", 253, tier=1,
+                      standings_format="conferences")
+        sql, params = cursor.calls[0]
+        self.assertIn("standings_format = EXCLUDED.standings_format", sql)
+        self.assertEqual(params[-1], "conferences")
+
+    @patch("etl.src.extract_metadata.upsert_league", return_value=123)
+    @patch("etl.src.extract_metadata.fetch_league_info")
+    def test_unknown_standings_format_is_ignored(self, fetch_league_info,
+                                                 upsert_league_mock):
+        fetch_league_info.return_value = [{"league": {"id": 41}, "seasons": []}]
+        process_league(_Cursor(), "England", 10,
+                       {"name": "League One", "tier": 3,
+                        "standings_format": "playoffs?"}, [])
+        upsert_league_mock.assert_called_once_with(
+            ANY, 10, "League One", 41, tier=3, standings_format=None)
 
 
 if __name__ == "__main__":

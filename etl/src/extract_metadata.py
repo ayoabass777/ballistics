@@ -120,6 +120,11 @@ def process_league(
     """
     league_name = league_data["name"]
     tier = league_data.get("tier")
+    standings_format = league_data.get("standings_format")
+    if standings_format is not None and standings_format not in STANDINGS_FORMATS:
+        logger.warning("Ignoring unknown standings_format %r for '%s'",
+                       standings_format, league_name)
+        standings_format = None
     league_info_list = fetch_league_info("leagues", params={"country": country, "name": league_name})
     if not league_info_list:
         logger.warning(f"No league info found for '{league_name}' in country '{country}'")
@@ -128,7 +133,8 @@ def process_league(
     league_info = league_info_list[0]
     api_league_id = league_info.get("league", {}).get("id")
     league_id = upsert_league(
-        cur, country_id, league_name, api_league_id, tier=tier)
+        cur, country_id, league_name, api_league_id, tier=tier,
+        standings_format=standings_format)
     league_seasons = league_info.get("seasons", [])
     if not league_seasons:
         logger.warning(f"No seasons found for league '{league_name}' in country '{country}'")
@@ -309,34 +315,47 @@ def upsert_country(
 # api_league_id is the id of the league from the API   
 ## Upsert function to insert or update league in the database and return the league_id
 
+# How a league's standings are laid out (league definition, metadata.yaml):
+#   single       one table
+#   conferences  parallel groups that never merge (MLS, USL)
+#   split        regular season, then championship / relegation rounds
+# None means "not declared"; dbt flags leagues whose API data disagrees.
+STANDINGS_FORMATS = {"single", "conferences", "split"}
+
+
 def upsert_league(
     cur: psycopg2.extensions.cursor,
     country_id: int,
     league_name: str,
     api_league_id: int,
     tier: Optional[int] = None,
+    standings_format: Optional[str] = None,
 ) -> int:
     """
     Insert or update a league in dim_leagues.
     Returns the surrogate league_id.
     """
     sql = """
-    INSERT INTO dim.dim_leagues (country_id, league_name, api_league_id, tier)
-    VALUES (%s, %s, %s, %s)
+    INSERT INTO dim.dim_leagues (country_id, league_name, api_league_id, tier,
+                                 standings_format)
+    VALUES (%s, %s, %s, %s, %s)
     ON CONFLICT (api_league_id) DO UPDATE 
     SET 
         league_name = EXCLUDED.league_name,
         country_id = EXCLUDED.country_id,
         tier = EXCLUDED.tier,
+        standings_format = EXCLUDED.standings_format,
         updated_at = NOW()
     WHERE
         dim.dim_leagues.league_name != EXCLUDED.league_name
         OR dim.dim_leagues.country_id != EXCLUDED.country_id
         OR dim.dim_leagues.tier IS DISTINCT FROM EXCLUDED.tier
+        OR dim.dim_leagues.standings_format IS DISTINCT FROM EXCLUDED.standings_format
     RETURNING league_id;
     """ 
     try:
-        cur.execute(sql, (country_id, league_name, api_league_id, tier))
+        cur.execute(sql, (country_id, league_name, api_league_id, tier,
+                          standings_format))
         result = cur.fetchone()
         if result:
             return result[0]  # return the league_id
