@@ -1,0 +1,3701 @@
+{
+ "source": "engine/eval/consensus_slips_2026-09-28.json",
+ "generated": "2026-09-29 00:08 UTC",
+ "run_ds": "2026-09-28",
+ "status": "MOCK for Figma — real saved values, non-live. Labels apply D27 thresholds to the raw mismatch gap; thresholds unvalidated.",
+ "rules": {
+  "Big dog": "gap > 250",
+  "Slight favourite": "100 < gap <= 250",
+  "Closely matched": "gap <= 100 (none derivable from this export)"
+ },
+ "count": 55,
+ "fixtures": [
+  {
+   "fixture_id": 48580,
+   "home": "Ponte Preta",
+   "away": "Juventude",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-07 00:35:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Juventude",
+   "underdog": "Ponte Preta",
+   "favourite_is_home": false,
+   "gap_internal": 287,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.67,
+     "defense_rate": 1.53,
+     "attack_rank": 20,
+     "defense_rank": 20,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 0.93,
+     "attack_rank": 15,
+     "defense_rank": 5,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.59,
+     "defense_rate": 2.14,
+     "attack_rank": 20,
+     "defense_rank": 20,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.07,
+     "defense_rate": 0.66,
+     "attack_rank": 14,
+     "defense_rank": 1,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8321
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8073
+    },
+    {
+     "market": "Juventude Over 0.5",
+     "probability": 0.7441
+    },
+    {
+     "market": "Match Under 2.5",
+     "probability": 0.6684
+    }
+   ]
+  },
+  {
+   "fixture_id": 48578,
+   "home": "America Mineiro",
+   "away": "Fortaleza EC",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-07 23:30:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Fortaleza EC",
+   "underdog": "America Mineiro",
+   "favourite_is_home": false,
+   "gap_internal": 272,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 1.43,
+     "attack_rank": 19,
+     "defense_rank": 18,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.73,
+     "defense_rate": 0.87,
+     "attack_rank": 17,
+     "defense_rank": 2,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.72,
+     "defense_rate": 1.69,
+     "attack_rank": 19,
+     "defense_rank": 19,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.17,
+     "defense_rate": 0.87,
+     "attack_rank": 11,
+     "defense_rank": 3,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8321
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7901
+    },
+    {
+     "market": "Fortaleza EC Over 0.5",
+     "probability": 0.7218
+    }
+   ]
+  },
+  {
+   "fixture_id": 63506,
+   "home": "Minija",
+   "away": "Kauno Žalgiris II",
+   "league": "1 Lyga",
+   "country": "Lithuania",
+   "kickoff_utc": "2026-10-02 14:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Minija",
+   "underdog": "Kauno Žalgiris II",
+   "favourite_is_home": true,
+   "gap_internal": 268,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.73,
+     "defense_rate": 0.55,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 0.64,
+     "defense_rate": 1.82,
+     "attack_rank": 16,
+     "defense_rank": 12,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 2.62,
+     "defense_rate": 0.54,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 0.96,
+     "defense_rate": 1.58,
+     "attack_rank": 16,
+     "defense_rank": 12,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Minija Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Minija Win",
+     "probability": 0.7983
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7782
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7518
+    },
+    {
+     "market": "Minija Over 1.5",
+     "probability": 0.7312
+    }
+   ]
+  },
+  {
+   "fixture_id": 46772,
+   "home": "Orsha",
+   "away": "Niva",
+   "league": "1. Division",
+   "country": "Belarus",
+   "kickoff_utc": "2026-10-03 15:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Niva",
+   "underdog": "Orsha",
+   "favourite_is_home": false,
+   "gap_internal": 268,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.31,
+     "attack_rank": 16,
+     "defense_rank": 15,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 2.15,
+     "defense_rate": 1.69,
+     "attack_rank": 1,
+     "defense_rank": 10,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.08,
+     "defense_rate": 1.96,
+     "attack_rank": 17,
+     "defense_rank": 15,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 2.58,
+     "defense_rate": 1.19,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Niva Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Niva Over 1.5",
+     "probability": 0.7949
+    },
+    {
+     "market": "Niva Win",
+     "probability": 0.7811
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7518
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6985
+    }
+   ]
+  },
+  {
+   "fixture_id": 75657,
+   "home": "Dongguan United",
+   "away": "Guangxi Hengchen",
+   "league": "League One",
+   "country": "China",
+   "kickoff_utc": "2026-10-07 11:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Guangxi Hengchen",
+   "underdog": "Dongguan United",
+   "favourite_is_home": false,
+   "gap_internal": 251,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.67,
+     "defense_rate": 2.0,
+     "attack_rank": 16,
+     "defense_rank": 15,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.42,
+     "defense_rate": 1.0,
+     "attack_rank": 5,
+     "defense_rank": 4,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.04,
+     "attack_rank": 14,
+     "defense_rank": 15,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.67,
+     "defense_rate": 1.08,
+     "attack_rank": 2,
+     "defense_rank": 6,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Guangxi Hengchen Over 0.5",
+     "probability": 0.8327
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7858
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7232
+    },
+    {
+     "market": "Guangxi Hengchen Win",
+     "probability": 0.7042
+    },
+    {
+     "market": "Guangxi Hengchen Over 1.5",
+     "probability": 0.6648
+    }
+   ]
+  },
+  {
+   "fixture_id": 48572,
+   "home": "Cuiaba",
+   "away": "Ponte Preta",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-03 20:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Cuiaba",
+   "underdog": "Ponte Preta",
+   "favourite_is_home": true,
+   "gap_internal": 244,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.13,
+     "defense_rate": 0.6,
+     "attack_rank": 14,
+     "defense_rank": 2,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.5,
+     "defense_rate": 2.79,
+     "attack_rank": 20,
+     "defense_rank": 20,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 0.83,
+     "attack_rank": 16,
+     "defense_rank": 2,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.59,
+     "defense_rate": 2.14,
+     "attack_rank": 20,
+     "defense_rank": 20,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Cuiaba Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Cuiaba Win",
+     "probability": 0.7902
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7749
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7463
+    },
+    {
+     "market": "Cuiaba Over 1.5",
+     "probability": 0.7041
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.6836
+    }
+   ]
+  },
+  {
+   "fixture_id": 67710,
+   "home": "Richmond Kickers",
+   "away": "One Knoxville",
+   "league": "USL League One",
+   "country": "USA",
+   "kickoff_utc": "2026-10-03 22:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "One Knoxville",
+   "underdog": "Richmond Kickers",
+   "favourite_is_home": false,
+   "gap_internal": 239,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.08,
+     "defense_rate": 1.23,
+     "attack_rank": 17,
+     "defense_rank": 8,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 1.79,
+     "defense_rate": 1.21,
+     "attack_rank": 1,
+     "defense_rank": 3,
+     "league_size": 17
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.07,
+     "attack_rank": 17,
+     "defense_rank": 17,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 1.57,
+     "defense_rate": 1.11,
+     "attack_rank": 6,
+     "defense_rank": 3,
+     "league_size": 17
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "One Knoxville Over 0.5",
+     "probability": 0.787
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7368
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7358
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7146
+    }
+   ]
+  },
+  {
+   "fixture_id": 70642,
+   "home": "Moss",
+   "away": "Kongsvinger",
+   "league": "1. Division",
+   "country": "Norway",
+   "kickoff_utc": "2026-10-05 17:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Kongsvinger",
+   "underdog": "Moss",
+   "favourite_is_home": false,
+   "gap_internal": 236,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.54,
+     "defense_rate": 2.18,
+     "attack_rank": 13,
+     "defense_rank": 13,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.09,
+     "defense_rate": 1.27,
+     "attack_rank": 3,
+     "defense_rank": 3,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.65,
+     "defense_rate": 2.26,
+     "attack_rank": 9,
+     "defense_rank": 11,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.96,
+     "defense_rate": 1.52,
+     "attack_rank": 2,
+     "defense_rank": 4,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Kongsvinger Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.8059
+    },
+    {
+     "market": "Kongsvinger Over 1.5",
+     "probability": 0.7887
+    },
+    {
+     "market": "Moss Over 0.5",
+     "probability": 0.7544
+    },
+    {
+     "market": "BTTS Yes",
+     "probability": 0.7371
+    },
+    {
+     "market": "Match Over 3.5",
+     "probability": 0.7003
+    },
+    {
+     "market": "Kongsvinger Win",
+     "probability": 0.6992
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6731
+    }
+   ]
+  },
+  {
+   "fixture_id": 48567,
+   "home": "Atletico Goianiense",
+   "away": "America Mineiro",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-03 19:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Atletico Goianiense",
+   "underdog": "America Mineiro",
+   "favourite_is_home": true,
+   "gap_internal": 229,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.6,
+     "defense_rate": 0.87,
+     "attack_rank": 5,
+     "defense_rank": 5,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.6,
+     "defense_rate": 1.93,
+     "attack_rank": 19,
+     "defense_rank": 19,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.23,
+     "defense_rate": 0.9,
+     "attack_rank": 9,
+     "defense_rank": 4,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.72,
+     "defense_rate": 1.69,
+     "attack_rank": 19,
+     "defense_rank": 19,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8321
+    },
+    {
+     "market": "Atletico Goianiense Over 0.5",
+     "probability": 0.8165
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7265
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7251
+    },
+    {
+     "market": "Atletico Goianiense Win",
+     "probability": 0.7212
+    }
+   ]
+  },
+  {
+   "fixture_id": 70636,
+   "home": "Stromsgodset",
+   "away": "Asane",
+   "league": "1. Division",
+   "country": "Norway",
+   "kickoff_utc": "2026-10-03 14:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Stromsgodset",
+   "underdog": "Asane",
+   "favourite_is_home": true,
+   "gap_internal": 211,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.73,
+     "defense_rate": 1.18,
+     "attack_rank": 5,
+     "defense_rank": 2,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.46,
+     "attack_rank": 15,
+     "defense_rank": 12,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 2.61,
+     "defense_rate": 1.35,
+     "attack_rank": 3,
+     "defense_rank": 2,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.48,
+     "defense_rate": 2.26,
+     "attack_rank": 13,
+     "defense_rank": 13,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Stromsgodset Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Stromsgodset Over 1.5",
+     "probability": 0.7891
+    },
+    {
+     "market": "Stromsgodset Win",
+     "probability": 0.7613
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7553
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6731
+    }
+   ]
+  },
+  {
+   "fixture_id": 63540,
+   "home": "Garliava",
+   "away": "Dainava",
+   "league": "1 Lyga",
+   "country": "Lithuania",
+   "kickoff_utc": "2026-10-02 16:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Dainava",
+   "underdog": "Garliava",
+   "favourite_is_home": false,
+   "gap_internal": 197,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.42,
+     "defense_rate": 1.0,
+     "attack_rank": 9,
+     "defense_rank": 5,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.1,
+     "defense_rate": 1.1,
+     "attack_rank": 10,
+     "defense_rank": 5,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.12,
+     "defense_rate": 1.25,
+     "attack_rank": 12,
+     "defense_rank": 7,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.42,
+     "defense_rate": 0.96,
+     "attack_rank": 8,
+     "defense_rank": 3,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8283
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8251
+    },
+    {
+     "market": "Match Under 2.5",
+     "probability": 0.7256
+    },
+    {
+     "market": "Dainava Over 0.5",
+     "probability": 0.669
+    }
+   ]
+  },
+  {
+   "fixture_id": 46780,
+   "home": "Gomel II",
+   "away": "FC Energetik-Bgu Minsk",
+   "league": "1. Division",
+   "country": "Belarus",
+   "kickoff_utc": "2026-10-03 15:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "FC Energetik-Bgu Minsk",
+   "underdog": "Gomel II",
+   "favourite_is_home": false,
+   "gap_internal": 191,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.46,
+     "defense_rate": 2.15,
+     "attack_rank": 13,
+     "defense_rank": 14,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.92,
+     "defense_rate": 1.15,
+     "attack_rank": 5,
+     "defense_rank": 2,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.39,
+     "defense_rate": 2.0,
+     "attack_rank": 13,
+     "defense_rank": 16,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 2.04,
+     "defense_rate": 1.19,
+     "attack_rank": 2,
+     "defense_rank": 4,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "FC Energetik-Bgu Minsk Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8323
+    },
+    {
+     "market": "FC Energetik-Bgu Minsk Over 1.5",
+     "probability": 0.7303
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7256
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6998
+    },
+    {
+     "market": "FC Energetik-Bgu Minsk Win",
+     "probability": 0.6894
+    },
+    {
+     "market": "Gomel II Over 0.5",
+     "probability": 0.6842
+    }
+   ]
+  },
+  {
+   "fixture_id": 46774,
+   "home": "Smorgon",
+   "away": "Osipovichy",
+   "league": "1. Division",
+   "country": "Belarus",
+   "kickoff_utc": "2026-10-03 15:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Smorgon",
+   "underdog": "Osipovichy",
+   "favourite_is_home": true,
+   "gap_internal": 190,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.15,
+     "defense_rate": 1.39,
+     "attack_rank": 15,
+     "defense_rank": 9,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 0.85,
+     "defense_rate": 2.38,
+     "attack_rank": 17,
+     "defense_rank": 18,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.19,
+     "defense_rate": 1.39,
+     "attack_rank": 15,
+     "defense_rank": 7,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.11,
+     "defense_rate": 2.5,
+     "attack_rank": 16,
+     "defense_rank": 18,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Smorgon Over 0.5",
+     "probability": 0.7953
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7395
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7359
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7181
+    }
+   ]
+  },
+  {
+   "fixture_id": 102499,
+   "home": "Huracan",
+   "away": "Aldosivi",
+   "league": "Liga Profesional Argentina",
+   "country": "Argentina",
+   "kickoff_utc": "2026-10-04 00:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Huracan",
+   "underdog": "Aldosivi",
+   "favourite_is_home": true,
+   "gap_internal": 184,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.15,
+     "defense_rate": 0.77,
+     "attack_rank": 15,
+     "defense_rank": 9,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 0.69,
+     "defense_rate": 1.85,
+     "attack_rank": 24,
+     "defense_rank": 28,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.04,
+     "defense_rate": 0.81,
+     "attack_rank": 20,
+     "defense_rank": 4,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 0.69,
+     "defense_rate": 1.35,
+     "attack_rank": 27,
+     "defense_rank": 25,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8294
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8016
+    },
+    {
+     "market": "Huracan Over 0.5",
+     "probability": 0.7368
+    }
+   ]
+  },
+  {
+   "fixture_id": 102500,
+   "home": "Banfield",
+   "away": "Rosario Central",
+   "league": "Liga Profesional Argentina",
+   "country": "Argentina",
+   "kickoff_utc": "2026-10-06 00:15:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Rosario Central",
+   "underdog": "Banfield",
+   "favourite_is_home": false,
+   "gap_internal": 183,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.33,
+     "defense_rate": 1.17,
+     "attack_rank": 10,
+     "defense_rank": 26,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.14,
+     "defense_rate": 1.0,
+     "attack_rank": 7,
+     "defense_rank": 9,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.08,
+     "defense_rate": 1.35,
+     "attack_rank": 16,
+     "defense_rank": 27,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.21,
+     "defense_rate": 0.93,
+     "attack_rank": 8,
+     "defense_rank": 12,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8294
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7532
+    },
+    {
+     "market": "Rosario Central Over 0.5",
+     "probability": 0.7368
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6889
+    }
+   ]
+  },
+  {
+   "fixture_id": 66418,
+   "home": "Orange County SC",
+   "away": "Monterey Bay",
+   "league": "USL Championship",
+   "country": "USA",
+   "kickoff_utc": "2026-10-04 02:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Orange County SC",
+   "underdog": "Monterey Bay",
+   "favourite_is_home": true,
+   "gap_internal": 174,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.08,
+     "defense_rate": 1.39,
+     "attack_rank": 23,
+     "defense_rank": 20,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 0.77,
+     "defense_rate": 2.0,
+     "attack_rank": 25,
+     "defense_rank": 22,
+     "league_size": 25
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.35,
+     "defense_rate": 1.54,
+     "attack_rank": 10,
+     "defense_rank": 18,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.04,
+     "defense_rate": 1.77,
+     "attack_rank": 23,
+     "defense_rank": 23,
+     "league_size": 25
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Orange County SC Over 0.5",
+     "probability": 0.8127
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7958
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7169
+    },
+    {
+     "market": "Monterey Bay Over 0.5",
+     "probability": 0.7104
+    }
+   ]
+  },
+  {
+   "fixture_id": 72357,
+   "home": "Eker Örebro",
+   "away": "Rågsved",
+   "league": "Division 2 - Södra Svealand",
+   "country": "Sweden",
+   "kickoff_utc": "2026-10-03 11:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Rågsved",
+   "underdog": "Eker Örebro",
+   "favourite_is_home": false,
+   "gap_internal": 171,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.64,
+     "defense_rate": 2.91,
+     "attack_rank": 11,
+     "defense_rank": 14,
+     "league_size": 14
+    },
+    "away_team": {
+     "attack_rate": 1.82,
+     "defense_rate": 1.64,
+     "attack_rank": 3,
+     "defense_rank": 5,
+     "league_size": 14
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.22,
+     "defense_rate": 2.96,
+     "attack_rank": 12,
+     "defense_rank": 14,
+     "league_size": 14
+    },
+    "away_team": {
+     "attack_rate": 1.83,
+     "defense_rate": 1.56,
+     "attack_rank": 5,
+     "defense_rank": 7,
+     "league_size": 14
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Rågsved Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7973
+    },
+    {
+     "market": "Rågsved Over 1.5",
+     "probability": 0.7721
+    },
+    {
+     "market": "Eker Örebro Over 0.5",
+     "probability": 0.7545
+    },
+    {
+     "market": "BTTS Yes",
+     "probability": 0.7302
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7224
+    },
+    {
+     "market": "Rågsved Win",
+     "probability": 0.6877
+    },
+    {
+     "market": "Match Over 3.5",
+     "probability": 0.6722
+    }
+   ]
+  },
+  {
+   "fixture_id": 102502,
+   "home": "Boca Juniors",
+   "away": "Union Santa Fe",
+   "league": "Liga Profesional Argentina",
+   "country": "Argentina",
+   "kickoff_utc": "2026-10-04 22:15:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Boca Juniors",
+   "underdog": "Union Santa Fe",
+   "favourite_is_home": true,
+   "gap_internal": 171,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.17,
+     "defense_rate": 0.42,
+     "attack_rank": 14,
+     "defense_rank": 1,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.4,
+     "defense_rate": 1.73,
+     "attack_rank": 2,
+     "defense_rank": 27,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.39,
+     "defense_rate": 0.77,
+     "attack_rank": 4,
+     "defense_rank": 3,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.54,
+     "defense_rate": 1.39,
+     "attack_rank": 2,
+     "defense_rank": 29,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Boca Juniors Over 0.5",
+     "probability": 0.8321
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8055
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7518
+    },
+    {
+     "market": "Boca Juniors Over 1.5",
+     "probability": 0.6611
+    }
+   ]
+  },
+  {
+   "fixture_id": 79454,
+   "home": "Albacete",
+   "away": "Eibar",
+   "league": "Segunda Division",
+   "country": "Spain",
+   "kickoff_utc": "2026-10-03 12:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Eibar",
+   "underdog": "Albacete",
+   "favourite_is_home": false,
+   "gap_internal": 168,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.67,
+     "defense_rate": 1.67,
+     "attack_rank": 18,
+     "defense_rank": 19,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 2.33,
+     "defense_rate": 0.33,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 22
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.57,
+     "defense_rate": 1.71,
+     "attack_rank": 22,
+     "defense_rank": 19,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 2.14,
+     "defense_rate": 0.86,
+     "attack_rank": 1,
+     "defense_rank": 5,
+     "league_size": 22
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8128
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7651
+    },
+    {
+     "market": "Eibar Over 0.5",
+     "probability": 0.7321
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6691
+    }
+   ]
+  },
+  {
+   "fixture_id": 79458,
+   "home": "Castellón",
+   "away": "AD Ceuta FC",
+   "league": "Segunda Division",
+   "country": "Spain",
+   "kickoff_utc": "2026-10-04 16:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Castellón",
+   "underdog": "AD Ceuta FC",
+   "favourite_is_home": true,
+   "gap_internal": 167,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.33,
+     "defense_rate": 0.0,
+     "attack_rank": 5,
+     "defense_rank": 1,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 0.67,
+     "defense_rate": 3.67,
+     "attack_rank": 15,
+     "defense_rank": 22,
+     "league_size": 22
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 2.0,
+     "defense_rate": 0.29,
+     "attack_rank": 3,
+     "defense_rank": 1,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 2.43,
+     "attack_rank": 19,
+     "defense_rank": 22,
+     "league_size": 22
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Castellón Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8186
+    },
+    {
+     "market": "Castellón Win",
+     "probability": 0.7695
+    },
+    {
+     "market": "Castellón Over 1.5",
+     "probability": 0.7486
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7232
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.6959
+    }
+   ]
+  },
+  {
+   "fixture_id": 48571,
+   "home": "Fortaleza EC",
+   "away": "Nautico Recife",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-03 00:35:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Fortaleza EC",
+   "underdog": "Nautico Recife",
+   "favourite_is_home": true,
+   "gap_internal": 164,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.6,
+     "defense_rate": 0.87,
+     "attack_rank": 6,
+     "defense_rank": 7,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.27,
+     "defense_rate": 1.6,
+     "attack_rank": 4,
+     "defense_rank": 15,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.17,
+     "defense_rate": 0.87,
+     "attack_rank": 11,
+     "defense_rank": 3,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.27,
+     "defense_rate": 1.23,
+     "attack_rank": 8,
+     "defense_rank": 12,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8321
+    },
+    {
+     "market": "Fortaleza EC Over 0.5",
+     "probability": 0.7754
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.732
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7182
+    }
+   ]
+  },
+  {
+   "fixture_id": 48569,
+   "home": "Londrina",
+   "away": "Criciuma",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-02 23:30:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Criciuma",
+   "underdog": "Londrina",
+   "favourite_is_home": false,
+   "gap_internal": 163,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.53,
+     "defense_rate": 1.2,
+     "attack_rank": 7,
+     "defense_rank": 17,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.93,
+     "defense_rate": 1.21,
+     "attack_rank": 12,
+     "defense_rank": 9,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.3,
+     "defense_rate": 1.43,
+     "attack_rank": 7,
+     "defense_rank": 18,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.03,
+     "defense_rate": 0.9,
+     "attack_rank": 15,
+     "defense_rank": 6,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8321
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7521
+    },
+    {
+     "market": "Londrina Over 0.5",
+     "probability": 0.7324
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6844
+    }
+   ]
+  },
+  {
+   "fixture_id": 86629,
+   "home": "Santos",
+   "away": "Flamengo",
+   "league": "Serie A",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-08 22:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Flamengo",
+   "underdog": "Santos",
+   "favourite_is_home": false,
+   "gap_internal": 160,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 1.29,
+     "attack_rank": 13,
+     "defense_rank": 15,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.93,
+     "defense_rate": 0.93,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.52,
+     "defense_rate": 1.48,
+     "attack_rank": 6,
+     "defense_rank": 13,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.96,
+     "defense_rate": 0.82,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Flamengo Over 0.5",
+     "probability": 0.7532
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7525
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7357
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7222
+    },
+    {
+     "market": "Santos Over 0.5",
+     "probability": 0.6645
+    }
+   ]
+  },
+  {
+   "fixture_id": 66404,
+   "home": "Brooklyn",
+   "away": "Detroit City",
+   "league": "USL Championship",
+   "country": "USA",
+   "kickoff_utc": "2026-09-30 23:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Detroit City",
+   "underdog": "Brooklyn",
+   "favourite_is_home": false,
+   "gap_internal": 159,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.08,
+     "defense_rate": 1.08,
+     "attack_rank": 21,
+     "defense_rank": 11,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.17,
+     "defense_rate": 1.17,
+     "attack_rank": 14,
+     "defense_rank": 5,
+     "league_size": 25
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.96,
+     "attack_rank": 25,
+     "defense_rank": 24,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.16,
+     "defense_rate": 0.76,
+     "attack_rank": 20,
+     "defense_rank": 1,
+     "league_size": 25
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8168
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8026
+    },
+    {
+     "market": "Detroit City Over 0.5",
+     "probability": 0.7297
+    },
+    {
+     "market": "Match Under 2.5",
+     "probability": 0.7017
+    }
+   ]
+  },
+  {
+   "fixture_id": 66414,
+   "home": "Tampa Bay Rowdies",
+   "away": "Miami FC",
+   "league": "USL Championship",
+   "country": "USA",
+   "kickoff_utc": "2026-10-03 23:30:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Tampa Bay Rowdies",
+   "underdog": "Miami FC",
+   "favourite_is_home": true,
+   "gap_internal": 159,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.33,
+     "defense_rate": 1.17,
+     "attack_rank": 2,
+     "defense_rank": 13,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 1.5,
+     "attack_rank": 23,
+     "defense_rank": 13,
+     "league_size": 25
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.73,
+     "defense_rate": 0.89,
+     "attack_rank": 4,
+     "defense_rank": 3,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.23,
+     "defense_rate": 1.65,
+     "attack_rank": 17,
+     "defense_rank": 20,
+     "league_size": 25
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Tampa Bay Rowdies Over 0.5",
+     "probability": 0.838
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7989
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7169
+    },
+    {
+     "market": "Tampa Bay Rowdies Win",
+     "probability": 0.7129
+    },
+    {
+     "market": "Tampa Bay Rowdies Over 1.5",
+     "probability": 0.6972
+    }
+   ]
+  },
+  {
+   "fixture_id": 102511,
+   "home": "Estudiantes de Rio Cuarto",
+   "away": "Racing Club",
+   "league": "Liga Profesional Argentina",
+   "country": "Argentina",
+   "kickoff_utc": "2026-10-05 00:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Racing Club",
+   "underdog": "Estudiantes de Rio Cuarto",
+   "favourite_is_home": false,
+   "gap_internal": 159,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.39,
+     "defense_rate": 1.0,
+     "attack_rank": 30,
+     "defense_rank": 19,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.07,
+     "attack_rank": 10,
+     "defense_rank": 14,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.39,
+     "defense_rate": 1.42,
+     "attack_rank": 30,
+     "defense_rank": 30,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.07,
+     "defense_rate": 1.15,
+     "attack_rank": 17,
+     "defense_rank": 19,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8294
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.822
+    },
+    {
+     "market": "Racing Club Over 0.5",
+     "probability": 0.7224
+    },
+    {
+     "market": "Match Under 2.5",
+     "probability": 0.7134
+    }
+   ]
+  },
+  {
+   "fixture_id": 59568,
+   "home": "Finn Harps",
+   "away": "Kerry",
+   "league": "First Division",
+   "country": "Ireland",
+   "kickoff_utc": "2026-10-02 18:45:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Kerry",
+   "underdog": "Finn Harps",
+   "favourite_is_home": false,
+   "gap_internal": 155,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.81,
+     "defense_rate": 1.56,
+     "attack_rank": 10,
+     "defense_rank": 10,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 1.06,
+     "defense_rate": 1.56,
+     "attack_rank": 6,
+     "defense_rank": 5,
+     "league_size": 10
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.91,
+     "defense_rate": 2.0,
+     "attack_rank": 10,
+     "defense_rank": 10,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 1.21,
+     "defense_rate": 1.18,
+     "attack_rank": 6,
+     "defense_rank": 3,
+     "league_size": 10
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8111
+    },
+    {
+     "market": "Kerry Over 0.5",
+     "probability": 0.747
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7388
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6931
+    }
+   ]
+  },
+  {
+   "fixture_id": 102497,
+   "home": "Velez Sarsfield",
+   "away": "Platense",
+   "league": "Liga Profesional Argentina",
+   "country": "Argentina",
+   "kickoff_utc": "2026-10-05 22:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Velez Sarsfield",
+   "underdog": "Platense",
+   "favourite_is_home": true,
+   "gap_internal": 155,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.14,
+     "defense_rate": 0.71,
+     "attack_rank": 18,
+     "defense_rank": 5,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 0.85,
+     "defense_rate": 1.0,
+     "attack_rank": 21,
+     "defense_rank": 11,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.22,
+     "defense_rate": 0.81,
+     "attack_rank": 7,
+     "defense_rank": 5,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 0.73,
+     "defense_rate": 1.15,
+     "attack_rank": 25,
+     "defense_rank": 20,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8294
+    },
+    {
+     "market": "Velez Sarsfield Over 0.5",
+     "probability": 0.7837
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7599
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6712
+    }
+   ]
+  },
+  {
+   "fixture_id": 67716,
+   "home": "Boise",
+   "away": "Greenville Triumph",
+   "league": "USL League One",
+   "country": "USA",
+   "kickoff_utc": "2026-10-03 19:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Boise",
+   "underdog": "Greenville Triumph",
+   "favourite_is_home": true,
+   "gap_internal": 154,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.5,
+     "defense_rate": 1.0,
+     "attack_rank": 11,
+     "defense_rank": 3,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 0.54,
+     "defense_rate": 2.08,
+     "attack_rank": 17,
+     "defense_rank": 15,
+     "league_size": 17
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.57,
+     "defense_rate": 1.39,
+     "attack_rank": 7,
+     "defense_rank": 7,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 1.11,
+     "defense_rate": 1.89,
+     "attack_rank": 15,
+     "defense_rank": 15,
+     "league_size": 17
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Boise Over 0.5",
+     "probability": 0.8361
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8015
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7151
+    },
+    {
+     "market": "Boise Win",
+     "probability": 0.6959
+    },
+    {
+     "market": "Boise Over 1.5",
+     "probability": 0.6855
+    }
+   ]
+  },
+  {
+   "fixture_id": 75655,
+   "home": "Shenzhen Juniors",
+   "away": "Guangzhou E-Power",
+   "league": "League One",
+   "country": "China",
+   "kickoff_utc": "2026-10-07 11:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Guangzhou E-Power",
+   "underdog": "Shenzhen Juniors",
+   "favourite_is_home": false,
+   "gap_internal": 154,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.5,
+     "defense_rate": 0.83,
+     "attack_rank": 8,
+     "defense_rank": 4,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.08,
+     "defense_rate": 1.0,
+     "attack_rank": 1,
+     "defense_rank": 3,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.62,
+     "defense_rate": 1.04,
+     "attack_rank": 3,
+     "defense_rank": 4,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.0,
+     "defense_rate": 0.83,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8027
+    },
+    {
+     "market": "Guangzhou E-Power Over 0.5",
+     "probability": 0.7497
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7345
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7237
+    }
+   ]
+  },
+  {
+   "fixture_id": 79451,
+   "home": "Las Palmas",
+   "away": "Valladolid",
+   "league": "Segunda Division",
+   "country": "Spain",
+   "kickoff_utc": "2026-10-04 16:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Las Palmas",
+   "underdog": "Valladolid",
+   "favourite_is_home": true,
+   "gap_internal": 153,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.0,
+     "attack_rank": 13,
+     "defense_rank": 10,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 0.5,
+     "defense_rate": 1.25,
+     "attack_rank": 18,
+     "defense_rank": 13,
+     "league_size": 22
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 1.57,
+     "attack_rank": 9,
+     "defense_rank": 16,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 1.29,
+     "attack_rank": 18,
+     "defense_rank": 13,
+     "league_size": 22
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8128
+    },
+    {
+     "market": "Las Palmas Over 0.5",
+     "probability": 0.7707
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.734
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7221
+    }
+   ]
+  },
+  {
+   "fixture_id": 75656,
+   "home": "Nanjing City",
+   "away": "Shaanxi Union",
+   "league": "League One",
+   "country": "China",
+   "kickoff_utc": "2026-10-07 11:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Shaanxi Union",
+   "underdog": "Nanjing City",
+   "favourite_is_home": false,
+   "gap_internal": 153,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.25,
+     "attack_rank": 14,
+     "defense_rank": 10,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.25,
+     "defense_rate": 1.5,
+     "attack_rank": 10,
+     "defense_rank": 10,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.83,
+     "defense_rate": 1.38,
+     "attack_rank": 16,
+     "defense_rank": 11,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.58,
+     "defense_rate": 1.08,
+     "attack_rank": 4,
+     "defense_rank": 5,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8063
+    },
+    {
+     "market": "Shaanxi Union Over 0.5",
+     "probability": 0.779
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7335
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7242
+    }
+   ]
+  },
+  {
+   "fixture_id": 59569,
+   "home": "Athlone Town",
+   "away": "Cork City",
+   "league": "First Division",
+   "country": "Ireland",
+   "kickoff_utc": "2026-10-02 18:45:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Cork City",
+   "underdog": "Athlone Town",
+   "favourite_is_home": false,
+   "gap_internal": 150,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.38,
+     "defense_rate": 0.88,
+     "attack_rank": 7,
+     "defense_rank": 2,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 1.56,
+     "defense_rate": 0.88,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 10
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.18,
+     "defense_rate": 1.18,
+     "attack_rank": 7,
+     "defense_rank": 2,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 2.12,
+     "defense_rate": 0.97,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 10
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8111
+    },
+    {
+     "market": "Cork City Over 0.5",
+     "probability": 0.7469
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.728
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.709
+    },
+    {
+     "market": "Athlone Town Over 0.5",
+     "probability": 0.7088
+    }
+   ]
+  },
+  {
+   "fixture_id": 66411,
+   "home": "Detroit City",
+   "away": "Birmingham Legion",
+   "league": "USL Championship",
+   "country": "USA",
+   "kickoff_utc": "2026-10-03 23:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Detroit City",
+   "underdog": "Birmingham Legion",
+   "favourite_is_home": true,
+   "gap_internal": 150,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.15,
+     "defense_rate": 0.39,
+     "attack_rank": 19,
+     "defense_rank": 1,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.46,
+     "defense_rate": 2.18,
+     "attack_rank": 7,
+     "defense_rank": 23,
+     "league_size": 25
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.16,
+     "defense_rate": 0.76,
+     "attack_rank": 20,
+     "defense_rank": 1,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.44,
+     "defense_rate": 1.68,
+     "attack_rank": 9,
+     "defense_rank": 21,
+     "league_size": 25
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8026
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7655
+    },
+    {
+     "market": "Detroit City Over 0.5",
+     "probability": 0.7569
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6622
+    }
+   ]
+  },
+  {
+   "fixture_id": 79460,
+   "home": "Sabadell",
+   "away": "FC Andorra",
+   "league": "Segunda Division",
+   "country": "Spain",
+   "kickoff_utc": "2026-10-03 16:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Sabadell",
+   "underdog": "FC Andorra",
+   "favourite_is_home": true,
+   "gap_internal": 146,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.33,
+     "defense_rate": 1.0,
+     "attack_rank": 4,
+     "defense_rank": 9,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 1.67,
+     "defense_rate": 2.33,
+     "attack_rank": 8,
+     "defense_rank": 19,
+     "league_size": 22
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.14,
+     "defense_rate": 0.86,
+     "attack_rank": 11,
+     "defense_rank": 6,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 1.71,
+     "defense_rate": 2.14,
+     "attack_rank": 4,
+     "defense_rank": 20,
+     "league_size": 22
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Sabadell Over 0.5",
+     "probability": 0.8187
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7822
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7331
+    }
+   ]
+  },
+  {
+   "fixture_id": 96535,
+   "home": "Seattle Sounders",
+   "away": "Sporting Kansas City",
+   "league": "Major League Soccer",
+   "country": "USA",
+   "kickoff_utc": "2026-10-02 01:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Seattle Sounders",
+   "underdog": "Sporting Kansas City",
+   "favourite_is_home": true,
+   "gap_internal": 142,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.61,
+     "defense_rate": 1.46,
+     "attack_rank": 20,
+     "defense_rank": 18,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.85,
+     "attack_rank": 25,
+     "defense_rank": 28,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.27,
+     "defense_rate": 1.31,
+     "attack_rank": 26,
+     "defense_rank": 5,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.19,
+     "defense_rate": 2.42,
+     "attack_rank": 29,
+     "defense_rank": 29,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Seattle Sounders Over 0.5",
+     "probability": 0.8184
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7763
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7344
+    }
+   ]
+  },
+  {
+   "fixture_id": 46775,
+   "home": "Volna",
+   "away": "Lida",
+   "league": "1. Division",
+   "country": "Belarus",
+   "kickoff_utc": "2026-10-03 15:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Lida",
+   "underdog": "Volna",
+   "favourite_is_home": false,
+   "gap_internal": 138,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.54,
+     "defense_rate": 1.46,
+     "attack_rank": 11,
+     "defense_rank": 11,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 2.08,
+     "defense_rate": 1.77,
+     "attack_rank": 2,
+     "defense_rank": 12,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.54,
+     "defense_rate": 1.85,
+     "attack_rank": 10,
+     "defense_rank": 13,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.89,
+     "defense_rate": 1.65,
+     "attack_rank": 5,
+     "defense_rank": 12,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.838
+    },
+    {
+     "market": "Lida Over 0.5",
+     "probability": 0.8286
+    },
+    {
+     "market": "Volna Over 0.5",
+     "probability": 0.7774
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7337
+    },
+    {
+     "market": "BTTS Yes",
+     "probability": 0.7268
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6985
+    }
+   ]
+  },
+  {
+   "fixture_id": 46779,
+   "home": "BATE II",
+   "away": "Ostrovets FC",
+   "league": "1. Division",
+   "country": "Belarus",
+   "kickoff_utc": "2026-10-03 15:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Ostrovets FC",
+   "underdog": "BATE II",
+   "favourite_is_home": false,
+   "gap_internal": 127,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.85,
+     "defense_rate": 2.54,
+     "attack_rank": 7,
+     "defense_rank": 17,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.39,
+     "defense_rate": 1.46,
+     "attack_rank": 12,
+     "defense_rank": 7,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.35,
+     "defense_rate": 2.31,
+     "attack_rank": 14,
+     "defense_rank": 17,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.42,
+     "defense_rate": 1.35,
+     "attack_rank": 11,
+     "defense_rank": 6,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Ostrovets FC Over 0.5",
+     "probability": 0.8142
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8057
+    },
+    {
+     "market": "BATE II Over 0.5",
+     "probability": 0.7226
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.718
+    }
+   ]
+  },
+  {
+   "fixture_id": 122079,
+   "home": "Helmond Sport",
+   "away": "Heracles",
+   "league": "Eerste Divisie",
+   "country": "Netherlands",
+   "kickoff_utc": "2026-10-02 19:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Heracles",
+   "underdog": "Helmond Sport",
+   "favourite_is_home": false,
+   "gap_internal": 126,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.25,
+     "defense_rate": 1.25,
+     "attack_rank": 6,
+     "defense_rank": 10,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 3.25,
+     "defense_rate": 1.5,
+     "attack_rank": 1,
+     "defense_rank": 5,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.62,
+     "defense_rate": 1.75,
+     "attack_rank": 10,
+     "defense_rank": 8,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 3.25,
+     "defense_rate": 1.25,
+     "attack_rank": 1,
+     "defense_rank": 3,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Heracles Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.829
+    },
+    {
+     "market": "Heracles Over 1.5",
+     "probability": 0.7522
+    },
+    {
+     "market": "Heracles Win",
+     "probability": 0.7416
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7306
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6953
+    }
+   ]
+  },
+  {
+   "fixture_id": 117210,
+   "home": "Oita Trinita",
+   "away": "Montedio Yamagata",
+   "league": "J2 League",
+   "country": "Japan",
+   "kickoff_utc": "2026-10-03 08:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Montedio Yamagata",
+   "underdog": "Oita Trinita",
+   "favourite_is_home": false,
+   "gap_internal": 125,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.5,
+     "defense_rate": 1.0,
+     "attack_rank": 9,
+     "defense_rank": 7,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 0.67,
+     "attack_rank": 12,
+     "defense_rank": 5,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.88,
+     "defense_rate": 0.75,
+     "attack_rank": 17,
+     "defense_rank": 1,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.25,
+     "defense_rate": 0.75,
+     "attack_rank": 13,
+     "defense_rank": 2,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Under 2.5",
+     "probability": 0.8032
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7095
+    }
+   ]
+  },
+  {
+   "fixture_id": 86632,
+   "home": "Vitoria",
+   "away": "Chapecoense-sc",
+   "league": "Serie A",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-07 23:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Vitoria",
+   "underdog": "Chapecoense-sc",
+   "favourite_is_home": true,
+   "gap_internal": 125,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.29,
+     "defense_rate": 0.86,
+     "attack_rank": 18,
+     "defense_rank": 5,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.79,
+     "defense_rate": 1.71,
+     "attack_rank": 18,
+     "defense_rank": 16,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.5,
+     "attack_rank": 20,
+     "defense_rank": 15,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.07,
+     "defense_rate": 1.96,
+     "attack_rank": 16,
+     "defense_rank": 20,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7525
+    },
+    {
+     "market": "Vitoria Over 0.5",
+     "probability": 0.7499
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7321
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7264
+    },
+    {
+     "market": "Chapecoense-sc Over 0.5",
+     "probability": 0.6553
+    }
+   ]
+  },
+  {
+   "fixture_id": 131917,
+   "home": "Leyton Orient",
+   "away": "Plymouth",
+   "league": "League One",
+   "country": "England",
+   "kickoff_utc": "2026-10-03 14:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Plymouth",
+   "underdog": "Leyton Orient",
+   "favourite_is_home": false,
+   "gap_internal": 122,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.25,
+     "defense_rate": 2.0,
+     "attack_rank": 15,
+     "defense_rank": 20,
+     "league_size": 24
+    },
+    "away_team": {
+     "attack_rate": 2.0,
+     "defense_rate": 1.75,
+     "attack_rank": 4,
+     "defense_rank": 16,
+     "league_size": 24
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.86,
+     "defense_rate": 1.29,
+     "attack_rank": 6,
+     "defense_rank": 11,
+     "league_size": 24
+    },
+    "away_team": {
+     "attack_rate": 1.75,
+     "defense_rate": 1.38,
+     "attack_rank": 7,
+     "defense_rank": 12,
+     "league_size": 24
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7928
+    },
+    {
+     "market": "Plymouth Over 0.5",
+     "probability": 0.7777
+    },
+    {
+     "market": "Leyton Orient Over 0.5",
+     "probability": 0.7469
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7039
+    }
+   ]
+  },
+  {
+   "fixture_id": 48573,
+   "home": "Botafogo SP",
+   "away": "Vila Nova",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-03 21:30:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Vila Nova",
+   "underdog": "Botafogo SP",
+   "favourite_is_home": false,
+   "gap_internal": 117,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.64,
+     "defense_rate": 1.5,
+     "attack_rank": 4,
+     "defense_rank": 19,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.8,
+     "defense_rate": 1.33,
+     "attack_rank": 16,
+     "defense_rank": 12,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.1,
+     "defense_rate": 1.24,
+     "attack_rank": 12,
+     "defense_rank": 13,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 1.03,
+     "attack_rank": 4,
+     "defense_rank": 7,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8321
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7959
+    }
+   ]
+  },
+  {
+   "fixture_id": 86631,
+   "home": "Cruzeiro",
+   "away": "Sao Paulo",
+   "league": "Serie A",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-08 00:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Cruzeiro",
+   "underdog": "Sao Paulo",
+   "favourite_is_home": true,
+   "gap_internal": 117,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.71,
+     "defense_rate": 1.14,
+     "attack_rank": 7,
+     "defense_rank": 12,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.79,
+     "defense_rate": 1.43,
+     "attack_rank": 17,
+     "defense_rank": 6,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.5,
+     "defense_rate": 1.43,
+     "attack_rank": 7,
+     "defense_rank": 12,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.19,
+     "defense_rate": 1.11,
+     "attack_rank": 13,
+     "defense_rank": 3,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8141
+    },
+    {
+     "market": "Cruzeiro Over 0.5",
+     "probability": 0.757
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7411
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7168
+    }
+   ]
+  },
+  {
+   "fixture_id": 72360,
+   "home": "Örebro Syrianska",
+   "away": "Haninge",
+   "league": "Division 2 - Södra Svealand",
+   "country": "Sweden",
+   "kickoff_utc": "2026-10-04 14:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Haninge",
+   "underdog": "Örebro Syrianska",
+   "favourite_is_home": false,
+   "gap_internal": 116,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.09,
+     "defense_rate": 1.0,
+     "attack_rank": 14,
+     "defense_rank": 5,
+     "league_size": 14
+    },
+    "away_team": {
+     "attack_rate": 2.18,
+     "defense_rate": 2.46,
+     "attack_rank": 1,
+     "defense_rank": 13,
+     "league_size": 14
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.09,
+     "defense_rate": 1.17,
+     "attack_rank": 14,
+     "defense_rank": 3,
+     "league_size": 14
+    },
+    "away_team": {
+     "attack_rate": 2.44,
+     "defense_rate": 1.87,
+     "attack_rank": 1,
+     "defense_rank": 11,
+     "league_size": 14
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.777
+    },
+    {
+     "market": "Örebro Syrianska Over 0.5",
+     "probability": 0.7732
+    },
+    {
+     "market": "Haninge Over 0.5",
+     "probability": 0.7549
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7473
+    }
+   ]
+  },
+  {
+   "fixture_id": 131914,
+   "home": "Peterborough",
+   "away": "Notts County",
+   "league": "League One",
+   "country": "England",
+   "kickoff_utc": "2026-10-03 14:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Notts County",
+   "underdog": "Peterborough",
+   "favourite_is_home": false,
+   "gap_internal": 115,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.75,
+     "defense_rate": 1.25,
+     "attack_rank": 22,
+     "defense_rank": 12,
+     "league_size": 24
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.5,
+     "attack_rank": 17,
+     "defense_rank": 14,
+     "league_size": 24
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.5,
+     "defense_rate": 1.62,
+     "attack_rank": 24,
+     "defense_rank": 17,
+     "league_size": 24
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.29,
+     "attack_rank": 20,
+     "defense_rank": 8,
+     "league_size": 24
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7924
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.788
+    },
+    {
+     "market": "Notts County Over 0.5",
+     "probability": 0.6577
+    }
+   ]
+  },
+  {
+   "fixture_id": 67719,
+   "home": "Naples",
+   "away": "Richmond Kickers",
+   "league": "USL League One",
+   "country": "USA",
+   "kickoff_utc": "2026-10-07 23:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Naples",
+   "underdog": "Richmond Kickers",
+   "favourite_is_home": true,
+   "gap_internal": 115,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.23,
+     "defense_rate": 1.31,
+     "attack_rank": 16,
+     "defense_rank": 14,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 0.93,
+     "defense_rate": 2.86,
+     "attack_rank": 14,
+     "defense_rank": 17,
+     "league_size": 17
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.11,
+     "defense_rate": 1.59,
+     "attack_rank": 16,
+     "defense_rank": 12,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.07,
+     "attack_rank": 17,
+     "defense_rank": 17,
+     "league_size": 17
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Naples Over 0.5",
+     "probability": 0.8012
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7468
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7368
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.695
+    }
+   ]
+  },
+  {
+   "fixture_id": 117211,
+   "home": "Tochigi City",
+   "away": "Imabari",
+   "league": "J2 League",
+   "country": "Japan",
+   "kickoff_utc": "2026-10-03 08:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Tochigi City",
+   "underdog": "Imabari",
+   "favourite_is_home": true,
+   "gap_internal": 114,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 2.33,
+     "defense_rate": 2.0,
+     "attack_rank": 3,
+     "defense_rank": 18,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.75,
+     "defense_rate": 2.25,
+     "attack_rank": 16,
+     "defense_rank": 17,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.75,
+     "defense_rate": 1.62,
+     "attack_rank": 5,
+     "defense_rank": 16,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.88,
+     "defense_rate": 2.12,
+     "attack_rank": 18,
+     "defense_rank": 19,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Tochigi City Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Tochigi City Over 1.5",
+     "probability": 0.7557
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7534
+    },
+    {
+     "market": "Imabari Over 0.5",
+     "probability": 0.7118
+    },
+    {
+     "market": "Tochigi City Win",
+     "probability": 0.7115
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.6897
+    },
+    {
+     "market": "BTTS Yes",
+     "probability": 0.6764
+    }
+   ]
+  },
+  {
+   "fixture_id": 102507,
+   "home": "Argentinos JRS",
+   "away": "Tigre",
+   "league": "Liga Profesional Argentina",
+   "country": "Argentina",
+   "kickoff_utc": "2026-10-03 22:15:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Argentinos JRS",
+   "underdog": "Tigre",
+   "favourite_is_home": true,
+   "gap_internal": 114,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 0.5,
+     "attack_rank": 6,
+     "defense_rank": 2,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.08,
+     "attack_rank": 13,
+     "defense_rank": 15,
+     "league_size": 30
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.19,
+     "defense_rate": 0.81,
+     "attack_rank": 10,
+     "defense_rank": 6,
+     "league_size": 30
+    },
+    "away_team": {
+     "attack_rate": 1.04,
+     "defense_rate": 0.92,
+     "attack_rank": 19,
+     "defense_rank": 10,
+     "league_size": 30
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8294
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8261
+    },
+    {
+     "market": "Match Under 2.5",
+     "probability": 0.7227
+    },
+    {
+     "market": "Argentinos JRS Over 0.5",
+     "probability": 0.6894
+    }
+   ]
+  },
+  {
+   "fixture_id": 48585,
+   "home": "Nautico Recife",
+   "away": "Novorizontino",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-08 22:30:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Novorizontino",
+   "underdog": "Nautico Recife",
+   "favourite_is_home": false,
+   "gap_internal": 113,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.27,
+     "defense_rate": 0.87,
+     "attack_rank": 11,
+     "defense_rank": 6,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.73,
+     "defense_rate": 0.87,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.27,
+     "defense_rate": 1.23,
+     "attack_rank": 8,
+     "defense_rank": 12,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.63,
+     "defense_rate": 0.9,
+     "attack_rank": 1,
+     "defense_rank": 5,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8072
+    },
+    {
+     "market": "Novorizontino Over 0.5",
+     "probability": 0.7468
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7363
+    },
+    {
+     "market": "Nautico Recife Over 0.5",
+     "probability": 0.7138
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7054
+    }
+   ]
+  },
+  {
+   "fixture_id": 67715,
+   "home": "Spokane Velocity",
+   "away": "Portland Hearts of Pine",
+   "league": "USL League One",
+   "country": "USA",
+   "kickoff_utc": "2026-10-04 01:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Spokane Velocity",
+   "underdog": "Portland Hearts of Pine",
+   "favourite_is_home": true,
+   "gap_internal": 108,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.93,
+     "defense_rate": 1.21,
+     "attack_rank": 6,
+     "defense_rank": 7,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 2.0,
+     "attack_rank": 6,
+     "defense_rank": 14,
+     "league_size": 17
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.48,
+     "defense_rate": 1.32,
+     "attack_rank": 9,
+     "defense_rank": 4,
+     "league_size": 17
+    },
+    "away_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 1.79,
+     "attack_rank": 10,
+     "defense_rank": 14,
+     "league_size": 17
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Spokane Velocity Over 0.5",
+     "probability": 0.8242
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7992
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7151
+    },
+    {
+     "market": "Portland Hearts of Pine Over 0.5",
+     "probability": 0.6535
+    }
+   ]
+  },
+  {
+   "fixture_id": 66407,
+   "home": "Sacramento Republic",
+   "away": "Las Vegas Lights",
+   "league": "USL Championship",
+   "country": "USA",
+   "kickoff_utc": "2026-10-01 02:00:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Sacramento Republic",
+   "underdog": "Las Vegas Lights",
+   "favourite_is_home": true,
+   "gap_internal": 107,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.67,
+     "defense_rate": 0.75,
+     "attack_rank": 9,
+     "defense_rank": 4,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.5,
+     "defense_rate": 1.75,
+     "attack_rank": 5,
+     "defense_rank": 20,
+     "league_size": 25
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.32,
+     "defense_rate": 0.88,
+     "attack_rank": 12,
+     "defense_rank": 2,
+     "league_size": 25
+    },
+    "away_team": {
+     "attack_rate": 1.28,
+     "defense_rate": 1.4,
+     "attack_rank": 13,
+     "defense_rank": 15,
+     "league_size": 25
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8026
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8023
+    },
+    {
+     "market": "Sacramento Republic Over 0.5",
+     "probability": 0.7374
+    }
+   ]
+  },
+  {
+   "fixture_id": 131908,
+   "home": "Wigan",
+   "away": "Mansfield Town",
+   "league": "League One",
+   "country": "England",
+   "kickoff_utc": "2026-10-03 14:00:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Mansfield Town",
+   "underdog": "Wigan",
+   "favourite_is_home": false,
+   "gap_internal": 103,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.75,
+     "defense_rate": 2.0,
+     "attack_rank": 21,
+     "defense_rank": 21,
+     "league_size": 24
+    },
+    "away_team": {
+     "attack_rate": 0.75,
+     "defense_rate": 2.5,
+     "attack_rank": 22,
+     "defense_rank": 22,
+     "league_size": 24
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.71,
+     "defense_rate": 1.71,
+     "attack_rank": 22,
+     "defense_rank": 18,
+     "league_size": 24
+    },
+    "away_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 1.86,
+     "attack_rank": 14,
+     "defense_rank": 20,
+     "league_size": 24
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7924
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7593
+    },
+    {
+     "market": "Mansfield Town Over 0.5",
+     "probability": 0.7266
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6809
+    }
+   ]
+  },
+  {
+   "fixture_id": 48586,
+   "home": "Operario-PR",
+   "away": "Botafogo SP",
+   "league": "Serie B",
+   "country": "Brazil",
+   "kickoff_utc": "2026-10-07 22:30:00+00:00",
+   "in_prototype_leagues": true,
+   "favourite": "Operario-PR",
+   "underdog": "Botafogo SP",
+   "favourite_is_home": true,
+   "gap_internal": 103,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 1.47,
+     "defense_rate": 1.2,
+     "attack_rank": 9,
+     "defense_rank": 16,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.6,
+     "defense_rate": 1.0,
+     "attack_rank": 18,
+     "defense_rank": 6,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.43,
+     "defense_rate": 1.27,
+     "attack_rank": 3,
+     "defense_rank": 14,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 1.1,
+     "defense_rate": 1.24,
+     "attack_rank": 12,
+     "defense_rank": 13,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Operario-PR Over 0.5",
+     "probability": 0.8069
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7749
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7457
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.6837
+    }
+   ]
+  },
+  {
+   "fixture_id": 79456,
+   "home": "Cadiz",
+   "away": "Leganes",
+   "league": "Segunda Division",
+   "country": "Spain",
+   "kickoff_utc": "2026-10-03 16:30:00+00:00",
+   "in_prototype_leagues": false,
+   "favourite": "Leganes",
+   "underdog": "Cadiz",
+   "favourite_is_home": false,
+   "gap_internal": 102,
+   "favourite_label": "Slight favourite",
+   "underdog_label": "Slight underdog",
+   "context_home_split": {
+    "home_team": {
+     "attack_rate": 0.5,
+     "defense_rate": 1.0,
+     "attack_rank": 20,
+     "defense_rank": 7,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 0.5,
+     "defense_rate": 0.75,
+     "attack_rank": 17,
+     "defense_rank": 8,
+     "league_size": 22
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.43,
+     "attack_rank": 16,
+     "defense_rank": 14,
+     "league_size": 22
+    },
+    "away_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 1.0,
+     "attack_rank": 17,
+     "defense_rank": 9,
+     "league_size": 22
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8128
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.8002
+    },
+    {
+     "market": "Cadiz Over 0.5",
+     "probability": 0.685
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,556 @@
+fixture_id,home,away,league,country,kickoff,list,event,market,team,context,k,n,base_rate,probability,league_rate,score_pp
+126487,Radnicki 1923,FK Crvena Zvezda,Super Liga,Serbia,2026-10-10 16:00:00+00:00,strength,,,,,,,,,,47.23117647058823
+60892,Tukums,Riga,Virsliga,Latvia,2026-10-10 11:00:00+00:00,strength,,,,,,,,,,45.37441558441559
+81893,Maritimo,FC Porto,Primeira Liga,Portugal,2026-10-10 17:00:00+00:00,strength,,,,,,,,,,43.63193548387097
+73955,Qingdao Jonoon,Beijing Guoan,Super League,China,2026-10-09 11:35:00+00:00,strength,,,,,,,,,,40.41615384615385
+79909,FC Augsburg,Bayern München,Bundesliga,Germany,2026-10-10 13:30:00+00:00,strength,,,,,,,,,,38.06222222222222
+60860,Rīgas FS,Super Nova,Virsliga,Latvia,2026-10-15 14:00:00+00:00,strength,,,,,,,,,,37.5822077922078
+60895,Rīgas FS,FS Jelgava,Virsliga,Latvia,2026-10-11 13:00:00+00:00,strength,,,,,,,,,,37.5822077922078
+81892,Benfica,Guimaraes,Primeira Liga,Portugal,2026-10-11 17:00:00+00:00,strength,,,,,,,,,,37.18032258064517
+89077,Cherno More Varna,Levski Sofia,First League,Bulgaria,2026-10-11 14:30:00+00:00,strength,,,,,,,,,,35.67521739130435
+128056,Veres Rivne,Shakhtar Donetsk,Premier League,Ukraine,2026-10-09 12:30:00+00:00,strength,,,,,,,,,,34.91132075471698
+71009,Rangers,Kilmarnock,Premiership,Scotland,2026-10-10 14:00:00+00:00,strength,,,,,,,,,,34.57476190476191
+90863,Zlin,Slavia Praha,Czech Liga,Czech-Republic,2026-10-09 16:00:00+00:00,strength,,,,,,,,,,34.18718309859155
+110189,Nantes,Reims,Ligue 2,France,2026-10-10 12:00:00+00:00,goals,,Reims Over 1.5,,,,,,0.7082,0.3016,30.901600000000002
+55126,Kuressaare,Flora Tallinn,Meistriliiga,Estonia,2026-10-11 13:30:00+00:00,strength,,,,,,,,,,30.25068965517242
+128054,Obolon'-Brovar,Kryvbas KR,Premier League,Ukraine,2026-10-10 12:30:00+00:00,goals,,Kryvbas KR Over 1.5,,,,,,0.6686,0.283,29.3056
+63542,Tauras,Minija,1 Lyga,Lithuania,2026-10-10 11:00:00+00:00,patterns,win,,Minija,all,22,25,0.4296,,,28.15
+48580,Ponte Preta,Juventude,Serie B,Brazil,2026-10-07 00:35:00+00:00,patterns,loss,,Ponte Preta,all,24,31,0.3661,,,27.501956521739125
+48594,Novorizontino,Ponte Preta,Serie B,Brazil,2026-10-12 22:00:00+00:00,patterns,loss,,Ponte Preta,all,24,31,0.3661,,,27.501956521739125
+45061,FC Dnepr Mogilev,Dinamo Minsk,Premier League,Belarus,2026-10-10 15:00:00+00:00,strength,,,,,,,,,,26.9904469273743
+110194,Saint Etienne,Rodez,Ligue 2,France,2026-10-10 18:00:00+00:00,goals,,Saint Etienne Over 1.5,,,,,,0.7175,0.3651,26.7824
+79905,SC Freiburg,FC Schalke 04,Bundesliga,Germany,2026-10-11 15:30:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.3889,26.752
+96602,Toronto FC,Orlando City SC,Major League Soccer,USA,2026-10-14 23:30:00+00:00,patterns,Over_4_5,,Orlando City Sc,away,11,14,0.2327,,,26.697241379310345
+55125,FC Levadia Tallinn,Paide,Meistriliiga,Estonia,2026-10-11 11:30:00+00:00,patterns,unbeaten,,Fc Levadia Tallinn,all,28,29,0.5621,,,26.588863636363634
+55131,Flora Tallinn,FC Levadia Tallinn,Meistriliiga,Estonia,2026-10-15 16:00:00+00:00,patterns,unbeaten,,Fc Levadia Tallinn,all,28,29,0.5621,,,26.588863636363634
+66421,Sporting JAX,Birmingham Legion,USL Championship,USA,2026-10-10 21:00:00+00:00,goals,,Birmingham Legion Over 1.5,,,,,,0.6686,0.3254,26.0832
+42665,Gais,Sirius,Allsvenskan,Sweden,2026-10-10 13:00:00+00:00,patterns,score_2goals,,Sirius,all,19,22,0.4261,,,26.01567567567568
+63543,Babrungas,Jonava,1 Lyga,Lithuania,2026-10-10 11:00:00+00:00,patterns,clean_sheet,,Babrungas,all,17,25,0.2688,,,25.700000000000006
+75657,Dongguan United,Guangxi Hengchen,League One,China,2026-10-07 11:30:00+00:00,goals,,Guangxi Hengchen Over 1.5,,,,,,0.6563,0.3229,25.3384
+48605,Juventude,São Bernardo,Serie B,Brazil,2026-10-11 19:00:00+00:00,patterns,clean_sheet,,Juventude,all,21,31,0.3065,,,24.996739130434786
+44639,Telstar,ADO Den Haag,Eredivisie,Netherlands,2026-10-11 12:30:00+00:00,goals,,Match Under 3.5,,,,,,0.6953,0.371,24.6468
+44246,Inter,Parma,Serie A,Italy,2026-10-10 16:00:00+00:00,strength,,,,,,,,,,24.42
+102513,River Plate,Estudiantes de Rio Cuarto,Liga Profesional Argentina,Argentina,2026-10-11 00:30:00+00:00,patterns,loss,,Estudiantes De Rio Cuarto,all,19,26,0.3554,,,23.803902439024387
+79912,SC Paderborn 07,VfB Stuttgart,Bundesliga,Germany,2026-10-10 13:30:00+00:00,goals,,Match Under 3.5,,,,,,0.7019,0.3889,23.788
+81808,Kaisar,Ordabasy,Premier League,Kazakhstan,2026-10-11 14:00:00+00:00,patterns,win,,Ordabasy,all,19,26,0.3617,,,23.40439024390244
+48578,America Mineiro,Fortaleza EC,Serie B,Brazil,2026-10-07 23:30:00+00:00,patterns,loss,,America Mineiro,all,22,31,0.3661,,,23.154130434782605
+48587,Criciuma,America Mineiro,Serie B,Brazil,2026-10-12 22:30:00+00:00,patterns,loss,,America Mineiro,all,22,31,0.3661,,,23.154130434782605
+67820,RAAL La Louvière,Club Brugge KV,Jupiler Pro League,Belgium,2026-10-10 16:15:00+00:00,goals,,Club Brugge KV Over 1.5,,,,,,0.6686,0.3651,23.066
+124383,Csikszereda,Universitatea Craiova,Liga I,Romania,2026-10-10 17:00:00+00:00,goals,,Universitatea Craiova Over 0.5,,,,,,0.8706,0.5696,22.875999999999998
+96610,Nashville SC,Sporting Kansas City,Major League Soccer,USA,2026-10-15 00:30:00+00:00,patterns,win,,Nashville Sc,home,13,14,0.4604,,,22.60137931034482
+67724,Charlotte Independence,NY Cosmos,USL League One,USA,2026-10-10 23:00:00+00:00,patterns,concede_2,,Ny Cosmos,all,22,28,0.4419,,,22.387906976744183
+86062,Galatasaray,Kasımpaşa,Süper Lig,Turkey,2026-10-09 17:00:00+00:00,strength,,,,,,,,,,22.231851851851854
+75665,Guangzhou E-Power,Heilongjiang Lava Spring,League One,China,2026-10-11 11:30:00+00:00,goals,,Guangzhou E-Power Over 1.5,,,,,,0.7018,0.4115,22.0628
+63547,Transinvest 2,Ekranas,1 Lyga,Lithuania,2026-10-10 12:00:00+00:00,patterns,concede_2,,Ekranas,all,19,25,0.407,,,22.0625
+107534,Bristol Rovers,Barnet,League Two,England,2026-10-10 14:00:00+00:00,goals,,Barnet Over 0.5,,,,,,0.8751,0.5882,21.804399999999998
+85316,Barcelona,Getafe,La Liga,Spain,2026-10-10 16:30:00+00:00,strength,,,,,,,,,,21.712463768115942
+40114,Brann,Viking,Eliteserien,Norway,2026-10-09 17:00:00+00:00,patterns,halftime_win,,Viking,all,15,21,0.3423,,,21.699166666666663
+40116,Bodo/Glimt,Kristiansund BK,Eliteserien,Norway,2026-10-10 14:00:00+00:00,patterns,halftime_win,,Bodo/Glimt,all,15,21,0.3423,,,21.699166666666663
+72366,Eker Örebro,Forward,Division 2 - Södra Svealand,Sweden,2026-10-11 11:00:00+00:00,goals,,Forward Over 1.5,,,,,,0.6939,0.4107,21.5232
+45065,Naftan,Belshina,Premier League,Belarus,2026-10-10 15:00:00+00:00,patterns,concede_2,,Naftan,all,16,23,0.3408,,,21.477894736842106
+81805,Kairat Almaty,Zhetysu,Premier League,Kazakhstan,2026-10-10 12:00:00+00:00,goals,,Kairat Almaty Over 1.5,,,,,,0.7124,0.432,21.310399999999998
+63544,Neptūną Klaipėda,Hegelmann II,1 Lyga,Lithuania,2026-10-10 11:00:00+00:00,strength,,,,,,,,,,21.26371859296482
+102509,Sarmiento Junin,River Plate,Liga Profesional Argentina,Argentina,2026-10-14 22:00:00+00:00,patterns,halftime_win,,Sarmiento Junin,home,10,13,0.3113,,,21.26107142857142
+86064,Gençlerbirliği S.K.,Amed,Süper Lig,Turkey,2026-10-10 10:30:00+00:00,goals,,Amed Over 1.5,,,,,,0.6686,0.3889,21.2572
+55123,Vaprus,Trans Narva,Meistriliiga,Estonia,2026-10-10 11:30:00+00:00,patterns,goalless,,Trans Narva,away,10,14,0.2759,,,21.163448275862073
+60894,Ogre United,BFC Daugavpils,Virsliga,Latvia,2026-10-11 11:00:00+00:00,patterns,concede_2,,Ogre United,all,21,31,0.3636,,,21.148695652173917
+53845,Coquimbo Unido,Colo Colo,Primera División,Chile,2026-10-11 18:00:00+00:00,patterns,win,,Colo Colo,all,17,23,0.3962,,,20.75631578947368
+70646,Sandnes ULF,Haugesund,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,win,,Haugesund,all,18,24,0.4158,,,20.56615384615385
+70653,Haugesund,Lyn,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,win,,Haugesund,all,18,24,0.4158,,,20.56615384615385
+119643,FC Juarez,Club Tijuana,Liga MX,Mexico,2026-10-10 23:00:00+00:00,patterns,loss,,Fc Juarez,all,9,10,0.3864,,,20.54399999999999
+45064,FC Gomel,ML Vitebsk,Premier League,Belarus,2026-10-10 15:00:00+00:00,patterns,score_2goals,,Ml Vitebsk,away,8,10,0.2905,,,20.380000000000003
+102520,San Lorenzo,Deportivo Riestra,Liga Profesional Argentina,Argentina,2026-10-11 17:45:00+00:00,patterns,goalless,,Deportivo Riestra,all,17,26,0.3346,,,20.24487804878048
+70763,CSKA Moscow,Rodina Moskva,Premier League,Russia,2026-10-11 13:30:00+00:00,goals,,CSKA Moscow Over 1.5,,,,,,0.6686,0.4028,20.2008
+85197,Suwon Bluewings,Ansan Greeners,K League 2,South-Korea,2026-10-11 05:00:00+00:00,goals,,Suwon Bluewings Over 1.5,,,,,,0.6686,0.4028,20.2008
+70645,Kongsvinger,Ranheim,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,Over_3_5,,Ranheim,all,20,24,0.5053,,,20.186666666666664
+70657,hodd,Ranheim,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,Over_3_5,,Ranheim,all,20,24,0.5053,,,20.186666666666664
+83671,FC Seoul,Jeju United FC,K League 1,South-Korea,2026-10-10 05:00:00+00:00,patterns,win,,Fc Seoul,all,19,30,0.3306,,,20.182222222222222
+131929,Mansfield Town,Bromley,League One,England,2026-10-10 14:00:00+00:00,goals,,Mansfield Town Over 1.5,,,,,,0.6858,0.4222,20.0336
+79907,Borussia Dortmund,Werder Bremen,Bundesliga,Germany,2026-10-09 18:30:00+00:00,goals,,Match Under 3.5,,,,,,0.652,0.3889,19.9956
+83673,Gwangju FC,Ulsan Hyundai FC,K League 1,South-Korea,2026-10-11 05:00:00+00:00,patterns,winless,,Gwangju Fc,all,29,30,0.6694,,,19.817777777777767
+79465,Almeria,Leganes,Segunda Division,Spain,2026-10-11 14:15:00+00:00,goals,,Almeria Over 1.5,,,,,,0.6686,0.4091,19.722
+75652,Heilongjiang Lava Spring,Meizhou Kejia,League One,China,2026-10-06 11:30:00+00:00,goals,,Heilongjiang Lava Spring Over 1.5,,,,,,0.6686,0.4115,19.5396
+75662,Shaanxi Union,Dongguan United,League One,China,2026-10-11 11:00:00+00:00,goals,,Shaanxi Union Over 1.5,,,,,,0.6686,0.4115,19.5396
+128055,Bukovyna,Polessya,Premier League,Ukraine,2026-10-11 15:00:00+00:00,patterns,halftime_win,,Polessya,all,6,7,0.2453,,,19.467727272727277
+43805,FC Midtjylland,FC Copenhagen,Superliga,Denmark,2026-10-11 16:00:00+00:00,patterns,win,,Fc Copenhagen,all,8,9,0.3704,,,19.44333333333334
+85195,Cheonan City,Gyeongnam FC,K League 2,South-Korea,2026-10-10 07:30:00+00:00,patterns,Under_2_5,,Gyeongnam Fc,away,11,12,0.4815,,,19.340740740740742
+92824,Raków Częstochowa,GKS Katowice,Ekstraklasa,Poland,2026-10-09 18:30:00+00:00,patterns,loss,,Raków Częstochowa,all,8,9,0.3782,,,19.15083333333334
+75660,Meizhou Kejia,Wuxi Wugou,League One,China,2026-10-10 11:30:00+00:00,patterns,concede_2,,Meizhou Kejia,home,9,12,0.3229,,,18.982222222222216
+94868,Servette FC,FC Sion,Super League,Switzerland,2026-10-10 16:00:00+00:00,goals,,Match Under 3.5,,,,,,0.6935,0.4444,18.9316
+94872,FC ST. Gallen,Lausanne,Super League,Switzerland,2026-10-11 14:30:00+00:00,goals,,Match Under 3.5,,,,,,0.6935,0.4444,18.9316
+85196,Gimhae City,Asan Mugunghwa,K League 2,South-Korea,2026-10-10 07:30:00+00:00,patterns,loss,,Gimhae City,home,9,12,0.3241,,,18.92888888888889
+96596,Sporting Kansas City,Portland Timbers,Major League Soccer,USA,2026-10-11 00:30:00+00:00,patterns,loss,,Sporting Kansas City,all,18,27,0.3725,,,18.910714285714285
+96598,Austin,Nashville SC,Major League Soccer,USA,2026-10-11 00:30:00+00:00,patterns,win,,Nashville Sc,all,18,27,0.3725,,,18.910714285714285
+72364,Syrianska FC,Farsta,Division 2 - Södra Svealand,Sweden,2026-10-10 15:00:00+00:00,patterns,Over_3_5,,Syrianska Fc,home,10,12,0.4107,,,18.783703703703697
+107538,Crawley Town,Chesterfield,League Two,England,2026-10-10 14:00:00+00:00,goals,,Chesterfield Over 0.5,,,,,,0.8351,0.5882,18.764400000000002
+75655,Shenzhen Juniors,Guangzhou E-Power,League One,China,2026-10-07 11:00:00+00:00,patterns,win,,Guangzhou E-Power,all,16,24,0.362,,,18.748717948717953
+131930,Stockport County,Barnsley,League One,England,2026-10-10 14:00:00+00:00,goals,,Stockport County Over 1.5,,,,,,0.6686,0.4222,18.7264
+56309,Meshakhte,Saburtalo,Erovnuli Liga,Georgia,2026-10-10 11:30:00+00:00,patterns,winless,,Meshakhte,home,13,13,0.6,,,18.571428571428573
+96588,Orlando City SC,Columbus Crew,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,Over_4_5,,Orlando City Sc,all,14,27,0.2327,,,18.37404761904762
+122096,Jong Ajax,VVV Venlo,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,score_2goals,,Vvv Venlo,all,9,9,0.5111,,,18.333749999999995
+122091,Roda,Jong PSV U21,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,goals,,Match Under 3.5,,,,,,0.7408,0.5,18.3008
+86629,Santos,Flamengo,Serie A,Brazil,2026-10-08 22:30:00+00:00,patterns,win,,Flamengo,all,18,28,0.362,,,18.288372093023252
+86638,Flamengo,Fluminense,Serie A,Brazil,2026-10-11 20:30:00+00:00,patterns,win,,Flamengo,all,18,28,0.362,,,18.288372093023252
+70644,ODD Ballklubb,Bryne,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,Under_3_5,,Bryne,all,19,24,0.4947,,,18.2748717948718
+70655,Bryne,Raufoss,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,Under_3_5,,Bryne,all,19,24,0.4947,,,18.2748717948718
+80229,Hertha BSC,SpVgg Greuther Fürth,2. Bundesliga,Germany,2026-10-11 11:30:00+00:00,patterns,win,,Hertha Bsc,all,6,6,0.3611,,,18.25428571428571
+72361,Lindo FF,Örebro Syrianska,Division 2 - Södra Svealand,Sweden,2026-10-10 11:00:00+00:00,patterns,goalless,,Örebro Syrianska,away,8,12,0.256,,,18.251851851851853
+59573,Cork City,Finn Harps,First Division,Ireland,2026-10-09 18:45:00+00:00,patterns,win,,Cork City,all,22,34,0.3853,,,18.16285714285715
+83672,Gimcheon Sangmu FC,FC Anyang,K League 1,South-Korea,2026-10-10 07:30:00+00:00,patterns,draw,,Gimcheon Sangmu Fc,home,10,14,0.3389,,,18.122068965517247
+86632,Vitoria,Chapecoense-sc,Serie A,Brazil,2026-10-07 23:00:00+00:00,patterns,concede_2,,Chapecoense-Sc,all,18,27,0.3853,,,18.087857142857146
+86640,Chapecoense-sc,Atletico Paranaense,Serie A,Brazil,2026-10-12 22:30:00+00:00,patterns,concede_2,,Chapecoense-Sc,all,18,27,0.3853,,,18.087857142857146
+102521,Aldosivi,Sarmiento Junin,Liga Profesional Argentina,Argentina,2026-10-09 17:30:00+00:00,patterns,winless,,Aldosivi,all,25,27,0.6446,,,18.085238095238086
+128051,Dynamo Kyiv,Karpaty,Premier League,Ukraine,2026-10-11 12:30:00+00:00,goals,,Karpaty Over 0.5,,,,,,0.7848,0.5472,18.0576
+94869,FC Lugano,FC Luzern,Super League,Switzerland,2026-10-10 18:30:00+00:00,patterns,win,,Fc Lugano,all,8,9,0.4074,,,18.05583333333334
+46784,Lida,Orsha,1. Division,Belarus,2026-10-11 12:00:00+00:00,patterns,score_2goals,,Lida,all,20,27,0.4606,,,18.009047619047614
+48586,Operario-PR,Botafogo SP,Serie B,Brazil,2026-10-07 22:30:00+00:00,patterns,Under_1_5,,Botafogo Sp,away,10,15,0.3065,,,18.008333333333333
+96590,Toronto FC,CF Montreal,Major League Soccer,USA,2026-10-10 17:00:00+00:00,patterns,BTTS,,Toronto Fc,home,14,14,0.6287,,,17.924827586206902
+58432,Shamrock Rovers,Bohemians,Premier Division,Ireland,2026-10-12 19:00:00+00:00,patterns,win,,Shamrock Rovers,home,11,15,0.375,,,17.91666666666667
+58449,Shamrock Rovers,Drogheda United,Premier Division,Ireland,2026-10-09 19:00:00+00:00,patterns,win,,Shamrock Rovers,home,11,15,0.375,,,17.91666666666667
+122089,Heracles,Waalwijk,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,halftime_win,,Heracles,all,7,9,0.3,,,17.91666666666667
+70650,Lyn,Stromsgodset,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,unbeaten,,Stromsgodset,all,21,24,0.5842,,,17.895384615384614
+70652,Stromsgodset,Kongsvinger,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,unbeaten,,Stromsgodset,all,21,24,0.5842,,,17.895384615384614
+85319,Real Madrid,Villarreal,La Liga,Spain,2026-10-10 19:00:00+00:00,goals,,Real Madrid Over 1.5,,,,,,0.6686,0.4348,17.768800000000002
+85190,Suwon City FC,Hwaseong,K League 2,South-Korea,2026-10-09 05:00:00+00:00,patterns,score_2goals,,Suwon City Fc,all,17,25,0.3958,,,17.7625
+67722,Union Omaha,Fort Wayne,USL League One,USA,2026-10-10 21:00:00+00:00,patterns,win,,Union Omaha,all,19,29,0.388,,,17.60909090909091
+124384,Corvinul Hunedoara,FC Voluntari,Liga I,Romania,2026-10-10 17:00:00+00:00,patterns,concede_2,,Fc Voluntari,all,8,10,0.3608,,,17.567999999999994
+46786,Minsk II,Smorgon,1. Division,Belarus,2026-10-11 11:00:00+00:00,patterns,Under_2_5,,Smorgon,all,17,27,0.3568,,,17.539047619047622
+55129,Trans Narva,Kuressaare,Meistriliiga,Estonia,2026-10-14 15:00:00+00:00,patterns,winless,,Trans Narva,all,24,29,0.5621,,,17.49795454545454
+58448,Shelbourne,Sligo Rovers,Premier Division,Ireland,2026-10-09 18:45:00+00:00,patterns,loss,,Sligo Rovers,all,19,32,0.3375,,,17.446808510638302
+96594,Inter Miami,DC United,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,Over_3_5,,Inter Miami,home,10,13,0.3936,,,17.439999999999994
+96607,Inter Miami,New York City FC,Major League Soccer,USA,2026-10-14 23:30:00+00:00,patterns,Over_3_5,,Inter Miami,home,10,13,0.3936,,,17.439999999999994
+48581,Vila Nova,Cuiaba,Serie B,Brazil,2026-10-07 23:30:00+00:00,patterns,win,,Vila Nova,home,12,15,0.4516,,,17.42
+75661,Yanbian Longding,Nantong Zhiyun,League One,China,2026-10-11 07:00:00+00:00,patterns,draw,,Nantong Zhiyun,away,8,12,0.276,,,17.362962962962964
+46781,FC Slutsk,Uni Minsk,1. Division,Belarus,2026-10-10 12:30:00+00:00,patterns,unbeaten,,Fc Slutsk,home,13,13,0.6266,,,17.336428571428574
+46789,Niva,Gomel II,1. Division,Belarus,2026-10-10 11:00:00+00:00,goals,,Niva Over 1.5,,,,,,0.7257,0.4979,17.3128
+70647,Asane,Sogndal,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,concede_2,,Sogndal,away,12,12,0.6105,,,17.3111111111111
+42659,Hammarby FF,Djurgardens IF,Allsvenskan,Sweden,2026-10-11 12:00:00+00:00,patterns,halftime_win,,Hammarby Ff,home,8,11,0.3182,,,17.306923076923077
+46785,Osipovichy,Volna,1. Division,Belarus,2026-10-10 11:00:00+00:00,patterns,loss,,Osipovichy,all,18,27,0.3983,,,17.25214285714286
+73956,Qingdao Youth Island,Dalian Zhixing,Super League,China,2026-10-11 10:00:00+00:00,patterns,draw,,Qingdao Youth Island,all,14,26,0.2692,,,17.07512195121951
+73953,Shanghai Shenhua,Yunnan Yukun,Super League,China,2026-10-10 11:35:00+00:00,patterns,Over_2_5,,Yunnan Yukun,all,22,26,0.5769,,,17.074634146341474
+42661,BK Hacken,Orgryte IS,Allsvenskan,Sweden,2026-10-11 14:30:00+00:00,patterns,loss,,Orgryte Is,away,9,11,0.4148,,,17.06615384615385
+42663,Malmo FF,Kalmar FF,Allsvenskan,Sweden,2026-10-12 17:00:00+00:00,patterns,loss,,Kalmar Ff,away,9,11,0.4148,,,17.06615384615385
+63548,FA Šiauliai II,Kauno Žalgiris II,1 Lyga,Lithuania,2026-10-09 15:00:00+00:00,patterns,concede_2,,Fa Šiauliai Ii,all,17,25,0.407,,,17.062500000000007
+103803,Lask Linz,Rapid Vienna,Bundesliga,Austria,2026-10-11 15:00:00+00:00,patterns,halftime_win,,Rapid Vienna,all,6,7,0.3214,,,17.046363636363644
+79462,Oviedo,Eibar,Segunda Division,Spain,2026-10-12 16:30:00+00:00,patterns,win,,Eibar,all,7,8,0.3851,,,17.04
+79464,Valladolid,Albacete,Segunda Division,Spain,2026-10-12 12:00:00+00:00,patterns,loss,,Albacete,all,7,8,0.3851,,,17.04
+43808,Aarhus,Sonderjyske,Superliga,Denmark,2026-10-12 17:00:00+00:00,patterns,concede_2,,Aarhus,all,8,9,0.4352,,,17.013333333333332
+48583,CRB,Atletico Goianiense,Serie B,Brazil,2026-10-07 23:30:00+00:00,patterns,score_2goals,,Crb,home,11,15,0.3935,,,16.991666666666667
+96592,Atlanta United FC,FC Cincinnati,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,Over_4_5,,Fc Cincinnati,all,13,26,0.2327,,,16.950731707317075
+96606,FC Cincinnati,New England Revolution,Major League Soccer,USA,2026-10-14 23:30:00+00:00,patterns,Over_4_5,,Fc Cincinnati,all,13,26,0.2327,,,16.950731707317075
+70648,Raufoss,Moss,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,loss,,Raufoss,all,16,23,0.4158,,,16.938421052631586
+53847,U. Catolica,A. Italiano,Primera División,Chile,2026-10-10 23:00:00+00:00,patterns,score_2goals,,U. Catolica,all,16,23,0.418,,,16.80526315789474
+96600,Los Angeles FC,Vancouver Whitecaps,Major League Soccer,USA,2026-10-11 02:30:00+00:00,patterns,clean_sheet,,Los Angeles Fc,home,8,13,0.255,,,16.732142857142858
+96615,Los Angeles FC,Austin,Major League Soccer,USA,2026-10-15 02:30:00+00:00,patterns,clean_sheet,,Los Angeles Fc,home,8,13,0.255,,,16.732142857142858
+67812,KVC Westerlo,Antwerp,Jupiler Pro League,Belgium,2026-10-11 16:30:00+00:00,patterns,Over_3_5,,Kvc Westerlo,all,6,7,0.3333,,,16.667727272727273
+131924,Milton Keynes Dons,Reading,League One,England,2026-10-10 14:00:00+00:00,patterns,draw,,Milton Keynes Dons,all,6,7,0.3333,,,16.667727272727273
+94870,Grasshoppers,BSC Young Boys,Super League,Switzerland,2026-10-11 12:00:00+00:00,patterns,Over_3_5,,Bsc Young Boys,all,9,9,0.5556,,,16.664999999999996
+89078,Septemvri Sofia,Dunav Ruse,First League,Bulgaria,2026-10-11 12:00:00+00:00,patterns,concede_2,,Dunav Ruse,all,8,10,0.3841,,,16.635999999999996
+89081,CSKA 1948,CSKA Sofia,First League,Bulgaria,2026-10-11 17:00:00+00:00,patterns,score_2goals,,Cska 1948,all,8,10,0.3841,,,16.635999999999996
+96597,Minnesota United FC,Houston Dynamo,Major League Soccer,USA,2026-10-11 00:30:00+00:00,patterns,Under_2_5,,Houston Dynamo,all,17,27,0.3713,,,16.60690476190477
+96616,San Diego,Houston Dynamo,Major League Soccer,USA,2026-10-15 02:30:00+00:00,patterns,Under_2_5,,Houston Dynamo,all,17,27,0.3713,,,16.60690476190477
+66423,Indy Eleven,Tampa Bay Rowdies,USL Championship,USA,2026-10-10 23:00:00+00:00,patterns,clean_sheet,,Tampa Bay Rowdies,away,8,14,0.2275,,,16.603448275862068
+86627,Palmeiras,Bahia,Serie A,Brazil,2026-10-09 00:30:00+00:00,patterns,unbeaten,,Palmeiras,all,25,28,0.638,,,16.5953488372093
+86636,Palmeiras,Corinthians,Serie A,Brazil,2026-10-11 20:30:00+00:00,patterns,unbeaten,,Palmeiras,all,25,28,0.638,,,16.5953488372093
+102517,Lanus,Velez Sarsfield,Liga Profesional Argentina,Argentina,2026-10-12 19:00:00+00:00,patterns,unbeaten,,Velez Sarsfield,away,12,13,0.5662,,,16.56928571428572
+67719,Naples,Richmond Kickers,USL League One,USA,2026-10-07 23:00:00+00:00,patterns,loss,,Richmond Kickers,away,12,14,0.5145,,,16.54137931034484
+67726,Sarasota Paradise,Richmond Kickers,USL League One,USA,2026-10-10 23:30:00+00:00,patterns,loss,,Richmond Kickers,away,12,14,0.5145,,,16.54137931034484
+79906,FSV Mainz 05,Bayer Leverkusen,Bundesliga,Germany,2026-10-10 13:30:00+00:00,goals,,Match Goals 1-4,,,,,,0.7173,0.5,16.514799999999997
+44632,PSV Eindhoven,Heerenveen,Eredivisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,halftime_win,,Psv Eindhoven,all,6,7,0.3387,,,16.495909090909088
+85194,Paju Citizen,Busan I Park,K League 2,South-Korea,2026-10-10 05:00:00+00:00,patterns,goalless,,Paju Citizen,home,7,12,0.213,,,16.45925925925926
+124379,Sepsi OSK Sfantu Gheorghe,Dinamo Bucuresti,Liga I,Romania,2026-10-10 17:00:00+00:00,patterns,halftime_win,,Dinamo Bucuresti,all,7,10,0.2911,,,16.355999999999998
+67813,KV Mechelen,St. Truiden,Jupiler Pro League,Belgium,2026-10-11 17:15:00+00:00,goals,,St. Truiden Over 0.5,,,,,,0.8183,0.6032,16.3476
+79911,Union Berlin,SV Elversberg,Bundesliga,Germany,2026-10-10 13:30:00+00:00,goals,,Match Goals 1-4,,,,,,0.7145,0.5,16.302
+67728,Alta,Greenville Triumph,USL League One,USA,2026-10-11 02:30:00+00:00,patterns,goalless,,Greenville Triumph,away,9,14,0.3071,,,16.20896551724138
+102516,Union Santa Fe,Defensa Y Justicia,Liga Profesional Argentina,Argentina,2026-10-10 00:45:00+00:00,patterns,Over_2_5,,Union Santa Fe,all,18,29,0.375,,,16.193181818181824
+70654,Sogndal,ODD Ballklubb,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,concede_2,,Sogndal,all,19,23,0.5605,,,16.074999999999996
+70658,Moss,Egersund,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,concede_2,,Moss,all,19,23,0.5605,,,16.074999999999996
+45066,Arsenal,Dinamo Brest,Premier League,Belarus,2026-10-10 15:00:00+00:00,goals,,Dinamo Brest Over 0.5,,,,,,0.8638,0.6536,15.975200000000001
+40119,Aalesund,Sarpsborg 08 FF,Eliteserien,Norway,2026-10-11 15:00:00+00:00,patterns,BTTS,,Aalesund,all,18,21,0.5833,,,15.974166666666667
+55124,Tammeka,Nõmme United,Meistriliiga,Estonia,2026-10-10 14:00:00+00:00,patterns,BTTS,,Nõmme United,all,24,29,0.5862,,,15.909545454545448
+55128,Laagri,Nõmme United,Meistriliiga,Estonia,2026-10-13 15:00:00+00:00,patterns,BTTS,,Nõmme United,all,24,29,0.5862,,,15.909545454545448
+102514,Racing Club,Belgrano Cordoba,Liga Profesional Argentina,Argentina,2026-10-11 22:15:00+00:00,patterns,clean_sheet,,Belgrano Cordoba,away,9,15,0.2819,,,15.905000000000003
+60893,Super Nova,Grobiņa,Virsliga,Latvia,2026-10-10 13:00:00+00:00,patterns,Under_2_5,,Grobiņa,all,22,31,0.474,,,15.882608695652179
+66422,Charleston Battery,Louisville City,USL Championship,USA,2026-10-10 22:00:00+00:00,goals,,Charleston Battery Over 1.5,,,,,,0.6686,0.4597,15.876400000000002
+66427,El Paso Locomotive,Orange County SC,USL Championship,USA,2026-10-11 01:00:00+00:00,goals,,El Paso Locomotive Over 1.5,,,,,,0.6686,0.4597,15.876400000000002
+68533,West Ham,QPR,Championship,England,2026-10-09 19:00:00+00:00,goals,,West Ham Over 1.5,,,,,,0.6931,0.4842,15.876400000000002
+48589,Fortaleza EC,CRB,Serie B,Brazil,2026-10-12 23:30:00+00:00,patterns,halftime_win,,Crb,all,16,31,0.2806,,,15.872608695652174
+92822,Piast Gliwice,Widzew Łódź,Ekstraklasa,Poland,2026-10-11 12:45:00+00:00,patterns,draw,,Widzew Łódź,all,6,9,0.2436,,,15.864999999999998
+44244,Atalanta,Venezia,Serie A,Italy,2026-10-12 16:30:00+00:00,goals,,Atalanta Over 1.5,,,,,,0.6686,0.46,15.8536
+83668,Daejeon Citizen,Jeonbuk Motors,K League 1,South-Korea,2026-10-09 05:00:00+00:00,patterns,Under_2_5,,Jeonbuk Motors,away,13,15,0.55,,,15.833333333333332
+55127,Vaprus,Kalju Nomme,Meistriliiga,Estonia,2026-10-13 15:00:00+00:00,patterns,clean_sheet,,Kalju Nomme,away,7,14,0.1724,,,15.815172413793105
+86065,Rizespor,Fenerbahçe,Süper Lig,Turkey,2026-10-10 16:00:00+00:00,goals,,Fenerbahçe Over 0.5,,,,,,0.8371,0.6296,15.770000000000001
+124380,Arges Pitesti,CFR 1907 Cluj,Liga I,Romania,2026-10-10 17:00:00+00:00,patterns,Under_2_5,,Arges Pitesti,all,9,10,0.5063,,,15.748000000000006
+56306,Dinamo Batumi,Dinamo Tbilisi,Erovnuli Liga,Georgia,2026-10-11 15:00:00+00:00,patterns,halftime_win,,Dinamo Batumi,all,14,27,0.2741,,,15.712619047619047
+102522,Instituto Cordoba,Boca Juniors,Liga Profesional Argentina,Argentina,2026-10-09 22:30:00+00:00,patterns,unbeaten,,Boca Juniors,all,24,27,0.6446,,,15.704285714285716
+126483,FK Partizan,Novi Pazar,Super Liga,Serbia,2026-10-10 16:00:00+00:00,patterns,BTTS,,Fk Partizan,all,8,9,0.4706,,,15.685833333333331
+110191,Clermont Foot,RED Star FC 93,Ligue 2,France,2026-10-10 12:00:00+00:00,patterns,draw,,Clermont Foot,all,6,7,0.3651,,,15.655909090909093
+42664,AIK Stockholm,IF Brommapojkarna,Allsvenskan,Sweden,2026-10-10 13:00:00+00:00,patterns,Over_2_5,,If Brommapojkarna,away,10,11,0.5398,,,15.623846153846166
+86067,Eyüpspor,Göztepe,Süper Lig,Turkey,2026-10-12 17:00:00+00:00,patterns,goalless,,Eyüpspor,all,5,6,0.287,,,15.609523809523813
+81807,Kaspiy,Altay,Premier League,Kazakhstan,2026-10-11 11:00:00+00:00,patterns,concede_2,,Kaspiy,home,8,13,0.2816,,,15.497142857142855
+44633,Feyenoord,AZ Alkmaar,Eredivisie,Netherlands,2026-10-10 16:45:00+00:00,patterns,win,,Az Alkmaar,all,6,7,0.371,,,15.468181818181815
+66424,Pittsburgh Riverhounds,Hartford Athletic,USL Championship,USA,2026-10-10 23:00:00+00:00,patterns,Under_3_5,,Hartford Athletic,away,14,14,0.6796,,,15.467586206896556
+66426,Detroit City,Rhode Island,USL Championship,USA,2026-10-10 23:00:00+00:00,patterns,Under_3_5,,Detroit City,home,14,14,0.6796,,,15.467586206896556
+107537,Shrewsbury,Exeter City,League Two,England,2026-10-10 14:00:00+00:00,patterns,Under_1_5,,Exeter City,all,6,9,0.2549,,,15.441249999999995
+86637,Sao Paulo,Vitoria,Serie A,Brazil,2026-10-11 00:00:00+00:00,patterns,concede_2,,Vitoria,away,11,14,0.4659,,,15.439310344827595
+128052,Chornomorets,FC Kharkiv,Premier League,Ukraine,2026-10-10 10:00:00+00:00,goals,,FC Kharkiv Over 0.5,,,,,,0.75,0.5472,15.4128
+119645,Club America,Monterrey,Liga MX,Mexico,2026-10-11 03:00:00+00:00,goals,,Club America Over 1.5,,,,,,0.6686,0.4659,15.405199999999999
+110196,Dunkerque,Annecy,Ligue 2,France,2026-10-09 18:00:00+00:00,patterns,halftime_win,,Annecy,all,5,7,0.2302,,,15.40272727272727
+79908,1899 Hoffenheim,Hamburger SV,Bundesliga,Germany,2026-10-10 13:30:00+00:00,goals,,Match Goals 1-4,,,,,,0.7022,0.5,15.3672
+79467,Mallorca,Las Palmas,Segunda Division,Spain,2026-10-11 16:30:00+00:00,patterns,clean_sheet,,Mallorca,all,6,8,0.3103,,,15.293913043478263
+66428,New Mexico United,Monterey Bay,USL Championship,USA,2026-10-11 01:00:00+00:00,patterns,loss,,Monterey Bay,all,16,27,0.3563,,,15.19023809523809
+62005,FK Zalgiris Vilnius,Suduva Marijampole,A Lyga,Lithuania,2026-10-10 11:15:00+00:00,patterns,unbeaten,,Suduva Marijampole,all,26,30,0.6399,,,15.117777777777775
+53844,Huachipato,O'Higgins,Primera División,Chile,2026-10-10 20:30:00+00:00,patterns,Over_2_5,,Huachipato,home,10,11,0.5519,,,15.111923076923084
+81725,Atyrau,Yelimay Semey,Premier League,Kazakhstan,2026-10-14 11:00:00+00:00,patterns,Under_2_5,,Atyrau,all,19,25,0.5194,,,15.037500000000003
+81810,Zhenys,Atyrau,Premier League,Kazakhstan,2026-10-10 14:00:00+00:00,patterns,Under_2_5,,Atyrau,all,19,25,0.5194,,,15.037500000000003
+89075,Ludogorets,Arda Kardzhali,First League,Bulgaria,2026-10-12 17:00:00+00:00,patterns,win,,Ludogorets,all,7,9,0.3768,,,15.036666666666665
+42662,IF Elfsborg,Halmstad,Allsvenskan,Sweden,2026-10-12 17:00:00+00:00,patterns,loss,,Halmstad,all,14,22,0.3835,,,15.03513513513514
+72365,Nyköping,Karlslund,Division 2 - Södra Svealand,Sweden,2026-10-11 11:00:00+00:00,patterns,halftime_win,,Nyköping,home,8,12,0.3293,,,14.99407407407407
+92818,Jagiellonia,Gornik Zabrze,Ekstraklasa,Poland,2026-10-10 18:15:00+00:00,patterns,win,,Gornik Zabrze,all,7,9,0.3782,,,14.984166666666665
+53848,Concepción,Union La Calera,Primera División,Chile,2026-10-11 20:30:00+00:00,patterns,Under_2_5,,Concepción,all,16,23,0.4481,,,14.983421052631579
+131927,Stevenage,Wigan,League One,England,2026-10-10 14:00:00+00:00,patterns,goalless,,Wigan,all,5,7,0.2444,,,14.950909090909093
+96593,New England Revolution,Seattle Sounders,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,Under_2_5,,Seattle Sounders,away,9,13,0.3713,,,14.903928571428576
+96608,FC Dallas,Seattle Sounders,Major League Soccer,USA,2026-10-15 00:30:00+00:00,patterns,Under_2_5,,Seattle Sounders,away,9,13,0.3713,,,14.903928571428576
+81732,Irtysh,FC Astana,Premier League,Kazakhstan,2026-10-14 10:00:00+00:00,patterns,halftime_win,,Fc Astana,all,13,25,0.2816,,,14.899999999999997
+81806,FK Tobol Kostanay,FC Astana,Premier League,Kazakhstan,2026-10-10 12:00:00+00:00,patterns,halftime_win,,Fc Astana,all,13,25,0.2816,,,14.899999999999997
+79910,RB Leipzig,Eintracht Frankfurt,Bundesliga,Germany,2026-10-10 16:30:00+00:00,goals,,Match Goals 1-4,,,,,,0.6956,0.5,14.8656
+90865,Slovan Liberec,Slovácko,Czech Liga,Czech-Republic,2026-10-11 11:00:00+00:00,patterns,winless,,Slovácko,all,9,9,0.6056,,,14.789999999999992
+107531,Oldham,Accrington ST,League Two,England,2026-10-10 11:30:00+00:00,goals,,Accrington ST Over 0.5,,,,,,0.7828,0.5882,14.7896
+126486,Zemun,Železničar Pančevo,Super Liga,Serbia,2026-10-10 16:00:00+00:00,goals,,Železničar Pančevo Over 0.5,,,,,,0.7828,0.5882,14.7896
+71008,Motherwell,Celtic,Premiership,Scotland,2026-10-11 11:00:00+00:00,patterns,win,,Celtic,all,6,7,0.3929,,,14.771363636363633
+103802,SCR Altach,Wolfsberger AC,Bundesliga,Austria,2026-10-11 12:30:00+00:00,patterns,loss,,Scr Altach,all,6,7,0.3929,,,14.771363636363633
+46782,Shakhter Soligorsk,Bumprom,1. Division,Belarus,2026-10-10 12:00:00+00:00,patterns,halftime_win,,Shakhter Soligorsk,all,14,27,0.2896,,,14.716190476190476
+122095,FC OSS,Helmond Sport,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,goals,,Match Under 3.5,,,,,,0.6935,0.5,14.706
+96587,Chicago Fire,New York City FC,Major League Soccer,USA,2026-10-10 18:30:00+00:00,patterns,Under_3_5,,New York City Fc,away,12,13,0.6064,,,14.70285714285714
+128053,Kolos Kovalivka,Epitsentr Dunayivtsi,Premier League,Ukraine,2026-10-10 10:00:00+00:00,patterns,concede_2,,Kolos Kovalivka,all,5,6,0.3208,,,14.643809523809526
+73958,Chongqing Tongliang Long,Shandong Luneng,Super League,China,2026-10-11 11:35:00+00:00,patterns,Under_2_5,,Chongqing Tongliang Long,all,17,26,0.4231,,,14.632682926829272
+63541,Be1 NFA,Dainava,1 Lyga,Lithuania,2026-10-09 14:30:00+00:00,patterns,win,,Be1 Nfa,all,16,24,0.4296,,,14.588717948717944
+117220,Omiya Ardija,Vanraure Hachinohe,J2 League,Japan,2026-10-10 05:00:00+00:00,patterns,goalless,,Vanraure Hachinohe,all,6,9,0.2778,,,14.582499999999998
+42666,Mjallby AIF,Degerfors IF,Allsvenskan,Sweden,2026-10-10 15:30:00+00:00,patterns,goalless,,Degerfors If,all,11,22,0.2557,,,14.525945945945946
+89080,Lokomotiv Sofia,Lokomotiv Plovdiv,First League,Bulgaria,2026-10-10 14:30:00+00:00,patterns,goalless,,Lokomotiv Plovdiv,all,6,10,0.2391,,,14.436000000000002
+75664,Guangxi Hengchen,Shenzhen Juniors,League One,China,2026-10-11 11:00:00+00:00,patterns,clean_sheet,,Shenzhen Juniors,all,12,24,0.2656,,,14.424615384615386
+48593,Botafogo SP,Ceara,Serie B,Brazil,2026-10-13 00:00:00+00:00,patterns,BTTS,,Botafogo Sp,home,12,16,0.471,,,14.399999999999991
+67814,Zulte Waregem,Gent,Jupiler Pro League,Belgium,2026-10-10 18:45:00+00:00,patterns,win,,Gent,all,6,7,0.4048,,,14.392727272727274
+67815,Standard Liege,Charleroi,Jupiler Pro League,Belgium,2026-10-11 11:30:00+00:00,patterns,win,,Charleroi,all,6,7,0.4048,,,14.392727272727274
+67818,Genk,Kortrijk,Jupiler Pro League,Belgium,2026-10-10 18:45:00+00:00,patterns,loss,,Kortrijk,all,6,7,0.4048,,,14.392727272727274
+67819,Union St. Gilloise,OH Leuven,Jupiler Pro League,Belgium,2026-10-11 14:00:00+00:00,patterns,win,,Union St. Gilloise,all,6,7,0.4048,,,14.392727272727274
+92761,GKS Katowice,Wieczysta Kraków,Ekstraklasa,Poland,2026-10-12 18:30:00+00:00,patterns,concede_2,,Wieczysta Kraków,all,7,8,0.4615,,,14.382608695652166
+92826,Wieczysta Kraków,Wisla Plock,Ekstraklasa,Poland,2026-10-09 16:00:00+00:00,patterns,concede_2,,Wieczysta Kraków,all,7,8,0.4615,,,14.382608695652166
+85320,Alaves,Atletico Madrid,La Liga,Spain,2026-10-10 14:15:00+00:00,patterns,score_2goals,,Atletico Madrid,all,6,7,0.4058,,,14.360909090909086
+75653,Nantong Zhiyun,Ningbo Professional,League One,China,2026-10-06 11:30:00+00:00,patterns,win,,Nantong Zhiyun,home,9,12,0.4271,,,14.35111111111111
+107542,York,Northampton,League Two,England,2026-10-10 14:00:00+00:00,patterns,Under_2_5,,Northampton,all,7,7,0.549,,,14.349999999999996
+48592,Operario-PR,Goias,Serie B,Brazil,2026-10-11 21:30:00+00:00,patterns,Over_2_5,,Operario-Pr,all,20,31,0.4323,,,14.344999999999997
+102515,Rosario Central,Independ. Rivadavia,Liga Profesional Argentina,Argentina,2026-10-11 20:00:00+00:00,patterns,BTTS,,Independ. Rivadavia,all,19,28,0.4583,,,14.343255813953487
+79913,1. FC Köln,Borussia Mönchengladbach,Bundesliga,Germany,2026-10-11 13:30:00+00:00,goals,,Match Goals 1-4,,,,,,0.6878,0.5,14.2728
+67730,Greenville Triumph,Spokane Velocity,USL League One,USA,2026-10-14 23:00:00+00:00,patterns,loss,,Greenville Triumph,all,17,28,0.388,,,14.26976744186046
+86628,Fluminense,Coritiba,Serie A,Brazil,2026-10-09 00:30:00+00:00,goals,,Fluminense Over 1.5,,,,,,0.6528,0.4659,14.2044
+131923,Bradford,Leyton Orient,League One,England,2026-10-10 14:00:00+00:00,patterns,Under_2_5,,Bradford,all,7,8,0.4667,,,14.201739130434776
+92820,Legia Warszawa,Wisla Krakow,Ekstraklasa,Poland,2026-10-11 18:15:00+00:00,patterns,unbeaten,,Legia Warszawa,all,9,9,0.6218,,,14.182499999999987
+53846,Cobresal,Universidad de Concepcion,Primera División,Chile,2026-10-10 18:00:00+00:00,patterns,concede_2,,Cobresal,all,15,23,0.418,,,14.173684210526321
+122088,NAC Breda,MVV,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,score_2goals,,Nac Breda,all,8,9,0.5111,,,14.16708333333333
+45060,FC Vitebsk,FC Isloch Minsk R.,Premier League,Belarus,2026-10-10 15:00:00+00:00,patterns,halftime_win,,Fc Isloch Minsk R.,all,12,22,0.3073,,,14.16054054054054
+75650,Changchun Yatai,Yanbian Longding,League One,China,2026-10-06 11:00:00+00:00,patterns,Over_2_5,,Changchun Yatai,all,18,24,0.5208,,,14.104615384615382
+75658,Dalian Huayi,Changchun Yatai,League One,China,2026-10-10 11:00:00+00:00,patterns,Over_2_5,,Changchun Yatai,all,18,24,0.5208,,,14.104615384615382
+70768,Rubin,Dynamo,Premier League,Russia,2026-10-11 16:30:00+00:00,patterns,BTTS,,Rubin,all,9,9,0.625,,,14.0625
+73952,Hangzhou Greentown,SHANGHAI SIPG,Super League,China,2026-10-09 12:00:00+00:00,patterns,Over_4_5,,Hangzhou Greentown,home,7,13,0.2356,,,14.061428571428571
+73951,Sichuan Jiuniu,Henan Jianye,Super League,China,2026-10-09 11:35:00+00:00,patterns,Under_3_5,,Henan Jianye,all,22,26,0.625,,,14.02439024390244
+68543,Wolves,Bolton,Championship,England,2026-10-13 18:45:00+00:00,goals,,Wolves Over 1.5,,,,,,0.6686,0.4842,14.014400000000002
+68534,Preston,Millwall,Championship,England,2026-10-10 14:00:00+00:00,patterns,loss,,Preston,all,6,8,0.3474,,,14.003478260869562
+68546,Birmingham,Preston,Championship,England,2026-10-13 19:00:00+00:00,patterns,loss,,Preston,all,6,8,0.3474,,,14.003478260869562
+81895,SC Braga,Sporting CP,Primeira Liga,Portugal,2026-10-09 19:15:00+00:00,patterns,halftime_win,,Sporting Cp,all,5,7,0.2742,,,14.002727272727272
+45063,Bate Borisov,Slavia Mozyr,Premier League,Belarus,2026-10-10 15:00:00+00:00,patterns,goalless,,Bate Borisov,all,12,22,0.3101,,,13.99405405405405
+48579,Ceara,Criciuma,Serie B,Brazil,2026-10-08 22:30:00+00:00,patterns,Under_2_5,,Criciuma,all,24,31,0.5677,,,13.915869565217399
+131928,Cambridge United,Blackpool,League One,England,2026-10-10 14:00:00+00:00,patterns,BTTS,,Cambridge United,all,8,8,0.6,,,13.913043478260867
+94871,FC Vaduz,FC Basel 1893,Super League,Switzerland,2026-10-11 14:30:00+00:00,patterns,loss,,Fc Vaduz,all,7,9,0.4074,,,13.889166666666675
+56307,Rustavi,Dila,Erovnuli Liga,Georgia,2026-10-10 14:00:00+00:00,patterns,Under_3_5,,Rustavi,all,26,27,0.7481,,,13.812619047619046
+72367,Sleipner,Fittja,Division 2 - Södra Svealand,Sweden,2026-10-11 14:00:00+00:00,patterns,unbeaten,,Sleipner,home,12,12,0.6905,,,13.755555555555565
+117222,Jubilo Iwata,Consadole Sapporo,J2 League,Japan,2026-10-10 09:00:00+00:00,patterns,BTTS,,Consadole Sapporo,all,8,9,0.5222,,,13.750833333333334
+81896,Rio Ave,Nacional,Primeira Liga,Portugal,2026-10-11 14:30:00+00:00,patterns,goalless,,Rio Ave,all,5,7,0.2823,,,13.745000000000001
+81900,Casa Pia,Santa Clara,Primeira Liga,Portugal,2026-10-10 14:30:00+00:00,patterns,goalless,,Casa Pia,all,5,7,0.2823,,,13.745000000000001
+117221,Ventforet Kofu,Tochigi City,J2 League,Japan,2026-10-10 07:00:00+00:00,goals,,Tochigi City Over 0.5,,,,,,0.8471,0.6667,13.7104
+46787,Dinamo Minsk II,BATE II,1. Division,Belarus,2026-10-10 15:00:00+00:00,patterns,winless,,Bate Ii,all,22,27,0.6017,,,13.700238095238094
+81898,Arouca,Estrela,Primeira Liga,Portugal,2026-10-11 19:30:00+00:00,patterns,concede_2,,Estrela,all,6,7,0.4274,,,13.673636363636366
+67817,Cercle Brugge,Anderlecht,Jupiler Pro League,Belgium,2026-10-10 14:00:00+00:00,goals,,Anderlecht Over 0.5,,,,,,0.7828,0.6032,13.649600000000001
+67723,Portland Hearts of Pine,Boise,USL League One,USA,2026-10-10 21:00:00+00:00,patterns,score_2goals,,Boise,away,9,14,0.361,,,13.606896551724134
+85191,Cheongju,Seongnam FC,K League 2,South-Korea,2026-10-09 07:30:00+00:00,patterns,draw,,Cheongju,all,14,26,0.3241,,,13.593658536585362
+86630,Atletico Paranaense,Atletico-MG,Serie A,Brazil,2026-10-08 23:00:00+00:00,patterns,goalless,,Atletico-Mg,away,8,14,0.2903,,,13.571724137931035
+119642,Tigres UANL,Toluca,Liga MX,Mexico,2026-10-10 03:00:00+00:00,patterns,halftime_win,,Toluca,all,6,10,0.2614,,,13.543999999999995
+80230,1. FC Nürnberg,VfL Wolfsburg,2. Bundesliga,Germany,2026-10-10 18:30:00+00:00,patterns,win,,1. Fc Nürnberg,all,5,6,0.3611,,,13.49238095238095
+96586,Chicago Fire,Vancouver Whitecaps,Major League Soccer,USA,2026-10-07 00:30:00+00:00,patterns,clean_sheet,,Vancouver Whitecaps,all,11,26,0.2104,,,13.486829268292686
+96611,St. Louis City,Vancouver Whitecaps,Major League Soccer,USA,2026-10-15 00:30:00+00:00,patterns,clean_sheet,,Vancouver Whitecaps,all,11,26,0.2104,,,13.486829268292686
+107540,Cheltenham,Salford City,League Two,England,2026-10-10 14:00:00+00:00,patterns,BTTS,,Cheltenham,all,8,9,0.5294,,,13.480833333333331
+70643,Stabaek,Strommen,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,win,,Stabaek,home,9,11,0.5,,,13.461538461538458
+70651,Stabaek,Sandnes ULF,1. Division,Norway,2026-10-14 17:00:00+00:00,patterns,win,,Stabaek,home,9,11,0.5,,,13.461538461538458
+48588,Atletico Goianiense,Sport Recife,Serie B,Brazil,2026-10-11 19:10:00+00:00,patterns,halftime_win,,Atletico Goianiense,home,10,16,0.3645,,,13.445161290322583
+68532,Southampton,Portsmouth,Championship,England,2026-10-11 11:00:00+00:00,goals,,Southampton Over 1.5,,,,,,0.661,0.4842,13.436800000000002
+66429,Phoenix Rising,Las Vegas Lights,USL Championship,USA,2026-10-11 02:00:00+00:00,patterns,score_2goals,,Las Vegas Lights,away,8,13,0.3263,,,13.421785714285717
+73954,Chengdu Better City,Tianjin Teda,Super League,China,2026-10-10 11:35:00+00:00,patterns,unbeaten,,Chengdu Better City,all,22,26,0.6346,,,13.415609756097545
+73957,Shenyang Urban,Wuhan Three Towns,Super League,China,2026-10-11 11:35:00+00:00,patterns,loss,,Shenyang Urban,all,15,26,0.3654,,,13.413658536585372
+79468,FC Andorra,Castellón,Segunda Division,Spain,2026-10-11 12:00:00+00:00,patterns,unbeaten,,Castellón,all,8,8,0.6149,,,13.394782608695655
+85323,Rayo Vallecano,Athletic Club,La Liga,Spain,2026-10-10 12:00:00+00:00,patterns,BTTS,,Rayo Vallecano,all,7,7,0.5797,,,13.373181818181813
+60896,FK Liepaja,Auda,Virsliga,Latvia,2026-10-12 15:00:00+00:00,patterns,win,,Auda,all,18,31,0.3831,,,13.31282608695652
+126485,Radnicki NIS,Vojvodina,Super Liga,Serbia,2026-10-10 16:00:00+00:00,patterns,win,,Vojvodina,all,7,10,0.3676,,,13.296000000000003
+131919,Plymouth,AFC Wimbledon,League One,England,2026-10-10 11:30:00+00:00,patterns,clean_sheet,,Afc Wimbledon,all,5,8,0.2444,,,13.238260869565217
+131922,Leicester,Peterborough,League One,England,2026-10-10 14:00:00+00:00,patterns,goalless,,Peterborough,all,5,8,0.2444,,,13.238260869565217
+80233,1. FC Heidenheim,1. FC Kaiserslautern,2. Bundesliga,Germany,2026-10-09 16:30:00+00:00,patterns,clean_sheet,,1. Fc Kaiserslautern,all,4,6,0.2037,,,13.227619047619049
+58446,Derry City,St Patrick's Athl.,Premier Division,Ireland,2026-10-09 18:45:00+00:00,patterns,win,,St Patrick'S Athl.,all,17,32,0.3375,,,13.191489361702125
+55122,Kalju Nomme,Laagri,Meistriliiga,Estonia,2026-10-10 11:30:00+00:00,patterns,halftime_win,,Kalju Nomme,all,15,29,0.3172,,,13.184545454545454
+96599,Colorado Rapids,San Jose Earthquakes,Major League Soccer,USA,2026-10-11 01:30:00+00:00,patterns,clean_sheet,,Colorado Rapids,home,7,13,0.255,,,13.160714285714281
+96613,Colorado Rapids,Minnesota United FC,Major League Soccer,USA,2026-10-15 01:30:00+00:00,patterns,clean_sheet,,Colorado Rapids,home,7,13,0.255,,,13.160714285714281
+86068,Samsunspor,Trabzonspor,Süper Lig,Turkey,2026-10-10 13:00:00+00:00,goals,,Trabzonspor Over 0.5,,,,,,0.8025,0.6296,13.1404
+46788,Ostrovets FC,Slonim,1. Division,Belarus,2026-10-10 13:00:00+00:00,patterns,draw,,Ostrovets Fc,all,11,27,0.2033,,,13.121190476190478
+96605,DC United,New York Red Bulls,Major League Soccer,USA,2026-10-14 23:30:00+00:00,patterns,draw,,Dc United,all,12,26,0.255,,,13.097560975609756
+48582,Avai,Londrina,Serie B,Brazil,2026-10-07 22:30:00+00:00,patterns,concede_2,,Londrina,all,16,31,0.3226,,,13.042173913043476
+48585,Nautico Recife,Novorizontino,Serie B,Brazil,2026-10-08 22:30:00+00:00,patterns,score_2goals,,Novorizontino,all,16,31,0.3226,,,13.042173913043476
+48595,Athletic Club,Londrina,Serie B,Brazil,2026-10-13 22:30:00+00:00,patterns,concede_2,,Londrina,all,16,31,0.3226,,,13.042173913043476
+67725,Westchester SC,Forward Madison,USL League One,USA,2026-10-10 23:00:00+00:00,patterns,halftime_win,,Forward Madison,all,15,29,0.3195,,,13.032954545454544
+70770,Fakel,Lokomotiv,Premier League,Russia,2026-10-10 12:15:00+00:00,patterns,Under_1_5,,Fakel,all,5,9,0.2083,,,13.022083333333336
+124377,FCSB,Oţelul,Liga I,Romania,2026-10-10 17:00:00+00:00,goals,,Oţelul Over 0.5,,,,,,0.7409,0.5696,13.0188
+86644,Atletico-MG,Santos,Serie A,Brazil,2026-10-11 19:00:00+00:00,patterns,Over_2_5,,Santos,away,11,14,0.5161,,,13.015862068965522
+72362,Haninge,Nacka Iliria,Division 2 - Södra Svealand,Sweden,2026-10-10 14:00:00+00:00,goals,,Haninge Over 1.5,,,,,,0.6949,0.5238,13.0036
+102523,Platense,Argentinos JRS,Liga Profesional Argentina,Argentina,2026-10-11 20:00:00+00:00,patterns,winless,,Platense,home,11,13,0.5662,,,12.99785714285715
+96591,New York Red Bulls,San Diego,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,concede_2,,New York Red Bulls,home,9,13,0.4134,,,12.949285714285718
+92819,Slask Wroclaw,Lech Poznan,Ekstraklasa,Poland,2026-10-10 15:30:00+00:00,patterns,win,,Lech Poznan,all,6,8,0.3782,,,12.932173913043476
+102524,Central Cordoba de Santiago,Estudiantes L.P.,Liga Profesional Argentina,Argentina,2026-10-10 20:00:00+00:00,patterns,goalless,,Central Cordoba De Santiago,all,14,26,0.3346,,,12.927804878048777
+66420,Lexington,FC Tulsa,USL Championship,USA,2026-10-09 23:30:00+00:00,patterns,Under_2_5,,Fc Tulsa,all,19,27,0.503,,,12.902380952380954
+66425,Miami FC,Loudoun United,USL Championship,USA,2026-10-10 23:00:00+00:00,patterns,winless,,Loudoun United,all,22,26,0.6437,,,12.838536585365844
+66432,Rhode Island,Loudoun United,USL Championship,USA,2026-10-14 23:30:00+00:00,patterns,winless,,Loudoun United,all,22,26,0.6437,,,12.838536585365844
+119646,CF Pachuca,Necaxa,Liga MX,Mexico,2026-10-11 23:00:00+00:00,patterns,BTTS,,Necaxa,all,9,10,0.5795,,,12.82000000000001
+68531,Watford,Burnley,Championship,England,2026-10-10 14:00:00+00:00,patterns,Under_3_5,,Watford,all,8,8,0.6316,,,12.813913043478253
+68544,Cardiff,Watford,Championship,England,2026-10-13 18:45:00+00:00,patterns,Under_3_5,,Watford,all,8,8,0.6316,,,12.813913043478253
+44635,Ajax,NEC Nijmegen,Eredivisie,Netherlands,2026-10-10 19:00:00+00:00,goals,,Ajax Over 1.5,,,,,,0.6686,0.5,12.8136
+44637,Utrecht,Willem II,Eredivisie,Netherlands,2026-10-11 10:15:00+00:00,goals,,Utrecht Over 1.5,,,,,,0.6686,0.5,12.8136
+70656,Strommen,Asane,1. Division,Norway,2026-10-14 13:00:00+00:00,patterns,winless,,Asane,all,19,24,0.5842,,,12.767179487179481
+85193,Jeonnam Dragons,Yongin City,K League 2,South-Korea,2026-10-10 05:00:00+00:00,patterns,concede_2,,Jeonnam Dragons,all,15,25,0.3958,,,12.762499999999994
+124376,CFR 1907 Cluj,Universitatea Cluj,Liga I,Romania,2026-10-08 17:30:00+00:00,goals,,Universitatea Cluj Over 0.5,,,,,,0.7371,0.5696,12.73
+67720,Corpus Christi,Fort Wayne,USL League One,USA,2026-10-08 00:30:00+00:00,patterns,halftime_win,,Fort Wayne,away,7,14,0.2365,,,12.720689655172412
+85192,Gimpo Citizen,Seoul E-Land FC,K League 2,South-Korea,2026-10-09 07:30:00+00:00,patterns,win,,Seoul E-Land Fc,all,14,26,0.338,,,12.71219512195122
+40118,Start,Ham-Kam,Eliteserien,Norway,2026-10-11 15:00:00+00:00,patterns,loss,,Start,all,13,21,0.4018,,,12.672777777777783
+59575,Athlone Town,Treaty United,First Division,Ireland,2026-10-09 18:45:00+00:00,patterns,goalless,,Treaty United,all,15,34,0.2588,,,12.65469387755102
+48577,Sport Recife,São Bernardo,Serie B,Brazil,2026-10-06 22:30:00+00:00,patterns,win,,São Bernardo,away,8,15,0.2806,,,12.636666666666663
+89079,Botev Vratsa,Spartak Varna,First League,Bulgaria,2026-10-10 12:00:00+00:00,patterns,concede_2,,Botev Vratsa,all,7,10,0.3841,,,12.636000000000003
+48591,Cuiaba,Avai,Serie B,Brazil,2026-10-11 21:30:00+00:00,patterns,Under_2_5,,Cuiaba,home,13,16,0.5677,,,12.634838709677421
+79469,Celta de Vigo II,Real Sociedad II,Segunda Division,Spain,2026-10-10 19:00:00+00:00,goals,,BTTS Yes,,,,,,0.6546,0.4886,12.616
+103949,Petrojet,Wadi Degla,Premier League,Egypt,2026-10-13 17:00:00+00:00,goals,,Petrojet Over 0.5,,,,,,0.7856,0.62,12.5856
+102512,Gimnasia L.P.,Atletico Tucuman,Liga Profesional Argentina,Argentina,2026-10-09 21:00:00+00:00,patterns,halftime_win,,Gimnasia L.P.,all,13,29,0.2574,,,12.580454545454545
+102500,Banfield,Rosario Central,Liga Profesional Argentina,Argentina,2026-10-06 00:15:00+00:00,goals,,Rosario Central Over 0.5,,,,,,0.78,0.615,12.540000000000001
+128057,LNZ Cherkasy,Kudrivka,Premier League,Ukraine,2026-10-11 10:00:00+00:00,patterns,concede_2,,Kudrivka,all,5,7,0.3208,,,12.519999999999998
+103806,Grazer AK,Red Bull Salzburg,Bundesliga,Austria,2026-10-10 15:00:00+00:00,patterns,unbeaten,,Red Bull Salzburg,all,7,7,0.6071,,,12.501363636363639
+70764,FC Krasnodar,Zenit,Premier League,Russia,2026-10-10 16:30:00+00:00,patterns,win,,Fc Krasnodar,all,6,9,0.3333,,,12.501249999999997
+70766,Krylia Sovetov,Spartak Moscow,Premier League,Russia,2026-10-10 14:30:00+00:00,patterns,win,,Spartak Moscow,all,6,9,0.3333,,,12.501249999999997
+70767,FC Orenburg,Dinamo Makhachkala,Premier League,Russia,2026-10-10 10:00:00+00:00,patterns,draw,,Fc Orenburg,all,6,9,0.3333,,,12.501249999999997
+46783,FC Energetik-Bgu Minsk,Molodechno-DYuSSh 4,1. Division,Belarus,2026-10-10 10:00:00+00:00,patterns,win,,Fc Energetik-Bgu Minsk,all,16,27,0.3983,,,12.490238095238093
+96601,St. Louis City,Los Angeles Galaxy,Major League Soccer,USA,2026-10-11 23:00:00+00:00,patterns,halftime_win,,St. Louis City,all,14,27,0.3255,,,12.408333333333331
+128058,Livyi Bereh,Zorya Luhansk,Premier League,Ukraine,2026-10-12 10:00:00+00:00,patterns,Under_2_5,,Livyi Bereh,all,6,6,0.566,,,12.4
+53849,Deportes Limache,Palestino,Primera División,Chile,2026-10-11 23:00:00+00:00,patterns,Over_3_5,,Deportes Limache,all,12,23,0.3169,,,12.398157894736839
+56308,Samgurali,Gagra,Erovnuli Liga,Georgia,2026-10-11 11:30:00+00:00,patterns,Over_3_5,,Samgurali,all,12,27,0.2519,,,12.377857142857145
+86625,Internacional,Corinthians,Serie A,Brazil,2026-10-07 22:30:00+00:00,patterns,winless,,Internacional,home,11,14,0.5305,,,12.320689655172412
+86634,Remo,Gremio,Serie A,Brazil,2026-10-07 22:30:00+00:00,patterns,winless,,Remo,home,11,14,0.5305,,,12.320689655172412
+107532,Swindon Town,Crewe,League Two,England,2026-10-10 11:30:00+00:00,patterns,unbeaten,,Crewe,all,9,9,0.6716,,,12.314999999999998
+126484,Mladost Lucani,OFK Beograd,Super Liga,Serbia,2026-10-10 16:00:00+00:00,goals,,OFK Beograd Over 0.5,,,,,,0.75,0.5882,12.296800000000001
+48590,Nautico Recife,Vila Nova,Serie B,Brazil,2026-10-11 20:30:00+00:00,patterns,win,,Vila Nova,all,17,31,0.3661,,,12.284565217391302
+79471,Eldense,Cordoba,Segunda Division,Spain,2026-10-10 16:30:00+00:00,patterns,Over_2_5,,Cordoba,all,6,7,0.4713,,,12.276818181818177
+45062,Neman,Baranovichi,Premier League,Belarus,2026-10-10 15:00:00+00:00,patterns,goalless,,Baranovichi,away,7,11,0.3464,,,12.267692307692307
+58447,Waterford,Galway United,Premier Division,Ireland,2026-10-09 18:45:00+00:00,patterns,draw,,Waterford,home,9,16,0.325,,,12.25806451612903
+81811,Ulytau,Okzhetpes,Premier League,Kazakhstan,2026-10-11 10:00:00+00:00,patterns,score_1goal,,Okzhetpes,all,24,26,0.7306,,,12.205853658536592
+59576,Bray Wanderers,Wexford,First Division,Ireland,2026-10-09 18:45:00+00:00,patterns,Over_3_5,,Bray Wanderers,home,9,17,0.3,,,12.187500000000002
+86066,Gaziantep FK,Çorum FK,Süper Lig,Turkey,2026-10-11 13:00:00+00:00,goals,,Çorum FK Over 0.5,,,,,,0.7896,0.6296,12.16
+40117,Rosenborg,Sandefjord,Eliteserien,Norway,2026-10-10 16:00:00+00:00,patterns,score_2goals,,Rosenborg,all,14,21,0.4583,,,12.154722222222219
+40121,Fredrikstad,Tromso,Eliteserien,Norway,2026-10-11 12:30:00+00:00,patterns,Over_4_5,,Tromso,away,5,10,0.1964,,,12.144000000000002
+86641,Vasco DA Gama,Remo,Serie A,Brazil,2026-10-10 20:00:00+00:00,patterns,concede_2,,Remo,all,16,28,0.3853,,,12.119999999999997
+96603,Columbus Crew,Charlotte,Major League Soccer,USA,2026-10-14 23:30:00+00:00,patterns,Under_3_5,,Columbus Crew,home,12,14,0.6064,,,12.10482758620689
+96614,Los Angeles Galaxy,Portland Timbers,Major League Soccer,USA,2026-10-15 02:30:00+00:00,patterns,Under_3_5,,Los Angeles Galaxy,home,12,14,0.6064,,,12.10482758620689
+117219,Yokohama FC,Oita Trinita,J2 League,Japan,2026-10-10 05:00:00+00:00,patterns,draw,,Oita Trinita,all,5,9,0.2333,,,12.084583333333338
+68545,Burnley,Charlton,Championship,England,2026-10-13 18:45:00+00:00,patterns,winless,,Burnley,all,8,8,0.6526,,,12.083478260869573
+107535,Fleetwood Town,Walsall,League Two,England,2026-10-10 14:00:00+00:00,patterns,clean_sheet,,Walsall,all,5,8,0.2794,,,12.02086956521739
+85317,Malaga,Espanyol,La Liga,Spain,2026-10-09 19:00:00+00:00,patterns,winless,,Malaga,all,7,7,0.6232,,,11.989090909090905
+86626,Botafogo,Vasco DA Gama,Serie A,Brazil,2026-10-07 23:30:00+00:00,patterns,Over_3_5,,Botafogo,home,7,14,0.2545,,,11.85172413793103
+81897,Academico Viseu,Estoril,Primeira Liga,Portugal,2026-10-10 19:30:00+00:00,patterns,Under_3_5,,Estoril,all,7,7,0.629,,,11.804545454545467
+75654,Hebei Kungfu,Dalian Huayi,League One,China,2026-10-06 11:30:00+00:00,patterns,Under_3_5,,Hebei Kungfu,home,12,12,0.7344,,,11.804444444444428
+102519,Talleres Cordoba,Independiente,Liga Profesional Argentina,Argentina,2026-10-12 00:30:00+00:00,patterns,score_1goal,,Independiente,away,12,14,0.6127,,,11.800689655172414
+96612,Real Salt Lake,San Jose Earthquakes,Major League Soccer,USA,2026-10-15 01:30:00+00:00,patterns,win,,San Jose Earthquakes,away,7,13,0.2847,,,11.781785714285714
+42660,IFK Goteborg,Vasteras SK FK,Allsvenskan,Sweden,2026-10-09 17:00:00+00:00,patterns,Over_2_5,,Vasteras Sk Fk,away,9,11,0.5398,,,11.777692307692323
+96604,CF Montreal,Atlanta United FC,Major League Soccer,USA,2026-10-14 23:30:00+00:00,patterns,loss,,Cf Montreal,all,15,27,0.3725,,,11.76785714285714
+90867,Teplice,Sigma Olomouc,Czech Liga,Czech-Republic,2026-10-11 13:00:00+00:00,patterns,Over_2_5,,Sigma Olomouc,all,8,9,0.5775,,,11.677083333333337
+43930,Paris Saint Germain,Le Mans,Ligue 1,France,2026-10-10 18:45:00+00:00,goals,,Paris Saint Germain Over 1.5,,,,,,0.6865,0.5333,11.6432
+86061,Konyaspor,Başakşehir,Süper Lig,Turkey,2026-10-11 10:30:00+00:00,goals,,Başakşehir Over 0.5,,,,,,0.7828,0.6296,11.6432
+102526,Barracas Central,Huracan,Liga Profesional Argentina,Argentina,2026-10-10 18:45:00+00:00,patterns,draw,,Huracan,away,7,13,0.2892,,,11.572857142857146
+66410,Hartford Athletic,Charleston Battery,USL Championship,USA,2026-10-14 23:00:00+00:00,patterns,win,,Charleston Battery,all,14,26,0.3563,,,11.551707317073168
+124382,Universitatea Cluj,Rapid,Liga I,Romania,2026-10-10 17:00:00+00:00,patterns,score_2goals,,Universitatea Cluj,all,6,9,0.3608,,,11.469999999999997
+81809,Irtysh,Kyzyl-Zhar,Premier League,Kazakhstan,2026-10-10 10:00:00+00:00,patterns,concede_1,,Irtysh,home,11,12,0.6602,,,11.398518518518507
+90834,Bohemians 1905,Mlada Boleslav,Czech Liga,Czech-Republic,2026-10-14 16:00:00+00:00,patterns,score_2goals,,Mlada Boleslav,all,6,8,0.4225,,,11.39130434782608
+90862,Plzen,Mlada Boleslav,Czech Liga,Czech-Republic,2026-10-10 13:00:00+00:00,patterns,score_2goals,,Mlada Boleslav,all,6,8,0.4225,,,11.39130434782608
+107536,Port Vale,Grimsby,League Two,England,2026-10-10 14:00:00+00:00,goals,,Grimsby Over 0.5,,,,,,0.7378,0.5882,11.3696
+119647,Atletico San Luis,Santos Laguna,Liga MX,Mexico,2026-10-11 23:00:00+00:00,patterns,Under_1_5,,Santos Laguna,all,5,10,0.2159,,,11.363999999999999
+68554,Lincoln,West Ham,Championship,England,2026-10-14 19:00:00+00:00,patterns,score_2goals,,West Ham,all,6,8,0.4263,,,11.259130434782616
+75659,Suzhou Dongwu,Hebei Kungfu,League One,China,2026-10-10 11:00:00+00:00,patterns,Under_3_5,,Hebei Kungfu,all,22,24,0.7344,,,11.216410256410247
+68113,Sunderland,Brighton,Premier League,England,2026-10-10 14:00:00+00:00,goals,,Brighton Over 0.5,,,,,,0.8464,0.7,11.1264
+68535,West Brom,Birmingham,Championship,England,2026-10-10 11:30:00+00:00,patterns,draw,,Birmingham,all,5,8,0.3053,,,11.119999999999997
+53843,Everton de Vina,D. La Serena,Primera División,Chile,2026-10-11 15:30:00+00:00,patterns,draw,,D. La Serena,all,9,23,0.2077,,,11.11289473684211
+86060,Beşiktaş,Kocaelispor,Süper Lig,Turkey,2026-10-11 16:00:00+00:00,patterns,Under_2_5,,Kocaelispor,all,5,6,0.4444,,,11.112380952380951
+67816,SK Beveren,Lommel United,Jupiler Pro League,Belgium,2026-10-09 18:45:00+00:00,patterns,Under_1_5,,Lommel United,all,4,7,0.2222,,,11.111818181818183
+80231,VfL Bochum,Arminia Bielefeld,2. Bundesliga,Germany,2026-10-11 11:30:00+00:00,patterns,Under_3_5,,Vfl Bochum,all,6,6,0.6111,,,11.111428571428572
+80235,FC St. Pauli,Karlsruher SC,2. Bundesliga,Germany,2026-10-11 11:30:00+00:00,patterns,draw,,Fc St. Pauli,all,4,6,0.2778,,,11.110476190476193
+80236,Eintracht Braunschweig,Holstein Kiel,2. Bundesliga,Germany,2026-10-09 16:30:00+00:00,patterns,draw,,Holstein Kiel,all,4,6,0.2778,,,11.110476190476193
+110193,Sochaux,Boulogne,Ligue 2,France,2026-10-09 18:00:00+00:00,patterns,draw,,Boulogne,all,5,7,0.3651,,,11.110454545454546
+43807,Randers FC,Viborg,Superliga,Denmark,2026-10-11 12:00:00+00:00,patterns,win,,Viborg,all,6,9,0.3704,,,11.110000000000003
+96595,Charlotte,FC Dallas,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,score_2goals,,Fc Dallas,away,9,14,0.4134,,,11.077241379310344
+66431,Oakland Roots,San Antonio,USL Championship,USA,2026-10-11 02:00:00+00:00,patterns,Under_3_5,,San Antonio,all,23,27,0.6796,,,11.073333333333347
+90868,Hradec Králové,Artis,Czech Liga,Czech-Republic,2026-10-10 13:00:00+00:00,patterns,goalless,,Hradec Králové,all,5,9,0.2606,,,11.060833333333331
+45059,FC Minsk,Torpedo Zhodino,Premier League,Belarus,2026-10-10 15:00:00+00:00,patterns,Over_3_5,,Torpedo Zhodino,away,5,10,0.2235,,,11.059999999999995
+75656,Nanjing City,Shaanxi Union,League One,China,2026-10-07 11:30:00+00:00,patterns,loss,,Nanjing City,all,13,24,0.362,,,11.05641025641026
+75663,Ningbo Professional,Nanjing City,League One,China,2026-10-11 11:00:00+00:00,patterns,loss,,Nanjing City,all,13,24,0.362,,,11.05641025641026
+68540,Middlesbrough,Wolves,Championship,England,2026-10-10 14:00:00+00:00,patterns,Over_3_5,,Wolves,all,5,7,0.3684,,,11.005454545454546
+66430,Sacramento Republic,Colorado Springs,USL Championship,USA,2026-10-11 02:00:00+00:00,patterns,unbeaten,,Sacramento Republic,all,22,27,0.6437,,,11.00023809523809
+68551,Norwich,Southampton,Championship,England,2026-10-14 18:45:00+00:00,patterns,BTTS,,Southampton,all,8,8,0.6842,,,10.98434782608695
+56310,Spaeri,Torpedo Kutaisi,Erovnuli Liga,Georgia,2026-10-10 16:00:00+00:00,patterns,winless,,Spaeri,all,22,27,0.6444,,,10.955238095238096
+79463,Tenerife,Girona,Segunda Division,Spain,2026-10-12 19:00:00+00:00,patterns,halftime_win,,Girona,all,5,8,0.3103,,,10.94608695652174
+55130,Paide,Tammeka,Meistriliiga,Estonia,2026-10-14 16:00:00+00:00,patterns,Under_2_5,,Paide,home,8,14,0.3448,,,10.940689655172415
+44636,Fortuna Sittard,Twente,Eredivisie,Netherlands,2026-10-10 18:00:00+00:00,patterns,win,,Twente,all,5,7,0.371,,,10.922727272727272
+44638,PEC Zwolle,Cambuur,Eredivisie,Netherlands,2026-10-11 12:30:00+00:00,patterns,loss,,Pec Zwolle,all,5,7,0.371,,,10.922727272727272
+119640,Club Queretaro,Atlante FC,Liga MX,Mexico,2026-10-10 01:00:00+00:00,patterns,draw,,Atlante Fc,all,5,10,0.2273,,,10.907999999999996
+81894,Moreirense,GIL Vicente,Primeira Liga,Portugal,2026-10-09 17:45:00+00:00,patterns,Under_2_5,,Gil Vicente,all,5,6,0.4516,,,10.906666666666675
+68105,Manchester United,Tottenham,Premier League,England,2026-10-10 16:30:00+00:00,goals,,Manchester United Over 0.5,,,,,,0.8433,0.7,10.8908
+117223,Montedio Yamagata,Vegalta Sendai,J2 League,Japan,2026-10-11 04:05:00+00:00,patterns,Under_3_5,,Montedio Yamagata,all,9,9,0.7111,,,10.833749999999998
+117218,Tokushima Vortis,Imabari,J2 League,Japan,2026-10-10 05:00:00+00:00,patterns,concede_2,,Imabari,all,6,9,0.3778,,,10.832500000000007
+117224,Kataller Toyama,Tegevajaro Miyazaki,J2 League,Japan,2026-10-11 05:00:00+00:00,patterns,score_2goals,,Kataller Toyama,all,6,9,0.3778,,,10.832500000000007
+122094,Almere City FC,FC Eindhoven,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,clean_sheet,,Almere City Fc,all,4,9,0.1556,,,10.831666666666665
+53842,Universidad de Chile,Nublense,Primera División,Chile,2026-10-12 21:00:00+00:00,patterns,unbeaten,,Universidad De Chile,all,18,23,0.6038,,,10.822631578947373
+40120,KFUM Oslo,Valerenga,Eliteserien,Norway,2026-10-12 17:00:00+00:00,patterns,Under_2_5,,Kfum Oslo,home,7,11,0.381,,,10.803846153846152
+85321,Real Betis,Osasuna,La Liga,Spain,2026-10-11 16:30:00+00:00,patterns,Under_1_5,,Real Betis,all,4,7,0.2319,,,10.803181818181823
+85324,Elche,Celta Vigo,La Liga,Spain,2026-10-11 12:00:00+00:00,patterns,Over_4_5,,Elche,all,4,7,0.2319,,,10.803181818181823
+85325,Racing Santander,Valencia,La Liga,Spain,2026-10-11 19:00:00+00:00,patterns,Over_4_5,,Racing Santander,all,4,7,0.2319,,,10.803181818181823
+79472,AD Ceuta FC,Sabadell,Segunda Division,Spain,2026-10-10 14:15:00+00:00,patterns,concede_1,,Ad Ceuta Fc,all,8,8,0.6897,,,10.793043478260877
+96589,Philadelphia Union,Real Salt Lake,Major League Soccer,USA,2026-10-10 23:30:00+00:00,patterns,loss,,Real Salt Lake,away,9,13,0.4604,,,10.767142857142858
+40115,Lillestrom,Molde,Eliteserien,Norway,2026-10-11 17:15:00+00:00,patterns,Over_4_5,,Molde,all,8,21,0.1964,,,10.765555555555553
+68548,Millwall,Swansea,Championship,England,2026-10-13 18:45:00+00:00,patterns,halftime_win,,Millwall,all,5,8,0.3158,,,10.75478260869565
+68549,Stoke City,Middlesbrough,Championship,England,2026-10-13 19:00:00+00:00,patterns,halftime_win,,Middlesbrough,all,5,8,0.3158,,,10.75478260869565
+117225,Iwaki,Blaublitz Akita,J2 League,Japan,2026-10-11 06:00:00+00:00,patterns,loss,,Iwaki,all,6,9,0.3833,,,10.626249999999999
+117226,Shonan Bellmare,Albirex Niigata,J2 League,Japan,2026-10-11 09:00:00+00:00,patterns,win,,Albirex Niigata,all,6,9,0.3833,,,10.626249999999999
+59577,Cobh Ramblers,Kerry,First Division,Ireland,2026-10-09 18:45:00+00:00,patterns,halftime_win,,Kerry,away,8,17,0.2706,,,10.624375000000002
+68536,Sheffield Utd,Lincoln,Championship,England,2026-10-10 14:00:00+00:00,patterns,clean_sheet,,Lincoln,all,4,8,0.1947,,,10.619130434782612
+68541,Swansea,Norwich,Championship,England,2026-10-10 11:30:00+00:00,patterns,clean_sheet,,Swansea,all,4,8,0.1947,,,10.619130434782612
+71007,Heart Of Midlothian,ST Mirren,Premiership,Scotland,2026-10-10 14:00:00+00:00,patterns,BTTS,,Heart Of Midlothian,all,6,7,0.5238,,,10.606363636363636
+71010,Dundee Utd,Hibernian,Premiership,Scotland,2026-10-10 14:00:00+00:00,patterns,BTTS,,Hibernian,all,6,7,0.5238,,,10.606363636363636
+80237,VfL Osnabrück,Dynamo Dresden,2. Bundesliga,Germany,2026-10-10 11:00:00+00:00,patterns,concede_2,,Dynamo Dresden,all,5,6,0.463,,,10.580952380952386
+86631,Cruzeiro,Sao Paulo,Serie A,Brazil,2026-10-08 00:30:00+00:00,patterns,Over_2_5,,Cruzeiro,all,19,28,0.5161,,,10.579534883720932
+86643,RB Bragantino,Cruzeiro,Serie A,Brazil,2026-10-13 00:00:00+00:00,patterns,Over_2_5,,Cruzeiro,all,19,28,0.5161,,,10.579534883720932
+90869,Zbrojovka Brno,FK Jablonec,Czech Liga,Czech-Republic,2026-10-10 13:00:00+00:00,patterns,Under_3_5,,Fk Jablonec,all,9,9,0.7183,,,10.563750000000006
+89076,Botev Plovdiv,Slavia Sofia,First League,Bulgaria,2026-10-10 17:00:00+00:00,patterns,Under_3_5,,Slavia Sofia,all,10,10,0.7391,,,10.436
+70765,FC Rostov,Akron,Premier League,Russia,2026-10-09 16:30:00+00:00,patterns,concede_2,,Akron,all,6,9,0.3889,,,10.41625
+63545,Garliava,Atmosfera,1 Lyga,Lithuania,2026-10-10 11:00:00+00:00,patterns,BTTS,,Atmosfera,all,16,24,0.4975,,,10.410256410256407
+86633,RB Bragantino,Mirassol,Serie A,Brazil,2026-10-07 22:30:00+00:00,patterns,concede_1,,Mirassol,all,26,28,0.7688,,,10.403720930232542
+86635,Bahia,Mirassol,Serie A,Brazil,2026-10-11 22:30:00+00:00,patterns,concede_1,,Mirassol,all,26,28,0.7688,,,10.403720930232542
+85322,Real Sociedad,Deportivo La Coruna,La Liga,Spain,2026-10-11 14:15:00+00:00,patterns,draw,,Deportivo La Coruna,all,4,7,0.2464,,,10.34181818181818
+92821,Pogon Szczecin,Korona Kielce,Ekstraklasa,Poland,2026-10-11 15:30:00+00:00,patterns,halftime_win,,Korona Kielce,all,5,9,0.2821,,,10.254583333333333
+110195,PAU,Laval,Ligue 2,France,2026-10-09 18:00:00+00:00,patterns,Over_1_5,,Laval,all,7,7,0.6825,,,10.102272727272732
+110188,Montpellier,Grenoble,Ligue 2,France,2026-10-09 18:00:00+00:00,patterns,Under_2_5,,Montpellier,all,6,7,0.5397,,,10.100454545454552
+43935,Estac Troyes,Marseille,Ligue 1,France,2026-10-11 18:45:00+00:00,goals,,Marseille Over 0.5,,,,,,0.8662,0.7333,10.1004
+102518,Tigre,Banfield,Liga Profesional Argentina,Argentina,2026-10-10 22:15:00+00:00,patterns,loss,,Banfield,away,9,14,0.4338,,,10.092413793103455
+92825,Radomiak Radom,Motor Lublin,Ekstraklasa,Poland,2026-10-12 16:00:00+00:00,patterns,winless,,Motor Lublin,all,8,9,0.6218,,,10.015833333333324
+122087,De Graafschap,Jong Utrecht,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,concede_2,,Jong Utrecht,all,7,9,0.5111,,,10.000416666666666
+85684,Vicenza Virtus,Pisa,Serie B,Italy,2026-10-10 15:15:00+00:00,goals,,Match Over 2.5,,,,,,0.6714,0.54,9.9864
+48584,Goias,Athletic Club,Serie B,Brazil,2026-10-06 23:30:00+00:00,patterns,draw,,Athletic Club,away,7,15,0.2677,,,9.94833333333333
+103945,Pyramids FC,Ceramica Cleopatra,Premier League,Egypt,2026-10-12 17:00:00+00:00,goals,,Pyramids FC Over 0.5,,,,,,0.75,0.62,9.879999999999999
+103805,WSG Wattens,Ried,Bundesliga,Austria,2026-10-10 15:00:00+00:00,patterns,BTTS,,Ried,all,6,7,0.5476,,,9.849090909090918
+71006,Aberdeen,ST Johnstone,Premiership,Scotland,2026-10-11 13:00:00+00:00,patterns,goalless,,Aberdeen,all,4,7,0.2619,,,9.848636363636365
+44640,Excelsior,Groningen,Eredivisie,Netherlands,2026-10-11 14:45:00+00:00,patterns,Under_4_5,,Excelsior,all,7,7,0.6935,,,9.752272727272725
+43809,Brondby,Lyngby,Superliga,Denmark,2026-10-11 14:00:00+00:00,patterns,winless,,Lyngby,all,8,9,0.6296,,,9.72333333333334
+83669,Gangwon FC,Bucheon FC 1995,K League 1,South-Korea,2026-10-09 07:30:00+00:00,patterns,draw,,Gangwon Fc,home,8,15,0.3389,,,9.721666666666673
+72363,Rågsved,Smedby,Division 2 - Södra Svealand,Sweden,2026-10-10 14:00:00+00:00,patterns,score_2goals,,Rågsved,all,15,24,0.4673,,,9.704615384615384
+59574,UCD,Longford Town,First Division,Ireland,2026-10-09 18:45:00+00:00,patterns,draw,,Longford Town,away,7,17,0.2294,,,9.688124999999998
+67718,One Knoxville,Chattanooga Red Wolves,USL League One,USA,2026-10-07 23:00:00+00:00,patterns,unbeaten,,One Knoxville,all,22,29,0.612,,,9.663636363636364
+67729,One Knoxville,Spokane Velocity,USL League One,USA,2026-10-11 19:00:00+00:00,patterns,unbeaten,,One Knoxville,all,22,29,0.612,,,9.663636363636364
+68539,Derby,Wrexham,Championship,England,2026-10-10 14:00:00+00:00,patterns,loss,,Derby,all,5,8,0.3474,,,9.655652173913037
+68552,QPR,Derby,Championship,England,2026-10-14 18:45:00+00:00,patterns,loss,,Derby,all,5,8,0.3474,,,9.655652173913037
+86639,Gremio,Internacional,Serie A,Brazil,2026-10-11 20:30:00+00:00,patterns,winless,,Internacional,all,22,28,0.638,,,9.618604651162787
+122092,FC Volendam,Vitesse,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,Over_4_5,,Fc Volendam,all,5,9,0.3,,,9.583333333333332
+131926,Wycombe,Luton,League One,England,2026-10-10 14:00:00+00:00,patterns,BTTS,,Wycombe,all,7,8,0.6,,,9.565217391304348
+119644,Atlas,Guadalajara Chivas,Liga MX,Mexico,2026-10-11 01:00:00+00:00,patterns,halftime_win,,Guadalajara Chivas,all,5,10,0.2614,,,9.543999999999997
+103804,TSV Hartberg,Austria Lustenau,Bundesliga,Austria,2026-10-11 12:30:00+00:00,patterns,concede_2,,Tsv Hartberg,all,5,7,0.4167,,,9.468636363636367
+96609,Chicago Fire,Philadelphia Union,Major League Soccer,USA,2026-10-15 00:30:00+00:00,patterns,Over_4_5,,Philadelphia Union,away,6,14,0.2327,,,9.455862068965523
+126489,IMT Novi Beograd,Radnik Surdulica,Super Liga,Serbia,2026-10-10 16:00:00+00:00,patterns,draw,,Radnik Surdulica,all,5,10,0.2647,,,9.411999999999999
+79466,Cadiz,Sporting Gijon,Segunda Division,Spain,2026-10-11 19:00:00+00:00,patterns,draw,,Cadiz,all,4,8,0.2299,,,9.394782608695651
+68538,Bolton,Stoke City,Championship,England,2026-10-10 14:00:00+00:00,patterns,Over_4_5,,Bolton,all,3,8,0.1053,,,9.380869565217392
+124378,FC Botosani,Uta Arad,Liga I,Romania,2026-10-10 17:00:00+00:00,patterns,draw,,Fc Botosani,all,5,10,0.2658,,,9.368000000000004
+124381,Farul Constanta,Petrolul Ploiesti,Liga I,Romania,2026-10-10 17:00:00+00:00,patterns,draw,,Farul Constanta,all,5,10,0.2658,,,9.368000000000004
+119641,Puebla,Leon,Liga MX,Mexico,2026-10-10 01:00:00+00:00,patterns,Under_2_5,,Puebla,all,7,10,0.4659,,,9.364000000000006
+94867,FC Zurich,FC Thun,Super League,Switzerland,2026-10-10 16:00:00+00:00,goals,,Match Goals 1-4,,,,,,0.7157,0.5926,9.3556
+103944,Future FC,Enppi,Premier League,Egypt,2026-10-12 14:00:00+00:00,goals,,Future FC Over 0.5,,,,,,0.7425,0.62,9.31
+126488,Cukaricki,Macva,Super Liga,Serbia,2026-10-10 16:00:00+00:00,patterns,concede_2,,Macva,all,6,10,0.3676,,,9.296
+103941,Olympic El Qanah,AL Masry,Premier League,Egypt,2026-10-11 14:00:00+00:00,goals,,AL Masry Over 0.5,,,,,,0.7823,0.66,9.2948
+68550,Wrexham,West Brom,Championship,England,2026-10-13 18:45:00+00:00,patterns,Under_2_5,,West Brom,all,5,8,0.3579,,,9.290434782608697
+68108,Chelsea,Bournemouth,Premier League,England,2026-10-10 14:00:00+00:00,goals,,Chelsea Over 0.5,,,,,,0.8218,0.7,9.256800000000002
+81812,Yelimay Semey,Aktobe,Premier League,Kazakhstan,2026-10-10 11:00:00+00:00,patterns,concede_1,,Aktobe,away,13,13,0.801,,,9.239285714285717
+131925,Doncaster,Burton Albion,League One,England,2026-10-10 14:00:00+00:00,patterns,Over_2_5,,Burton Albion,all,7,9,0.5333,,,9.167916666666676
+90866,Bohemians 1905,Baník Ostrava,Czech Liga,Czech-Republic,2026-10-10 16:00:00+00:00,patterns,concede_2,,Baník Ostrava,all,6,9,0.4225,,,9.15625
+90864,Sparta Praha,Pardubice,Czech Liga,Czech-Republic,2026-10-11 16:00:00+00:00,patterns,BTTS,,Pardubice,all,7,9,0.5352,,,9.096666666666664
+43806,FC Nordsjaelland,Odense,Superliga,Denmark,2026-10-09 17:00:00+00:00,patterns,clean_sheet,,Fc Nordsjaelland,all,4,9,0.2037,,,9.02791666666667
+81899,Famalicao,Alverca,Primeira Liga,Portugal,2026-10-12 19:15:00+00:00,patterns,draw,,Famalicao,all,4,7,0.2903,,,8.944999999999997
+103947,National Bank of Egypt,El Geish,Premier League,Egypt,2026-10-13 14:00:00+00:00,goals,,National Bank of Egypt Over 0.5,,,,,,0.7373,0.62,8.9148
+44634,GO Ahead Eagles,Sparta Rotterdam,Eredivisie,Netherlands,2026-10-10 14:30:00+00:00,patterns,BTTS,,Go Ahead Eagles,all,6,6,0.6935,,,8.757142857142853
+80234,SV Darmstadt 98,Energie Cottbus,2. Bundesliga,Germany,2026-10-10 11:00:00+00:00,patterns,loss,,Sv Darmstadt 98,all,4,6,0.3611,,,8.730476190476189
+43810,Silkeborg,AC Horsens,Superliga,Denmark,2026-10-11 12:00:00+00:00,patterns,concede_2,,Ac Horsens,all,6,9,0.4352,,,8.679999999999993
+131931,Mansfield Town,Oxford United,League One,England,2026-10-15 19:00:00+00:00,goals,,Oxford United Over 0.5,,,,,,0.8584,0.7444,8.664000000000001
+110190,Dijon,Metz,Ligue 2,France,2026-10-12 18:45:00+00:00,patterns,BTTS,,Dijon,all,6,7,0.5873,,,8.585909090909084
+68110,Ipswich,Fulham,Premier League,England,2026-10-10 14:00:00+00:00,goals,,Match Over 1.5,,,,,,0.8328,0.72,8.572799999999999
+131920,Notts County,Oxford United,League One,England,2026-10-10 11:30:00+00:00,patterns,Over_2_5,,Oxford United,all,5,6,0.5333,,,8.572380952380954
+92823,Cracovia Krakow,Zaglebie Lubin,Ekstraklasa,Poland,2026-10-10 12:45:00+00:00,patterns,goalless,,Cracovia Krakow,all,4,9,0.2179,,,8.495416666666664
+80232,1. FC Magdeburg,Hannover 96,2. Bundesliga,Germany,2026-10-10 11:00:00+00:00,patterns,clean_sheet,,1. Fc Magdeburg,all,3,6,0.2037,,,8.465714285714288
+68542,Charlton,Bristol City,Championship,England,2026-10-10 11:30:00+00:00,goals,,Match Under 3.5,,,,,,0.7424,0.6316,8.4208
+79470,Burgos,Granada CF,Segunda Division,Spain,2026-10-12 14:15:00+00:00,patterns,score_2goals,,Granada Cf,all,5,8,0.3851,,,8.344347826086956
+70649,Egersund,hodd,1. Division,Norway,2026-10-11 15:00:00+00:00,patterns,goalless,,Egersund,home,4,12,0.1474,,,8.263703703703703
+86642,Coritiba,Botafogo,Serie A,Brazil,2026-10-12 19:00:00+00:00,patterns,Over_2_5,,Botafogo,all,18,28,0.5161,,,8.253953488372101
+110192,Nancy,Guingamp,Ligue 2,France,2026-10-09 18:00:00+00:00,goals,,Match Over 1.5,,,,,,0.7908,0.6825,8.230799999999999
+103942,Zamalek SC,Al Ahly,Premier League,Egypt,2026-10-11 17:00:00+00:00,goals,,Zamalek SC Over 0.5,,,,,,0.728,0.62,8.208
+86063,Alanyaspor,Erzurumspor FK,Süper Lig,Turkey,2026-10-10 13:00:00+00:00,patterns,score_1goal,,Alanyaspor,all,6,6,0.713,,,8.200000000000006
+68537,Blackburn,Cardiff,Championship,England,2026-10-10 14:00:00+00:00,patterns,Over_2_5,,Blackburn,all,7,8,0.6421,,,8.100869565217405
+68547,Bristol City,Blackburn,Championship,England,2026-10-13 18:45:00+00:00,patterns,Over_2_5,,Blackburn,all,7,8,0.6421,,,8.100869565217405
+67727,Corpus Christi,Naples,USL League One,USA,2026-10-11 00:30:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.6349,8.056
+67721,Chattanooga Red Wolves,Tormenta,USL League One,USA,2026-10-10 20:00:00+00:00,patterns,clean_sheet,,Chattanooga Red Wolves,home,7,15,0.3071,,,7.978333333333337
+107541,Tranmere,Rochdale,League Two,England,2026-10-10 14:00:00+00:00,patterns,draw,,Tranmere,all,5,9,0.3431,,,7.96708333333333
+71011,Falkirk,Dundee,Premiership,Scotland,2026-10-10 14:00:00+00:00,patterns,winless,,Falkirk,all,6,7,0.6071,,,7.955909090909097
+68112,Aston Villa,Brentford,Premier League,England,2026-10-10 14:00:00+00:00,goals,,Brentford Over 0.5,,,,,,0.8044,0.7,7.934400000000001
+117217,Sagan Tosu,Fujieda MYFC,J2 League,Japan,2026-10-10 05:00:00+00:00,patterns,draw,,Fujieda Myfc,all,4,9,0.2333,,,7.9179166666666685
+83670,Incheon United,Pohang Steelers,K League 1,South-Korea,2026-10-09 07:30:00+00:00,patterns,concede_2,,Pohang Steelers,away,8,17,0.3222,,,7.8831250000000015
+85318,Levante,Sevilla,La Liga,Spain,2026-10-12 19:00:00+00:00,patterns,score_1goal,,Sevilla,all,7,7,0.7536,,,7.8400000000000025
+119648,U.N.A.M. - Pumas,Cruz Azul,Liga MX,Mexico,2026-10-12 01:00:00+00:00,patterns,Over_4_5,,Cruz Azul,all,4,10,0.2045,,,7.820000000000002
+68106,Liverpool,Manchester City,Premier League,England,2026-10-11 15:30:00+00:00,goals,,Match Over 1.5,,,,,,0.8217,0.72,7.7292
+107539,Newport County,Colchester,League Two,England,2026-10-10 14:00:00+00:00,patterns,BTTS,,Colchester,all,6,8,0.5294,,,7.673043478260865
+102525,Gimnasia M.,Newells Old Boys,Liga Profesional Argentina,Argentina,2026-10-12 21:30:00+00:00,patterns,draw,,Newells Old Boys,all,11,27,0.2892,,,7.599047619047622
+107533,Rotherham,Gillingham,League Two,England,2026-10-10 14:00:00+00:00,goals,,Gillingham Over 0.5,,,,,,0.6879,0.5882,7.5771999999999995
+131921,Huddersfield,Sheffield Wednesday,League One,England,2026-10-10 14:00:00+00:00,patterns,win,,Sheffield Wednesday,all,4,7,0.3333,,,7.5768181818181795
+75651,Wuxi Wugou,Suzhou Dongwu,League One,China,2026-10-06 11:00:00+00:00,patterns,draw,,Suzhou Dongwu,away,5,11,0.276,,,7.553846153846155
+63546,BFA,Žalgiris II,1 Lyga,Lithuania,2026-10-09 17:15:00+00:00,patterns,Over_3_5,,Bfa,all,11,25,0.3216,,,7.400000000000001
+70769,Akhmat,Baltika,Premier League,Russia,2026-10-11 11:00:00+00:00,patterns,Over_4_5,,Akhmat,all,3,9,0.1389,,,7.291249999999999
+68114,Coventry,Newcastle,Premier League,England,2026-10-12 19:00:00+00:00,goals,,Newcastle Over 0.5,,,,,,0.7907,0.7,6.893200000000001
+122090,Dordrecht,Emmen,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,winless,,Dordrecht,all,7,9,0.5944,,,6.876666666666664
+122093,Jong AZ,Den Bosch,Eerste Divisie,Netherlands,2026-10-09 18:00:00+00:00,patterns,winless,,Den Bosch,all,7,9,0.5944,,,6.876666666666664
+103801,Austria Vienna,Sturm Graz,Bundesliga,Austria,2026-10-10 17:30:00+00:00,patterns,Under_2_5,,Sturm Graz,all,4,7,0.3571,,,6.8195454545454615
+43932,Rennes,Auxerre,Ligue 1,France,2026-10-11 15:15:00+00:00,goals,,Rennes Over 0.5,,,,,,0.8672,0.7778,6.794399999999999
+68111,Hull City,Everton,Premier League,England,2026-10-11 13:00:00+00:00,goals,,Match Under 3.5,,,,,,0.7426,0.66,6.277600000000001
+68553,Portsmouth,Sheffield Utd,Championship,England,2026-10-14 18:45:00+00:00,patterns,goalless,,Sheffield Utd,all,3,8,0.1947,,,6.271304347826087
+68107,Arsenal,Leeds,Premier League,England,2026-10-10 11:30:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.66,6.1484000000000005
+43931,Monaco,Toulouse,Ligue 1,France,2026-10-10 18:45:00+00:00,goals,,Monaco Over 0.5,,,,,,0.8483,0.7778,5.358
+85681,Arezzo,Cremonese,Serie B,Italy,2026-10-10 17:30:00+00:00,goals,,Match Over 1.5,,,,,,0.8279,0.76,5.1604
+43933,Lorient,Paris FC,Ligue 1,France,2026-10-10 18:45:00+00:00,goals,,Match Under 3.5,,,,,,0.7344,0.6667,5.1452
+68109,Crystal Palace,Nottingham Forest,Premier League,England,2026-10-11 13:00:00+00:00,goals,,Match Over 1.5,,,,,,0.7875,0.72,5.130000000000001
+85682,Modena,Hellas Verona,Serie B,Italy,2026-10-11 17:30:00+00:00,goals,,Match Over 1.5,,,,,,0.8228,0.76,4.7728
+85685,Catanzaro,Mantova,Serie B,Italy,2026-10-11 13:00:00+00:00,goals,,Match Over 1.5,,,,,,0.8228,0.76,4.7728
+103943,El Mokawloon,Masr,Premier League,Egypt,2026-10-12 14:00:00+00:00,goals,,El Mokawloon Over 0.5,,,,,,0.6825,0.62,4.75
+103950,Al Ittihad,El Gouna FC,Premier League,Egypt,2026-10-13 17:00:00+00:00,goals,,Al Ittihad Over 0.5,,,,,,0.6784,0.62,4.4384
+43929,Nice,Strasbourg,Ligue 1,France,2026-10-11 13:00:00+00:00,goals,,Strasbourg Over 0.5,,,,,,0.7828,0.7333,3.762
+43936,Lens,Lyon,Ligue 1,France,2026-10-09 18:45:00+00:00,goals,,Lyon Over 0.5,,,,,,0.7828,0.7333,3.762
+43928,Lille,Le Havre,Ligue 1,France,2026-10-10 15:15:00+00:00,goals,,Match Under 3.5,,,,,,0.7109,0.6667,3.3592000000000004
+103946,Smouha SC,Ghazl El Mehalla,Premier League,Egypt,2026-10-12 17:00:00+00:00,goals,,Smouha SC Over 0.5,,,,,,0.6635,0.62,3.306
+103948,Abu Qair Semad,Asyut Petrol,Premier League,Egypt,2026-10-13 14:00:00+00:00,goals,,Abu Qair Semad Over 0.5,,,,,,0.6635,0.62,3.306
+43934,Stade Brestois 29,Angers,Ligue 1,France,2026-10-10 18:45:00+00:00,goals,,Match Under 3.5,,,,,,0.7019,0.6667,2.6752000000000002
+85676,Benevento,Cesena,Serie B,Italy,2026-10-10 13:00:00+00:00,goals,,Match Over 1.5,,,,,,0.7908,0.76,2.3408
+44241,Cagliari,Juventus,Serie A,Italy,2026-10-11 18:45:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.72,1.5883999999999998
+44247,Lecce,Bologna,Serie A,Italy,2026-10-11 13:00:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.72,1.5883999999999998
+44239,Lazio,Monza,Serie A,Italy,2026-10-11 13:00:00+00:00,goals,,Lazio Over 0.5,,,,,,0.7994,0.78,1.4744
+44242,Napoli,Frosinone,Serie A,Italy,2026-10-10 18:45:00+00:00,goals,,Napoli Over 0.5,,,,,,0.793,0.78,0.988
+85678,Virtus Entella,Juve Stabia,Serie B,Italy,2026-10-10 13:00:00+00:00,goals,,Match Under 3.5,,,,,,0.7416,0.74,0.12160000000000001
+85679,Avellino,Sampdoria,Serie B,Italy,2026-10-09 18:30:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.74,0.0684
+85680,Padova,Carrarese,Serie B,Italy,2026-10-11 15:15:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.74,0.0684
+85683,Sudtirol,Ascoli,Serie B,Italy,2026-10-10 13:00:00+00:00,goals,,Match Under 3.5,,,,,,0.7409,0.74,0.0684

@@ -1,0 +1,613 @@
+{
+  "source_generated": "2026-10-06 00:13 UTC",
+  "fixtures": 567,
+  "date_range": [
+    "2026-10-06",
+    "2026-10-15"
+  ],
+  "summary": [
+    {
+      "cutoff_pp": 5,
+      "unique_fixtures": 536,
+      "strength": 18,
+      "goals": 93,
+      "patterns": 425,
+      "qualifying_before_cross_section_selection": {
+        "strength": 20,
+        "goals": 359,
+        "patterns": 502
+      }
+    },
+    {
+      "cutoff_pp": 10,
+      "unique_fixtures": 450,
+      "strength": 18,
+      "goals": 69,
+      "patterns": 363,
+      "qualifying_before_cross_section_selection": {
+        "strength": 20,
+        "goals": 137,
+        "patterns": 425
+      }
+    },
+    {
+      "cutoff_pp": 15,
+      "unique_fixtures": 206,
+      "strength": 18,
+      "goals": 42,
+      "patterns": 146,
+      "qualifying_before_cross_section_selection": {
+        "strength": 20,
+        "goals": 56,
+        "patterns": 173
+      }
+    }
+  ],
+  "variants": [
+    {
+      "prior": 20,
+      "prediction_gate": true,
+      "counts": {
+        "5": 508,
+        "10": 245,
+        "15": 88
+      }
+    },
+    {
+      "prior": 15,
+      "prediction_gate": true,
+      "counts": {
+        "5": 521,
+        "10": 308,
+        "15": 113
+      }
+    },
+    {
+      "prior": 15,
+      "prediction_gate": false,
+      "counts": {
+        "5": 536,
+        "10": 450,
+        "15": 206
+      }
+    }
+  ],
+  "daily": [
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-06",
+      "available_fixtures": 8,
+      "standouts": 8,
+      "strength": 0,
+      "goals": 2,
+      "patterns": 6
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-07",
+      "available_fixtures": 17,
+      "standouts": 17,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 16
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-08",
+      "available_fixtures": 7,
+      "standouts": 7,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 6
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-09",
+      "available_fixtures": 62,
+      "standouts": 60,
+      "strength": 4,
+      "goals": 6,
+      "patterns": 50
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-10",
+      "available_fixtures": 231,
+      "standouts": 216,
+      "strength": 9,
+      "goals": 49,
+      "patterns": 158
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-11",
+      "available_fixtures": 151,
+      "standouts": 142,
+      "strength": 4,
+      "goals": 26,
+      "patterns": 112
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-12",
+      "available_fixtures": 35,
+      "standouts": 32,
+      "strength": 0,
+      "goals": 4,
+      "patterns": 28
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-13",
+      "available_fixtures": 17,
+      "standouts": 15,
+      "strength": 0,
+      "goals": 3,
+      "patterns": 12
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-14",
+      "available_fixtures": 27,
+      "standouts": 27,
+      "strength": 0,
+      "goals": 0,
+      "patterns": 27
+    },
+    {
+      "cutoff_pp": 5,
+      "date_utc": "2026-10-15",
+      "available_fixtures": 12,
+      "standouts": 12,
+      "strength": 1,
+      "goals": 1,
+      "patterns": 10
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-06",
+      "available_fixtures": 8,
+      "standouts": 6,
+      "strength": 0,
+      "goals": 2,
+      "patterns": 4
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-07",
+      "available_fixtures": 17,
+      "standouts": 16,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 15
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-08",
+      "available_fixtures": 7,
+      "standouts": 7,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 6
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-09",
+      "available_fixtures": 62,
+      "standouts": 51,
+      "strength": 4,
+      "goals": 5,
+      "patterns": 42
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-10",
+      "available_fixtures": 231,
+      "standouts": 178,
+      "strength": 9,
+      "goals": 38,
+      "patterns": 131
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-11",
+      "available_fixtures": 151,
+      "standouts": 123,
+      "strength": 4,
+      "goals": 19,
+      "patterns": 100
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-12",
+      "available_fixtures": 35,
+      "standouts": 22,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 21
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-13",
+      "available_fixtures": 17,
+      "standouts": 12,
+      "strength": 0,
+      "goals": 2,
+      "patterns": 10
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-14",
+      "available_fixtures": 27,
+      "standouts": 25,
+      "strength": 0,
+      "goals": 0,
+      "patterns": 25
+    },
+    {
+      "cutoff_pp": 10,
+      "date_utc": "2026-10-15",
+      "available_fixtures": 12,
+      "standouts": 10,
+      "strength": 1,
+      "goals": 0,
+      "patterns": 9
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-06",
+      "available_fixtures": 8,
+      "standouts": 1,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 0
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-07",
+      "available_fixtures": 17,
+      "standouts": 9,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 8
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-08",
+      "available_fixtures": 7,
+      "standouts": 1,
+      "strength": 0,
+      "goals": 0,
+      "patterns": 1
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-09",
+      "available_fixtures": 62,
+      "standouts": 22,
+      "strength": 4,
+      "goals": 3,
+      "patterns": 15
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-10",
+      "available_fixtures": 231,
+      "standouts": 80,
+      "strength": 9,
+      "goals": 23,
+      "patterns": 48
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-11",
+      "available_fixtures": 151,
+      "standouts": 60,
+      "strength": 4,
+      "goals": 13,
+      "patterns": 43
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-12",
+      "available_fixtures": 35,
+      "standouts": 14,
+      "strength": 0,
+      "goals": 1,
+      "patterns": 13
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-13",
+      "available_fixtures": 17,
+      "standouts": 2,
+      "strength": 0,
+      "goals": 0,
+      "patterns": 2
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-14",
+      "available_fixtures": 27,
+      "standouts": 12,
+      "strength": 0,
+      "goals": 0,
+      "patterns": 12
+    },
+    {
+      "cutoff_pp": 15,
+      "date_utc": "2026-10-15",
+      "available_fixtures": 12,
+      "standouts": 5,
+      "strength": 1,
+      "goals": 0,
+      "patterns": 4
+    }
+  ],
+  "top15": [
+    {
+      "fixture_id": 126487,
+      "home": "Radnicki 1923",
+      "away": "FK Crvena Zvezda",
+      "league": "Super Liga",
+      "country": "Serbia",
+      "kickoff": "2026-10-10 16:00:00+00:00",
+      "list": "strength",
+      "score": 0.4723117647058823,
+      "favourite": "FK Crvena Zvezda",
+      "underdog": "Radnicki 1923",
+      "elo_gap": 295,
+      "group_win_rate": 0.6929,
+      "group_rate_source": "league record 90/118 (lower bound)",
+      "league_win_rate": 0.2206,
+      "league_win_context": "away",
+      "score_pp": 47.23117647058823
+    },
+    {
+      "fixture_id": 60892,
+      "home": "Tukums",
+      "away": "Riga",
+      "league": "Virsliga",
+      "country": "Latvia",
+      "kickoff": "2026-10-10 11:00:00+00:00",
+      "list": "strength",
+      "score": 0.4537441558441559,
+      "favourite": "Riga",
+      "underdog": "Tukums",
+      "elo_gap": 451,
+      "group_win_rate": 0.7979,
+      "group_rate_source": "league record 164/194 (lower bound)",
+      "league_win_rate": 0.3442,
+      "league_win_context": "away",
+      "score_pp": 45.37441558441559
+    },
+    {
+      "fixture_id": 81893,
+      "home": "Maritimo",
+      "away": "FC Porto",
+      "league": "Primeira Liga",
+      "country": "Portugal",
+      "kickoff": "2026-10-10 17:00:00+00:00",
+      "list": "strength",
+      "score": 0.4363193548387097,
+      "favourite": "FC Porto",
+      "underdog": "Maritimo",
+      "elo_gap": 303,
+      "group_win_rate": 0.7589,
+      "group_rate_source": "league record 186/231 (lower bound)",
+      "league_win_rate": 0.3226,
+      "league_win_context": "away",
+      "score_pp": 43.63193548387097
+    },
+    {
+      "fixture_id": 73955,
+      "home": "Qingdao Jonoon",
+      "away": "Beijing Guoan",
+      "league": "Super League",
+      "country": "China",
+      "kickoff": "2026-10-09 11:35:00+00:00",
+      "list": "strength",
+      "score": 0.40416153846153846,
+      "favourite": "Beijing Guoan",
+      "underdog": "Qingdao Jonoon",
+      "elo_gap": 265,
+      "group_win_rate": 0.6782,
+      "group_rate_source": "league record 43/55 (lower bound)",
+      "league_win_rate": 0.274,
+      "league_win_context": "away",
+      "score_pp": 40.41615384615385
+    },
+    {
+      "fixture_id": 79909,
+      "home": "FC Augsburg",
+      "away": "Bayern M\u00fcnchen",
+      "league": "Bundesliga",
+      "country": "Germany",
+      "kickoff": "2026-10-10 13:30:00+00:00",
+      "list": "strength",
+      "score": 0.3806222222222222,
+      "favourite": "Bayern M\u00fcnchen",
+      "underdog": "FC Augsburg",
+      "elo_gap": 287,
+      "group_win_rate": 0.6584,
+      "group_rate_source": "league record 82/112 (lower bound)",
+      "league_win_rate": 0.2778,
+      "league_win_context": "away",
+      "score_pp": 38.06222222222222
+    },
+    {
+      "fixture_id": 60860,
+      "home": "R\u012bgas FS",
+      "away": "Super Nova",
+      "league": "Virsliga",
+      "country": "Latvia",
+      "kickoff": "2026-10-15 14:00:00+00:00",
+      "list": "strength",
+      "score": 0.375822077922078,
+      "favourite": "R\u012bgas FS",
+      "underdog": "Super Nova",
+      "elo_gap": 419,
+      "group_win_rate": 0.7979,
+      "group_rate_source": "league record 164/194 (lower bound)",
+      "league_win_rate": 0.4221,
+      "league_win_context": "home",
+      "score_pp": 37.5822077922078
+    },
+    {
+      "fixture_id": 60895,
+      "home": "R\u012bgas FS",
+      "away": "FS Jelgava",
+      "league": "Virsliga",
+      "country": "Latvia",
+      "kickoff": "2026-10-11 13:00:00+00:00",
+      "list": "strength",
+      "score": 0.375822077922078,
+      "favourite": "R\u012bgas FS",
+      "underdog": "FS Jelgava",
+      "elo_gap": 406,
+      "group_win_rate": 0.7979,
+      "group_rate_source": "league record 164/194 (lower bound)",
+      "league_win_rate": 0.4221,
+      "league_win_context": "home",
+      "score_pp": 37.5822077922078
+    },
+    {
+      "fixture_id": 81892,
+      "home": "Benfica",
+      "away": "Guimaraes",
+      "league": "Primeira Liga",
+      "country": "Portugal",
+      "kickoff": "2026-10-11 17:00:00+00:00",
+      "list": "strength",
+      "score": 0.37180322580645164,
+      "favourite": "Benfica",
+      "underdog": "Guimaraes",
+      "elo_gap": 335,
+      "group_win_rate": 0.7589,
+      "group_rate_source": "league record 186/231 (lower bound)",
+      "league_win_rate": 0.3871,
+      "league_win_context": "home",
+      "score_pp": 37.18032258064517
+    },
+    {
+      "fixture_id": 89077,
+      "home": "Cherno More Varna",
+      "away": "Levski Sofia",
+      "league": "First League",
+      "country": "Bulgaria",
+      "kickoff": "2026-10-11 14:30:00+00:00",
+      "list": "strength",
+      "score": 0.3567521739130435,
+      "favourite": "Levski Sofia",
+      "underdog": "Cherno More Varna",
+      "elo_gap": 270,
+      "group_win_rate": 0.6611,
+      "group_rate_source": "league record 76/103 (lower bound)",
+      "league_win_rate": 0.3043,
+      "league_win_context": "away",
+      "score_pp": 35.67521739130435
+    },
+    {
+      "fixture_id": 128056,
+      "home": "Veres Rivne",
+      "away": "Shakhtar Donetsk",
+      "league": "Premier League",
+      "country": "Ukraine",
+      "kickoff": "2026-10-09 12:30:00+00:00",
+      "list": "strength",
+      "score": 0.34911320754716985,
+      "favourite": "Shakhtar Donetsk",
+      "underdog": "Veres Rivne",
+      "elo_gap": 305,
+      "group_win_rate": 0.651,
+      "group_rate_source": "league record 31/40 (lower bound)",
+      "league_win_rate": 0.3019,
+      "league_win_context": "away",
+      "score_pp": 34.91132075471698
+    },
+    {
+      "fixture_id": 71009,
+      "home": "Rangers",
+      "away": "Kilmarnock",
+      "league": "Premiership",
+      "country": "Scotland",
+      "kickoff": "2026-10-10 14:00:00+00:00",
+      "list": "strength",
+      "score": 0.3457476190476191,
+      "favourite": "Rangers",
+      "underdog": "Kilmarnock",
+      "elo_gap": 328,
+      "group_win_rate": 0.7267,
+      "group_rate_source": "league record 170/219 (lower bound)",
+      "league_win_rate": 0.381,
+      "league_win_context": "home",
+      "score_pp": 34.57476190476191
+    },
+    {
+      "fixture_id": 90863,
+      "home": "Zlin",
+      "away": "Slavia Praha",
+      "league": "Czech Liga",
+      "country": "Czech-Republic",
+      "kickoff": "2026-10-09 16:00:00+00:00",
+      "list": "strength",
+      "score": 0.34187183098591545,
+      "favourite": "Slavia Praha",
+      "underdog": "Zlin",
+      "elo_gap": 501,
+      "group_win_rate": 0.6799,
+      "group_rate_source": "league record 144/196 (lower bound)",
+      "league_win_rate": 0.338,
+      "league_win_context": "away",
+      "score_pp": 34.18718309859155
+    },
+    {
+      "fixture_id": 110189,
+      "home": "Nantes",
+      "away": "Reims",
+      "league": "Ligue 2",
+      "country": "France",
+      "kickoff": "2026-10-10 12:00:00+00:00",
+      "list": "goals",
+      "score": 0.309016,
+      "market": "Reims Over 1.5",
+      "probability": 0.7082,
+      "league_rate": 0.3016,
+      "league_comparison": "well_above",
+      "score_pp": 30.901600000000002
+    },
+    {
+      "fixture_id": 55126,
+      "home": "Kuressaare",
+      "away": "Flora Tallinn",
+      "league": "Meistriliiga",
+      "country": "Estonia",
+      "kickoff": "2026-10-11 13:30:00+00:00",
+      "list": "strength",
+      "score": 0.3025068965517242,
+      "favourite": "Flora Tallinn",
+      "underdog": "Kuressaare",
+      "elo_gap": 261,
+      "group_win_rate": 0.7163,
+      "group_rate_source": "league record 176/230 (lower bound)",
+      "league_win_rate": 0.4138,
+      "league_win_context": "away",
+      "score_pp": 30.25068965517242
+    },
+    {
+      "fixture_id": 128054,
+      "home": "Obolon'-Brovar",
+      "away": "Kryvbas KR",
+      "league": "Premier League",
+      "country": "Ukraine",
+      "kickoff": "2026-10-10 12:30:00+00:00",
+      "list": "goals",
+      "score": 0.293056,
+      "market": "Kryvbas KR Over 1.5",
+      "probability": 0.6686,
+      "league_rate": 0.283,
+      "league_comparison": "well_above",
+      "score_pp": 29.3056
+    }
+  ]
+}

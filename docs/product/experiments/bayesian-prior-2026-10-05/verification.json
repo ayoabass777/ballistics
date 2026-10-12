@@ -1,0 +1,9 @@
+{
+  "sampled_predictions_reconstructed": 130,
+  "uniqueness": "passed",
+  "event_completeness": "passed",
+  "minimum_sample": "passed",
+  "strict_prior_date_and_season_filters": "passed",
+  "context_selection": "passed",
+  "outcomes_and_probability_formulas": "passed"
+}

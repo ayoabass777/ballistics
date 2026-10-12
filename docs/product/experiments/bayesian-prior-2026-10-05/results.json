@@ -1,0 +1,218 @@
+{
+  "source_rows": 113950,
+  "source_leagues": 62,
+  "source_start": "2020-01-24",
+  "source_end": "2026-10-04",
+  "source_hash": "3b6531ecca4c3badd4aa62c317b967b05bbeeeb2bd39e8d1594101df007d8fd8",
+  "selected_on_validation": "fixed_15",
+  "summary": {
+    "test": [
+      {
+        "model": "fixed_3",
+        "brier": 0.2257771460048487,
+        "log_loss": 0.6486439207542084,
+        "mean_probability": 0.5190237929065515,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      },
+      {
+        "model": "fixed_5",
+        "brier": 0.22287383242801634,
+        "log_loss": 0.6397574409702249,
+        "mean_probability": 0.5190348491707018,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      },
+      {
+        "model": "fixed_10",
+        "brier": 0.21976329979568485,
+        "log_loss": 0.6312343096023578,
+        "mean_probability": 0.5190507338554178,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      },
+      {
+        "model": "fixed_15",
+        "brier": 0.21866288094600497,
+        "log_loss": 0.628401347211315,
+        "mean_probability": 0.5190590587225381,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      },
+      {
+        "model": "half_n",
+        "brier": 0.22450619779883624,
+        "log_loss": 0.6449847206281409,
+        "mean_probability": 0.5190233724599168,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      },
+      {
+        "model": "league_only",
+        "brier": 0.21924996995899323,
+        "log_loss": 0.6294023766759221,
+        "mean_probability": 0.5190811022412564,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      },
+      {
+        "model": "team_only",
+        "brier": 0.2369723854324819,
+        "log_loss": 0.8776649766781001,
+        "mean_probability": 0.518994507569247,
+        "observed_rate": 0.5221451408085518,
+        "rows": 734721
+      }
+    ],
+    "validation": [
+      {
+        "model": "fixed_3",
+        "brier": 0.22694708296854527,
+        "log_loss": 0.6509975804445585,
+        "mean_probability": 0.5176882178322362,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      },
+      {
+        "model": "fixed_5",
+        "brier": 0.22407379617035042,
+        "log_loss": 0.6422737147331907,
+        "mean_probability": 0.5176747428453236,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      },
+      {
+        "model": "fixed_10",
+        "brier": 0.22097721709375379,
+        "log_loss": 0.6338339188218184,
+        "mean_probability": 0.5176494516255286,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      },
+      {
+        "model": "fixed_15",
+        "brier": 0.21987820670699873,
+        "log_loss": 0.6310106643911539,
+        "mean_probability": 0.5176318846703859,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      },
+      {
+        "model": "half_n",
+        "brier": 0.22553939422740568,
+        "log_loss": 0.6468861558074835,
+        "mean_probability": 0.5176538317343197,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      },
+      {
+        "model": "league_only",
+        "brier": 0.22049241665308034,
+        "log_loss": 0.6320316360307309,
+        "mean_probability": 0.5175339071136867,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      },
+      {
+        "model": "team_only",
+        "brier": 0.2378311882242778,
+        "log_loss": 0.8644065687739202,
+        "mean_probability": 0.5177137940446359,
+        "observed_rate": 0.5196388102814603,
+        "rows": 425815
+      }
+    ]
+  },
+  "holdout_intervals": {
+    "half_n": {
+      "brier_delta_vs_15": 0.005843316852831225,
+      "cluster_bootstrap_95pct": [
+        0.0055073681591798745,
+        0.006204803307700969
+      ],
+      "clusters": 154
+    },
+    "fixed_15": {
+      "brier_delta_vs_15": 0.0,
+      "cluster_bootstrap_95pct": [
+        0.0,
+        0.0
+      ],
+      "clusters": 154
+    }
+  },
+  "unique_events_test": [
+    {
+      "model": "fixed_3",
+      "brier": 0.22556346242606812,
+      "log_loss": 0.6480173244693366,
+      "mean_probability": 0.5147170962084291,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    },
+    {
+      "model": "fixed_5",
+      "brier": 0.2226697726879319,
+      "log_loss": 0.6391812575439333,
+      "mean_probability": 0.5147533683895698,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    },
+    {
+      "model": "fixed_10",
+      "brier": 0.21958236659824207,
+      "log_loss": 0.6307414414186545,
+      "mean_probability": 0.5148088510748072,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    },
+    {
+      "model": "fixed_15",
+      "brier": 0.2185001153045088,
+      "log_loss": 0.6279623471829562,
+      "mean_probability": 0.5148406599155028,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    },
+    {
+      "model": "half_n",
+      "brier": 0.2243042736363918,
+      "log_loss": 0.6444043642057441,
+      "mean_probability": 0.5147377383085935,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    },
+    {
+      "model": "league_only",
+      "brier": 0.2191989891995321,
+      "log_loss": 0.6292387961005426,
+      "mean_probability": 0.5149619798005697,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    },
+    {
+      "model": "team_only",
+      "brier": 0.23675484028156937,
+      "log_loss": 0.8763502355885493,
+      "mean_probability": 0.5146256175626049,
+      "observed_rate": 0.5232722504339894,
+      "rows": 508653
+    }
+  ],
+  "coverage": {
+    "test": {
+      "fixtures": 28383,
+      "team_contexts": 56517,
+      "leagues": 62,
+      "start": "2025-01-01",
+      "end": "2026-10-04"
+    },
+    "validation": {
+      "fixtures": 16448,
+      "team_contexts": 32755,
+      "leagues": 62,
+      "start": "2024-01-01",
+      "end": "2024-12-31"
+    }
+  }
+}
