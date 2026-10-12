@@ -115,6 +115,10 @@ sources:
           - name: goals_against
           - name: goal_diff
           - name: form
+          - name: group_name
+            description: "API table label (conference / split round); part of the key since 2026-10-11."
+          - name: group_order
+          - name: description
           - name: created_at
           - name: updated_at
 

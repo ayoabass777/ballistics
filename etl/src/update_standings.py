@@ -1,9 +1,15 @@
 """
-Fetch league standings from the API and upsert into raw.raw_league_standings keyed by league_season_id + team_id.
+Fetch league standings from the API and upsert into raw.raw_league_standings
+keyed by league_season_id + group_name + api_team_id.
+
+API-Football returns one table per group: a single table for most leagues,
+parallel tables for conferences (MLS, USL), and extra tables for split
+seasons (championship / relegation rounds). Each table is kept as its own
+group; nothing is merged or overwritten.
 """
 import argparse
 import time
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import psycopg2
 from psycopg2.extras import execute_values
@@ -17,7 +23,7 @@ STANDINGS_ENDPOINT = "standings"
 logger = get_logger(__name__)
 
 RAW_TABLE = "raw.raw_league_standings"
-UPSERT_CONFLICT = "(league_season_id, api_team_id)"
+UPSERT_CONFLICT = "(league_season_id, group_name, api_team_id)"
 
 # Columns for upsert
 COLUMNS = [
@@ -36,6 +42,9 @@ COLUMNS = [
     "goals_against",
     "goal_diff",
     "form",
+    "group_name",
+    "group_order",
+    "description",
 ]
 
 
@@ -62,7 +71,15 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     except (IndexError, AttributeError):
         return flattened
 
-    for table in tables:
+    labels = [_table_label(table, i) for i, table in enumerate(tables)]
+    repeated = {lab for lab in labels if labels.count(lab) > 1}
+
+    for group_order, table in enumerate(tables):
+        label = labels[group_order]
+        if label in repeated:
+            # The API sometimes gives parallel tables the same label (USL
+            # Championship conferences both say "USL Championship").
+            label = f"{label} - Table {group_order + 1}"
         for row in table:
             team = row.get("team", {}) or {}
             stats = row.get("all", {}) or {}
@@ -80,23 +97,40 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                     "goals_against": stats.get("goals", {}).get("against"),
                     "goal_diff": row.get("goalsDiff"),
                     "form": row.get("form"),
+                    "group_name": label,
+                    "group_order": group_order,
+                    "description": row.get("description"),
                 }
             )
     return flattened
 
 
-def get_league_seasons(cur: psycopg2.extensions.cursor) -> List[Tuple[int, int, int]]:
+def _table_label(table: List[Dict[str, Any]], group_order: int) -> str:
+    """Table label ("Eastern Conference", "Championship Round") from the
+    /standings rows; tables without one are named by position so parallel
+    tables still get distinct keys instead of overwriting each other."""
+    for row in table:
+        if row.get("group"):
+            return row["group"]
+    return f"Table {group_order + 1}"
+
+
+def get_league_seasons(
+    cur: psycopg2.extensions.cursor, league_season_ids: Optional[List[int]] = None
+) -> List[Tuple[int, int, int]]:
     """
-    Fetch league_season_id, api_league_id, season.
+    Fetch league_season_id, api_league_id, season: current seasons, or the
+    given ids (backfill of past seasons).
     """
-    cur.execute(
-        """
+    sql = """
         SELECT ls.league_season_id, l.api_league_id, ls.season
         FROM raw_stg.stg_dim_league_seasons ls
         JOIN raw_stg.stg_dim_leagues l ON ls.league_id = l.league_id
-        WHERE ls.is_current
-        """
-    )
+    """
+    if league_season_ids:
+        cur.execute(sql + " WHERE ls.league_season_id = ANY(%s)", (list(league_season_ids),))
+    else:
+        cur.execute(sql + " WHERE ls.is_current")
     return cur.fetchall()
 
 
@@ -119,33 +153,88 @@ def ensure_table(cur: psycopg2.extensions.cursor) -> None:
             goals_against INT,
             goal_diff INT,
             form TEXT,
+            group_name TEXT NOT NULL DEFAULT '',
+            group_order INT,
+            description TEXT,
             created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-            updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-            UNIQUE (league_season_id, api_team_id)
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         )
         """
     )
+    migrate_groups(cur)
 
 
-def upsert_standings(rows: List[Dict[str, Any]]) -> int:
+def migrate_groups(cur: psycopg2.extensions.cursor) -> None:
+    """Idempotent: add group columns and key standings by group (2026-10-11).
+
+    Rows written before this keep group_name '' and stop being refreshed;
+    dbt's mart_league_standings shows only each league season's latest
+    refresh, so they drop out of display on the next run.
     """
-    Upsert standings rows into RAW_TABLE.
-    Deduplicates by (league_season_id, api_team_id) before insert — some leagues
-    return multiple standings tables (e.g. playoff groups) with overlapping teams.
-    """
-    if not rows:
-        return 0
+    cur.execute(f"""
+        ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS group_name TEXT NOT NULL DEFAULT '';
+        ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS group_order INT;
+        ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS description TEXT;
+        ALTER TABLE {RAW_TABLE}
+            DROP CONSTRAINT IF EXISTS raw_league_standings_league_season_id_api_team_id_key;
+        CREATE UNIQUE INDEX IF NOT EXISTS raw_league_standings_season_group_team_uidx
+            ON {RAW_TABLE} (league_season_id, group_name, api_team_id);
+    """)
 
-    # Deduplicate: last occurrence wins (most current table)
-    seen: Dict[Tuple[Any, Any], int] = {}
+
+def dedupe_rows(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Drop exact repeats of (league_season, group, team); last one wins.
+
+    A team in two groups (regular season + championship round) is two
+    rows, not a duplicate.
+    """
+    seen: Dict[Tuple[Any, Any, Any], int] = {}
     deduped: List[Dict[str, Any]] = []
     for row in rows:
-        key = (row.get("league_season_id"), row.get("api_team_id"))
+        key = (row.get("league_season_id"), row.get("group_name") or "",
+               row.get("api_team_id"))
         if key in seen:
             deduped[seen[key]] = row
         else:
             seen[key] = len(deduped)
             deduped.append(row)
+    return deduped
+
+
+def prune_stale_rows(cur: psycopg2.extensions.cursor, rows: List[Dict[str, Any]]) -> int:
+    """Delete a refreshed league season's rows that the new payload doesn't
+    have: pre-groups rows (group_name ''), relabelled groups, teams that left
+    a table. Only seasons present in `rows` are touched, so an empty API
+    response never wipes a season."""
+    by_season: Dict[Any, List[Tuple[str, Any]]] = {}
+    for row in rows:
+        by_season.setdefault(row.get("league_season_id"), []).append(
+            (row.get("group_name") or "", row.get("api_team_id"))
+        )
+    deleted = 0
+    for league_season_id, keys in by_season.items():
+        cur.execute(
+            f"""
+            DELETE FROM {RAW_TABLE}
+            WHERE league_season_id = %s
+              AND (group_name, api_team_id) NOT IN %s
+            """,
+            (league_season_id, tuple(keys)),
+        )
+        deleted += cur.rowcount or 0
+    return deleted
+
+
+def upsert_standings(rows: List[Dict[str, Any]]) -> int:
+    """
+    Upsert standings rows into RAW_TABLE, one row per (league season, group,
+    team). One transaction per call, so a league season's refresh shares one
+    updated_at.
+    """
+    if not rows:
+        return 0
+
+    deduped = dedupe_rows(rows)
 
     conn = get_db_connection()
     cur = conn.cursor()
@@ -168,11 +257,15 @@ def upsert_standings(rows: List[Dict[str, Any]]) -> int:
                 row.get("goals_against"),
                 row.get("goal_diff"),
                 row.get("form"),
+                row.get("group_name") or "",
+                row.get("group_order"),
+                row.get("description"),
             ]
             for row in deduped
         ]
         set_clause = ", ".join(
-            f"{col}=EXCLUDED.{col}" for col in COLUMNS if col not in {"league_season_id", "api_team_id"}
+            f"{col}=EXCLUDED.{col}" for col in COLUMNS
+            if col not in {"league_season_id", "group_name", "api_team_id"}
         )
         insert_sql = f"""
             INSERT INTO {RAW_TABLE} ({', '.join(COLUMNS)})
@@ -181,7 +274,10 @@ def upsert_standings(rows: List[Dict[str, Any]]) -> int:
             DO UPDATE SET {set_clause}, updated_at = NOW()
         """
         execute_values(cur, insert_sql, values, page_size=500)
+        pruned = prune_stale_rows(cur, deduped)
         conn.commit()
+        if pruned:
+            logger.info("Pruned %d standings rows no longer in the API response.", pruned)
         if len(deduped) < len(rows):
             logger.info("Deduplicated %d duplicate standings rows before upsert.", len(rows) - len(deduped))
         return len(deduped)
@@ -194,7 +290,9 @@ def upsert_standings(rows: List[Dict[str, Any]]) -> int:
         conn.close()
 
 
-def update_standings(return_summary: bool = False) -> Union[int, Dict[str, Any]]:
+def update_standings(
+    return_summary: bool = False, league_season_ids: Optional[List[int]] = None
+) -> Union[int, Dict[str, Any]]:
     """
     Fetch standings for all current league seasons and upsert into DB.
     """
@@ -204,7 +302,7 @@ def update_standings(return_summary: bool = False) -> Union[int, Dict[str, Any]]
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        league_rows = get_league_seasons(cur)
+        league_rows = get_league_seasons(cur, league_season_ids)
         if not league_rows:
             logger.info("No league seasons found for standings update.")
             if return_summary:
@@ -257,8 +355,12 @@ def update_standings(return_summary: bool = False) -> Union[int, Dict[str, Any]]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Update league standings from API.")
+    parser.add_argument(
+        "--league-season-ids", type=int, nargs="+",
+        help="Refresh these league seasons (e.g. past seasons) instead of current ones.",
+    )
     args = parser.parse_args()
     try:
-        update_standings()
+        update_standings(league_season_ids=args.league_season_ids)
     except KeyboardInterrupt:
         logger.warning("KeyboardInterrupt received; shutting down standings update.")
