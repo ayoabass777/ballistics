@@ -90,6 +90,13 @@ def ensure_raw_fixtures_bootstrap_ready(cur: psycopg2.extensions.cursor) -> None
     Public wrapper for fixture ETL entrypoints.
     """
     assert_raw_fixtures_fixture_id_contract(cur)
+    migrate_raw_fixtures_columns(cur)
+
+
+def migrate_raw_fixtures_columns(cur: psycopg2.extensions.cursor) -> None:
+    """Idempotent column additions, so loaders never write a column the table
+    lacks (2026-10-12: round)."""
+    cur.execute("ALTER TABLE raw.raw_fixtures ADD COLUMN IF NOT EXISTS round TEXT")
 
 
 def ensure_data_detector_ready(cur: psycopg2.extensions.cursor) -> None:

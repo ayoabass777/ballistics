@@ -51,6 +51,7 @@ RAW_COLUMNS = [
     "away_fulltime_result",
     "home_halftime_result",
     "away_halftime_result",
+    "round",
 ]
 COPY_SQL = f"COPY {RAW_TABLE} ({', '.join(RAW_COLUMNS)}) FROM STDIN WITH CSV NULL ''"
 
@@ -75,6 +76,27 @@ def write_fixtures_to_s3(
         ContentType="application/json",
     )
     logger.info("Wrote %d fixtures to s3://%s/%s", len(fixtures), bucket, s3_key)
+    return s3_key
+
+
+def write_raw_payload_to_s3(
+    payload: List[Dict[str, Any]],
+    api_league_id: int,
+    season_year: int,
+    ds: str,
+    bucket: str = S3_BUCKET,
+) -> str:
+    """Land the untouched API response, so a field we don't extract today can
+    be recovered later without another API pull."""
+    s3_key = f"raw_payload/fixtures/{api_league_id}/{season_year}/{ds}/fixtures.json"
+    s3 = boto3.client("s3")
+    s3.put_object(
+        Bucket=bucket,
+        Key=s3_key,
+        Body=json.dumps(payload, default=str),
+        ContentType="application/json",
+    )
+    logger.info("Wrote raw payload (%d fixtures) to s3://%s/%s", len(payload), bucket, s3_key)
     return s3_key
 
 

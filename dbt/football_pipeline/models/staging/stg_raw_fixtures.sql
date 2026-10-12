@@ -1,6 +1,7 @@
 {{ config(
     materialized='incremental',
-    unique_key='api_fixture_id'
+    unique_key='api_fixture_id',
+    on_schema_change='append_new_columns'
 ) }}
 
 SELECT
@@ -22,6 +23,7 @@ SELECT
     away_fulltime_result,
     home_halftime_result,
     away_halftime_result,
+    round,                              -- API league.round, e.g. "Regular Season - 12", "Final"
     CASE WHEN fixture_status='FT' THEN TRUE
     ELSE FALSE END AS is_played,
     created_at,

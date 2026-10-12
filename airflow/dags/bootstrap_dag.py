@@ -159,7 +159,11 @@ def bootstrap_dag():
         )
         from etl.src.extract_metadata import get_db_connection
         from etl.src.schema_checks import ensure_raw_fixtures_bootstrap_ready
-        from etl.src.s3_landing import write_fixtures_to_s3, write_to_dlq
+        from etl.src.s3_landing import (
+            write_fixtures_to_s3,
+            write_raw_payload_to_s3,
+            write_to_dlq,
+        )
         from etl.src.logger import get_logger
         from etl.src.config import EXTRACT_FIXTURES_LOG
         from etl.src.data_detector import (
@@ -191,6 +195,8 @@ def bootstrap_dag():
                         params={"league": api_league_id, "season": season_year},
                     )
                     extracted = extract_fixtures_field(fixtures)
+                    if fixtures:
+                        write_raw_payload_to_s3(fixtures, api_league_id, season_year, ds)
 
                     if not extracted:
                         logger.warning("No fixtures extracted for %s (%s)", league_name, season_year)

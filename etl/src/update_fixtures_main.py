@@ -42,6 +42,7 @@ RAW_COLUMNS = [
     "away_fulltime_result",
     "home_halftime_result",
     "away_halftime_result",
+    "round",
 ]
 
 

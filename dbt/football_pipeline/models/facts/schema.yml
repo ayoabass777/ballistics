@@ -54,3 +54,23 @@ models:
         tests:
           - not_null:
               config: {severity: warn}
+      - name: round
+        description: "API-Football league.round (\"Regular Season - 12\", \"Semi-finals\"). NULL until backfilled."
+        tests:
+          - not_null:
+              config: {severity: warn}
+      - name: phase
+        description: "round without its matchday number (\"Regular Season\", \"Relegation Group\", \"Semi-finals\")."
+      - name: stage
+        description: >
+          Format: 'league' (round-robin: a team plays 3+ games in the phase) or 'knockout'
+          (single games / ties, or a label naming one: final, semis, Round of 16, play-in...).
+          Macros fixture_phase / fixture_knockout_name.
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['league', 'knockout']
+      - name: is_knockout
+        description: "stage = 'knockout'. Single games / ties where extra time and penalties can decide."
+      - name: is_playoff
+        description: "Post-season: knockout games plus phases named play-offs (round-robin play-off groups)."

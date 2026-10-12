@@ -22,9 +22,13 @@ CREATE TABLE IF NOT EXISTS raw.raw_fixtures (
   away_fulltime_result          TEXT,
   home_halftime_result          TEXT,
   away_halftime_result          TEXT,
+  round                         TEXT,
   created_at                    TIMESTAMPTZ  NOT NULL DEFAULT now(),
   updated_at                    TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
+
+-- Existing databases (2026-10-12): competition round from the API.
+ALTER TABLE raw.raw_fixtures ADD COLUMN IF NOT EXISTS round TEXT;
 
 CREATE INDEX IF NOT EXISTS raw_raw_fixtures_fixture_id_idx
   ON raw.raw_fixtures (fixture_id);
