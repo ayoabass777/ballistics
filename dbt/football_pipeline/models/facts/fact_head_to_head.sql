@@ -28,10 +28,19 @@ with src as (
         is_played,
         updated_at,
         team_pair_key
-    from {{ ref('fact_team_fixtures') }}
+    from {{ ref('fact_team_fixtures') }} tf
     where is_played
     {% if is_incremental() %}
-      and updated_at > (select coalesce(max(updated_at), '1900-01-01') from {{ this }})
+      -- New or changed rows, plus any played row not yet here. The second
+      -- branch catches rows that arrive upstream late with an old updated_at
+      -- (e.g. after a backfill), which the watermark alone skips forever.
+      and (
+        updated_at > (select coalesce(max(updated_at), '1900-01-01') from {{ this }})
+        or not exists (
+          select 1 from {{ this }} h
+          where h.fixture_id = tf.fixture_id and h.team_id = tf.team_id
+        )
+      )
     {% endif %}
 ),
 
