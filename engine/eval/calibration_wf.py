@@ -59,7 +59,7 @@ RECORD_FLOOR_POISSON = 0.55
 RECORD_FLOOR_MISMATCH = 0.60
 RECORD_FLOOR_DC = 0.55
 
-MODELS = ("bayesian", "poisson", "mismatch", "dixon_coles")
+MODELS = ("bayesian", "mismatch", "dixon_coles")   # Poisson retired 2026-10-11
 DC_BOUNDS_1_4_MARKET = "Match Goals 1-4"
 DC_BOUNDS_1_4_CALIBRATION_KEY = "dixon_coles_bounds_1_4"
 CALIBRATION_KEYS = (*MODELS, *DC_MARKET_KEYS)
@@ -947,14 +947,6 @@ def run_walk_forward(months: int = 6, fold_days: int = 14,
                 print(f"    Bayesian: {len(bp)} raw predictions")
             except Exception as e:
                 print(f"    Bayesian failed: {e}")
-
-            # Poisson
-            try:
-                pp = _poisson_fold(conn, test_fix, cutoff_dt, league_map)
-                fold_preds.extend(pp)
-                print(f"    Poisson:  {len(pp)} raw predictions")
-            except Exception as e:
-                print(f"    Poisson failed: {e}")
 
             # Mismatch
             try:

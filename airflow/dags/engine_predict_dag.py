@@ -13,7 +13,7 @@ from raw.model_picks (--from-picks) and writes raw.consensus_pool + the JSON fee
 Task graph:
     wait_for_dbt_refresh
             ├──► refresh_elo ──► mismatch
-            └──► [poisson] [bayesian] [dixon_coles]
+            └──► [bayesian] [dixon_coles]
                                   wait_for_quorum  ──►  consensus
                                                             │
                                                             ▼
@@ -30,8 +30,9 @@ from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.providers.docker.operators.docker import DockerOperator
 from docker.types import Mount
 
-MODELS = ("poisson", "mismatch", "bayesian", "dixon_coles")
-QUORUM = 3                          # proceed once this many models are ready
+# Poisson GLM retired 2026-10-11 (not used by the product; slips retired).
+MODELS = ("mismatch", "bayesian", "dixon_coles")
+QUORUM = 2                          # proceed once this many models are ready
 GRACE = timedelta(minutes=30)       # ...or this long after the first finishes
 DAYS_AHEAD = int(os.getenv("ENGINE_PREDICT_DAYS", "10"))
 BANKROLL = os.getenv("ENGINE_BANKROLL", "300000")
@@ -157,7 +158,6 @@ def engine_predict_dag():
     )
     wait_for_dbt_refresh >> initialise_forecast_history >> settle_forecast_history
     wait_for_dbt_refresh >> [
-        model_tasks["poisson"],
         model_tasks["bayesian"],
         model_tasks["dixon_coles"],
     ]

@@ -72,19 +72,20 @@ class EloGapShortlistTests(unittest.TestCase):
 
 class ConsensusGoalModelRuleTests(unittest.TestCase):
     def test_over_2_5_has_no_model_combination_restriction(self):
-        for model in ("poisson", "mismatch", "bayesian", "dixon_coles"):
+        for model in ("mismatch", "bayesian", "dixon_coles"):
             with self.subTest(model=model):
                 self.assertTrue(
                     _passes_goal_model_rules("Match Over 2.5", {model})
                 )
 
-    def test_other_special_goal_rules_are_unchanged(self):
-        self.assertFalse(
-            _passes_goal_model_rules("Match Over 1.5", {"dixon_coles"})
-        )
-        self.assertFalse(
-            _passes_goal_model_rules("Match Under 3.5", {"dixon_coles"})
-        )
+    def test_over_1_5_and_unders_need_dixon_coles(self):
+        # Poisson retired 2026-10-11: Dixon-Coles alone qualifies these.
+        for market in ("Match Over 1.5", "Match Under 3.5"):
+            with self.subTest(market=market):
+                self.assertTrue(_passes_goal_model_rules(market, {"dixon_coles"}))
+                self.assertFalse(_passes_goal_model_rules(market, {"bayesian"}))
+                self.assertFalse(
+                    _passes_goal_model_rules(market, {"bayesian", "mismatch"}))
 
 
 class BayesianFixtureAnalysisTests(unittest.TestCase):

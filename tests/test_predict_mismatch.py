@@ -120,3 +120,13 @@ class MismatchDagWiringTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_poisson_is_retired_from_the_daily_engine():
+    from engine.eval import picks_store
+    from engine.eval.run_model import RUNNERS
+    dag = Path("airflow/dags/engine_predict_dag.py").read_text()
+    assert "poisson" not in picks_store.MODELS
+    assert "poisson" not in RUNNERS
+    assert 'MODELS = ("mismatch", "bayesian", "dixon_coles")' in dag
+    assert 'model_tasks["poisson"]' not in dag
