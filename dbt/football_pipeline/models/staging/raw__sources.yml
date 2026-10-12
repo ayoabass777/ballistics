@@ -81,6 +81,8 @@ sources:
             tests:
               - accepted_values:
                   values: ['win', 'draw', 'loss', null]
+          - name: round
+            description: "API-Football league.round. Filled for past seasons by etl.src.backfill_fixture_rounds (2026-10-12)."
           - name: created_at
             description: "Timestamp when the raw record was created"
             tests:

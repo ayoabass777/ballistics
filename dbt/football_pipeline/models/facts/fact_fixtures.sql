@@ -40,6 +40,9 @@ select
     rf.away_team_fulltime_goal,
     rf.home_fulltime_result,
     rf.away_fulltime_result,
+    rf.round,
+    {{ fixture_stage('rf.round') }}            as stage,
+    {{ fixture_stage('rf.round') }} = 'knockout' as is_knockout,
     rf.updated_at
 from {{ ref('stg_raw_fixtures') }} as rf
 left join {{ ref('int_league_context') }} as lc

@@ -54,3 +54,16 @@ models:
         tests:
           - not_null:
               config: {severity: warn}
+      - name: round
+        description: "API-Football league.round (\"Regular Season - 12\", \"Semi-finals\"). NULL until backfilled."
+        tests:
+          - not_null:
+              config: {severity: warn}
+      - name: stage
+        description: "'league' (round-robin) or 'knockout' (play-offs, finals, cup rounds); macro fixture_stage."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['league', 'knockout']
+      - name: is_knockout
+        description: "stage = 'knockout'. Single games / ties where extra time and penalties can decide."

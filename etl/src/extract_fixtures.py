@@ -235,6 +235,9 @@ def extract_fixtures_field(
                 "api_fixture_id": fixture_data.get("id"),
                 "api_league_id": league_id,
                 "season": season,
+                # Competition round ("Regular Season - 12", "Play-offs",
+                # "Semi-finals"); dbt derives stage / is_knockout from it.
+                "round": league_data.get("round"),
                 "kickoff_utc": fixture_data.get("date"),
                 "fixture_status": status_data.get("short", "NS"),
                 "home_team_id": home_team.get("id"),
