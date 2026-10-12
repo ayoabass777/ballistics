@@ -89,9 +89,11 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                     "goals_against": stats.get("goals", {}).get("against"),
                     "goal_diff": row.get("goalsDiff"),
                     "form": row.get("form"),
-                    # Table label ("Eastern Conference", "Championship Round");
-                    # '' when the API sends none, so the key stays NOT NULL.
-                    "group_name": row.get("group") or "",
+                    # Table label ("Eastern Conference", "Championship Round").
+                    # The /standings rows usually carry it; when they don't,
+                    # name the table by position so parallel tables still get
+                    # distinct keys instead of overwriting each other.
+                    "group_name": row.get("group") or f"Table {group_order + 1}",
                     "group_order": group_order,
                     "description": row.get("description"),
                 }

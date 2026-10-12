@@ -37,9 +37,14 @@ def test_split_season_team_is_kept_in_both_tables():
     assert kept[2]["description"] == "Promotion - Champions League"
 
 
-def test_missing_group_label_becomes_empty_string():
-    (row,) = us.extract_standings(_payload([_row(5, 1, None)]))
-    assert row["group_name"] == ""
+def test_missing_group_label_falls_back_to_table_position():
+    rows = us.extract_standings(_payload(
+        [_row(5, 1, None)], [_row(6, 1, None)],
+    ))
+    assert [r["group_name"] for r in rows] == ["Table 1", "Table 2"]
+    for r in rows:
+        r["league_season_id"] = 1
+    assert len(us.dedupe_rows(rows)) == 2   # unlabeled tables don't collide
 
 
 def test_exact_repeat_in_the_same_group_is_deduped_last_wins():
