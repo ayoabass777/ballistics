@@ -30,8 +30,6 @@ CREATE TABLE IF NOT EXISTS dim.dim_leagues (
 
 ALTER TABLE dim.dim_leagues ADD COLUMN IF NOT EXISTS tier INT;
 ALTER TABLE dim.dim_leagues ADD COLUMN IF NOT EXISTS logo_file_id UUID;
--- single | conferences | split (league definition in metadata.yaml); NULL = not declared
-ALTER TABLE dim.dim_leagues ADD COLUMN IF NOT EXISTS standings_format TEXT;
 ALTER TABLE dim.dim_leagues ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT now();
 ALTER TABLE dim.dim_leagues ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
 CREATE UNIQUE INDEX IF NOT EXISTS dim_leagues_api_league_id_uidx
