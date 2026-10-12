@@ -1,0 +1,2448 @@
+{
+ "run_ds": "2026-10-07",
+ "source": "consensus_slips_2026-10-07.json",
+ "fixtures": [
+  {
+   "fixture_id": 126487,
+   "home": "Radnicki 1923",
+   "away": "FK Crvena Zvezda",
+   "league": "Super Liga",
+   "country": "Serbia",
+   "kickoff": "Sat 10 Oct · 17:00 UTC",
+   "bar_title": "Radnicki 1923 v Crvena Zvezda",
+   "bar_sub": "Super Liga · Sat 10 Oct · 17:00 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "1.89",
+    "away_scored": "2.40",
+    "home_conceded": "1.00",
+    "away_conceded": "0.30",
+    "home_attack_rank": "#4 of 14",
+    "away_attack_rank": "#1 of 14",
+    "home_defence_rank": "#4 of 14",
+    "away_defence_rank": "#1 of 14"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "FK Crvena Zvezda",
+    "dog": "Radnicki 1923",
+    "record_title": "Big dogs in Super Liga",
+    "record": "Won 90 of 118 · 76%",
+    "record_note": "Across past seasons in this league: drew 16, lost 12."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Radnicki 1923",
+       "event": "Won",
+       "record": "5 / 9",
+       "line": "Much more often than usual\n56% vs league 37%"
+      },
+      "away": {
+       "team": "FK Crvena Zvezda",
+       "event": "Won",
+       "record": "9 / 10",
+       "line": "Much more often than usual\n90% vs league 37%"
+      }
+     },
+     {
+      "label": "Radnicki 1923 defence vs Crvena Zvezda attack",
+      "home": {
+       "team": "Radnicki 1923",
+       "event": "Conceded 2+",
+       "record": "2 / 9",
+       "line": "Less often than usual\n22% vs league 37%"
+      },
+      "away": {
+       "team": "FK Crvena Zvezda",
+       "event": "Scored 2+",
+       "record": "8 / 10",
+       "line": "Much more often than usual\n80% vs league 37%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "FK Crvena Zvezda · Clean sheet",
+      "record": "7 / 10",
+      "line": "Much more often than usual · 70% vs league 31%"
+     },
+     {
+      "text": "FK Crvena Zvezda · Unbeaten",
+      "record": "10 / 10",
+      "line": "Much more often than usual · 100% vs league 63%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "FK Crvena Zvezda over 0.5",
+      "value": "78%",
+      "label": "Much more likely than usual · league 59% (away)"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "78%",
+      "label": "Typical for this league · league 79%"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "76%",
+      "label": "Typical for this league · league 74%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 60892,
+   "home": "Tukums",
+   "away": "Riga",
+   "league": "Virsliga",
+   "country": "Latvia",
+   "kickoff": "Sat 10 Oct · 11:00 UTC",
+   "bar_title": "Tukums v Riga",
+   "bar_sub": "Virsliga · Sat 10 Oct · 11:00 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "1.42",
+    "away_scored": "2.77",
+    "home_conceded": "1.97",
+    "away_conceded": "0.97",
+    "home_attack_rank": "#4 of 10",
+    "away_attack_rank": "#1 of 10",
+    "home_defence_rank": "#9 of 10",
+    "away_defence_rank": "#2 of 10"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "Riga",
+    "dog": "Tukums",
+    "record_title": "Big dogs in Virsliga",
+    "record": "Won 164 of 194 · 85%",
+    "record_note": "Across past seasons in this league: drew 19, lost 11."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Tukums defence vs Riga attack",
+      "home": {
+       "team": "Tukums",
+       "event": "Conceded 2+",
+       "record": "6 / 16",
+       "line": "More often than usual\n38% vs league 31%"
+      },
+      "away": {
+       "team": "Riga",
+       "event": "Scored 2+",
+       "record": "11 / 15",
+       "line": "Much more often than usual\n73% vs league 31%"
+      }
+     },
+     {
+      "label": "Both teams scored",
+      "home": {
+       "team": "Tukums",
+       "event": "Both teams scored",
+       "record": "14 / 16",
+       "line": "Much more often than usual\n88% vs league 54%"
+      },
+      "away": {
+       "team": "Riga",
+       "event": "Both teams scored",
+       "record": "9 / 15",
+       "line": "More often than usual\n60% vs league 54%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Riga · Won",
+      "record": "10 / 15",
+      "line": "Much more often than usual · 67% vs league 34%"
+     },
+     {
+      "text": "Riga · Unbeaten",
+      "record": "13 / 15",
+      "line": "Much more often than usual · 87% vs league 58%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Riga over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 73% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "More likely than usual · league 75%"
+     },
+     {
+      "market": "Tukums over 0.5",
+      "value": "72%",
+      "label": "Typical for this league · league 76% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 81893,
+   "home": "Maritimo",
+   "away": "FC Porto",
+   "league": "Primeira Liga",
+   "country": "Portugal",
+   "kickoff": "Sat 10 Oct · 17:00 UTC",
+   "bar_title": "Maritimo v FC Porto",
+   "bar_sub": "Primeira Liga · Sat 10 Oct · 17:00 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "1.14",
+    "away_scored": "2.57",
+    "home_conceded": "1.71",
+    "away_conceded": "0.43",
+    "home_attack_rank": "#12 of 18",
+    "away_attack_rank": "#2 of 18",
+    "home_defence_rank": "#13 of 18",
+    "away_defence_rank": "#1 of 18"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "FC Porto",
+    "dog": "Maritimo",
+    "record_title": "Big dogs in Primeira Liga",
+    "record": "Won 186 of 231 · 81%",
+    "record_note": "Across past seasons in this league: drew 29, lost 16."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Maritimo",
+       "event": "Lost",
+       "record": "3 / 7",
+       "line": "More often than usual\n43% vs league 35%"
+      },
+      "away": {
+       "team": "FC Porto",
+       "event": "Won",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 35%"
+      }
+     },
+     {
+      "label": "Maritimo defence vs FC Porto attack",
+      "home": {
+       "team": "Maritimo",
+       "event": "Conceded 2+",
+       "record": "4 / 7",
+       "line": "More often than usual\n57% vs league 43%"
+      },
+      "away": {
+       "team": "FC Porto",
+       "event": "Scored 2+",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 43%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "FC Porto · Conceded 2+",
+      "record": "0 / 7",
+      "line": "Much less often than usual · 0% vs league 43%"
+     },
+     {
+      "text": "FC Porto · Unbeaten",
+      "record": "7 / 7",
+      "line": "Much more often than usual · 100% vs league 65%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "FC Porto over 0.5",
+      "value": "88%",
+      "label": "Much more likely than usual · league 71% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "82%",
+      "label": "More likely than usual · league 76%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "77%",
+      "label": "Less likely than usual · league 85%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 79909,
+   "home": "FC Augsburg",
+   "away": "Bayern München",
+   "league": "Bundesliga",
+   "country": "Germany",
+   "kickoff": "Sat 10 Oct · 13:30 UTC",
+   "bar_title": "FC Augsburg v Bayern München",
+   "bar_sub": "Bundesliga · Sat 10 Oct · 13:30 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "2.75",
+    "away_scored": "3.50",
+    "home_conceded": "1.50",
+    "away_conceded": "0.50",
+    "home_attack_rank": "#3 of 18",
+    "away_attack_rank": "#1 of 18",
+    "home_defence_rank": "#9 of 18",
+    "away_defence_rank": "#1 of 18"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "Bayern München",
+    "dog": "FC Augsburg",
+    "record_title": "Big dogs in Bundesliga",
+    "record": "Won 82 of 112 · 73%",
+    "record_note": "Across past seasons in this league: drew 18, lost 12."
+   },
+   "patterns": {
+    "pairs": [],
+    "also": [],
+    "too_early": [
+     "FC Augsburg",
+     "Bayern München"
+    ]
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Bayern München over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 67% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "Typical for this league · league 86%"
+     },
+     {
+      "market": "FC Augsburg over 0.5",
+      "value": "78%",
+      "label": "Less likely than usual · league 83% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 71009,
+   "home": "Rangers",
+   "away": "Kilmarnock",
+   "league": "Premiership",
+   "country": "Scotland",
+   "kickoff": "Sat 10 Oct · 14:00 UTC",
+   "bar_title": "Rangers v Kilmarnock",
+   "bar_sub": "Premiership · Sat 10 Oct · 14:00 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "1.14",
+    "away_scored": "0.86",
+    "home_conceded": "0.57",
+    "away_conceded": "2.14",
+    "home_attack_rank": "#9 of 12",
+    "away_attack_rank": "#11 of 12",
+    "home_defence_rank": "#2 of 12",
+    "away_defence_rank": "#12 of 12"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "Rangers",
+    "dog": "Kilmarnock",
+    "record_title": "Big dogs in Premiership",
+    "record": "Won 170 of 219 · 78%",
+    "record_note": "Across past seasons in this league: drew 29, lost 20."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Rangers",
+       "event": "Won",
+       "record": "5 / 7",
+       "line": "Much more often than usual\n71% vs league 39%"
+      },
+      "away": {
+       "team": "Kilmarnock",
+       "event": "Lost",
+       "record": "4 / 7",
+       "line": "Much more often than usual\n57% vs league 39%"
+      }
+     },
+     {
+      "label": "Under 1.5 goals",
+      "home": {
+       "team": "Rangers",
+       "event": "Under 1.5 goals",
+       "record": "4 / 7",
+       "line": "Much more often than usual\n57% vs league 26%"
+      },
+      "away": {
+       "team": "Kilmarnock",
+       "event": "Under 1.5 goals",
+       "record": "3 / 7",
+       "line": "Much more often than usual\n43% vs league 26%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Rangers · Clean sheet",
+      "record": "4 / 7",
+      "line": "Much more often than usual · 57% vs league 26%"
+     },
+     {
+      "text": "Rangers · Scored 1+",
+      "record": "7 / 7",
+      "line": "Much more often than usual · 100% vs league 74%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Rangers over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 71% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "81%",
+      "label": "More likely than usual · league 74%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "78%",
+      "label": "Less likely than usual · league 88%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 45061,
+   "home": "FC Dnepr Mogilev",
+   "away": "Dinamo Minsk",
+   "league": "Premier League",
+   "country": "Belarus",
+   "kickoff": "Sat 10 Oct · 15:00 UTC",
+   "bar_title": "Dnepr Mogilev v Dinamo Minsk",
+   "bar_sub": "Premier League · Sat 10 Oct · 15:00 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "0.87",
+    "away_scored": "1.76",
+    "home_conceded": "1.56",
+    "away_conceded": "0.76",
+    "home_attack_rank": "#14 of 16",
+    "away_attack_rank": "#2 of 16",
+    "home_defence_rank": "#12 of 16",
+    "away_defence_rank": "#1 of 16"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "Dinamo Minsk",
+    "dog": "FC Dnepr Mogilev",
+    "record_title": "Big dogs in Premier League",
+    "record": "Won 53 of 76 · 70%",
+    "record_note": "Across past seasons in this league: drew 16, lost 7."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "FC Dnepr Mogilev",
+       "event": "Drew",
+       "record": "7 / 11",
+       "line": "Much more often than usual\n64% vs league 28%"
+      },
+      "away": {
+       "team": "Dinamo Minsk",
+       "event": "Drew",
+       "record": "2 / 10",
+       "line": "Less often than usual\n20% vs league 28%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "FC Dnepr Mogilev",
+       "event": "Winless",
+       "record": "10 / 11",
+       "line": "Much more often than usual\n91% vs league 61%"
+      },
+      "away": {
+       "team": "Dinamo Minsk",
+       "event": "Unbeaten",
+       "record": "9 / 10",
+       "line": "Much more often than usual\n90% vs league 61%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Dinamo Minsk · Won",
+      "record": "7 / 10",
+      "line": "Much more often than usual · 70% vs league 34%"
+     },
+     {
+      "text": "Dinamo Minsk · Conceded 2+",
+      "record": "1 / 10",
+      "line": "Much less often than usual · 10% vs league 39%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Dinamo Minsk over 0.5",
+      "value": "81%",
+      "label": "Much more likely than usual · league 65% (away)"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "81%",
+      "label": "Typical for this league · league 79%"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "74%",
+      "label": "Typical for this league · league 72%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 85316,
+   "home": "Barcelona",
+   "away": "Getafe",
+   "league": "La Liga",
+   "country": "Spain",
+   "kickoff": "Sat 10 Oct · 16:30 UTC",
+   "bar_title": "Barcelona v Getafe",
+   "bar_sub": "La Liga · Sat 10 Oct · 16:30 UTC",
+   "why": "Clear strength advantage",
+   "pick_list": "strength",
+   "context": {
+    "home_scored": "4.43",
+    "away_scored": "0.57",
+    "home_conceded": "1.00",
+    "away_conceded": "1.00",
+    "home_attack_rank": "#1 of 20",
+    "away_attack_rank": "#18 of 20",
+    "home_defence_rank": "#5 of 20",
+    "away_defence_rank": "#3 of 20"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "Barcelona",
+    "dog": "Getafe",
+    "record_title": "Big dogs in La Liga",
+    "record": "Won 138 of 191 · 72%",
+    "record_note": "Across past seasons in this league: drew 25, lost 28."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Barcelona",
+       "event": "Won",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 38%"
+      },
+      "away": {
+       "team": "Getafe",
+       "event": "Lost",
+       "record": "3 / 7",
+       "line": "More often than usual\n43% vs league 38%"
+      }
+     },
+     {
+      "label": "Barcelona attack vs Getafe defence",
+      "home": {
+       "team": "Barcelona",
+       "event": "Scored 2+",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 41%"
+      },
+      "away": {
+       "team": "Getafe",
+       "event": "Conceded 2+",
+       "record": "1 / 7",
+       "line": "Much less often than usual\n14% vs league 41%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Barcelona · Over 4.5 goals",
+      "record": "5 / 7",
+      "line": "Much more often than usual · 71% vs league 23%"
+     },
+     {
+      "text": "Barcelona · Over 3.5 goals",
+      "record": "6 / 7",
+      "line": "Much more often than usual · 86% vs league 39%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Barcelona over 0.5",
+      "value": "90%",
+      "label": "More likely than usual · league 81% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "82%",
+      "label": "More likely than usual · league 77%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "73%",
+      "label": "Typical for this league · league 70%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 63544,
+   "home": "Neptūną Klaipėda",
+   "away": "Hegelmann II",
+   "league": "1 Lyga",
+   "country": "Lithuania",
+   "kickoff": "Sat 10 Oct · 11:00 UTC",
+   "bar_title": "Neptūną Klaipėda v Hegelmann II",
+   "bar_sub": "1 Lyga · Sat 10 Oct · 11:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.32",
+    "away_scored": "1.20",
+    "home_conceded": "1.20",
+    "away_conceded": "2.24",
+    "home_attack_rank": "#9 of 16",
+    "away_attack_rank": "#10 of 16",
+    "home_defence_rank": "#5 of 16",
+    "away_defence_rank": "#14 of 16"
+   },
+   "strength": {
+    "state": "label_off",
+    "record_title": "Big dog labels",
+    "record": "Top-flight leagues only",
+    "record_note": "1 Lyga is not a top-flight league, so no Big dog label is shown."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Neptūną Klaipėda attack vs Hegelmann II defence",
+      "home": {
+       "team": "Neptūną Klaipėda",
+       "event": "Scored 2+",
+       "record": "6 / 12",
+       "line": "Typical for this league\n50% vs league 49%"
+      },
+      "away": {
+       "team": "Hegelmann II",
+       "event": "Conceded 2+",
+       "record": "9 / 12",
+       "line": "Much more often than usual\n75% vs league 49%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Neptūną Klaipėda",
+       "event": "Won",
+       "record": "8 / 12",
+       "line": "Much more often than usual\n67% vs league 51%"
+      },
+      "away": {
+       "team": "Hegelmann II",
+       "event": "Lost",
+       "record": "9 / 12",
+       "line": "Much more often than usual\n75% vs league 51%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Hegelmann II · Over 4.5 goals",
+      "record": "4 / 12",
+      "line": "Much more often than usual · 33% vs league 14%"
+     },
+     {
+      "text": "Hegelmann II · Winless",
+      "record": "10 / 12",
+      "line": "Much more often than usual · 83% vs league 65%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Neptūną Klaipėda over 0.5",
+      "value": "90%",
+      "label": "More likely than usual · league 76% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "83%",
+      "label": "More likely than usual · league 76%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "76%",
+      "label": "Less likely than usual · league 82%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 110189,
+   "home": "Nantes",
+   "away": "Reims",
+   "league": "Ligue 2",
+   "country": "France",
+   "kickoff": "Sat 10 Oct · 12:00 UTC",
+   "bar_title": "Nantes v Reims",
+   "bar_sub": "Ligue 2 · Sat 10 Oct · 12:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "1.29",
+    "away_scored": "2.14",
+    "home_conceded": "1.86",
+    "away_conceded": "1.29",
+    "home_attack_rank": "#10 of 18",
+    "away_attack_rank": "#2 of 18",
+    "home_defence_rank": "#16 of 18",
+    "away_defence_rank": "#10 of 18"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Nantes defence vs Reims attack",
+      "home": {
+       "team": "Nantes",
+       "event": "Conceded 2+",
+       "record": "3 / 7",
+       "line": "More often than usual\n43% vs league 33%"
+      },
+      "away": {
+       "team": "Reims",
+       "event": "Scored 2+",
+       "record": "5 / 7",
+       "line": "Much more often than usual\n71% vs league 33%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Nantes",
+       "event": "Winless",
+       "record": "5 / 7",
+       "line": "Typical for this league\n71% vs league 68%"
+      },
+      "away": {
+       "team": "Reims",
+       "event": "Unbeaten",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 68%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Reims · Over 3.5 goals",
+      "record": "4 / 7",
+      "line": "Much more often than usual · 57% vs league 29%"
+     },
+     {
+      "text": "Reims · Both teams scored",
+      "record": "6 / 7",
+      "line": "Much more often than usual · 86% vs league 59%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Reims over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 73% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "Much more likely than usual · league 68%"
+     },
+     {
+      "market": "Nantes over 0.5",
+      "value": "75%",
+      "label": "Typical for this league · league 75% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 128054,
+   "home": "Obolon'-Brovar",
+   "away": "Kryvbas KR",
+   "league": "Premier League",
+   "country": "Ukraine",
+   "kickoff": "Sat 10 Oct · 10:00 UTC",
+   "bar_title": "Obolon'-Brovar v Kryvbas KR",
+   "bar_sub": "Premier League · Sat 10 Oct · 10:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "0.29",
+    "away_scored": "1.17",
+    "home_conceded": "1.71",
+    "away_conceded": "1.67",
+    "home_attack_rank": "#16 of 16",
+    "away_attack_rank": "#6 of 16",
+    "home_defence_rank": "#15 of 16",
+    "away_defence_rank": "#14 of 16"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Obolon'-Brovar",
+       "event": "Winless",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 65%"
+      },
+      "away": {
+       "team": "Kryvbas KR",
+       "event": "Winless",
+       "record": "5 / 6",
+       "line": "Much more often than usual\n83% vs league 65%"
+      }
+     },
+     {
+      "label": "Over 3.5 goals",
+      "home": {
+       "team": "Obolon'-Brovar",
+       "event": "Over 3.5 goals",
+       "record": "2 / 7",
+       "line": "More often than usual\n29% vs league 17%"
+      },
+      "away": {
+       "team": "Kryvbas KR",
+       "event": "Over 3.5 goals",
+       "record": "3 / 6",
+       "line": "Much more often than usual\n50% vs league 17%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Kryvbas KR · Conceded 1+",
+      "record": "6 / 6",
+      "line": "Much more often than usual · 100% vs league 60%"
+     },
+     {
+      "text": "Obolon'-Brovar · Scored 2+",
+      "record": "0 / 7",
+      "line": "Much less often than usual · 0% vs league 32%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Kryvbas KR over 0.5",
+      "value": "89%",
+      "label": "Much more likely than usual · league 55% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "83%",
+      "label": "More likely than usual · league 72%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "75%",
+      "label": "Typical for this league · league 74%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 110194,
+   "home": "Saint Etienne",
+   "away": "Rodez",
+   "league": "Ligue 2",
+   "country": "France",
+   "kickoff": "Sat 10 Oct · 18:00 UTC",
+   "bar_title": "Saint Etienne v Rodez",
+   "bar_sub": "Ligue 2 · Sat 10 Oct · 18:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "2.71",
+    "away_scored": "2.00",
+    "home_conceded": "1.14",
+    "away_conceded": "2.29",
+    "home_attack_rank": "#1 of 18",
+    "away_attack_rank": "#3 of 18",
+    "home_defence_rank": "#9 of 18",
+    "away_defence_rank": "#18 of 18"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Over 2.5 goals",
+      "home": {
+       "team": "Saint Etienne",
+       "event": "Over 2.5 goals",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 46%"
+      },
+      "away": {
+       "team": "Rodez",
+       "event": "Over 2.5 goals",
+       "record": "5 / 7",
+       "line": "Much more often than usual\n71% vs league 46%"
+      }
+     },
+     {
+      "label": "Saint Etienne attack vs Rodez defence",
+      "home": {
+       "team": "Saint Etienne",
+       "event": "Scored 2+",
+       "record": "6 / 7",
+       "line": "Much more often than usual\n86% vs league 33%"
+      },
+      "away": {
+       "team": "Rodez",
+       "event": "Conceded 2+",
+       "record": "5 / 7",
+       "line": "Much more often than usual\n71% vs league 33%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Saint Etienne · Over 3.5 goals",
+      "record": "5 / 7",
+      "line": "Much more often than usual · 71% vs league 29%"
+     },
+     {
+      "text": "Rodez · Over 3.5 goals",
+      "record": "5 / 7",
+      "line": "Much more often than usual · 71% vs league 29%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Saint Etienne over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 75% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "Much more likely than usual · league 68%"
+     },
+     {
+      "market": "Rodez over 0.5",
+      "value": "78%",
+      "label": "More likely than usual · league 73% (away)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 66421,
+   "home": "Sporting JAX",
+   "away": "Birmingham Legion",
+   "league": "USL Championship",
+   "country": "USA",
+   "kickoff": "Sat 10 Oct · 21:00 UTC",
+   "bar_title": "Sporting JAX v Birmingham Legion",
+   "bar_sub": "USL Championship · Sat 10 Oct · 21:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "1.19",
+    "away_scored": "1.39",
+    "home_conceded": "2.70",
+    "away_conceded": "1.65",
+    "home_attack_rank": "#19 of 25",
+    "away_attack_rank": "#9 of 25",
+    "home_defence_rank": "#25 of 25",
+    "away_defence_rank": "#21 of 25"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Sporting JAX defence vs Birmingham Legion attack",
+      "home": {
+       "team": "Sporting JAX",
+       "event": "Conceded 2+",
+       "record": "10 / 13",
+       "line": "Much more often than usual\n77% vs league 33%"
+      },
+      "away": {
+       "team": "Birmingham Legion",
+       "event": "Scored 2+",
+       "record": "6 / 12",
+       "line": "Much more often than usual\n50% vs league 33%"
+      }
+     },
+     {
+      "label": "Over 2.5 goals",
+      "home": {
+       "team": "Sporting JAX",
+       "event": "Over 2.5 goals",
+       "record": "11 / 13",
+       "line": "Much more often than usual\n85% vs league 50%"
+      },
+      "away": {
+       "team": "Birmingham Legion",
+       "event": "Over 2.5 goals",
+       "record": "8 / 12",
+       "line": "Much more often than usual\n67% vs league 50%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Sporting JAX · Lost",
+      "record": "8 / 13",
+      "line": "Much more often than usual · 62% vs league 27%"
+     },
+     {
+      "text": "Sporting JAX · Conceded 1+",
+      "record": "13 / 13",
+      "line": "Much more often than usual · 100% vs league 68%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Birmingham Legion over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 68% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "More likely than usual · league 72%"
+     },
+     {
+      "market": "Sporting JAX over 0.5",
+      "value": "81%",
+      "label": "Typical for this league · league 77% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 79912,
+   "home": "SC Paderborn 07",
+   "away": "VfB Stuttgart",
+   "league": "Bundesliga",
+   "country": "Germany",
+   "kickoff": "Sat 10 Oct · 13:30 UTC",
+   "bar_title": "Paderborn 07 v VfB Stuttgart",
+   "bar_sub": "Bundesliga · Sat 10 Oct · 13:30 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "0.75",
+    "away_scored": "1.50",
+    "home_conceded": "1.25",
+    "away_conceded": "2.25",
+    "home_attack_rank": "#17 of 18",
+    "away_attack_rank": "#13 of 18",
+    "home_defence_rank": "#7 of 18",
+    "away_defence_rank": "#12 of 18"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [],
+    "also": [],
+    "too_early": [
+     "SC Paderborn 07",
+     "VfB Stuttgart"
+    ]
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Match over 1.5",
+      "value": "76%",
+      "label": "Less likely than usual · league 86%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "75%",
+      "label": "Much more likely than usual · league 50%"
+     },
+     {
+      "market": "VfB Stuttgart over 0.5",
+      "value": "75%",
+      "label": "More likely than usual · league 67% (away)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 124383,
+   "home": "Csikszereda",
+   "away": "Universitatea Craiova",
+   "league": "Liga I",
+   "country": "Romania",
+   "kickoff": "Sat 10 Oct · 17:00 UTC",
+   "bar_title": "Csikszereda v Universitatea Craiova",
+   "bar_sub": "Liga I · Sat 10 Oct · 17:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "0.60",
+    "away_scored": "2.40",
+    "home_conceded": "2.30",
+    "away_conceded": "0.90",
+    "home_attack_rank": "#16 of 16",
+    "away_attack_rank": "#1 of 16",
+    "home_defence_rank": "#16 of 16",
+    "away_defence_rank": "#3 of 16"
+   },
+   "strength": {
+    "state": "label_off",
+    "record_title": "Favourites in Liga I",
+    "record": "Won 8 of 16 · 50%",
+    "record_note": "Not enough past matches like this in this league for a Big dog label yet."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Csikszereda",
+       "event": "Lost",
+       "record": "9 / 10",
+       "line": "Much more often than usual\n90% vs league 37%"
+      },
+      "away": {
+       "team": "Universitatea Craiova",
+       "event": "Won",
+       "record": "6 / 10",
+       "line": "Much more often than usual\n60% vs league 37%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Csikszereda",
+       "event": "Winless",
+       "record": "10 / 10",
+       "line": "Much more often than usual\n100% vs league 63%"
+      },
+      "away": {
+       "team": "Universitatea Craiova",
+       "event": "Unbeaten",
+       "record": "8 / 10",
+       "line": "Much more often than usual\n80% vs league 63%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Csikszereda · Conceded 2+",
+      "record": "7 / 10",
+      "line": "Much more often than usual · 70% vs league 36%"
+     },
+     {
+      "text": "Csikszereda · Failed to score",
+      "record": "6 / 10",
+      "line": "Much more often than usual · 60% vs league 31%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Universitatea Craiova over 0.5",
+      "value": "87%",
+      "label": "Much more likely than usual · league 57% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "79%",
+      "label": "More likely than usual · league 70%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "77%",
+      "label": "Typical for this league · league 77%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 107534,
+   "home": "Bristol Rovers",
+   "away": "Barnet",
+   "league": "League Two",
+   "country": "England",
+   "kickoff": "Sat 10 Oct · 14:00 UTC",
+   "bar_title": "Bristol Rovers v Barnet",
+   "bar_sub": "League Two · Sat 10 Oct · 14:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "1.56",
+    "away_scored": "2.43",
+    "home_conceded": "1.56",
+    "away_conceded": "1.43",
+    "home_attack_rank": "#5 of 24",
+    "away_attack_rank": "#1 of 24",
+    "home_defence_rank": "#19 of 24",
+    "away_defence_rank": "#16 of 24"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Bristol Rovers defence vs Barnet attack",
+      "home": {
+       "team": "Bristol Rovers",
+       "event": "Conceded 2+",
+       "record": "5 / 9",
+       "line": "Much more often than usual\n56% vs league 38%"
+      },
+      "away": {
+       "team": "Barnet",
+       "event": "Scored 2+",
+       "record": "6 / 7",
+       "line": "Much more often than usual\n86% vs league 38%"
+      }
+     },
+     {
+      "label": "Both teams scored",
+      "home": {
+       "team": "Bristol Rovers",
+       "event": "Both teams scored",
+       "record": "3 / 9",
+       "line": "Much less often than usual\n33% vs league 53%"
+      },
+      "away": {
+       "team": "Barnet",
+       "event": "Both teams scored",
+       "record": "7 / 7",
+       "line": "Much more often than usual\n100% vs league 53%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Barnet · Over 3.5 goals",
+      "record": "5 / 7",
+      "line": "Much more often than usual · 71% vs league 26%"
+     },
+     {
+      "text": "Barnet · Over 2.5 goals",
+      "record": "6 / 7",
+      "line": "Much more often than usual · 86% vs league 45%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Bristol Rovers over 0.5",
+      "value": "90%",
+      "label": "Typical for this league · league 85% (home)"
+     },
+     {
+      "market": "Barnet over 0.5",
+      "value": "88%",
+      "label": "Much more likely than usual · league 59% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "More likely than usual · league 75%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 81805,
+   "home": "Kairat Almaty",
+   "away": "Zhetysu",
+   "league": "Premier League",
+   "country": "Kazakhstan",
+   "kickoff": "Sat 10 Oct · 12:00 UTC",
+   "bar_title": "Kairat Almaty v Zhetysu",
+   "bar_sub": "Premier League · Sat 10 Oct · 12:00 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "1.96",
+    "away_scored": "1.00",
+    "home_conceded": "0.77",
+    "away_conceded": "1.69",
+    "home_attack_rank": "#1 of 16",
+    "away_attack_rank": "#11 of 16",
+    "home_defence_rank": "#2 of 16",
+    "away_defence_rank": "#16 of 16"
+   },
+   "strength": {
+    "state": "label_off",
+    "record_title": "Favourites in Premier League",
+    "record": "Won 17 of 25 · 68%",
+    "record_note": "Not enough past matches like this in this league for a Big dog label yet."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Kairat Almaty attack vs Zhetysu defence",
+      "home": {
+       "team": "Kairat Almaty",
+       "event": "Scored 2+",
+       "record": "8 / 12",
+       "line": "Much more often than usual\n67% vs league 43%"
+      },
+      "away": {
+       "team": "Zhetysu",
+       "event": "Conceded 2+",
+       "record": "10 / 14",
+       "line": "Much more often than usual\n71% vs league 43%"
+      }
+     },
+     {
+      "label": "Both teams scored",
+      "home": {
+       "team": "Kairat Almaty",
+       "event": "Both teams scored",
+       "record": "5 / 12",
+       "line": "Less often than usual\n42% vs league 54%"
+      },
+      "away": {
+       "team": "Zhetysu",
+       "event": "Both teams scored",
+       "record": "11 / 14",
+       "line": "Much more often than usual\n79% vs league 54%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Kairat Almaty · Clean sheet",
+      "record": "7 / 12",
+      "line": "Much more often than usual · 58% vs league 34%"
+     },
+     {
+      "text": "Zhetysu · Over 2.5 goals",
+      "record": "10 / 14",
+      "line": "Much more often than usual · 71% vs league 48%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Kairat Almaty over 0.5",
+      "value": "90%",
+      "label": "More likely than usual · league 80% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "85%",
+      "label": "More likely than usual · league 72%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "73%",
+      "label": "Less likely than usual · league 82%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 86064,
+   "home": "Gençlerbirliği S.K.",
+   "away": "Amed",
+   "league": "Süper Lig",
+   "country": "Turkey",
+   "kickoff": "Sat 10 Oct · 10:30 UTC",
+   "bar_title": "Gençlerbirliği S.K. v Amed",
+   "bar_sub": "Süper Lig · Sat 10 Oct · 10:30 UTC",
+   "why": "Goal estimate well above the league",
+   "pick_list": "goals",
+   "context": {
+    "home_scored": "0.83",
+    "away_scored": "2.50",
+    "home_conceded": "2.17",
+    "away_conceded": "1.17",
+    "home_attack_rank": "#15 of 18",
+    "away_attack_rank": "#2 of 18",
+    "home_defence_rank": "#16 of 18",
+    "away_defence_rank": "#8 of 18"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Gençlerbirliği S.K. defence vs Amed attack",
+      "home": {
+       "team": "Gençlerbirliği S.K.",
+       "event": "Conceded 2+",
+       "record": "3 / 6",
+       "line": "More often than usual\n50% vs league 44%"
+      },
+      "away": {
+       "team": "Amed",
+       "event": "Scored 2+",
+       "record": "5 / 6",
+       "line": "Much more often than usual\n83% vs league 44%"
+      }
+     },
+     {
+      "label": "Over 2.5 goals",
+      "home": {
+       "team": "Gençlerbirliği S.K.",
+       "event": "Over 2.5 goals",
+       "record": "4 / 6",
+       "line": "More often than usual\n67% vs league 56%"
+      },
+      "away": {
+       "team": "Amed",
+       "event": "Over 2.5 goals",
+       "record": "5 / 6",
+       "line": "Much more often than usual\n83% vs league 56%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Amed · Won",
+      "record": "4 / 6",
+      "line": "Much more often than usual · 67% vs league 40%"
+     },
+     {
+      "text": "Gençlerbirliği S.K. · Scored 2+",
+      "record": "1 / 6",
+      "line": "Much less often than usual · 17% vs league 44%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Amed over 0.5",
+      "value": "90%",
+      "label": "Much more likely than usual · league 63% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "84%",
+      "label": "More likely than usual · league 74%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "72%",
+      "label": "Typical for this league · league 76%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 63542,
+   "home": "Tauras",
+   "away": "Minija",
+   "league": "1 Lyga",
+   "country": "Lithuania",
+   "kickoff": "Sat 10 Oct · 11:00 UTC",
+   "bar_title": "Tauras v Minija",
+   "bar_sub": "1 Lyga · Sat 10 Oct · 11:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.72",
+    "away_scored": "2.72",
+    "home_conceded": "1.24",
+    "away_conceded": "0.52",
+    "home_attack_rank": "#4 of 16",
+    "away_attack_rank": "#1 of 16",
+    "home_defence_rank": "#7 of 16",
+    "away_defence_rank": "#2 of 16"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Tauras",
+       "event": "Won",
+       "record": "8 / 12",
+       "line": "Much more often than usual\n67% vs league 51%"
+      },
+      "away": {
+       "team": "Minija",
+       "event": "Won",
+       "record": "10 / 13",
+       "line": "Much more often than usual\n77% vs league 35%"
+      }
+     },
+     {
+      "label": "Tauras attack vs Minija defence",
+      "home": {
+       "team": "Tauras",
+       "event": "Scored 2+",
+       "record": "9 / 12",
+       "line": "Much more often than usual\n75% vs league 49%"
+      },
+      "away": {
+       "team": "Minija",
+       "event": "Conceded 2+",
+       "record": "1 / 13",
+       "line": "Much less often than usual\n8% vs league 49%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Minija · Unbeaten",
+      "record": "11 / 13",
+      "line": "Much more often than usual · 85% vs league 49%"
+     },
+     {
+      "text": "Minija · Clean sheet",
+      "record": "7 / 13",
+      "line": "Much more often than usual · 54% vs league 24%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 42665,
+   "home": "Gais",
+   "away": "Sirius",
+   "league": "Allsvenskan",
+   "country": "Sweden",
+   "kickoff": "Sat 10 Oct · 13:00 UTC",
+   "bar_title": "Gais v Sirius",
+   "bar_sub": "Allsvenskan · Sat 10 Oct · 13:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.27",
+    "away_scored": "2.36",
+    "home_conceded": "0.91",
+    "away_conceded": "1.27",
+    "home_attack_rank": "#11 of 16",
+    "away_attack_rank": "#1 of 16",
+    "home_defence_rank": "#2 of 16",
+    "away_defence_rank": "#5 of 16"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Gais defence vs Sirius attack",
+      "home": {
+       "team": "Gais",
+       "event": "Conceded 2+",
+       "record": "0 / 11",
+       "line": "Much less often than usual\n0% vs league 37%"
+      },
+      "away": {
+       "team": "Sirius",
+       "event": "Scored 2+",
+       "record": "10 / 11",
+       "line": "Much more often than usual\n91% vs league 37%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Gais",
+       "event": "Won",
+       "record": "5 / 11",
+       "line": "Typical for this league\n45% vs league 41%"
+      },
+      "away": {
+       "team": "Sirius",
+       "event": "Won",
+       "record": "9 / 11",
+       "line": "Much more often than usual\n82% vs league 35%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Gais · Both teams scored",
+      "record": "2 / 11",
+      "line": "Much less often than usual · 18% vs league 53%"
+     },
+     {
+      "text": "Gais · Clean sheet",
+      "record": "7 / 11",
+      "line": "Much more often than usual · 64% vs league 29%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Match over 1.5",
+      "value": "79%",
+      "label": "Typical for this league · league 82%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "78%",
+      "label": "Typical for this league · league 78%"
+     },
+     {
+      "market": "Gais over 0.5",
+      "value": "76%",
+      "label": "Typical for this league · league 78% (home)"
+     }
+    ],
+    "all_typical": true
+   }
+  },
+  {
+   "fixture_id": 63543,
+   "home": "Babrungas",
+   "away": "Jonava",
+   "league": "1 Lyga",
+   "country": "Lithuania",
+   "kickoff": "Sat 10 Oct · 11:00 UTC",
+   "bar_title": "Babrungas v Jonava",
+   "bar_sub": "1 Lyga · Sat 10 Oct · 11:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.72",
+    "away_scored": "1.12",
+    "home_conceded": "0.44",
+    "away_conceded": "1.32",
+    "home_attack_rank": "#3 of 16",
+    "away_attack_rank": "#13 of 16",
+    "home_defence_rank": "#1 of 16",
+    "away_defence_rank": "#9 of 16"
+   },
+   "strength": {
+    "state": "label_off",
+    "record_title": "Big dog labels",
+    "record": "Top-flight leagues only",
+    "record_note": "1 Lyga is not a top-flight league, so no Big dog label is shown."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Babrungas defence vs Jonava attack",
+      "home": {
+       "team": "Babrungas",
+       "event": "Clean sheet",
+       "record": "9 / 12",
+       "line": "Much more often than usual\n75% vs league 30%"
+      },
+      "away": {
+       "team": "Jonava",
+       "event": "Failed to score",
+       "record": "5 / 13",
+       "line": "More often than usual\n38% vs league 30%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Babrungas",
+       "event": "Unbeaten",
+       "record": "12 / 12",
+       "line": "Much more often than usual\n100% vs league 65%"
+      },
+      "away": {
+       "team": "Jonava",
+       "event": "Winless",
+       "record": "9 / 13",
+       "line": "Typical for this league\n69% vs league 65%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Babrungas · Won",
+      "record": "10 / 12",
+      "line": "Much more often than usual · 83% vs league 51%"
+     },
+     {
+      "text": "Babrungas · Both teams scored",
+      "record": "3 / 12",
+      "line": "Much less often than usual · 25% vs league 50%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Match goals 1–4",
+      "value": "82%",
+      "label": "Typical for this league · league 82%"
+     },
+     {
+      "market": "Babrungas over 0.5",
+      "value": "78%",
+      "label": "Typical for this league · league 76% (home)"
+     },
+     {
+      "market": "Match under 3.5",
+      "value": "76%",
+      "label": "More likely than usual · league 68%"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 67724,
+   "home": "Charlotte Independence",
+   "away": "NY Cosmos",
+   "league": "USL League One",
+   "country": "USA",
+   "kickoff": "Sat 10 Oct · 23:00 UTC",
+   "bar_title": "Charlotte Independence v NY Cosmos",
+   "bar_sub": "USL League One · Sat 10 Oct · 23:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "2.31",
+    "away_scored": "1.29",
+    "home_conceded": "1.45",
+    "away_conceded": "2.00",
+    "home_attack_rank": "#1 of 17",
+    "away_attack_rank": "#12 of 17",
+    "home_defence_rank": "#10 of 17",
+    "away_defence_rank": "#16 of 17"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Charlotte Independence",
+       "event": "Won",
+       "record": "13 / 15",
+       "line": "Much more often than usual\n87% vs league 51%"
+      },
+      "away": {
+       "team": "NY Cosmos",
+       "event": "Lost",
+       "record": "11 / 15",
+       "line": "Much more often than usual\n73% vs league 51%"
+      }
+     },
+     {
+      "label": "Charlotte Independence attack vs NY Cosmos defence",
+      "home": {
+       "team": "Charlotte Independence",
+       "event": "Scored 2+",
+       "record": "12 / 15",
+       "line": "Much more often than usual\n80% vs league 52%"
+      },
+      "away": {
+       "team": "NY Cosmos",
+       "event": "Conceded 2+",
+       "record": "13 / 15",
+       "line": "Much more often than usual\n87% vs league 52%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Charlotte Independence · Over 3.5 goals",
+      "record": "10 / 15",
+      "line": "Much more often than usual · 67% vs league 37%"
+     },
+     {
+      "text": "NY Cosmos · Over 1.5 goals",
+      "record": "15 / 15",
+      "line": "Much more often than usual · 100% vs league 80%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Charlotte Independence over 0.5",
+      "value": "90%",
+      "label": "Typical for this league · league 85% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "More likely than usual · league 80%"
+     },
+     {
+      "market": "NY Cosmos over 0.5",
+      "value": "74%",
+      "label": "More likely than usual · league 69% (away)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 63547,
+   "home": "Transinvest 2",
+   "away": "Ekranas",
+   "league": "1 Lyga",
+   "country": "Lithuania",
+   "kickoff": "Sat 10 Oct · 12:00 UTC",
+   "bar_title": "Transinvest 2 v Ekranas",
+   "bar_sub": "1 Lyga · Sat 10 Oct · 12:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.16",
+    "away_scored": "1.00",
+    "home_conceded": "2.32",
+    "away_conceded": "2.32",
+    "home_attack_rank": "#12 of 16",
+    "away_attack_rank": "#15 of 16",
+    "home_defence_rank": "#16 of 16",
+    "away_defence_rank": "#15 of 16"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Transinvest 2 attack vs Ekranas defence",
+      "home": {
+       "team": "Transinvest 2",
+       "event": "Scored 2+",
+       "record": "5 / 12",
+       "line": "Less often than usual\n42% vs league 49%"
+      },
+      "away": {
+       "team": "Ekranas",
+       "event": "Conceded 2+",
+       "record": "10 / 12",
+       "line": "Much more often than usual\n83% vs league 49%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Transinvest 2",
+       "event": "Lost",
+       "record": "6 / 12",
+       "line": "Much more often than usual\n50% vs league 35%"
+      },
+      "away": {
+       "team": "Ekranas",
+       "event": "Lost",
+       "record": "10 / 12",
+       "line": "Much more often than usual\n83% vs league 51%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Ekranas · Winless",
+      "record": "11 / 12",
+      "line": "Much more often than usual · 92% vs league 65%"
+     },
+     {
+      "text": "Transinvest 2 · Winless",
+      "record": "9 / 12",
+      "line": "Much more often than usual · 75% vs league 49%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Transinvest 2 over 0.5",
+      "value": "90%",
+      "label": "More likely than usual · league 76% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "More likely than usual · league 76%"
+     },
+     {
+      "market": "Ekranas over 0.5",
+      "value": "78%",
+      "label": "More likely than usual · league 70% (away)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 40116,
+   "home": "Bodo/Glimt",
+   "away": "Kristiansund BK",
+   "league": "Eliteserien",
+   "country": "Norway",
+   "kickoff": "Sat 10 Oct · 14:00 UTC",
+   "bar_title": "Bodo/Glimt v Kristiansund BK",
+   "bar_sub": "Eliteserien · Sat 10 Oct · 14:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "2.52",
+    "away_scored": "1.00",
+    "home_conceded": "0.91",
+    "away_conceded": "1.91",
+    "home_attack_rank": "#2 of 16",
+    "away_attack_rank": "#15 of 16",
+    "home_defence_rank": "#1 of 16",
+    "away_defence_rank": "#12 of 16"
+   },
+   "strength": {
+    "state": "big_dog",
+    "fav": "Bodo/Glimt",
+    "dog": "Kristiansund BK",
+    "record_title": "Big dogs in Eliteserien",
+    "record": "Won 56 of 75 · 75%",
+    "record_note": "Across past seasons in this league: drew 10, lost 9."
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "Bodo/Glimt",
+       "event": "Won",
+       "record": "9 / 10",
+       "line": "Much more often than usual\n90% vs league 51%"
+      },
+      "away": {
+       "team": "Kristiansund BK",
+       "event": "Lost",
+       "record": "8 / 11",
+       "line": "Much more often than usual\n73% vs league 51%"
+      }
+     },
+     {
+      "label": "Bodo/Glimt defence vs Kristiansund BK attack",
+      "home": {
+       "team": "Bodo/Glimt",
+       "event": "Clean sheet",
+       "record": "6 / 10",
+       "line": "Much more often than usual\n60% vs league 29%"
+      },
+      "away": {
+       "team": "Kristiansund BK",
+       "event": "Failed to score",
+       "record": "5 / 11",
+       "line": "Much more often than usual\n45% vs league 29%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Bodo/Glimt · Both teams scored",
+      "record": "3 / 10",
+      "line": "Much less often than usual · 30% vs league 58%"
+     },
+     {
+      "text": "Bodo/Glimt · Over 3.5 goals",
+      "record": "6 / 10",
+      "line": "Much more often than usual · 60% vs league 35%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Bodo/Glimt over 0.5",
+      "value": "90%",
+      "label": "More likely than usual · league 84% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "86%",
+      "label": "Typical for this league · league 86%"
+     },
+     {
+      "market": "Bodo/Glimt over 1.5",
+      "value": "73%",
+      "label": "Much more likely than usual · league 55% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 45065,
+   "home": "Naftan",
+   "away": "Belshina",
+   "league": "Premier League",
+   "country": "Belarus",
+   "kickoff": "Sat 10 Oct · 12:00 UTC",
+   "bar_title": "Naftan v Belshina",
+   "bar_sub": "Premier League · Sat 10 Oct · 12:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "0.87",
+    "away_scored": "1.00",
+    "home_conceded": "2.35",
+    "away_conceded": "1.64",
+    "home_attack_rank": "#15 of 16",
+    "away_attack_rank": "#13 of 16",
+    "home_defence_rank": "#16 of 16",
+    "away_defence_rank": "#13 of 16"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Naftan attack vs Belshina defence",
+      "home": {
+       "team": "Naftan",
+       "event": "Failed to score",
+       "record": "7 / 11",
+       "line": "Much more often than usual\n64% vs league 27%"
+      },
+      "away": {
+       "team": "Belshina",
+       "event": "Failed to score",
+       "record": "5 / 11",
+       "line": "More often than usual\n45% vs league 35%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Naftan",
+       "event": "Lost",
+       "record": "6 / 11",
+       "line": "Much more often than usual\n55% vs league 34%"
+      },
+      "away": {
+       "team": "Belshina",
+       "event": "Lost",
+       "record": "8 / 11",
+       "line": "Much more often than usual\n73% vs league 39%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Belshina · Winless",
+      "record": "11 / 11",
+      "line": "Much more often than usual · 100% vs league 66%"
+     },
+     {
+      "text": "Belshina · Scored 2+",
+      "record": "0 / 11",
+      "line": "Much less often than usual · 0% vs league 29%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Match over 1.5",
+      "value": "82%",
+      "label": "More likely than usual · league 72%"
+     },
+     {
+      "market": "Belshina over 0.5",
+      "value": "82%",
+      "label": "Much more likely than usual · league 65% (away)"
+     },
+     {
+      "market": "Naftan over 0.5",
+      "value": "77%",
+      "label": "Typical for this league · league 73% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 55123,
+   "home": "Vaprus",
+   "away": "Trans Narva",
+   "league": "Meistriliiga",
+   "country": "Estonia",
+   "kickoff": "Sat 10 Oct · 11:30 UTC",
+   "bar_title": "Vaprus v Trans Narva",
+   "bar_sub": "Meistriliiga · Sat 10 Oct · 11:30 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.34",
+    "away_scored": "0.76",
+    "home_conceded": "1.97",
+    "away_conceded": "2.24",
+    "home_attack_rank": "#7 of 10",
+    "away_attack_rank": "#10 of 10",
+    "home_defence_rank": "#8 of 10",
+    "away_defence_rank": "#9 of 10"
+   },
+   "strength": {
+    "state": "none"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Vaprus defence vs Trans Narva attack",
+      "home": {
+       "team": "Vaprus",
+       "event": "Clean sheet",
+       "record": "4 / 14",
+       "line": "Typical for this league\n29% vs league 28%"
+      },
+      "away": {
+       "team": "Trans Narva",
+       "event": "Failed to score",
+       "record": "10 / 14",
+       "line": "Much more often than usual\n71% vs league 28%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "Vaprus",
+       "event": "Won",
+       "record": "7 / 14",
+       "line": "Typical for this league\n50% vs league 46%"
+      },
+      "away": {
+       "team": "Trans Narva",
+       "event": "Lost",
+       "record": "12 / 14",
+       "line": "Much more often than usual\n86% vs league 46%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "Trans Narva · Scored 2+",
+      "record": "1 / 14",
+      "line": "Much less often than usual · 7% vs league 45%"
+     },
+     {
+      "text": "Trans Narva · Winless",
+      "record": "13 / 14",
+      "line": "Much more often than usual · 93% vs league 59%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Vaprus over 0.5",
+      "value": "85%",
+      "label": "Typical for this league · league 83% (home)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "79%",
+      "label": "Typical for this league · league 81%"
+     },
+     {
+      "market": "Match goals 1–4",
+      "value": "77%",
+      "label": "Typical for this league · league 77%"
+     }
+    ],
+    "all_typical": true
+   }
+  },
+  {
+   "fixture_id": 119643,
+   "home": "FC Juarez",
+   "away": "Club Tijuana",
+   "league": "Liga MX",
+   "country": "Mexico",
+   "kickoff": "Sat 10 Oct · 23:00 UTC",
+   "bar_title": "FC Juarez v Club Tijuana",
+   "bar_sub": "Liga MX · Sat 10 Oct · 23:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "0.70",
+    "away_scored": "1.56",
+    "home_conceded": "2.50",
+    "away_conceded": "1.44",
+    "home_attack_rank": "#18 of 18",
+    "away_attack_rank": "#7 of 18",
+    "home_defence_rank": "#18 of 18",
+    "away_defence_rank": "#9 of 18"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "Results",
+      "home": {
+       "team": "FC Juarez",
+       "event": "Lost",
+       "record": "9 / 10",
+       "line": "Much more often than usual\n90% vs league 39%"
+      },
+      "away": {
+       "team": "Club Tijuana",
+       "event": "Won",
+       "record": "4 / 9",
+       "line": "More often than usual\n44% vs league 39%"
+      }
+     },
+     {
+      "label": "FC Juarez attack vs Club Tijuana defence",
+      "home": {
+       "team": "FC Juarez",
+       "event": "Scored 2+",
+       "record": "1 / 10",
+       "line": "Much less often than usual\n10% vs league 44%"
+      },
+      "away": {
+       "team": "Club Tijuana",
+       "event": "Conceded 2+",
+       "record": "3 / 9",
+       "line": "Less often than usual\n33% vs league 44%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "FC Juarez · Winless",
+      "record": "9 / 10",
+      "line": "Much more often than usual · 90% vs league 61%"
+     },
+     {
+      "text": "FC Juarez · Conceded 2+",
+      "record": "7 / 10",
+      "line": "Much more often than usual · 70% vs league 44%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Club Tijuana over 0.5",
+      "value": "85%",
+      "label": "More likely than usual · league 75% (away)"
+     },
+     {
+      "market": "Match over 1.5",
+      "value": "83%",
+      "label": "Typical for this league · league 78%"
+     },
+     {
+      "market": "FC Juarez over 0.5",
+      "value": "75%",
+      "label": "Typical for this league · league 77% (home)"
+     }
+    ],
+    "all_typical": false
+   }
+  },
+  {
+   "fixture_id": 45064,
+   "home": "FC Gomel",
+   "away": "ML Vitebsk",
+   "league": "Premier League",
+   "country": "Belarus",
+   "kickoff": "Sat 10 Oct · 15:00 UTC",
+   "bar_title": "FC Gomel v ML Vitebsk",
+   "bar_sub": "Premier League · Sat 10 Oct · 15:00 UTC",
+   "why": "Record well above the league",
+   "pick_list": "patterns",
+   "context": {
+    "home_scored": "1.44",
+    "away_scored": "2.00",
+    "home_conceded": "0.78",
+    "away_conceded": "0.81",
+    "home_attack_rank": "#5 of 16",
+    "away_attack_rank": "#1 of 16",
+    "home_defence_rank": "#2 of 16",
+    "away_defence_rank": "#3 of 16"
+   },
+   "strength": {
+    "state": "close"
+   },
+   "patterns": {
+    "pairs": [
+     {
+      "label": "FC Gomel defence vs ML Vitebsk attack",
+      "home": {
+       "team": "FC Gomel",
+       "event": "Conceded 2+",
+       "record": "1 / 11",
+       "line": "Much less often than usual\n9% vs league 29%"
+      },
+      "away": {
+       "team": "ML Vitebsk",
+       "event": "Scored 2+",
+       "record": "8 / 10",
+       "line": "Much more often than usual\n80% vs league 29%"
+      }
+     },
+     {
+      "label": "Results",
+      "home": {
+       "team": "FC Gomel",
+       "event": "Won",
+       "record": "6 / 11",
+       "line": "Much more often than usual\n55% vs league 39%"
+      },
+      "away": {
+       "team": "ML Vitebsk",
+       "event": "Won",
+       "record": "8 / 10",
+       "line": "Much more often than usual\n80% vs league 34%"
+      }
+     }
+    ],
+    "also": [
+     {
+      "text": "ML Vitebsk · Unbeaten",
+      "record": "10 / 10",
+      "line": "Much more often than usual · 100% vs league 61%"
+     },
+     {
+      "text": "ML Vitebsk · Over 2.5 goals",
+      "record": "8 / 10",
+      "line": "Much more often than usual · 80% vs league 44%"
+     }
+    ],
+    "too_early": []
+   },
+   "goals": {
+    "rows": [
+     {
+      "market": "Match goals 1–4",
+      "value": "81%",
+      "label": "Typical for this league · league 79%"
+     },
+     {
+      "market": "Match under 3.5",
+      "value": "74%",
+      "label": "Typical for this league · league 78%"
+     },
+     {
+      "market": "ML Vitebsk over 0.5",
+      "value": "72%",
+      "label": "More likely than usual · league 65% (away)"
+     }
+    ],
+    "all_typical": false
+   }
+  }
+ ]
+}

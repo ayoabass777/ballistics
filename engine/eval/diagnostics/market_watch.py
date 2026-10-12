@@ -5,7 +5,7 @@ one row per (market, source) to engine/eval/watch/<slug>.csv, and flags drift
 against the first row with at least MIN_N picks (baseline). Idempotent: a report already logged (same
 `generated`/mtime stamp) is skipped.
 
-Watched now (D116): "Match Over 1.5" — all sources, and Dixon–Coles alone
+Watched now (D120): "Match Over 1.5" — all sources, and Dixon–Coles alone
 (Poisson retired 2026-10-11, so DC now carries most Over 1.5 picks by itself).
 
 Usage:

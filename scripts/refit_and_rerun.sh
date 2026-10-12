@@ -42,7 +42,7 @@ for k in [x for x in ["overall", "mismatch", "dixon_coles", "bayesian"] if x in 
     print(f"  {k:<12}{cells}")
 PY
 
-echo "== market watch (D116)"
+echo "== market watch (D120)"
 python3 -m engine.eval.diagnostics.market_watch || true
 
 echo "== rerun engine for $DS"
