@@ -7,7 +7,7 @@ Status: **proposal for the frontend build** (2026-10-07; sources and IDs updated
 | Source | What it gives | Where |
 |---|---|---|
 | Engine run export | Strength splits, patterns, goal estimates, Big dog label and league record; warehouse `home_team_id`, `away_team_id`, `league_id` | `engine/eval/consensus_slips_<run_ds>.json` → `fixture_analysis[]`, `elo_gap_shortlist[]`, `elo_gap_group.big_dog_leagues[]` |
-| League standings | Position, played, W/D/L, goal difference, points, form | dbt, warehouse ids: today `raw_int.dim_teams` (team × league season). **NEW** `mart_league_standings` needed for D69 (see §6) |
+| League standings | Position, played, W/D/L, goal difference, points, form, group (conference / split round) | dbt `raw_mart.mart_league_standings`: warehouse ids, latest refresh per league season (D69), one row per group and team; `standings_updated_at` is the ETL refresh time |
 | Head-to-head | Completed meetings between the two teams | dbt `raw.fact_head_to_head` (warehouse ids, played only): rows where `team_id` = one team and `opponent_id` = the other, either venue, `kickoff_utc` before the export cutoff, newest 5 |
 | Crests | Team badge image | API returns `crest_url` per team; the frontend never builds provider URLs. Backed by `logo_file_id` (see §6); initials if missing |
 | User state | Saved, followed leagues, venue preference | Account (not built) |
@@ -50,13 +50,14 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 
 | Row | Home/Away view | All venues view |
 |---|---|---|
-| League position | standings `rank`, `points` (overall table in both views) | same |
+| League position | `rank`, `points` from the team's row where `is_team_current_group` | same |
 | Goals scored / match | `strength.home_team.home.attack_rate` · `strength.away_team.away.attack_rate` | `…overall.attack_rate` |
 | Goals conceded / match | `…home.defense_rate` · `…away.defense_rate` | `…overall.defense_rate` |
 | Attack rank | `attack_rank` "of" `league_size` | overall |
 | Defence rank | `defense_rank` "of" `league_size` | overall |
 
-- Show totals always: "#13 of 17", "10th of 17" (`league_size` / number of standings rows).
+- Show totals always: "#13 of 17", "10th of 17" (`league_size` / number of rows in the team's group).
+- Conferences or split rounds (`n_groups > 1`): position is within the team's group; name it ("4th of 15 · Eastern Conference"). Teams in different conferences: show each team's own group.
 - Shade the better side per row (higher scored, lower conceded, lower rank number, higher position). Equal → no shade.
 - Show rates to 2 decimals. Do not use `*_shrunk` or `*_pct` on this page.
 
@@ -66,7 +67,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 - 1–2 meetings: tally + list only, no goal stats ("too few for goal stats").
 - 0 meetings: "No previous meetings in our records" — not tappable; not the same as "never played".
 
-**League table page**: all `display_standings` rows (`rank`, `team_name`, `games_played`, `goal_diff`, `points`); both teams highlighted; "This match" card with position, points, W/D/L (`wins`/`draws`/`losses`), GD and points gap.
+**League table page**: rows of the team's current group from `mart_league_standings` (`rank`, `team_name`, `games_played`, `goal_diff`, `points`); both teams highlighted; `group_name` as the table title when `n_groups > 1`, with the other groups as tabs; "This match" card with position, points, W/D/L (`wins`/`draws`/`losses`), GD and points gap (gap only when both teams share a group). `description` (e.g. "Promotion - Champions League") can mark zone rows.
 
 ### 3.3 Strength
 | State | Condition | Shown |
@@ -112,7 +113,7 @@ Never show the rating gap number or a win percentage (D61).
 ## 5. Missing data — never shown as zero
 | Missing | Behaviour |
 |---|---|
-| Standings groups unresolved (`standings_group_unresolved`) | Hide position row and table link; explain conferences |
+| Group's ranks repeat (`ranks_repeat`) | Hide position row and table link for that group |
 | Team not in standings | Position "—" with "Not in table yet" |
 | No H2H | Non-tappable "No previous meetings in our records" |
 | Pattern `n < 6` | See 3.4 |
@@ -123,7 +124,7 @@ Never show the rating gap number or a win percentage (D61).
 1. ~~W/D/L~~ — already stored (`wins`, `draws`, `losses`, `goals_for`, `goals_against`, `form`). No ETL change needed.
 2. ~~Team IDs in the engine export~~ — done 2026-10-11: `fixture_analysis[]` carries warehouse `home_team_id`, `away_team_id`, `league_id` (engine reads dbt `fact_fixtures`).
 3. ~~Pattern league sample size~~ — done 2026-10-11: `bayesian[]` rows carry `league_rate_matches`; under 20 → `too_few_matches`. Follow-up idea: blend last season into thin early-season league rates.
-4. **Standings mart** — `dim_teams` has the numbers but not what D69 needs: `standings_updated_at`, the latest-refresh-cohort filter, and conference/group detection (USL repeats ranks). Add dbt `mart_league_standings` (warehouse `team_id`, `league_season_id`, rank, played, W/D/L, GD, points, form, `updated_at`, `is_display_row`, `group_unresolved`).
+4. ~~Standings mart~~ — built 2026-10-11: `mart_league_standings`. The ETL now keeps each API table as a group (`group_name`, `group_order`, `description`) instead of overwriting; the league definition declares `standings_format` (single / conferences / split) and `format_check` flags leagues whose data disagrees. Pending: first refresh, then set formats from `etl/sql/diagnostics/standings_groups.sql`.
 5. **Crests** — `logo_file_id` exists in the dimensions but the loader that fills it is not in the repo, so coverage is unknown. Until it is, the API resolves `crest_url` server-side (it may proxy the provider image); the frontend contract does not change when storage does.
 6. **H2H stats** — computed on read from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
 7. **One snapshot rule** — standings/H2H are a current DB snapshot, not point-in-time with the forecast (D69); page must show both dates.

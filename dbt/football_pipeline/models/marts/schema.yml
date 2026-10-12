@@ -350,3 +350,30 @@ models:
       - name: h2h_matches_json
       - name: h2h_context_scopes_json
         
+
+  - name: mart_league_standings
+    description: >
+      Latest standings refresh per league season, one row per group and team,
+      warehouse ids. Match page position row and league table page
+      (match-detail-contract.md §3.2). Show a team's group where
+      is_team_current_group; hide the table when ranks_repeat.
+    columns:
+      - name: league_season_id
+        tests: [not_null]
+      - name: team_id
+        tests:
+          - not_null:
+              config: {severity: warn}
+          - relationships:
+              arguments:
+                to: ref('stg_dim_teams')
+                field: team_id
+      - name: rank
+        tests: [not_null]
+      - name: standings_updated_at
+        tests: [not_null]
+      - name: format_check
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['ok', 'undeclared_groups', 'single_has_groups', 'declared_groups_has_one']

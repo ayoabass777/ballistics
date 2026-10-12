@@ -20,6 +20,9 @@ standings as (
         goals_against,
         goal_diff,
         form,
+        group_name,         -- API table label; '' for rows written before 2026-10-11
+        group_order,        -- table position in the API response
+        description,        -- e.g. "Promotion - Champions League"
         created_at,
         updated_at
     from source s

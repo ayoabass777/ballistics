@@ -22,7 +22,15 @@ standings as (
         goals_against,
         goal_diff,
         form,
-        league_season_id
+        league_season_id,
+        -- A team can sit in two groups (split season: regular season +
+        -- championship round). Keep one row per team and league season:
+        -- latest refresh, then the last table in the API response (the
+        -- ETL's previous last-table-wins behaviour).
+        row_number() over (
+            partition by league_season_id, api_team_id
+            order by updated_at desc, group_order desc nulls last
+        ) as rn
     from {{ ref('stg_raw_league_standings') }}
 )
 
@@ -50,3 +58,4 @@ select
 from teams t
 join standings s
   on t.api_team_id = s.api_team_id
+ and s.rn = 1
