@@ -1,0 +1,1014 @@
+{
+ "source": "engine/eval/consensus_slips_2026-10-02.json",
+ "generated": "2026-10-03 00:07 UTC",
+ "run_ds": "2026-10-02",
+ "status": "MOCK for Figma — real saved engine elo_gap_shortlist, non-live.",
+ "rule": "Engine shortlist (D43): gap >= 300 and league upset rate <= 27% over >= 50 matches; max 7 per league, 40 total; ranked by gap.",
+ "count": 13,
+ "fixtures": [
+  {
+   "elo_gap_rank": 1,
+   "fixture_id": 90863,
+   "match": "Zlin vs Slavia Praha",
+   "home": "Zlin",
+   "away": "Slavia Praha",
+   "kickoff": "2026-10-09 16:00:00+00:00",
+   "league": "Czech Liga",
+   "country": "Czech-Republic",
+   "favourite": "Slavia Praha",
+   "underdog": "Zlin",
+   "elo_gap": 501,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.24002751031636863,
+   "league_matches": 1454,
+   "best_signal": "Slavia Praha Over 0.5",
+   "best_signal_confidence": 0.887,
+   "win_confidence": 0.796,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 0.4,
+     "defense_rate": 1.8,
+     "attack_rank": 16,
+     "defense_rank": 13,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.5,
+     "defense_rate": 0.25,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.89,
+     "defense_rate": 2.11,
+     "attack_rank": 12,
+     "defense_rank": 16,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.78,
+     "defense_rate": 0.67,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Slavia Praha Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8224
+    },
+    {
+     "market": "Slavia Praha Win",
+     "probability": 0.773
+    },
+    {
+     "market": "Slavia Praha Over 1.5",
+     "probability": 0.7527
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7418
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.6991
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 2,
+   "fixture_id": 60892,
+   "match": "Tukums vs Riga",
+   "home": "Tukums",
+   "away": "Riga",
+   "kickoff": "2026-10-10 11:00:00+00:00",
+   "league": "Virsliga",
+   "country": "Latvia",
+   "favourite": "Riga",
+   "underdog": "Tukums",
+   "elo_gap": 451,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.18787878787878787,
+   "league_matches": 660,
+   "best_signal": "Riga Over 0.5",
+   "best_signal_confidence": 0.865,
+   "win_confidence": 0.821,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 1.75,
+     "defense_rate": 1.5,
+     "attack_rank": 4,
+     "defense_rank": 7,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 2.67,
+     "defense_rate": 1.07,
+     "attack_rank": 1,
+     "defense_rank": 3,
+     "league_size": 10
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.42,
+     "defense_rate": 1.97,
+     "attack_rank": 4,
+     "defense_rank": 9,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 2.77,
+     "defense_rate": 0.97,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 10
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Riga Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Riga Over 1.5",
+     "probability": 0.7975
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7705
+    },
+    {
+     "market": "Riga Win",
+     "probability": 0.7609
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7166
+    }
+   ],
+   "patterns_available": 84
+  },
+  {
+   "elo_gap_rank": 3,
+   "fixture_id": 60895,
+   "match": "Rīgas FS vs FS Jelgava",
+   "home": "Rīgas FS",
+   "away": "FS Jelgava",
+   "kickoff": "2026-10-11 13:00:00+00:00",
+   "league": "Virsliga",
+   "country": "Latvia",
+   "favourite": "Rīgas FS",
+   "underdog": "FS Jelgava",
+   "elo_gap": 406,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.18787878787878787,
+   "league_matches": 660,
+   "best_signal": "Rīgas FS Over 0.5",
+   "best_signal_confidence": 0.865,
+   "win_confidence": 0.821,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 3.0,
+     "defense_rate": 0.86,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 1.27,
+     "defense_rate": 1.6,
+     "attack_rank": 4,
+     "defense_rank": 6,
+     "league_size": 10
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 2.37,
+     "defense_rate": 0.73,
+     "attack_rank": 2,
+     "defense_rank": 1,
+     "league_size": 10
+    },
+    "away_team": {
+     "attack_rate": 1.03,
+     "defense_rate": 1.58,
+     "attack_rank": 7,
+     "defense_rank": 7,
+     "league_size": 10
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Rīgas FS Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8043
+    },
+    {
+     "market": "Rīgas FS Win",
+     "probability": 0.7914
+    },
+    {
+     "market": "Rīgas FS Over 1.5",
+     "probability": 0.7424
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7354
+    }
+   ],
+   "patterns_available": 84
+  },
+  {
+   "elo_gap_rank": 4,
+   "fixture_id": 67820,
+   "match": "RAAL La Louvière vs Club Brugge KV",
+   "home": "RAAL La Louvière",
+   "away": "Club Brugge KV",
+   "kickoff": "2026-10-10 16:15:00+00:00",
+   "league": "Jupiler Pro League",
+   "country": "Belgium",
+   "favourite": "Club Brugge KV",
+   "underdog": "RAAL La Louvière",
+   "elo_gap": 378,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.26173020527859236,
+   "league_matches": 1364,
+   "best_signal": "Club Brugge KV Over 0.5",
+   "best_signal_confidence": 0.893,
+   "win_confidence": 0.808,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 2.0,
+     "defense_rate": 1.33,
+     "attack_rank": 7,
+     "defense_rank": 10,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.67,
+     "defense_rate": 0.67,
+     "attack_rank": 7,
+     "defense_rank": 3,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.0,
+     "attack_rank": 12,
+     "defense_rank": 15,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 2.14,
+     "defense_rate": 0.43,
+     "attack_rank": 4,
+     "defense_rank": 2,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Club Brugge KV Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8066
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7314
+    },
+    {
+     "market": "Club Brugge KV Win",
+     "probability": 0.731
+    },
+    {
+     "market": "Club Brugge KV Over 1.5",
+     "probability": 0.7247
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.6772
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 5,
+   "fixture_id": 67819,
+   "match": "Union St. Gilloise vs OH Leuven",
+   "home": "Union St. Gilloise",
+   "away": "OH Leuven",
+   "kickoff": "2026-10-11 14:00:00+00:00",
+   "league": "Jupiler Pro League",
+   "country": "Belgium",
+   "favourite": "Union St. Gilloise",
+   "underdog": "OH Leuven",
+   "elo_gap": 377,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.26173020527859236,
+   "league_matches": 1364,
+   "best_signal": "Union St. Gilloise Over 0.5",
+   "best_signal_confidence": 0.893,
+   "win_confidence": 0.821,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 2.67,
+     "defense_rate": 0.0,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 0.33,
+     "defense_rate": 2.33,
+     "attack_rank": 14,
+     "defense_rank": 13,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 3.0,
+     "defense_rate": 0.43,
+     "attack_rank": 1,
+     "defense_rank": 1,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 0.71,
+     "defense_rate": 1.86,
+     "attack_rank": 17,
+     "defense_rank": 12,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Union St. Gilloise Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Union St. Gilloise Win",
+     "probability": 0.7895
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7526
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7523
+    },
+    {
+     "market": "Union St. Gilloise Over 1.5",
+     "probability": 0.7114
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 6,
+   "fixture_id": 81805,
+   "match": "Kairat Almaty vs Zhetysu",
+   "home": "Kairat Almaty",
+   "away": "Zhetysu",
+   "kickoff": "2026-10-10 12:00:00+00:00",
+   "league": "Premier League",
+   "country": "Kazakhstan",
+   "favourite": "Kairat Almaty",
+   "underdog": "Zhetysu",
+   "elo_gap": 351,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.22710163111668757,
+   "league_matches": 797,
+   "best_signal": "Kairat Almaty Over 0.5",
+   "best_signal_confidence": 0.909,
+   "win_confidence": 0.835,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 2.25,
+     "defense_rate": 0.75,
+     "attack_rank": 2,
+     "defense_rank": 3,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.21,
+     "defense_rate": 2.14,
+     "attack_rank": 6,
+     "defense_rank": 16,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.96,
+     "defense_rate": 0.77,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.69,
+     "attack_rank": 11,
+     "defense_rank": 16,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Kairat Almaty Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Kairat Almaty Win",
+     "probability": 0.8284
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8259
+    },
+    {
+     "market": "Kairat Almaty Over 1.5",
+     "probability": 0.7968
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7291
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.7231
+    }
+   ],
+   "patterns_available": 84
+  },
+  {
+   "elo_gap_rank": 7,
+   "fixture_id": 81892,
+   "match": "Benfica vs Guimaraes",
+   "home": "Benfica",
+   "away": "Guimaraes",
+   "kickoff": "2026-10-11 17:00:00+00:00",
+   "league": "Primeira Liga",
+   "country": "Portugal",
+   "favourite": "Benfica",
+   "underdog": "Guimaraes",
+   "elo_gap": 335,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.21739130434782608,
+   "league_matches": 1150,
+   "best_signal": "Benfica Over 0.5",
+   "best_signal_confidence": 0.903,
+   "win_confidence": 0.845,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 2.33,
+     "defense_rate": 1.33,
+     "attack_rank": 4,
+     "defense_rank": 11,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 2.0,
+     "attack_rank": 11,
+     "defense_rank": 16,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 3.14,
+     "defense_rate": 1.0,
+     "attack_rank": 1,
+     "defense_rank": 7,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 0.71,
+     "defense_rate": 1.14,
+     "attack_rank": 15,
+     "defense_rank": 9,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Benfica Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7867
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.744
+    },
+    {
+     "market": "Benfica Win",
+     "probability": 0.7346
+    },
+    {
+     "market": "Benfica Over 1.5",
+     "probability": 0.7016
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 8,
+   "fixture_id": 85316,
+   "match": "Barcelona vs Getafe",
+   "home": "Barcelona",
+   "away": "Getafe",
+   "kickoff": "2026-10-10 16:30:00+00:00",
+   "league": "La Liga",
+   "country": "Spain",
+   "favourite": "Barcelona",
+   "underdog": "Getafe",
+   "elo_gap": 335,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.24188034188034188,
+   "league_matches": 2340,
+   "best_signal": "Barcelona Over 0.5",
+   "best_signal_confidence": 0.871,
+   "win_confidence": null,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 4.67,
+     "defense_rate": 1.33,
+     "attack_rank": 1,
+     "defense_rank": 13,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.0,
+     "defense_rate": 1.67,
+     "attack_rank": 20,
+     "defense_rank": 14,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 4.43,
+     "defense_rate": 1.0,
+     "attack_rank": 1,
+     "defense_rank": 5,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.57,
+     "defense_rate": 1.0,
+     "attack_rank": 18,
+     "defense_rank": 3,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Barcelona Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Barcelona Win",
+     "probability": 0.7924
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7782
+    },
+    {
+     "market": "Barcelona Over 1.5",
+     "probability": 0.7287
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7113
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 9,
+   "fixture_id": 71009,
+   "match": "Rangers vs Kilmarnock",
+   "home": "Rangers",
+   "away": "Kilmarnock",
+   "kickoff": "2026-10-10 14:00:00+00:00",
+   "league": "Premiership",
+   "country": "Scotland",
+   "favourite": "Rangers",
+   "underdog": "Kilmarnock",
+   "elo_gap": 328,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.23606271777003485,
+   "league_matches": 1148,
+   "best_signal": "Rangers Over 0.5",
+   "best_signal_confidence": 0.877,
+   "win_confidence": 0.8,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 0.67,
+     "attack_rank": 7,
+     "defense_rank": 3,
+     "league_size": 12
+    },
+    "away_team": {
+     "attack_rate": 1.33,
+     "defense_rate": 1.33,
+     "attack_rank": 6,
+     "defense_rank": 7,
+     "league_size": 12
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.14,
+     "defense_rate": 0.57,
+     "attack_rank": 9,
+     "defense_rank": 2,
+     "league_size": 12
+    },
+    "away_team": {
+     "attack_rate": 0.86,
+     "defense_rate": 2.14,
+     "attack_rank": 11,
+     "defense_rank": 12,
+     "league_size": 12
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Rangers Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Rangers Win",
+     "probability": 0.7687
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7602
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7578
+    },
+    {
+     "market": "Rangers Over 1.5",
+     "probability": 0.7062
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 10,
+   "fixture_id": 44246,
+   "match": "Inter vs Parma",
+   "home": "Inter",
+   "away": "Parma",
+   "kickoff": "2026-10-10 16:00:00+00:00",
+   "league": "Serie A",
+   "country": "Italy",
+   "favourite": "Inter",
+   "underdog": "Parma",
+   "elo_gap": 320,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.2220657276995305,
+   "league_matches": 2130,
+   "best_signal": "Inter Over 0.5",
+   "best_signal_confidence": 0.898,
+   "win_confidence": 0.824,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 4.0,
+     "defense_rate": 2.0,
+     "attack_rank": 1,
+     "defense_rank": 17,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.5,
+     "defense_rate": 2.0,
+     "attack_rank": 19,
+     "defense_rank": 14,
+     "league_size": 20
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 3.0,
+     "defense_rate": 1.6,
+     "attack_rank": 1,
+     "defense_rank": 13,
+     "league_size": 20
+    },
+    "away_team": {
+     "attack_rate": 0.8,
+     "defense_rate": 1.4,
+     "attack_rank": 17,
+     "defense_rank": 10,
+     "league_size": 20
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Inter Over 0.5",
+     "probability": 0.8387
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.8087
+    },
+    {
+     "market": "Inter Win",
+     "probability": 0.7607
+    },
+    {
+     "market": "Inter Over 1.5",
+     "probability": 0.7353
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7271
+    },
+    {
+     "market": "Match Over 2.5",
+     "probability": 0.6502
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 11,
+   "fixture_id": 128056,
+   "match": "Veres Rivne vs Shakhtar Donetsk",
+   "home": "Veres Rivne",
+   "away": "Shakhtar Donetsk",
+   "kickoff": "2026-10-10 15:00:00+00:00",
+   "league": "Premier League",
+   "country": "Ukraine",
+   "favourite": "Shakhtar Donetsk",
+   "underdog": "Veres Rivne",
+   "elo_gap": 314,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.22404371584699453,
+   "league_matches": 549,
+   "best_signal": "Shakhtar Donetsk Over 0.5",
+   "best_signal_confidence": 0.88,
+   "win_confidence": 0.802,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.5,
+     "attack_rank": 8,
+     "defense_rank": 12,
+     "league_size": 15
+    },
+    "away_team": {
+     "attack_rate": 1.67,
+     "defense_rate": 0.33,
+     "attack_rank": 4,
+     "defense_rank": 1,
+     "league_size": 16
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 0.67,
+     "defense_rate": 0.83,
+     "attack_rank": 11,
+     "defense_rank": 7,
+     "league_size": 16
+    },
+    "away_team": {
+     "attack_rate": 2.14,
+     "defense_rate": 0.57,
+     "attack_rank": 1,
+     "defense_rank": 2,
+     "league_size": 16
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.8067
+    },
+    {
+     "market": "Shakhtar Donetsk Over 0.5",
+     "probability": 0.8016
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.7576
+    },
+    {
+     "market": "Shakhtar Donetsk Win",
+     "probability": 0.7011
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.6924
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 12,
+   "fixture_id": 81893,
+   "match": "Maritimo vs FC Porto",
+   "home": "Maritimo",
+   "away": "FC Porto",
+   "kickoff": "2026-10-10 17:00:00+00:00",
+   "league": "Primeira Liga",
+   "country": "Portugal",
+   "favourite": "FC Porto",
+   "underdog": "Maritimo",
+   "elo_gap": 303,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.21739130434782608,
+   "league_matches": 1150,
+   "best_signal": "FC Porto Over 0.5",
+   "best_signal_confidence": 0.903,
+   "win_confidence": 0.833,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 1.0,
+     "defense_rate": 1.67,
+     "attack_rank": 12,
+     "defense_rank": 12,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 3.0,
+     "defense_rate": 0.33,
+     "attack_rank": 2,
+     "defense_rank": 1,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 1.14,
+     "defense_rate": 1.71,
+     "attack_rank": 12,
+     "defense_rank": 13,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 2.57,
+     "defense_rate": 0.43,
+     "attack_rank": 2,
+     "defense_rank": 1,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "FC Porto Over 0.5",
+     "probability": 0.8281
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7614
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7567
+    },
+    {
+     "market": "FC Porto Win",
+     "probability": 0.7152
+    },
+    {
+     "market": "Match Under 3.5",
+     "probability": 0.6629
+    }
+   ],
+   "patterns_available": 42
+  },
+  {
+   "elo_gap_rank": 13,
+   "fixture_id": 86062,
+   "match": "Galatasaray vs Kasımpaşa",
+   "home": "Galatasaray",
+   "away": "Kasımpaşa",
+   "kickoff": "2026-10-09 17:00:00+00:00",
+   "league": "Süper Lig",
+   "country": "Turkey",
+   "favourite": "Galatasaray",
+   "underdog": "Kasımpaşa",
+   "elo_gap": 301,
+   "gap_bin": "300+",
+   "league_upset_rate": 0.26819620253164556,
+   "league_matches": 1264,
+   "best_signal": "Galatasaray Over 0.5",
+   "best_signal_confidence": 0.863,
+   "win_confidence": 0.77,
+   "favourite_label": "Big dog",
+   "underdog_label": "Underdog",
+   "context_home_away": {
+    "home_team": {
+     "attack_rate": 2.0,
+     "defense_rate": 1.33,
+     "attack_rank": 6,
+     "defense_rank": 12,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.33,
+     "defense_rate": 0.67,
+     "attack_rank": 7,
+     "defense_rank": 4,
+     "league_size": 18
+    }
+   },
+   "context_overall": {
+    "home_team": {
+     "attack_rate": 2.17,
+     "defense_rate": 1.67,
+     "attack_rank": 6,
+     "defense_rank": 11,
+     "league_size": 18
+    },
+    "away_team": {
+     "attack_rate": 1.17,
+     "defense_rate": 0.83,
+     "attack_rank": 13,
+     "defense_rank": 3,
+     "league_size": 18
+    }
+   },
+   "dc_goal_forecasts": [
+    {
+     "market": "Galatasaray Over 0.5",
+     "probability": 0.8246
+    },
+    {
+     "market": "Match Over 1.5",
+     "probability": 0.7504
+    },
+    {
+     "market": "Match Goals 1-4",
+     "probability": 0.7451
+    },
+    {
+     "market": "Galatasaray Win",
+     "probability": 0.7065
+    }
+   ],
+   "patterns_available": 42
+  }
+ ]
+}

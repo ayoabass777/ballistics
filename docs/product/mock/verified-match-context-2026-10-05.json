@@ -1,0 +1,4453 @@
+{
+  "retrieved_at": "2026-10-05T21:17:48.026187+00:00",
+  "standings_semantics": "Current DB snapshot, not reconstructed at saved forecast cutoff",
+  "fixtures": [
+    {
+      "fixture_id": 48565,
+      "api_league_id": 72,
+      "season": 2026,
+      "kickoff_utc": "2026-09-29 22:30:00+00:00",
+      "home_team_id": 2618,
+      "home_team_name": "Botafogo SP",
+      "away_team_id": 139,
+      "away_team_name": "Ponte Preta",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Vila Nova",
+          "api_team_id": 142,
+          "games_played": 31,
+          "goal_diff": 13,
+          "points": 57,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Juventude",
+          "api_team_id": 152,
+          "games_played": 31,
+          "goal_diff": 16,
+          "points": 56,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Novorizontino",
+          "api_team_id": 7834,
+          "games_played": 31,
+          "goal_diff": 25,
+          "points": 54,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Criciuma",
+          "api_team_id": 140,
+          "games_played": 31,
+          "goal_diff": 6,
+          "points": 53,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Fortaleza EC",
+          "api_team_id": 154,
+          "games_played": 31,
+          "goal_diff": 9,
+          "points": 53,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Atletico Goianiense",
+          "api_team_id": 144,
+          "games_played": 31,
+          "goal_diff": 12,
+          "points": 52,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "CRB",
+          "api_team_id": 146,
+          "games_played": 31,
+          "goal_diff": 2,
+          "points": 48,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Operario-PR",
+          "api_team_id": 1223,
+          "games_played": 31,
+          "goal_diff": 2,
+          "points": 48,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Sport Recife",
+          "api_team_id": 123,
+          "games_played": 31,
+          "goal_diff": 9,
+          "points": 47,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Cuiaba",
+          "api_team_id": 1193,
+          "games_played": 31,
+          "goal_diff": 7,
+          "points": 46,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "S\u00e3o Bernardo",
+          "api_team_id": 7865,
+          "games_played": 31,
+          "goal_diff": 11,
+          "points": 45,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Goias",
+          "api_team_id": 151,
+          "games_played": 31,
+          "goal_diff": -9,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Nautico Recife",
+          "api_team_id": 755,
+          "games_played": 31,
+          "goal_diff": 1,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Athletic Club",
+          "api_team_id": 13975,
+          "games_played": 31,
+          "goal_diff": 2,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Ceara",
+          "api_team_id": 129,
+          "games_played": 31,
+          "goal_diff": -5,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Botafogo SP",
+          "api_team_id": 2618,
+          "games_played": 31,
+          "goal_diff": -3,
+          "points": 35,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Avai",
+          "api_team_id": 145,
+          "games_played": 31,
+          "goal_diff": -12,
+          "points": 30,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Londrina",
+          "api_team_id": 148,
+          "games_played": 31,
+          "goal_diff": -6,
+          "points": 28,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 19,
+          "team_name": "America Mineiro",
+          "api_team_id": 125,
+          "games_played": 31,
+          "goal_diff": -31,
+          "points": 17,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 20,
+          "team_name": "Ponte Preta",
+          "api_team_id": 139,
+          "games_played": 31,
+          "goal_diff": -49,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 48377,
+          "kickoff_utc": "2026-06-01 22:00:00+00:00",
+          "home_team_name": "Ponte Preta",
+          "away_team_name": "Botafogo SP",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 49318,
+          "kickoff_utc": "2024-10-05 20:00:00+00:00",
+          "home_team_name": "Ponte Preta",
+          "away_team_name": "Botafogo SP",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 49129,
+          "kickoff_utc": "2024-06-20 00:00:00+00:00",
+          "home_team_name": "Botafogo SP",
+          "away_team_name": "Ponte Preta",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 49629,
+          "kickoff_utc": "2023-08-12 20:00:00+00:00",
+          "home_team_name": "Botafogo SP",
+          "away_team_name": "Ponte Preta",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 49436,
+          "kickoff_utc": "2023-05-02 22:00:00+00:00",
+          "home_team_name": "Ponte Preta",
+          "away_team_name": "Botafogo SP",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 0
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:04.132583+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Vila Nova",
+          "api_team_id": 142,
+          "games_played": 31,
+          "goal_diff": 13,
+          "points": 57,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Juventude",
+          "api_team_id": 152,
+          "games_played": 31,
+          "goal_diff": 16,
+          "points": 56,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Novorizontino",
+          "api_team_id": 7834,
+          "games_played": 31,
+          "goal_diff": 25,
+          "points": 54,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Criciuma",
+          "api_team_id": 140,
+          "games_played": 31,
+          "goal_diff": 6,
+          "points": 53,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Fortaleza EC",
+          "api_team_id": 154,
+          "games_played": 31,
+          "goal_diff": 9,
+          "points": 53,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Atletico Goianiense",
+          "api_team_id": 144,
+          "games_played": 31,
+          "goal_diff": 12,
+          "points": 52,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "CRB",
+          "api_team_id": 146,
+          "games_played": 31,
+          "goal_diff": 2,
+          "points": 48,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Operario-PR",
+          "api_team_id": 1223,
+          "games_played": 31,
+          "goal_diff": 2,
+          "points": 48,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Sport Recife",
+          "api_team_id": 123,
+          "games_played": 31,
+          "goal_diff": 9,
+          "points": 47,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Cuiaba",
+          "api_team_id": 1193,
+          "games_played": 31,
+          "goal_diff": 7,
+          "points": 46,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "S\u00e3o Bernardo",
+          "api_team_id": 7865,
+          "games_played": 31,
+          "goal_diff": 11,
+          "points": 45,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Goias",
+          "api_team_id": 151,
+          "games_played": 31,
+          "goal_diff": -9,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Nautico Recife",
+          "api_team_id": 755,
+          "games_played": 31,
+          "goal_diff": 1,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Athletic Club",
+          "api_team_id": 13975,
+          "games_played": 31,
+          "goal_diff": 2,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Ceara",
+          "api_team_id": 129,
+          "games_played": 31,
+          "goal_diff": -5,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Botafogo SP",
+          "api_team_id": 2618,
+          "games_played": 31,
+          "goal_diff": -3,
+          "points": 35,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Avai",
+          "api_team_id": 145,
+          "games_played": 31,
+          "goal_diff": -12,
+          "points": 30,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Londrina",
+          "api_team_id": 148,
+          "games_played": 31,
+          "goal_diff": -6,
+          "points": 28,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 19,
+          "team_name": "America Mineiro",
+          "api_team_id": 125,
+          "games_played": 31,
+          "goal_diff": -31,
+          "points": 17,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        },
+        {
+          "rank": 20,
+          "team_name": "Ponte Preta",
+          "api_team_id": 139,
+          "games_played": 31,
+          "goal_diff": -49,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:04.132583+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 66404,
+      "api_league_id": 255,
+      "season": 2026,
+      "kickoff_utc": "2026-09-30 23:00:00+00:00",
+      "home_team_id": 27252,
+      "home_team_name": "Brooklyn",
+      "away_team_id": 9043,
+      "away_team_name": "Detroit City",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "El Paso Locomotive",
+          "api_team_id": 3993,
+          "games_played": 27,
+          "goal_diff": 11,
+          "points": 47,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 1,
+          "team_name": "Tampa Bay Rowdies",
+          "api_team_id": 4021,
+          "games_played": 27,
+          "goal_diff": 21,
+          "points": 52,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Detroit City",
+          "api_team_id": 9043,
+          "games_played": 27,
+          "goal_diff": 13,
+          "points": 47,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Sacramento Republic",
+          "api_team_id": 4015,
+          "games_played": 27,
+          "goal_diff": 12,
+          "points": 44,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Charleston Battery",
+          "api_team_id": 3990,
+          "games_played": 26,
+          "goal_diff": 21,
+          "points": 46,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "New Mexico United",
+          "api_team_id": 4003,
+          "games_played": 26,
+          "goal_diff": 8,
+          "points": 43,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Hartford Athletic",
+          "api_team_id": 3995,
+          "games_played": 26,
+          "goal_diff": 3,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Lexington",
+          "api_team_id": 20808,
+          "games_played": 27,
+          "goal_diff": 16,
+          "points": 43,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "FC Tulsa",
+          "api_team_id": 4022,
+          "games_played": 27,
+          "goal_diff": 7,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Rhode Island",
+          "api_team_id": 22855,
+          "games_played": 26,
+          "goal_diff": 10,
+          "points": 38,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Colorado Springs",
+          "api_team_id": 3992,
+          "games_played": 27,
+          "goal_diff": 3,
+          "points": 40,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Pittsburgh Riverhounds",
+          "api_team_id": 4010,
+          "games_played": 27,
+          "goal_diff": 1,
+          "points": 38,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Louisville City",
+          "api_team_id": 4000,
+          "games_played": 26,
+          "goal_diff": 1,
+          "points": 37,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Orange County SC",
+          "api_team_id": 4007,
+          "games_played": 27,
+          "goal_diff": -6,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Miami FC",
+          "api_team_id": 9030,
+          "games_played": 28,
+          "goal_diff": -7,
+          "points": 36,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "San Antonio",
+          "api_team_id": 4017,
+          "games_played": 27,
+          "goal_diff": 0,
+          "points": 38,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Indy Eleven",
+          "api_team_id": 3996,
+          "games_played": 27,
+          "goal_diff": 0,
+          "points": 34,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Las Vegas Lights",
+          "api_team_id": 3998,
+          "games_played": 27,
+          "goal_diff": -3,
+          "points": 36,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Loudoun United",
+          "api_team_id": 3999,
+          "games_played": 26,
+          "goal_diff": -12,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Oakland Roots",
+          "api_team_id": 10874,
+          "games_played": 27,
+          "goal_diff": -2,
+          "points": 34,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Birmingham Legion",
+          "api_team_id": 3989,
+          "games_played": 26,
+          "goal_diff": -7,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Phoenix Rising",
+          "api_team_id": 4009,
+          "games_played": 26,
+          "goal_diff": -3,
+          "points": 33,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Brooklyn",
+          "api_team_id": 27252,
+          "games_played": 27,
+          "goal_diff": -28,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Monterey Bay",
+          "api_team_id": 18375,
+          "games_played": 27,
+          "goal_diff": -18,
+          "points": 21,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Sporting JAX",
+          "api_team_id": 25959,
+          "games_played": 27,
+          "goal_diff": -41,
+          "points": 14,
+          "updated_at": "2026-10-05 00:09:07.299573+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 66095,
+          "kickoff_utc": "2026-03-14 20:00:00+00:00",
+          "home_team_name": "Detroit City",
+          "away_team_name": "Brooklyn",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 0
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:07.299573+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [],
+      "standings_group_unresolved": true
+    },
+    {
+      "fixture_id": 67719,
+      "api_league_id": 489,
+      "season": 2026,
+      "kickoff_utc": "2026-10-07 23:00:00+00:00",
+      "home_team_id": 25485,
+      "home_team_name": "Naples",
+      "away_team_id": 4024,
+      "away_team_name": "Richmond Kickers",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Union Omaha",
+          "api_team_id": 10283,
+          "games_played": 29,
+          "goal_diff": 22,
+          "points": 61,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Charlotte Independence",
+          "api_team_id": 3991,
+          "games_played": 29,
+          "goal_diff": 25,
+          "points": 60,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Forward Madison",
+          "api_team_id": 9025,
+          "games_played": 29,
+          "goal_diff": 23,
+          "points": 52,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Boise",
+          "api_team_id": 27251,
+          "games_played": 29,
+          "goal_diff": 6,
+          "points": 49,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "One Knoxville",
+          "api_team_id": 18905,
+          "games_played": 29,
+          "goal_diff": 12,
+          "points": 48,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Spokane Velocity",
+          "api_team_id": 22785,
+          "games_played": 27,
+          "goal_diff": 5,
+          "points": 47,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Chattanooga Red Wolves",
+          "api_team_id": 9016,
+          "games_played": 29,
+          "goal_diff": 10,
+          "points": 46,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Fort Wayne",
+          "api_team_id": 16679,
+          "games_played": 28,
+          "goal_diff": 6,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Corpus Christi",
+          "api_team_id": 4043,
+          "games_played": 28,
+          "goal_diff": -8,
+          "points": 36,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Naples",
+          "api_team_id": 25485,
+          "games_played": 28,
+          "goal_diff": -12,
+          "points": 34,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Westchester SC",
+          "api_team_id": 25488,
+          "games_played": 29,
+          "goal_diff": 2,
+          "points": 33,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Sarasota Paradise",
+          "api_team_id": 21289,
+          "games_played": 28,
+          "goal_diff": -4,
+          "points": 33,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Alta",
+          "api_team_id": 25838,
+          "games_played": 29,
+          "goal_diff": -7,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Portland Hearts of Pine",
+          "api_team_id": 25486,
+          "games_played": 29,
+          "goal_diff": -10,
+          "points": 31,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "NY Cosmos",
+          "api_team_id": 9033,
+          "games_played": 28,
+          "goal_diff": -20,
+          "points": 25,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Greenville Triumph",
+          "api_team_id": 9026,
+          "games_played": 28,
+          "goal_diff": -22,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Richmond Kickers",
+          "api_team_id": 4024,
+          "games_played": 28,
+          "goal_diff": -28,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Tormenta",
+          "api_team_id": 4108,
+          "games_played": 0,
+          "goal_diff": 0,
+          "points": 0,
+          "updated_at": "2026-08-04 00:02:30.059016+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 67468,
+          "kickoff_utc": "2026-03-21 22:00:00+00:00",
+          "home_team_name": "Richmond Kickers",
+          "away_team_name": "Naples",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 67337,
+          "kickoff_utc": "2025-08-02 23:00:00+00:00",
+          "home_team_name": "Richmond Kickers",
+          "away_team_name": "Naples",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 2
+        },
+        {
+          "fixture_id": 67251,
+          "kickoff_utc": "2025-04-12 23:00:00+00:00",
+          "home_team_name": "Naples",
+          "away_team_name": "Richmond Kickers",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 1
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:04.649781+00:00",
+      "stale_rows_excluded": 1,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Union Omaha",
+          "api_team_id": 10283,
+          "games_played": 29,
+          "goal_diff": 22,
+          "points": 61,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Charlotte Independence",
+          "api_team_id": 3991,
+          "games_played": 29,
+          "goal_diff": 25,
+          "points": 60,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Forward Madison",
+          "api_team_id": 9025,
+          "games_played": 29,
+          "goal_diff": 23,
+          "points": 52,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Boise",
+          "api_team_id": 27251,
+          "games_played": 29,
+          "goal_diff": 6,
+          "points": 49,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "One Knoxville",
+          "api_team_id": 18905,
+          "games_played": 29,
+          "goal_diff": 12,
+          "points": 48,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Spokane Velocity",
+          "api_team_id": 22785,
+          "games_played": 27,
+          "goal_diff": 5,
+          "points": 47,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Chattanooga Red Wolves",
+          "api_team_id": 9016,
+          "games_played": 29,
+          "goal_diff": 10,
+          "points": 46,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Fort Wayne",
+          "api_team_id": 16679,
+          "games_played": 28,
+          "goal_diff": 6,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Corpus Christi",
+          "api_team_id": 4043,
+          "games_played": 28,
+          "goal_diff": -8,
+          "points": 36,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Naples",
+          "api_team_id": 25485,
+          "games_played": 28,
+          "goal_diff": -12,
+          "points": 34,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Westchester SC",
+          "api_team_id": 25488,
+          "games_played": 29,
+          "goal_diff": 2,
+          "points": 33,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Sarasota Paradise",
+          "api_team_id": 21289,
+          "games_played": 28,
+          "goal_diff": -4,
+          "points": 33,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Alta",
+          "api_team_id": 25838,
+          "games_played": 29,
+          "goal_diff": -7,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Portland Hearts of Pine",
+          "api_team_id": 25486,
+          "games_played": 29,
+          "goal_diff": -10,
+          "points": 31,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "NY Cosmos",
+          "api_team_id": 9033,
+          "games_played": 28,
+          "goal_diff": -20,
+          "points": 25,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Greenville Triumph",
+          "api_team_id": 9026,
+          "games_played": 28,
+          "goal_diff": -22,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Richmond Kickers",
+          "api_team_id": 4024,
+          "games_played": 28,
+          "goal_diff": -28,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:04.649781+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 90863,
+      "api_league_id": 345,
+      "season": 2026,
+      "kickoff_utc": "2026-10-09 16:00:00+00:00",
+      "home_team_id": 603,
+      "home_team_name": "Zlin",
+      "away_team_id": 560,
+      "away_team_name": "Slavia Praha",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Slavia Praha",
+          "api_team_id": 560,
+          "games_played": 9,
+          "goal_diff": 19,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Slovan Liberec",
+          "api_team_id": 782,
+          "games_played": 9,
+          "goal_diff": 9,
+          "points": 20,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Mlada Boleslav",
+          "api_team_id": 640,
+          "games_played": 8,
+          "goal_diff": 8,
+          "points": 17,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Sigma Olomouc",
+          "api_team_id": 2250,
+          "games_played": 9,
+          "goal_diff": 3,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Teplice",
+          "api_team_id": 3720,
+          "games_played": 9,
+          "goal_diff": 2,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Zbrojovka Brno",
+          "api_team_id": 3733,
+          "games_played": 9,
+          "goal_diff": 0,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Sparta Praha",
+          "api_team_id": 628,
+          "games_played": 9,
+          "goal_diff": 6,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "FK Jablonec",
+          "api_team_id": 1122,
+          "games_played": 9,
+          "goal_diff": 2,
+          "points": 14,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Hradec Kr\u00e1lov\u00e9",
+          "api_team_id": 3723,
+          "games_played": 9,
+          "goal_diff": -1,
+          "points": 14,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Plzen",
+          "api_team_id": 567,
+          "games_played": 9,
+          "goal_diff": 0,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Ban\u00edk Ostrava",
+          "api_team_id": 3713,
+          "games_played": 9,
+          "goal_diff": -10,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Bohemians 1905",
+          "api_team_id": 3714,
+          "games_played": 8,
+          "goal_diff": -2,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Pardubice",
+          "api_team_id": 3724,
+          "games_played": 9,
+          "goal_diff": -5,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Artis",
+          "api_team_id": 4257,
+          "games_played": 9,
+          "goal_diff": -11,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Karvin\u00e1",
+          "api_team_id": 3716,
+          "games_played": 0,
+          "goal_diff": 0,
+          "points": 0,
+          "updated_at": "2026-07-25 00:02:43.693023+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Slov\u00e1cko",
+          "api_team_id": 3719,
+          "games_played": 9,
+          "goal_diff": -9,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Zlin",
+          "api_team_id": 603,
+          "games_played": 9,
+          "goal_diff": -11,
+          "points": 1,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 91233,
+          "kickoff_utc": "2026-03-14 17:00:00+00:00",
+          "home_team_name": "Zlin",
+          "away_team_name": "Slavia Praha",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 91121,
+          "kickoff_utc": "2025-10-18 16:00:00+00:00",
+          "home_team_name": "Slavia Praha",
+          "away_team_name": "Zlin",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 91748,
+          "kickoff_utc": "2024-02-14 17:00:00+00:00",
+          "home_team_name": "Zlin",
+          "away_team_name": "Slavia Praha",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 91613,
+          "kickoff_utc": "2023-08-06 16:00:00+00:00",
+          "home_team_name": "Slavia Praha",
+          "away_team_name": "Zlin",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 91998,
+          "kickoff_utc": "2022-11-13 17:00:00+00:00",
+          "home_team_name": "Zlin",
+          "away_team_name": "Slavia Praha",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 4
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:10.858331+00:00",
+      "stale_rows_excluded": 1,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Slavia Praha",
+          "api_team_id": 560,
+          "games_played": 9,
+          "goal_diff": 19,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Slovan Liberec",
+          "api_team_id": 782,
+          "games_played": 9,
+          "goal_diff": 9,
+          "points": 20,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Mlada Boleslav",
+          "api_team_id": 640,
+          "games_played": 8,
+          "goal_diff": 8,
+          "points": 17,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Sigma Olomouc",
+          "api_team_id": 2250,
+          "games_played": 9,
+          "goal_diff": 3,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Teplice",
+          "api_team_id": 3720,
+          "games_played": 9,
+          "goal_diff": 2,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Zbrojovka Brno",
+          "api_team_id": 3733,
+          "games_played": 9,
+          "goal_diff": 0,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Sparta Praha",
+          "api_team_id": 628,
+          "games_played": 9,
+          "goal_diff": 6,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "FK Jablonec",
+          "api_team_id": 1122,
+          "games_played": 9,
+          "goal_diff": 2,
+          "points": 14,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Hradec Kr\u00e1lov\u00e9",
+          "api_team_id": 3723,
+          "games_played": 9,
+          "goal_diff": -1,
+          "points": 14,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Plzen",
+          "api_team_id": 567,
+          "games_played": 9,
+          "goal_diff": 0,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Ban\u00edk Ostrava",
+          "api_team_id": 3713,
+          "games_played": 9,
+          "goal_diff": -10,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Bohemians 1905",
+          "api_team_id": 3714,
+          "games_played": 8,
+          "goal_diff": -2,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Pardubice",
+          "api_team_id": 3724,
+          "games_played": 9,
+          "goal_diff": -5,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Artis",
+          "api_team_id": 4257,
+          "games_played": 9,
+          "goal_diff": -11,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Slov\u00e1cko",
+          "api_team_id": 3719,
+          "games_played": 9,
+          "goal_diff": -9,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Zlin",
+          "api_team_id": 603,
+          "games_played": 9,
+          "goal_diff": -11,
+          "points": 1,
+          "updated_at": "2026-10-05 00:09:10.858331+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 60892,
+      "api_league_id": 365,
+      "season": 2026,
+      "kickoff_utc": "2026-10-10 11:00:00+00:00",
+      "home_team_id": 4144,
+      "home_team_name": "Tukums",
+      "away_team_id": 10124,
+      "away_team_name": "Riga",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "R\u012bgas FS",
+          "api_team_id": 4160,
+          "games_played": 30,
+          "goal_diff": 49,
+          "points": 74,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Riga",
+          "api_team_id": 10124,
+          "games_played": 31,
+          "goal_diff": 56,
+          "points": 73,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Auda",
+          "api_team_id": 4135,
+          "games_played": 31,
+          "goal_diff": 19,
+          "points": 61,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "FK Liepaja",
+          "api_team_id": 661,
+          "games_played": 31,
+          "goal_diff": -2,
+          "points": 43,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "BFC Daugavpils",
+          "api_team_id": 4149,
+          "games_played": 31,
+          "goal_diff": 0,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Super Nova",
+          "api_team_id": 4143,
+          "games_played": 30,
+          "goal_diff": -11,
+          "points": 35,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "FS Jelgava",
+          "api_team_id": 18834,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Grobi\u0146a",
+          "api_team_id": 4138,
+          "games_played": 31,
+          "goal_diff": -31,
+          "points": 26,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Tukums",
+          "api_team_id": 4144,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Ogre United",
+          "api_team_id": 18936,
+          "games_played": 31,
+          "goal_diff": -46,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 60847,
+          "kickoff_utc": "2026-07-18 16:00:00+00:00",
+          "home_team_name": "Riga",
+          "away_team_name": "Tukums",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 60802,
+          "kickoff_utc": "2026-05-20 15:00:00+00:00",
+          "home_team_name": "Tukums",
+          "away_team_name": "Riga",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 60761,
+          "kickoff_utc": "2026-04-09 16:00:00+00:00",
+          "home_team_name": "Riga",
+          "away_team_name": "Tukums",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 60720,
+          "kickoff_utc": "2025-10-24 15:00:00+00:00",
+          "home_team_name": "Riga",
+          "away_team_name": "Tukums",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 60678,
+          "kickoff_utc": "2025-08-03 15:00:00+00:00",
+          "home_team_name": "Tukums",
+          "away_team_name": "Riga",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 1
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:06.526111+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "R\u012bgas FS",
+          "api_team_id": 4160,
+          "games_played": 30,
+          "goal_diff": 49,
+          "points": 74,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Riga",
+          "api_team_id": 10124,
+          "games_played": 31,
+          "goal_diff": 56,
+          "points": 73,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Auda",
+          "api_team_id": 4135,
+          "games_played": 31,
+          "goal_diff": 19,
+          "points": 61,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "FK Liepaja",
+          "api_team_id": 661,
+          "games_played": 31,
+          "goal_diff": -2,
+          "points": 43,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "BFC Daugavpils",
+          "api_team_id": 4149,
+          "games_played": 31,
+          "goal_diff": 0,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Super Nova",
+          "api_team_id": 4143,
+          "games_played": 30,
+          "goal_diff": -11,
+          "points": 35,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "FS Jelgava",
+          "api_team_id": 18834,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Grobi\u0146a",
+          "api_team_id": 4138,
+          "games_played": 31,
+          "goal_diff": -31,
+          "points": 26,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Tukums",
+          "api_team_id": 4144,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Ogre United",
+          "api_team_id": 18936,
+          "games_played": 31,
+          "goal_diff": -46,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 60895,
+      "api_league_id": 365,
+      "season": 2026,
+      "kickoff_utc": "2026-10-11 13:00:00+00:00",
+      "home_team_id": 4160,
+      "home_team_name": "R\u012bgas FS",
+      "away_team_id": 18834,
+      "away_team_name": "FS Jelgava",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "R\u012bgas FS",
+          "api_team_id": 4160,
+          "games_played": 30,
+          "goal_diff": 49,
+          "points": 74,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Riga",
+          "api_team_id": 10124,
+          "games_played": 31,
+          "goal_diff": 56,
+          "points": 73,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Auda",
+          "api_team_id": 4135,
+          "games_played": 31,
+          "goal_diff": 19,
+          "points": 61,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "FK Liepaja",
+          "api_team_id": 661,
+          "games_played": 31,
+          "goal_diff": -2,
+          "points": 43,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "BFC Daugavpils",
+          "api_team_id": 4149,
+          "games_played": 31,
+          "goal_diff": 0,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Super Nova",
+          "api_team_id": 4143,
+          "games_played": 30,
+          "goal_diff": -11,
+          "points": 35,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "FS Jelgava",
+          "api_team_id": 18834,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Grobi\u0146a",
+          "api_team_id": 4138,
+          "games_played": 31,
+          "goal_diff": -31,
+          "points": 26,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Tukums",
+          "api_team_id": 4144,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Ogre United",
+          "api_team_id": 18936,
+          "games_played": 31,
+          "goal_diff": -46,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 60848,
+          "kickoff_utc": "2026-07-20 15:00:00+00:00",
+          "home_team_name": "FS Jelgava",
+          "away_team_name": "R\u012bgas FS",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 60805,
+          "kickoff_utc": "2026-05-21 17:00:00+00:00",
+          "home_team_name": "R\u012bgas FS",
+          "away_team_name": "FS Jelgava",
+          "home_team_fulltime_goal": 4,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 60759,
+          "kickoff_utc": "2026-04-08 16:00:00+00:00",
+          "home_team_name": "FS Jelgava",
+          "away_team_name": "R\u012bgas FS",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 60694,
+          "kickoff_utc": "2025-09-13 13:00:00+00:00",
+          "home_team_name": "R\u012bgas FS",
+          "away_team_name": "FS Jelgava",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 4
+        },
+        {
+          "fixture_id": 60652,
+          "kickoff_utc": "2025-06-26 16:00:00+00:00",
+          "home_team_name": "FS Jelgava",
+          "away_team_name": "R\u012bgas FS",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 1
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:06.526111+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "R\u012bgas FS",
+          "api_team_id": 4160,
+          "games_played": 30,
+          "goal_diff": 49,
+          "points": 74,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Riga",
+          "api_team_id": 10124,
+          "games_played": 31,
+          "goal_diff": 56,
+          "points": 73,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Auda",
+          "api_team_id": 4135,
+          "games_played": 31,
+          "goal_diff": 19,
+          "points": 61,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "FK Liepaja",
+          "api_team_id": 661,
+          "games_played": 31,
+          "goal_diff": -2,
+          "points": 43,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "BFC Daugavpils",
+          "api_team_id": 4149,
+          "games_played": 31,
+          "goal_diff": 0,
+          "points": 39,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Super Nova",
+          "api_team_id": 4143,
+          "games_played": 30,
+          "goal_diff": -11,
+          "points": 35,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "FS Jelgava",
+          "api_team_id": 18834,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Grobi\u0146a",
+          "api_team_id": 4138,
+          "games_played": 31,
+          "goal_diff": -31,
+          "points": 26,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Tukums",
+          "api_team_id": 4144,
+          "games_played": 31,
+          "goal_diff": -17,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Ogre United",
+          "api_team_id": 18936,
+          "games_played": 31,
+          "goal_diff": -46,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:06.526111+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 67820,
+      "api_league_id": 144,
+      "season": 2026,
+      "kickoff_utc": "2026-10-10 16:15:00+00:00",
+      "home_team_id": 5902,
+      "home_team_name": "RAAL La Louvi\u00e8re",
+      "away_team_id": 569,
+      "away_team_name": "Club Brugge KV",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Union St. Gilloise",
+          "api_team_id": 1393,
+          "games_played": 7,
+          "goal_diff": 18,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Gent",
+          "api_team_id": 631,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Club Brugge KV",
+          "api_team_id": 569,
+          "games_played": 7,
+          "goal_diff": 12,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Charleroi",
+          "api_team_id": 736,
+          "games_played": 7,
+          "goal_diff": 8,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Anderlecht",
+          "api_team_id": 554,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Zulte Waregem",
+          "api_team_id": 600,
+          "games_played": 7,
+          "goal_diff": 3,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Standard Liege",
+          "api_team_id": 733,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "KVC Westerlo",
+          "api_team_id": 261,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "SK Beveren",
+          "api_team_id": 738,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Genk",
+          "api_team_id": 742,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "St. Truiden",
+          "api_team_id": 735,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Lommel United",
+          "api_team_id": 259,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Antwerp",
+          "api_team_id": 740,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "RAAL La Louvi\u00e8re",
+          "api_team_id": 5902,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "OH Leuven",
+          "api_team_id": 260,
+          "games_played": 7,
+          "goal_diff": -8,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Kortrijk",
+          "api_team_id": 734,
+          "games_played": 7,
+          "goal_diff": -13,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Cercle Brugge",
+          "api_team_id": 741,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "KV Mechelen",
+          "api_team_id": 266,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 34399,
+          "kickoff_utc": "2026-01-16 19:45:00+00:00",
+          "home_team_name": "Club Brugge KV",
+          "away_team_name": "RAAL La Louvi\u00e8re",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 34287,
+          "kickoff_utc": "2025-09-13 18:45:00+00:00",
+          "home_team_name": "RAAL La Louvi\u00e8re",
+          "away_team_name": "Club Brugge KV",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 0
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:07.798705+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Union St. Gilloise",
+          "api_team_id": 1393,
+          "games_played": 7,
+          "goal_diff": 18,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Gent",
+          "api_team_id": 631,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Club Brugge KV",
+          "api_team_id": 569,
+          "games_played": 7,
+          "goal_diff": 12,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Charleroi",
+          "api_team_id": 736,
+          "games_played": 7,
+          "goal_diff": 8,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Anderlecht",
+          "api_team_id": 554,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Zulte Waregem",
+          "api_team_id": 600,
+          "games_played": 7,
+          "goal_diff": 3,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Standard Liege",
+          "api_team_id": 733,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "KVC Westerlo",
+          "api_team_id": 261,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "SK Beveren",
+          "api_team_id": 738,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Genk",
+          "api_team_id": 742,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "St. Truiden",
+          "api_team_id": 735,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Lommel United",
+          "api_team_id": 259,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Antwerp",
+          "api_team_id": 740,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "RAAL La Louvi\u00e8re",
+          "api_team_id": 5902,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "OH Leuven",
+          "api_team_id": 260,
+          "games_played": 7,
+          "goal_diff": -8,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Kortrijk",
+          "api_team_id": 734,
+          "games_played": 7,
+          "goal_diff": -13,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Cercle Brugge",
+          "api_team_id": 741,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "KV Mechelen",
+          "api_team_id": 266,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 67819,
+      "api_league_id": 144,
+      "season": 2026,
+      "kickoff_utc": "2026-10-11 14:00:00+00:00",
+      "home_team_id": 1393,
+      "home_team_name": "Union St. Gilloise",
+      "away_team_id": 260,
+      "away_team_name": "OH Leuven",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Union St. Gilloise",
+          "api_team_id": 1393,
+          "games_played": 7,
+          "goal_diff": 18,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Gent",
+          "api_team_id": 631,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Club Brugge KV",
+          "api_team_id": 569,
+          "games_played": 7,
+          "goal_diff": 12,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Charleroi",
+          "api_team_id": 736,
+          "games_played": 7,
+          "goal_diff": 8,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Anderlecht",
+          "api_team_id": 554,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Zulte Waregem",
+          "api_team_id": 600,
+          "games_played": 7,
+          "goal_diff": 3,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Standard Liege",
+          "api_team_id": 733,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "KVC Westerlo",
+          "api_team_id": 261,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "SK Beveren",
+          "api_team_id": 738,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Genk",
+          "api_team_id": 742,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "St. Truiden",
+          "api_team_id": 735,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Lommel United",
+          "api_team_id": 259,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Antwerp",
+          "api_team_id": 740,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "RAAL La Louvi\u00e8re",
+          "api_team_id": 5902,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "OH Leuven",
+          "api_team_id": 260,
+          "games_played": 7,
+          "goal_diff": -8,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Kortrijk",
+          "api_team_id": 734,
+          "games_played": 7,
+          "goal_diff": -13,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Cercle Brugge",
+          "api_team_id": 741,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "KV Mechelen",
+          "api_team_id": 266,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 34410,
+          "kickoff_utc": "2026-01-24 19:45:00+00:00",
+          "home_team_name": "OH Leuven",
+          "away_team_name": "Union St. Gilloise",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 34253,
+          "kickoff_utc": "2025-08-03 16:30:00+00:00",
+          "home_team_name": "Union St. Gilloise",
+          "away_team_name": "OH Leuven",
+          "home_team_fulltime_goal": 5,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 836,
+          "kickoff_utc": "2025-01-19 15:00:00+00:00",
+          "home_team_name": "Union St. Gilloise",
+          "away_team_name": "OH Leuven",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 780,
+          "kickoff_utc": "2024-11-24 15:00:00+00:00",
+          "home_team_name": "OH Leuven",
+          "away_team_name": "Union St. Gilloise",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 34769,
+          "kickoff_utc": "2024-03-02 17:15:00+00:00",
+          "home_team_name": "OH Leuven",
+          "away_team_name": "Union St. Gilloise",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 2
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:07.798705+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Union St. Gilloise",
+          "api_team_id": 1393,
+          "games_played": 7,
+          "goal_diff": 18,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Gent",
+          "api_team_id": 631,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 19,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Club Brugge KV",
+          "api_team_id": 569,
+          "games_played": 7,
+          "goal_diff": 12,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Charleroi",
+          "api_team_id": 736,
+          "games_played": 7,
+          "goal_diff": 8,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Anderlecht",
+          "api_team_id": 554,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Zulte Waregem",
+          "api_team_id": 600,
+          "games_played": 7,
+          "goal_diff": 3,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Standard Liege",
+          "api_team_id": 733,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "KVC Westerlo",
+          "api_team_id": 261,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "SK Beveren",
+          "api_team_id": 738,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Genk",
+          "api_team_id": 742,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 9,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "St. Truiden",
+          "api_team_id": 735,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Lommel United",
+          "api_team_id": 259,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Antwerp",
+          "api_team_id": 740,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "RAAL La Louvi\u00e8re",
+          "api_team_id": 5902,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "OH Leuven",
+          "api_team_id": 260,
+          "games_played": 7,
+          "goal_diff": -8,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Kortrijk",
+          "api_team_id": 734,
+          "games_played": 7,
+          "goal_diff": -13,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Cercle Brugge",
+          "api_team_id": 741,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "KV Mechelen",
+          "api_team_id": 266,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:07.798705+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 81805,
+      "api_league_id": 389,
+      "season": 2026,
+      "kickoff_utc": "2026-10-10 12:00:00+00:00",
+      "home_team_id": 664,
+      "home_team_name": "Kairat Almaty",
+      "away_team_id": 4560,
+      "away_team_name": "Zhetysu",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Ordabasy",
+          "api_team_id": 692,
+          "games_played": 25,
+          "goal_diff": 30,
+          "points": 58,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Kairat Almaty",
+          "api_team_id": 664,
+          "games_played": 25,
+          "goal_diff": 32,
+          "points": 57,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "FC Astana",
+          "api_team_id": 562,
+          "games_played": 24,
+          "goal_diff": 16,
+          "points": 45,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Okzhetpes",
+          "api_team_id": 4558,
+          "games_played": 26,
+          "goal_diff": 6,
+          "points": 45,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Aktobe",
+          "api_team_id": 4563,
+          "games_played": 26,
+          "goal_diff": 7,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Yelimay Semey",
+          "api_team_id": 21011,
+          "games_played": 25,
+          "goal_diff": 2,
+          "points": 38,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "FK Tobol Kostanay",
+          "api_team_id": 2259,
+          "games_played": 26,
+          "goal_diff": -2,
+          "points": 34,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Zhenys",
+          "api_team_id": 16611,
+          "games_played": 26,
+          "goal_diff": -6,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Ulytau",
+          "api_team_id": 21010,
+          "games_played": 26,
+          "goal_diff": -8,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Kaspiy",
+          "api_team_id": 4552,
+          "games_played": 26,
+          "goal_diff": -9,
+          "points": 29,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Irtysh",
+          "api_team_id": 4565,
+          "games_played": 25,
+          "goal_diff": -8,
+          "points": 26,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Kyzyl-Zhar",
+          "api_team_id": 4554,
+          "games_played": 26,
+          "goal_diff": -11,
+          "points": 25,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Kaisar",
+          "api_team_id": 4562,
+          "games_played": 26,
+          "goal_diff": -11,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Atyrau",
+          "api_team_id": 4564,
+          "games_played": 24,
+          "goal_diff": -7,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Altay",
+          "api_team_id": 4544,
+          "games_played": 26,
+          "goal_diff": -13,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Zhetysu",
+          "api_team_id": 4560,
+          "games_played": 26,
+          "goal_diff": -18,
+          "points": 22,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 81610,
+          "kickoff_utc": "2026-03-21 10:00:00+00:00",
+          "home_team_name": "Zhetysu",
+          "away_team_name": "Kairat Almaty",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 81574,
+          "kickoff_utc": "2025-10-05 11:00:00+00:00",
+          "home_team_name": "Kairat Almaty",
+          "away_team_name": "Zhetysu",
+          "home_team_fulltime_goal": 5,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 81487,
+          "kickoff_utc": "2025-06-14 13:00:00+00:00",
+          "home_team_name": "Zhetysu",
+          "away_team_name": "Kairat Almaty",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 2
+        },
+        {
+          "fixture_id": 81388,
+          "kickoff_utc": "2024-10-26 09:00:00+00:00",
+          "home_team_name": "Zhetysu",
+          "away_team_name": "Kairat Almaty",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 2
+        },
+        {
+          "fixture_id": 81271,
+          "kickoff_utc": "2024-04-06 14:00:00+00:00",
+          "home_team_name": "Kairat Almaty",
+          "away_team_name": "Zhetysu",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 0
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:09.579840+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Ordabasy",
+          "api_team_id": 692,
+          "games_played": 25,
+          "goal_diff": 30,
+          "points": 58,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Kairat Almaty",
+          "api_team_id": 664,
+          "games_played": 25,
+          "goal_diff": 32,
+          "points": 57,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "FC Astana",
+          "api_team_id": 562,
+          "games_played": 24,
+          "goal_diff": 16,
+          "points": 45,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Okzhetpes",
+          "api_team_id": 4558,
+          "games_played": 26,
+          "goal_diff": 6,
+          "points": 45,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Aktobe",
+          "api_team_id": 4563,
+          "games_played": 26,
+          "goal_diff": 7,
+          "points": 42,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Yelimay Semey",
+          "api_team_id": 21011,
+          "games_played": 25,
+          "goal_diff": 2,
+          "points": 38,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "FK Tobol Kostanay",
+          "api_team_id": 2259,
+          "games_played": 26,
+          "goal_diff": -2,
+          "points": 34,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Zhenys",
+          "api_team_id": 16611,
+          "games_played": 26,
+          "goal_diff": -6,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Ulytau",
+          "api_team_id": 21010,
+          "games_played": 26,
+          "goal_diff": -8,
+          "points": 32,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Kaspiy",
+          "api_team_id": 4552,
+          "games_played": 26,
+          "goal_diff": -9,
+          "points": 29,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Irtysh",
+          "api_team_id": 4565,
+          "games_played": 25,
+          "goal_diff": -8,
+          "points": 26,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Kyzyl-Zhar",
+          "api_team_id": 4554,
+          "games_played": 26,
+          "goal_diff": -11,
+          "points": 25,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Kaisar",
+          "api_team_id": 4562,
+          "games_played": 26,
+          "goal_diff": -11,
+          "points": 24,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Atyrau",
+          "api_team_id": 4564,
+          "games_played": 24,
+          "goal_diff": -7,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Altay",
+          "api_team_id": 4544,
+          "games_played": 26,
+          "goal_diff": -13,
+          "points": 23,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Zhetysu",
+          "api_team_id": 4560,
+          "games_played": 26,
+          "goal_diff": -18,
+          "points": 22,
+          "updated_at": "2026-10-05 00:09:09.579840+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 81892,
+      "api_league_id": 94,
+      "season": 2026,
+      "kickoff_utc": "2026-10-11 17:00:00+00:00",
+      "home_team_id": 211,
+      "home_team_name": "Benfica",
+      "away_team_id": 224,
+      "away_team_name": "Guimaraes",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "FC Porto",
+          "api_team_id": 212,
+          "games_played": 7,
+          "goal_diff": 15,
+          "points": 21,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Benfica",
+          "api_team_id": 211,
+          "games_played": 7,
+          "goal_diff": 15,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Sporting CP",
+          "api_team_id": 228,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Santa Clara",
+          "api_team_id": 227,
+          "games_played": 7,
+          "goal_diff": 7,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Arouca",
+          "api_team_id": 240,
+          "games_played": 7,
+          "goal_diff": 3,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "SC Braga",
+          "api_team_id": 217,
+          "games_played": 6,
+          "goal_diff": 2,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Academico Viseu",
+          "api_team_id": 238,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Estrela",
+          "api_team_id": 15130,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "GIL Vicente",
+          "api_team_id": 762,
+          "games_played": 6,
+          "goal_diff": 0,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Alverca",
+          "api_team_id": 4724,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Maritimo",
+          "api_team_id": 214,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Moreirense",
+          "api_team_id": 215,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Famalicao",
+          "api_team_id": 242,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Vit\u00f3ria SC",
+          "api_team_id": 224,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Nacional",
+          "api_team_id": 225,
+          "games_played": 7,
+          "goal_diff": -8,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Rio Ave",
+          "api_team_id": 226,
+          "games_played": 7,
+          "goal_diff": -10,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Casa Pia",
+          "api_team_id": 4716,
+          "games_played": 7,
+          "goal_diff": -13,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Estoril",
+          "api_team_id": 230,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 2,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 40892,
+          "kickoff_utc": "2026-03-21 18:00:00+00:00",
+          "home_team_name": "Benfica",
+          "away_team_name": "Guimaraes",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 40742,
+          "kickoff_utc": "2025-11-01 20:30:00+00:00",
+          "home_team_name": "Guimaraes",
+          "away_team_name": "Benfica",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 23457,
+          "kickoff_utc": "2025-04-19 19:30:00+00:00",
+          "home_team_name": "Guimaraes",
+          "away_team_name": "Benfica",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 23298,
+          "kickoff_utc": "2024-12-07 18:00:00+00:00",
+          "home_team_name": "Benfica",
+          "away_team_name": "Guimaraes",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 23065,
+          "kickoff_utc": "2024-02-11 20:30:00+00:00",
+          "home_team_name": "Guimaraes",
+          "away_team_name": "Benfica",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 2
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:10.088503+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "FC Porto",
+          "api_team_id": 212,
+          "games_played": 7,
+          "goal_diff": 15,
+          "points": 21,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Benfica",
+          "api_team_id": 211,
+          "games_played": 7,
+          "goal_diff": 15,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Sporting CP",
+          "api_team_id": 228,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Santa Clara",
+          "api_team_id": 227,
+          "games_played": 7,
+          "goal_diff": 7,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Arouca",
+          "api_team_id": 240,
+          "games_played": 7,
+          "goal_diff": 3,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "SC Braga",
+          "api_team_id": 217,
+          "games_played": 6,
+          "goal_diff": 2,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Academico Viseu",
+          "api_team_id": 238,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Estrela",
+          "api_team_id": 15130,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "GIL Vicente",
+          "api_team_id": 762,
+          "games_played": 6,
+          "goal_diff": 0,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Alverca",
+          "api_team_id": 4724,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Maritimo",
+          "api_team_id": 214,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Moreirense",
+          "api_team_id": 215,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Famalicao",
+          "api_team_id": 242,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Vit\u00f3ria SC",
+          "api_team_id": 224,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Nacional",
+          "api_team_id": 225,
+          "games_played": 7,
+          "goal_diff": -8,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Rio Ave",
+          "api_team_id": 226,
+          "games_played": 7,
+          "goal_diff": -10,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Casa Pia",
+          "api_team_id": 4716,
+          "games_played": 7,
+          "goal_diff": -13,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Estoril",
+          "api_team_id": 230,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 2,
+          "updated_at": "2026-10-05 00:09:10.088503+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 85316,
+      "api_league_id": 140,
+      "season": 2026,
+      "kickoff_utc": "2026-10-10 16:30:00+00:00",
+      "home_team_id": 529,
+      "home_team_name": "Barcelona",
+      "away_team_id": 546,
+      "away_team_name": "Getafe",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Barcelona",
+          "api_team_id": 529,
+          "games_played": 7,
+          "goal_diff": 24,
+          "points": 21,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Atletico Madrid",
+          "api_team_id": 530,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Real Betis",
+          "api_team_id": 543,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Real Madrid",
+          "api_team_id": 541,
+          "games_played": 7,
+          "goal_diff": 10,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Sevilla",
+          "api_team_id": 536,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Alaves",
+          "api_team_id": 542,
+          "games_played": 7,
+          "goal_diff": 5,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Deportivo La Coruna",
+          "api_team_id": 544,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Real Sociedad",
+          "api_team_id": 548,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Villarreal",
+          "api_team_id": 533,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Athletic Club",
+          "api_team_id": 531,
+          "games_played": 6,
+          "goal_diff": 1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Getafe",
+          "api_team_id": 546,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Rayo Vallecano",
+          "api_team_id": 728,
+          "games_played": 7,
+          "goal_diff": -5,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Osasuna",
+          "api_team_id": 727,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Celta Vigo",
+          "api_team_id": 538,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Espanyol",
+          "api_team_id": 540,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Racing Santander",
+          "api_team_id": 4665,
+          "games_played": 7,
+          "goal_diff": -10,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Levante",
+          "api_team_id": 539,
+          "games_played": 6,
+          "goal_diff": -4,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Elche",
+          "api_team_id": 797,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 19,
+          "team_name": "Valencia",
+          "api_team_id": 532,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 20,
+          "team_name": "Malaga",
+          "api_team_id": 535,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 41963,
+          "kickoff_utc": "2026-04-25 14:15:00+00:00",
+          "home_team_name": "Getafe",
+          "away_team_name": "Barcelona",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 2
+        },
+        {
+          "fixture_id": 41691,
+          "kickoff_utc": "2025-09-21 19:00:00+00:00",
+          "home_team_name": "Barcelona",
+          "away_team_name": "Getafe",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 28035,
+          "kickoff_utc": "2025-01-18 20:00:00+00:00",
+          "home_team_name": "Getafe",
+          "away_team_name": "Barcelona",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 27907,
+          "kickoff_utc": "2024-09-25 19:00:00+00:00",
+          "home_team_name": "Barcelona",
+          "away_team_name": "Getafe",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 27712,
+          "kickoff_utc": "2024-02-24 15:15:00+00:00",
+          "home_team_name": "Barcelona",
+          "away_team_name": "Getafe",
+          "home_team_fulltime_goal": 4,
+          "away_team_fulltime_goal": 0
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:10.363243+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Barcelona",
+          "api_team_id": 529,
+          "games_played": 7,
+          "goal_diff": 24,
+          "points": 21,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Atletico Madrid",
+          "api_team_id": 530,
+          "games_played": 7,
+          "goal_diff": 9,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Real Betis",
+          "api_team_id": 543,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Real Madrid",
+          "api_team_id": 541,
+          "games_played": 7,
+          "goal_diff": 10,
+          "points": 15,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "Sevilla",
+          "api_team_id": 536,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Alaves",
+          "api_team_id": 542,
+          "games_played": 7,
+          "goal_diff": 5,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Deportivo La Coruna",
+          "api_team_id": 544,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Real Sociedad",
+          "api_team_id": 548,
+          "games_played": 7,
+          "goal_diff": -4,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Villarreal",
+          "api_team_id": 533,
+          "games_played": 7,
+          "goal_diff": 1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Athletic Club",
+          "api_team_id": 531,
+          "games_played": 6,
+          "goal_diff": 1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Getafe",
+          "api_team_id": 546,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Rayo Vallecano",
+          "api_team_id": 728,
+          "games_played": 7,
+          "goal_diff": -5,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Osasuna",
+          "api_team_id": 727,
+          "games_played": 7,
+          "goal_diff": -7,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Celta Vigo",
+          "api_team_id": 538,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Espanyol",
+          "api_team_id": 540,
+          "games_played": 7,
+          "goal_diff": 0,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Racing Santander",
+          "api_team_id": 4665,
+          "games_played": 7,
+          "goal_diff": -10,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Levante",
+          "api_team_id": 539,
+          "games_played": 6,
+          "goal_diff": -4,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Elche",
+          "api_team_id": 797,
+          "games_played": 7,
+          "goal_diff": -6,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 19,
+          "team_name": "Valencia",
+          "api_team_id": 532,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        },
+        {
+          "rank": 20,
+          "team_name": "Malaga",
+          "api_team_id": 535,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 3,
+          "updated_at": "2026-10-05 00:09:10.363243+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 71009,
+      "api_league_id": 179,
+      "season": 2026,
+      "kickoff_utc": "2026-10-10 14:00:00+00:00",
+      "home_team_id": 257,
+      "home_team_name": "Rangers",
+      "away_team_id": 250,
+      "away_team_name": "Kilmarnock",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "Celtic",
+          "api_team_id": 247,
+          "games_played": 7,
+          "goal_diff": 10,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Rangers",
+          "api_team_id": 257,
+          "games_played": 7,
+          "goal_diff": 4,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Heart Of Midlothian",
+          "api_team_id": 254,
+          "games_played": 7,
+          "goal_diff": 6,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Dundee",
+          "api_team_id": 253,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "ST Mirren",
+          "api_team_id": 251,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "ST Johnstone",
+          "api_team_id": 258,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Aberdeen",
+          "api_team_id": 252,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Dundee Utd",
+          "api_team_id": 1386,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Motherwell",
+          "api_team_id": 256,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Hibernian",
+          "api_team_id": 249,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Falkirk",
+          "api_team_id": 1389,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 6,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Kilmarnock",
+          "api_team_id": 250,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 41589,
+          "kickoff_utc": "2026-02-04 19:45:00+00:00",
+          "home_team_name": "Rangers",
+          "away_team_name": "Kilmarnock",
+          "home_team_fulltime_goal": 5,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 41534,
+          "kickoff_utc": "2025-12-06 20:00:00+00:00",
+          "home_team_name": "Kilmarnock",
+          "away_team_name": "Rangers",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 3
+        },
+        {
+          "fixture_id": 41497,
+          "kickoff_utc": "2025-10-26 15:00:00+00:00",
+          "home_team_name": "Rangers",
+          "away_team_name": "Kilmarnock",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 26062,
+          "kickoff_utc": "2025-02-26 20:00:00+00:00",
+          "home_team_name": "Kilmarnock",
+          "away_team_name": "Rangers",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 4
+        },
+        {
+          "fixture_id": 25981,
+          "kickoff_utc": "2024-12-04 19:45:00+00:00",
+          "home_team_name": "Rangers",
+          "away_team_name": "Kilmarnock",
+          "home_team_fulltime_goal": 6,
+          "away_team_fulltime_goal": 0
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:04.909800+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "Celtic",
+          "api_team_id": 247,
+          "games_played": 7,
+          "goal_diff": 10,
+          "points": 18,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Rangers",
+          "api_team_id": 257,
+          "games_played": 7,
+          "goal_diff": 4,
+          "points": 16,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Heart Of Midlothian",
+          "api_team_id": 254,
+          "games_played": 7,
+          "goal_diff": 6,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Dundee",
+          "api_team_id": 253,
+          "games_played": 7,
+          "goal_diff": 2,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "ST Mirren",
+          "api_team_id": 251,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "ST Johnstone",
+          "api_team_id": 258,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Aberdeen",
+          "api_team_id": 252,
+          "games_played": 7,
+          "goal_diff": -1,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Dundee Utd",
+          "api_team_id": 1386,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Motherwell",
+          "api_team_id": 256,
+          "games_played": 7,
+          "goal_diff": -2,
+          "points": 8,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Hibernian",
+          "api_team_id": 249,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Falkirk",
+          "api_team_id": 1389,
+          "games_played": 7,
+          "goal_diff": -3,
+          "points": 6,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Kilmarnock",
+          "api_team_id": 250,
+          "games_played": 7,
+          "goal_diff": -9,
+          "points": 5,
+          "updated_at": "2026-10-05 00:09:04.909800+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    },
+    {
+      "fixture_id": 44246,
+      "api_league_id": 135,
+      "season": 2026,
+      "kickoff_utc": "2026-10-10 16:00:00+00:00",
+      "home_team_id": 505,
+      "home_team_name": "Inter",
+      "away_team_id": 523,
+      "away_team_name": "Parma",
+      "standings": [
+        {
+          "rank": 1,
+          "team_name": "AS Roma",
+          "api_team_id": 497,
+          "games_played": 5,
+          "goal_diff": 11,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Inter",
+          "api_team_id": 505,
+          "games_played": 5,
+          "goal_diff": 7,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Lazio",
+          "api_team_id": 487,
+          "games_played": 5,
+          "goal_diff": 5,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Cagliari",
+          "api_team_id": 490,
+          "games_played": 5,
+          "goal_diff": 3,
+          "points": 12,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "AC Milan",
+          "api_team_id": 489,
+          "games_played": 5,
+          "goal_diff": 6,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Frosinone",
+          "api_team_id": 512,
+          "games_played": 5,
+          "goal_diff": 5,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Juventus",
+          "api_team_id": 496,
+          "games_played": 5,
+          "goal_diff": 4,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Como",
+          "api_team_id": 895,
+          "games_played": 5,
+          "goal_diff": 3,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Napoli",
+          "api_team_id": 492,
+          "games_played": 5,
+          "goal_diff": 1,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Sassuolo",
+          "api_team_id": 488,
+          "games_played": 5,
+          "goal_diff": 0,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Atalanta",
+          "api_team_id": 499,
+          "games_played": 5,
+          "goal_diff": -2,
+          "points": 6,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Lecce",
+          "api_team_id": 867,
+          "games_played": 5,
+          "goal_diff": -5,
+          "points": 6,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Udinese",
+          "api_team_id": 494,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Torino",
+          "api_team_id": 503,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Parma",
+          "api_team_id": 523,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Monza",
+          "api_team_id": 1579,
+          "games_played": 5,
+          "goal_diff": -4,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Fiorentina",
+          "api_team_id": 502,
+          "games_played": 5,
+          "goal_diff": -6,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Bologna",
+          "api_team_id": 500,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 2,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 19,
+          "team_name": "Genoa",
+          "api_team_id": 495,
+          "games_played": 5,
+          "goal_diff": -7,
+          "points": 1,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 20,
+          "team_name": "Venezia",
+          "api_team_id": 517,
+          "games_played": 5,
+          "goal_diff": -9,
+          "points": 0,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        }
+      ],
+      "h2h": [
+        {
+          "fixture_id": 38440,
+          "kickoff_utc": "2026-05-03 18:45:00+00:00",
+          "home_team_name": "Inter",
+          "away_team_name": "Parma",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 0
+        },
+        {
+          "fixture_id": 38277,
+          "kickoff_utc": "2026-01-07 19:45:00+00:00",
+          "home_team_name": "Parma",
+          "away_team_name": "Inter",
+          "home_team_fulltime_goal": 0,
+          "away_team_fulltime_goal": 2
+        },
+        {
+          "fixture_id": 16537,
+          "kickoff_utc": "2025-04-05 16:00:00+00:00",
+          "home_team_name": "Parma",
+          "away_team_name": "Inter",
+          "home_team_fulltime_goal": 2,
+          "away_team_fulltime_goal": 2
+        },
+        {
+          "fixture_id": 16373,
+          "kickoff_utc": "2024-12-06 17:30:00+00:00",
+          "home_team_name": "Inter",
+          "away_team_name": "Parma",
+          "home_team_fulltime_goal": 3,
+          "away_team_fulltime_goal": 1
+        },
+        {
+          "fixture_id": 14960,
+          "kickoff_utc": "2021-03-04 19:45:00+00:00",
+          "home_team_name": "Parma",
+          "away_team_name": "Inter",
+          "home_team_fulltime_goal": 1,
+          "away_team_fulltime_goal": 2
+        }
+      ],
+      "standings_updated_at": "2026-10-05 00:09:02.840548+00:00",
+      "stale_rows_excluded": 0,
+      "display_standings": [
+        {
+          "rank": 1,
+          "team_name": "AS Roma",
+          "api_team_id": 497,
+          "games_played": 5,
+          "goal_diff": 11,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 2,
+          "team_name": "Inter",
+          "api_team_id": 505,
+          "games_played": 5,
+          "goal_diff": 7,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 3,
+          "team_name": "Lazio",
+          "api_team_id": 487,
+          "games_played": 5,
+          "goal_diff": 5,
+          "points": 13,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 4,
+          "team_name": "Cagliari",
+          "api_team_id": 490,
+          "games_played": 5,
+          "goal_diff": 3,
+          "points": 12,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 5,
+          "team_name": "AC Milan",
+          "api_team_id": 489,
+          "games_played": 5,
+          "goal_diff": 6,
+          "points": 11,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 6,
+          "team_name": "Frosinone",
+          "api_team_id": 512,
+          "games_played": 5,
+          "goal_diff": 5,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 7,
+          "team_name": "Juventus",
+          "api_team_id": 496,
+          "games_played": 5,
+          "goal_diff": 4,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 8,
+          "team_name": "Como",
+          "api_team_id": 895,
+          "games_played": 5,
+          "goal_diff": 3,
+          "points": 10,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 9,
+          "team_name": "Napoli",
+          "api_team_id": 492,
+          "games_played": 5,
+          "goal_diff": 1,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 10,
+          "team_name": "Sassuolo",
+          "api_team_id": 488,
+          "games_played": 5,
+          "goal_diff": 0,
+          "points": 7,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 11,
+          "team_name": "Atalanta",
+          "api_team_id": 499,
+          "games_played": 5,
+          "goal_diff": -2,
+          "points": 6,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 12,
+          "team_name": "Lecce",
+          "api_team_id": 867,
+          "games_played": 5,
+          "goal_diff": -5,
+          "points": 6,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 13,
+          "team_name": "Udinese",
+          "api_team_id": 494,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 14,
+          "team_name": "Torino",
+          "api_team_id": 503,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 15,
+          "team_name": "Parma",
+          "api_team_id": 523,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 16,
+          "team_name": "Monza",
+          "api_team_id": 1579,
+          "games_played": 5,
+          "goal_diff": -4,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 17,
+          "team_name": "Fiorentina",
+          "api_team_id": 502,
+          "games_played": 5,
+          "goal_diff": -6,
+          "points": 4,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 18,
+          "team_name": "Bologna",
+          "api_team_id": 500,
+          "games_played": 5,
+          "goal_diff": -3,
+          "points": 2,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 19,
+          "team_name": "Genoa",
+          "api_team_id": 495,
+          "games_played": 5,
+          "goal_diff": -7,
+          "points": 1,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        },
+        {
+          "rank": 20,
+          "team_name": "Venezia",
+          "api_team_id": 517,
+          "games_played": 5,
+          "goal_diff": -9,
+          "points": 0,
+          "updated_at": "2026-10-05 00:09:02.840548+00:00"
+        }
+      ],
+      "standings_group_unresolved": false
+    }
+  ]
+}

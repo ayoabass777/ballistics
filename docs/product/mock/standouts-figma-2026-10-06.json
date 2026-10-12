@@ -1,0 +1,809 @@
+{
+  "date": "2026-10-06",
+  "fixture_date": "2026-10-10",
+  "cutoff_adjusted_pp": 15,
+  "mobile_full_list": "536:54144",
+  "desktop_full_list": "536:54871",
+  "fixtures": [
+    {
+      "id": 126487,
+      "home": "Radnicki 1923",
+      "away": "FK Crvena Zvezda",
+      "section": "Team strength",
+      "title": "FK Crvena Zvezda · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Super Liga · Serbia · 16:00 UTC",
+      "score": 0.4723
+    },
+    {
+      "id": 60892,
+      "home": "Tukums",
+      "away": "Riga",
+      "section": "Team strength",
+      "title": "Riga · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Virsliga · Latvia · 11:00 UTC",
+      "score": 0.4537
+    },
+    {
+      "id": 81893,
+      "home": "Maritimo",
+      "away": "FC Porto",
+      "section": "Team strength",
+      "title": "FC Porto · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Primeira Liga · Portugal · 17:00 UTC",
+      "score": 0.4363
+    },
+    {
+      "id": 79909,
+      "home": "FC Augsburg",
+      "away": "Bayern München",
+      "section": "Team strength",
+      "title": "Bayern München · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Bundesliga · Germany · 13:30 UTC",
+      "score": 0.3806
+    },
+    {
+      "id": 71009,
+      "home": "Rangers",
+      "away": "Kilmarnock",
+      "section": "Team strength",
+      "title": "Rangers · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Premiership · Scotland · 14:00 UTC",
+      "score": 0.3457
+    },
+    {
+      "id": 110189,
+      "home": "Nantes",
+      "away": "Reims",
+      "section": "Goals outlook",
+      "title": "Reims scores 2+",
+      "sub": "71% estimated chance",
+      "meta": "Ligue 2 · France · 12:00 UTC",
+      "score": 0.309
+    },
+    {
+      "id": 128054,
+      "home": "Obolon'-Brovar",
+      "away": "Kryvbas KR",
+      "section": "Goals outlook",
+      "title": "Kryvbas KR scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "Premier League · Ukraine · 12:30 UTC",
+      "score": 0.2931
+    },
+    {
+      "id": 63542,
+      "home": "Tauras",
+      "away": "Minija",
+      "section": "Team patterns",
+      "title": "Minija · won",
+      "sub": "22/25 matches · all venues",
+      "meta": "1 Lyga · Lithuania · 11:00 UTC",
+      "score": 0.2815
+    },
+    {
+      "id": 45061,
+      "home": "FC Dnepr Mogilev",
+      "away": "Dinamo Minsk",
+      "section": "Team strength",
+      "title": "Dinamo Minsk · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Premier League · Belarus · 15:00 UTC",
+      "score": 0.2699
+    },
+    {
+      "id": 110194,
+      "home": "Saint Etienne",
+      "away": "Rodez",
+      "section": "Goals outlook",
+      "title": "Saint Etienne scores 2+",
+      "sub": "72% estimated chance",
+      "meta": "Ligue 2 · France · 18:00 UTC",
+      "score": 0.2678
+    },
+    {
+      "id": 66421,
+      "home": "Sporting JAX",
+      "away": "Birmingham Legion",
+      "section": "Goals outlook",
+      "title": "Birmingham Legion scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "USL Championship · USA · 21:00 UTC",
+      "score": 0.2608
+    },
+    {
+      "id": 42665,
+      "home": "Gais",
+      "away": "Sirius",
+      "section": "Team patterns",
+      "title": "Sirius · scored 2+",
+      "sub": "19/22 matches · all venues",
+      "meta": "Allsvenskan · Sweden · 13:00 UTC",
+      "score": 0.2602
+    },
+    {
+      "id": 63543,
+      "home": "Babrungas",
+      "away": "Jonava",
+      "section": "Team patterns",
+      "title": "Babrungas · kept a clean sheet",
+      "sub": "17/25 matches · all venues",
+      "meta": "1 Lyga · Lithuania · 11:00 UTC",
+      "score": 0.257
+    },
+    {
+      "id": 44246,
+      "home": "Inter",
+      "away": "Parma",
+      "section": "Team strength",
+      "title": "Inter · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "Serie A · Italy · 16:00 UTC",
+      "score": 0.2442
+    },
+    {
+      "id": 79912,
+      "home": "SC Paderborn 07",
+      "away": "VfB Stuttgart",
+      "section": "Goals outlook",
+      "title": "Match Under 3.5",
+      "sub": "70% estimated chance",
+      "meta": "Bundesliga · Germany · 13:30 UTC",
+      "score": 0.2379
+    },
+    {
+      "id": 67820,
+      "home": "RAAL La Louvière",
+      "away": "Club Brugge KV",
+      "section": "Goals outlook",
+      "title": "Club Brugge KV scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "Jupiler Pro League · Belgium · 16:15 UTC",
+      "score": 0.2307
+    },
+    {
+      "id": 124383,
+      "home": "Csikszereda",
+      "away": "Universitatea Craiova",
+      "section": "Goals outlook",
+      "title": "Universitatea Craiova scores 1+",
+      "sub": "87% estimated chance",
+      "meta": "Liga I · Romania · 17:00 UTC",
+      "score": 0.2288
+    },
+    {
+      "id": 67724,
+      "home": "Charlotte Independence",
+      "away": "NY Cosmos",
+      "section": "Team patterns",
+      "title": "Ny Cosmos · conceded 2+",
+      "sub": "22/28 matches · all venues",
+      "meta": "USL League One · USA · 23:00 UTC",
+      "score": 0.2239
+    },
+    {
+      "id": 63547,
+      "home": "Transinvest 2",
+      "away": "Ekranas",
+      "section": "Team patterns",
+      "title": "Ekranas · conceded 2+",
+      "sub": "19/25 matches · all venues",
+      "meta": "1 Lyga · Lithuania · 12:00 UTC",
+      "score": 0.2206
+    },
+    {
+      "id": 107534,
+      "home": "Bristol Rovers",
+      "away": "Barnet",
+      "section": "Goals outlook",
+      "title": "Barnet scores 1+",
+      "sub": "88% estimated chance",
+      "meta": "League Two · England · 14:00 UTC",
+      "score": 0.218
+    },
+    {
+      "id": 85316,
+      "home": "Barcelona",
+      "away": "Getafe",
+      "section": "Team strength",
+      "title": "Barcelona · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "La Liga · Spain · 16:30 UTC",
+      "score": 0.2171
+    },
+    {
+      "id": 40116,
+      "home": "Bodo/Glimt",
+      "away": "Kristiansund BK",
+      "section": "Team patterns",
+      "title": "Bodo/Glimt · led at half-time",
+      "sub": "15/21 matches · all venues",
+      "meta": "Eliteserien · Norway · 14:00 UTC",
+      "score": 0.217
+    },
+    {
+      "id": 45065,
+      "home": "Naftan",
+      "away": "Belshina",
+      "section": "Team patterns",
+      "title": "Naftan · conceded 2+",
+      "sub": "16/23 matches · all venues",
+      "meta": "Premier League · Belarus · 15:00 UTC",
+      "score": 0.2148
+    },
+    {
+      "id": 81805,
+      "home": "Kairat Almaty",
+      "away": "Zhetysu",
+      "section": "Goals outlook",
+      "title": "Kairat Almaty scores 2+",
+      "sub": "71% estimated chance",
+      "meta": "Premier League · Kazakhstan · 12:00 UTC",
+      "score": 0.2131
+    },
+    {
+      "id": 63544,
+      "home": "Neptūną Klaipėda",
+      "away": "Hegelmann II",
+      "section": "Team strength",
+      "title": "Neptūną Klaipėda · Big dog",
+      "sub": "Clear strength advantage",
+      "meta": "1 Lyga · Lithuania · 11:00 UTC",
+      "score": 0.2126
+    },
+    {
+      "id": 86064,
+      "home": "Gençlerbirliği S.K.",
+      "away": "Amed",
+      "section": "Goals outlook",
+      "title": "Amed scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "Süper Lig · Turkey · 10:30 UTC",
+      "score": 0.2126
+    },
+    {
+      "id": 55123,
+      "home": "Vaprus",
+      "away": "Trans Narva",
+      "section": "Team patterns",
+      "title": "Trans Narva · failed to score",
+      "sub": "10/14 matches · away",
+      "meta": "Meistriliiga · Estonia · 11:30 UTC",
+      "score": 0.2116
+    },
+    {
+      "id": 119643,
+      "home": "FC Juarez",
+      "away": "Club Tijuana",
+      "section": "Team patterns",
+      "title": "Fc Juarez · lost",
+      "sub": "9/10 matches · all venues",
+      "meta": "Liga MX · Mexico · 23:00 UTC",
+      "score": 0.2054
+    },
+    {
+      "id": 45064,
+      "home": "FC Gomel",
+      "away": "ML Vitebsk",
+      "section": "Team patterns",
+      "title": "Ml Vitebsk · scored 2+",
+      "sub": "8/10 matches · away",
+      "meta": "Premier League · Belarus · 15:00 UTC",
+      "score": 0.2038
+    },
+    {
+      "id": 83671,
+      "home": "FC Seoul",
+      "away": "Jeju United FC",
+      "section": "Team patterns",
+      "title": "Fc Seoul · won",
+      "sub": "19/30 matches · all venues",
+      "meta": "K League 1 · South-Korea · 05:00 UTC",
+      "score": 0.2018
+    },
+    {
+      "id": 131929,
+      "home": "Mansfield Town",
+      "away": "Bromley",
+      "section": "Goals outlook",
+      "title": "Mansfield Town scores 2+",
+      "sub": "69% estimated chance",
+      "meta": "League One · England · 14:00 UTC",
+      "score": 0.2003
+    },
+    {
+      "id": 85195,
+      "home": "Cheonan City",
+      "away": "Gyeongnam FC",
+      "section": "Team patterns",
+      "title": "Gyeongnam Fc · under 2.5 goals",
+      "sub": "11/12 matches · away",
+      "meta": "K League 2 · South-Korea · 07:30 UTC",
+      "score": 0.1934
+    },
+    {
+      "id": 75660,
+      "home": "Meizhou Kejia",
+      "away": "Wuxi Wugou",
+      "section": "Team patterns",
+      "title": "Meizhou Kejia · conceded 2+",
+      "sub": "9/12 matches · at home",
+      "meta": "League One · China · 11:30 UTC",
+      "score": 0.1898
+    },
+    {
+      "id": 85196,
+      "home": "Gimhae City",
+      "away": "Asan Mugunghwa",
+      "section": "Team patterns",
+      "title": "Gimhae City · lost",
+      "sub": "9/12 matches · at home",
+      "meta": "K League 2 · South-Korea · 07:30 UTC",
+      "score": 0.1893
+    },
+    {
+      "id": 94868,
+      "home": "Servette FC",
+      "away": "FC Sion",
+      "section": "Goals outlook",
+      "title": "Match Under 3.5",
+      "sub": "69% estimated chance",
+      "meta": "Super League · Switzerland · 16:00 UTC",
+      "score": 0.1893
+    },
+    {
+      "id": 72364,
+      "home": "Syrianska FC",
+      "away": "Farsta",
+      "section": "Team patterns",
+      "title": "Syrianska Fc · over 3.5 goals",
+      "sub": "10/12 matches · at home",
+      "meta": "Division 2 - Södra Svealand · Sweden · 15:00 UTC",
+      "score": 0.1878
+    },
+    {
+      "id": 107538,
+      "home": "Crawley Town",
+      "away": "Chesterfield",
+      "section": "Goals outlook",
+      "title": "Chesterfield scores 1+",
+      "sub": "84% estimated chance",
+      "meta": "League Two · England · 14:00 UTC",
+      "score": 0.1876
+    },
+    {
+      "id": 131930,
+      "home": "Stockport County",
+      "away": "Barnsley",
+      "section": "Goals outlook",
+      "title": "Stockport County scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "League One · England · 14:00 UTC",
+      "score": 0.1873
+    },
+    {
+      "id": 56309,
+      "home": "Meshakhte",
+      "away": "Saburtalo",
+      "section": "Team patterns",
+      "title": "Meshakhte · winless",
+      "sub": "13/13 matches · at home",
+      "meta": "Erovnuli Liga · Georgia · 11:30 UTC",
+      "score": 0.1857
+    },
+    {
+      "id": 96588,
+      "home": "Orlando City SC",
+      "away": "Columbus Crew",
+      "section": "Team patterns",
+      "title": "Orlando City Sc · over 4.5 goals",
+      "sub": "14/27 matches · all venues",
+      "meta": "Major League Soccer · USA · 23:30 UTC",
+      "score": 0.1837
+    },
+    {
+      "id": 72361,
+      "home": "Lindo FF",
+      "away": "Örebro Syrianska",
+      "section": "Team patterns",
+      "title": "Örebro Syrianska · failed to score",
+      "sub": "8/12 matches · away",
+      "meta": "Division 2 - Södra Svealand · Sweden · 11:00 UTC",
+      "score": 0.1825
+    },
+    {
+      "id": 83672,
+      "home": "Gimcheon Sangmu FC",
+      "away": "FC Anyang",
+      "section": "Team patterns",
+      "title": "Gimcheon Sangmu Fc · drew",
+      "sub": "10/14 matches · at home",
+      "meta": "K League 1 · South-Korea · 07:30 UTC",
+      "score": 0.1812
+    },
+    {
+      "id": 94869,
+      "home": "FC Lugano",
+      "away": "FC Luzern",
+      "section": "Team patterns",
+      "title": "Fc Lugano · won",
+      "sub": "8/9 matches · all venues",
+      "meta": "Super League · Switzerland · 18:30 UTC",
+      "score": 0.1806
+    },
+    {
+      "id": 96590,
+      "home": "Toronto FC",
+      "away": "CF Montreal",
+      "section": "Team patterns",
+      "title": "Toronto Fc · both teams scored",
+      "sub": "14/14 matches · at home",
+      "meta": "Major League Soccer · USA · 17:00 UTC",
+      "score": 0.1792
+    },
+    {
+      "id": 85319,
+      "home": "Real Madrid",
+      "away": "Villarreal",
+      "section": "Goals outlook",
+      "title": "Real Madrid scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "La Liga · Spain · 19:00 UTC",
+      "score": 0.1777
+    },
+    {
+      "id": 67722,
+      "home": "Union Omaha",
+      "away": "Fort Wayne",
+      "section": "Team patterns",
+      "title": "Union Omaha · won",
+      "sub": "19/29 matches · all venues",
+      "meta": "USL League One · USA · 21:00 UTC",
+      "score": 0.1761
+    },
+    {
+      "id": 124384,
+      "home": "Corvinul Hunedoara",
+      "away": "FC Voluntari",
+      "section": "Team patterns",
+      "title": "Fc Voluntari · conceded 2+",
+      "sub": "8/10 matches · all venues",
+      "meta": "Liga I · Romania · 17:00 UTC",
+      "score": 0.1757
+    },
+    {
+      "id": 96594,
+      "home": "Inter Miami",
+      "away": "DC United",
+      "section": "Team patterns",
+      "title": "Inter Miami · over 3.5 goals",
+      "sub": "10/13 matches · at home",
+      "meta": "Major League Soccer · USA · 23:30 UTC",
+      "score": 0.1744
+    },
+    {
+      "id": 46781,
+      "home": "FC Slutsk",
+      "away": "Uni Minsk",
+      "section": "Team patterns",
+      "title": "Fc Slutsk · unbeaten",
+      "sub": "13/13 matches · at home",
+      "meta": "1. Division · Belarus · 12:30 UTC",
+      "score": 0.1734
+    },
+    {
+      "id": 46789,
+      "home": "Niva",
+      "away": "Gomel II",
+      "section": "Goals outlook",
+      "title": "Niva scores 2+",
+      "sub": "73% estimated chance",
+      "meta": "1. Division · Belarus · 11:00 UTC",
+      "score": 0.1731
+    },
+    {
+      "id": 46785,
+      "home": "Osipovichy",
+      "away": "Volna",
+      "section": "Team patterns",
+      "title": "Osipovichy · lost",
+      "sub": "18/27 matches · all venues",
+      "meta": "1. Division · Belarus · 11:00 UTC",
+      "score": 0.1725
+    },
+    {
+      "id": 73953,
+      "home": "Shanghai Shenhua",
+      "away": "Yunnan Yukun",
+      "section": "Team patterns",
+      "title": "Yunnan Yukun · over 2.5 goals",
+      "sub": "22/26 matches · all venues",
+      "meta": "Super League · China · 11:35 UTC",
+      "score": 0.1707
+    },
+    {
+      "id": 96592,
+      "home": "Atlanta United FC",
+      "away": "FC Cincinnati",
+      "section": "Team patterns",
+      "title": "Fc Cincinnati · over 4.5 goals",
+      "sub": "13/26 matches · all venues",
+      "meta": "Major League Soccer · USA · 23:30 UTC",
+      "score": 0.1695
+    },
+    {
+      "id": 53847,
+      "home": "U. Catolica",
+      "away": "A. Italiano",
+      "section": "Team patterns",
+      "title": "U. Catolica · scored 2+",
+      "sub": "16/23 matches · all venues",
+      "meta": "Primera División · Chile · 23:00 UTC",
+      "score": 0.1681
+    },
+    {
+      "id": 131924,
+      "home": "Milton Keynes Dons",
+      "away": "Reading",
+      "section": "Team patterns",
+      "title": "Milton Keynes Dons · drew",
+      "sub": "6/7 matches · all venues",
+      "meta": "League One · England · 14:00 UTC",
+      "score": 0.1667
+    },
+    {
+      "id": 66423,
+      "home": "Indy Eleven",
+      "away": "Tampa Bay Rowdies",
+      "section": "Team patterns",
+      "title": "Tampa Bay Rowdies · kept a clean sheet",
+      "sub": "8/14 matches · away",
+      "meta": "USL Championship · USA · 23:00 UTC",
+      "score": 0.166
+    },
+    {
+      "id": 67726,
+      "home": "Sarasota Paradise",
+      "away": "Richmond Kickers",
+      "section": "Team patterns",
+      "title": "Richmond Kickers · lost",
+      "sub": "12/14 matches · away",
+      "meta": "USL League One · USA · 23:30 UTC",
+      "score": 0.1654
+    },
+    {
+      "id": 79906,
+      "home": "FSV Mainz 05",
+      "away": "Bayer Leverkusen",
+      "section": "Goals outlook",
+      "title": "Match Goals 1-4",
+      "sub": "72% estimated chance",
+      "meta": "Bundesliga · Germany · 13:30 UTC",
+      "score": 0.1651
+    },
+    {
+      "id": 85194,
+      "home": "Paju Citizen",
+      "away": "Busan I Park",
+      "section": "Team patterns",
+      "title": "Paju Citizen · failed to score",
+      "sub": "7/12 matches · at home",
+      "meta": "K League 2 · South-Korea · 05:00 UTC",
+      "score": 0.1646
+    },
+    {
+      "id": 124379,
+      "home": "Sepsi OSK Sfantu Gheorghe",
+      "away": "Dinamo Bucuresti",
+      "section": "Team patterns",
+      "title": "Dinamo Bucuresti · led at half-time",
+      "sub": "7/10 matches · all venues",
+      "meta": "Liga I · Romania · 17:00 UTC",
+      "score": 0.1636
+    },
+    {
+      "id": 79911,
+      "home": "Union Berlin",
+      "away": "SV Elversberg",
+      "section": "Goals outlook",
+      "title": "Match Goals 1-4",
+      "sub": "71% estimated chance",
+      "meta": "Bundesliga · Germany · 13:30 UTC",
+      "score": 0.163
+    },
+    {
+      "id": 102516,
+      "home": "Union Santa Fe",
+      "away": "Defensa Y Justicia",
+      "section": "Team patterns",
+      "title": "Union Santa Fe · over 2.5 goals",
+      "sub": "18/29 matches · all venues",
+      "meta": "Liga Profesional Argentina · Argentina · 00:45 UTC",
+      "score": 0.1619
+    },
+    {
+      "id": 45066,
+      "home": "Arsenal",
+      "away": "Dinamo Brest",
+      "section": "Goals outlook",
+      "title": "Dinamo Brest scores 1+",
+      "sub": "86% estimated chance",
+      "meta": "Premier League · Belarus · 15:00 UTC",
+      "score": 0.1598
+    },
+    {
+      "id": 55124,
+      "home": "Tammeka",
+      "away": "Nõmme United",
+      "section": "Team patterns",
+      "title": "Nõmme United · both teams scored",
+      "sub": "24/29 matches · all venues",
+      "meta": "Meistriliiga · Estonia · 14:00 UTC",
+      "score": 0.1591
+    },
+    {
+      "id": 60893,
+      "home": "Super Nova",
+      "away": "Grobiņa",
+      "section": "Team patterns",
+      "title": "Grobiņa · under 2.5 goals",
+      "sub": "22/31 matches · all venues",
+      "meta": "Virsliga · Latvia · 13:00 UTC",
+      "score": 0.1588
+    },
+    {
+      "id": 66422,
+      "home": "Charleston Battery",
+      "away": "Louisville City",
+      "section": "Goals outlook",
+      "title": "Charleston Battery scores 2+",
+      "sub": "67% estimated chance",
+      "meta": "USL Championship · USA · 22:00 UTC",
+      "score": 0.1588
+    },
+    {
+      "id": 86065,
+      "home": "Rizespor",
+      "away": "Fenerbahçe",
+      "section": "Goals outlook",
+      "title": "Fenerbahçe scores 1+",
+      "sub": "84% estimated chance",
+      "meta": "Süper Lig · Turkey · 16:00 UTC",
+      "score": 0.1577
+    },
+    {
+      "id": 124380,
+      "home": "Arges Pitesti",
+      "away": "CFR 1907 Cluj",
+      "section": "Team patterns",
+      "title": "Arges Pitesti · under 2.5 goals",
+      "sub": "9/10 matches · all venues",
+      "meta": "Liga I · Romania · 17:00 UTC",
+      "score": 0.1575
+    },
+    {
+      "id": 126483,
+      "home": "FK Partizan",
+      "away": "Novi Pazar",
+      "section": "Team patterns",
+      "title": "Fk Partizan · both teams scored",
+      "sub": "8/9 matches · all venues",
+      "meta": "Super Liga · Serbia · 16:00 UTC",
+      "score": 0.1569
+    },
+    {
+      "id": 110191,
+      "home": "Clermont Foot",
+      "away": "RED Star FC 93",
+      "section": "Team patterns",
+      "title": "Clermont Foot · drew",
+      "sub": "6/7 matches · all venues",
+      "meta": "Ligue 2 · France · 12:00 UTC",
+      "score": 0.1566
+    },
+    {
+      "id": 42664,
+      "home": "AIK Stockholm",
+      "away": "IF Brommapojkarna",
+      "section": "Team patterns",
+      "title": "If Brommapojkarna · over 2.5 goals",
+      "sub": "10/11 matches · away",
+      "meta": "Allsvenskan · Sweden · 13:00 UTC",
+      "score": 0.1562
+    },
+    {
+      "id": 44633,
+      "home": "Feyenoord",
+      "away": "AZ Alkmaar",
+      "section": "Team patterns",
+      "title": "Az Alkmaar · won",
+      "sub": "6/7 matches · all venues",
+      "meta": "Eredivisie · Netherlands · 16:45 UTC",
+      "score": 0.1547
+    },
+    {
+      "id": 66424,
+      "home": "Pittsburgh Riverhounds",
+      "away": "Hartford Athletic",
+      "section": "Team patterns",
+      "title": "Hartford Athletic · under 3.5 goals",
+      "sub": "14/14 matches · away",
+      "meta": "USL Championship · USA · 23:00 UTC",
+      "score": 0.1547
+    },
+    {
+      "id": 66426,
+      "home": "Detroit City",
+      "away": "Rhode Island",
+      "section": "Team patterns",
+      "title": "Detroit City · under 3.5 goals",
+      "sub": "14/14 matches · at home",
+      "meta": "USL Championship · USA · 23:00 UTC",
+      "score": 0.1547
+    },
+    {
+      "id": 107537,
+      "home": "Shrewsbury",
+      "away": "Exeter City",
+      "section": "Team patterns",
+      "title": "Exeter City · under 1.5 goals",
+      "sub": "6/9 matches · all venues",
+      "meta": "League Two · England · 14:00 UTC",
+      "score": 0.1544
+    },
+    {
+      "id": 128052,
+      "home": "Chornomorets",
+      "away": "FC Kharkiv",
+      "section": "Goals outlook",
+      "title": "FC Kharkiv scores 1+",
+      "sub": "75% estimated chance",
+      "meta": "Premier League · Ukraine · 10:00 UTC",
+      "score": 0.1541
+    },
+    {
+      "id": 79908,
+      "home": "1899 Hoffenheim",
+      "away": "Hamburger SV",
+      "section": "Goals outlook",
+      "title": "Match Goals 1-4",
+      "sub": "70% estimated chance",
+      "meta": "Bundesliga · Germany · 13:30 UTC",
+      "score": 0.1537
+    },
+    {
+      "id": 62005,
+      "home": "FK Zalgiris Vilnius",
+      "away": "Suduva Marijampole",
+      "section": "Team patterns",
+      "title": "Suduva Marijampole · unbeaten",
+      "sub": "26/30 matches · all venues",
+      "meta": "A Lyga · Lithuania · 11:15 UTC",
+      "score": 0.1512
+    },
+    {
+      "id": 53844,
+      "home": "Huachipato",
+      "away": "O'Higgins",
+      "section": "Team patterns",
+      "title": "Huachipato · over 2.5 goals",
+      "sub": "10/11 matches · at home",
+      "meta": "Primera División · Chile · 20:30 UTC",
+      "score": 0.1511
+    },
+    {
+      "id": 81810,
+      "home": "Zhenys",
+      "away": "Atyrau",
+      "section": "Team patterns",
+      "title": "Atyrau · under 2.5 goals",
+      "sub": "19/25 matches · all venues",
+      "meta": "Premier League · Kazakhstan · 14:00 UTC",
+      "score": 0.1504
+    }
+  ]
+}

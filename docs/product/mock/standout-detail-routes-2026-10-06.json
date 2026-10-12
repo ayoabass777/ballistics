@@ -1,0 +1,806 @@
+{
+  "routes": [
+    {
+      "fixtureId": 126487,
+      "desktop": false,
+      "id": "542:54144"
+    },
+    {
+      "fixtureId": 126487,
+      "desktop": true,
+      "id": "542:54175"
+    },
+    {
+      "fixtureId": 60892,
+      "desktop": false,
+      "id": "542:54206"
+    },
+    {
+      "fixtureId": 60892,
+      "desktop": true,
+      "id": "542:54235"
+    },
+    {
+      "fixtureId": 81893,
+      "desktop": false,
+      "id": "542:54264"
+    },
+    {
+      "fixtureId": 81893,
+      "desktop": true,
+      "id": "542:54295"
+    },
+    {
+      "fixtureId": 79909,
+      "desktop": false,
+      "id": "542:54326"
+    },
+    {
+      "fixtureId": 79909,
+      "desktop": true,
+      "id": "542:54357"
+    },
+    {
+      "fixtureId": 71009,
+      "desktop": false,
+      "id": "542:54388"
+    },
+    {
+      "fixtureId": 71009,
+      "desktop": true,
+      "id": "542:54417"
+    },
+    {
+      "fixtureId": 110189,
+      "desktop": false,
+      "id": "542:54446"
+    },
+    {
+      "fixtureId": 110189,
+      "desktop": true,
+      "id": "542:54477"
+    },
+    {
+      "fixtureId": 128054,
+      "desktop": false,
+      "id": "542:54508"
+    },
+    {
+      "fixtureId": 128054,
+      "desktop": true,
+      "id": "542:54539"
+    },
+    {
+      "fixtureId": 63542,
+      "desktop": false,
+      "id": "542:54570"
+    },
+    {
+      "fixtureId": 63542,
+      "desktop": true,
+      "id": "542:54601"
+    },
+    {
+      "fixtureId": 45061,
+      "desktop": false,
+      "id": "542:54632"
+    },
+    {
+      "fixtureId": 45061,
+      "desktop": true,
+      "id": "542:54663"
+    },
+    {
+      "fixtureId": 110194,
+      "desktop": false,
+      "id": "542:54694"
+    },
+    {
+      "fixtureId": 110194,
+      "desktop": true,
+      "id": "542:54725"
+    },
+    {
+      "fixtureId": 66421,
+      "desktop": false,
+      "id": "542:54756"
+    },
+    {
+      "fixtureId": 66421,
+      "desktop": true,
+      "id": "542:54787"
+    },
+    {
+      "fixtureId": 42665,
+      "desktop": false,
+      "id": "542:54818"
+    },
+    {
+      "fixtureId": 42665,
+      "desktop": true,
+      "id": "542:54849"
+    },
+    {
+      "fixtureId": 63543,
+      "desktop": false,
+      "id": "542:54880"
+    },
+    {
+      "fixtureId": 63543,
+      "desktop": true,
+      "id": "542:54911"
+    },
+    {
+      "fixtureId": 44246,
+      "desktop": false,
+      "id": "542:54942"
+    },
+    {
+      "fixtureId": 44246,
+      "desktop": true,
+      "id": "542:54971"
+    },
+    {
+      "fixtureId": 79912,
+      "desktop": false,
+      "id": "542:55000"
+    },
+    {
+      "fixtureId": 79912,
+      "desktop": true,
+      "id": "542:55031"
+    },
+    {
+      "fixtureId": 67820,
+      "desktop": false,
+      "id": "542:55062"
+    },
+    {
+      "fixtureId": 67820,
+      "desktop": true,
+      "id": "542:55091"
+    },
+    {
+      "fixtureId": 124383,
+      "desktop": false,
+      "id": "542:55120"
+    },
+    {
+      "fixtureId": 124383,
+      "desktop": true,
+      "id": "542:55151"
+    },
+    {
+      "fixtureId": 67724,
+      "desktop": false,
+      "id": "542:55182"
+    },
+    {
+      "fixtureId": 67724,
+      "desktop": true,
+      "id": "542:55213"
+    },
+    {
+      "fixtureId": 63547,
+      "desktop": false,
+      "id": "542:55244"
+    },
+    {
+      "fixtureId": 63547,
+      "desktop": true,
+      "id": "542:55275"
+    },
+    {
+      "fixtureId": 107534,
+      "desktop": false,
+      "id": "542:55306"
+    },
+    {
+      "fixtureId": 107534,
+      "desktop": true,
+      "id": "542:55337"
+    },
+    {
+      "fixtureId": 85316,
+      "desktop": false,
+      "id": "542:55368"
+    },
+    {
+      "fixtureId": 85316,
+      "desktop": true,
+      "id": "542:55397"
+    },
+    {
+      "fixtureId": 40116,
+      "desktop": false,
+      "id": "542:55426"
+    },
+    {
+      "fixtureId": 40116,
+      "desktop": true,
+      "id": "542:55457"
+    },
+    {
+      "fixtureId": 45065,
+      "desktop": false,
+      "id": "542:55488"
+    },
+    {
+      "fixtureId": 45065,
+      "desktop": true,
+      "id": "542:55519"
+    },
+    {
+      "fixtureId": 81805,
+      "desktop": false,
+      "id": "542:55550"
+    },
+    {
+      "fixtureId": 81805,
+      "desktop": true,
+      "id": "542:55579"
+    },
+    {
+      "fixtureId": 63544,
+      "desktop": false,
+      "id": "542:55608"
+    },
+    {
+      "fixtureId": 63544,
+      "desktop": true,
+      "id": "542:55639"
+    },
+    {
+      "fixtureId": 86064,
+      "desktop": false,
+      "id": "542:55670"
+    },
+    {
+      "fixtureId": 86064,
+      "desktop": true,
+      "id": "542:55701"
+    },
+    {
+      "fixtureId": 55123,
+      "desktop": false,
+      "id": "542:55732"
+    },
+    {
+      "fixtureId": 55123,
+      "desktop": true,
+      "id": "542:55763"
+    },
+    {
+      "fixtureId": 119643,
+      "desktop": false,
+      "id": "542:55794"
+    },
+    {
+      "fixtureId": 119643,
+      "desktop": true,
+      "id": "542:55825"
+    },
+    {
+      "fixtureId": 45064,
+      "desktop": false,
+      "id": "542:55856"
+    },
+    {
+      "fixtureId": 45064,
+      "desktop": true,
+      "id": "542:55887"
+    },
+    {
+      "fixtureId": 83671,
+      "desktop": false,
+      "id": "542:55918"
+    },
+    {
+      "fixtureId": 83671,
+      "desktop": true,
+      "id": "542:55949"
+    },
+    {
+      "fixtureId": 131929,
+      "desktop": false,
+      "id": "542:55980"
+    },
+    {
+      "fixtureId": 131929,
+      "desktop": true,
+      "id": "542:56011"
+    },
+    {
+      "fixtureId": 85195,
+      "desktop": false,
+      "id": "542:56042"
+    },
+    {
+      "fixtureId": 85195,
+      "desktop": true,
+      "id": "542:56073"
+    },
+    {
+      "fixtureId": 75660,
+      "desktop": false,
+      "id": "542:56104"
+    },
+    {
+      "fixtureId": 75660,
+      "desktop": true,
+      "id": "542:56135"
+    },
+    {
+      "fixtureId": 85196,
+      "desktop": false,
+      "id": "542:56166"
+    },
+    {
+      "fixtureId": 85196,
+      "desktop": true,
+      "id": "542:56197"
+    },
+    {
+      "fixtureId": 94868,
+      "desktop": false,
+      "id": "542:56228"
+    },
+    {
+      "fixtureId": 94868,
+      "desktop": true,
+      "id": "542:56259"
+    },
+    {
+      "fixtureId": 72364,
+      "desktop": false,
+      "id": "542:56290"
+    },
+    {
+      "fixtureId": 72364,
+      "desktop": true,
+      "id": "542:56321"
+    },
+    {
+      "fixtureId": 107538,
+      "desktop": false,
+      "id": "542:56352"
+    },
+    {
+      "fixtureId": 107538,
+      "desktop": true,
+      "id": "542:56383"
+    },
+    {
+      "fixtureId": 131930,
+      "desktop": false,
+      "id": "542:56414"
+    },
+    {
+      "fixtureId": 131930,
+      "desktop": true,
+      "id": "542:56445"
+    },
+    {
+      "fixtureId": 56309,
+      "desktop": false,
+      "id": "542:56476"
+    },
+    {
+      "fixtureId": 56309,
+      "desktop": true,
+      "id": "542:56507"
+    },
+    {
+      "fixtureId": 96588,
+      "desktop": false,
+      "id": "542:56538"
+    },
+    {
+      "fixtureId": 96588,
+      "desktop": true,
+      "id": "542:56569"
+    },
+    {
+      "fixtureId": 72361,
+      "desktop": false,
+      "id": "542:56600"
+    },
+    {
+      "fixtureId": 72361,
+      "desktop": true,
+      "id": "542:56631"
+    },
+    {
+      "fixtureId": 83672,
+      "desktop": false,
+      "id": "542:56662"
+    },
+    {
+      "fixtureId": 83672,
+      "desktop": true,
+      "id": "542:56693"
+    },
+    {
+      "fixtureId": 94869,
+      "desktop": false,
+      "id": "542:56724"
+    },
+    {
+      "fixtureId": 94869,
+      "desktop": true,
+      "id": "542:56755"
+    },
+    {
+      "fixtureId": 96590,
+      "desktop": false,
+      "id": "542:56786"
+    },
+    {
+      "fixtureId": 96590,
+      "desktop": true,
+      "id": "542:56817"
+    },
+    {
+      "fixtureId": 85319,
+      "desktop": false,
+      "id": "542:56848"
+    },
+    {
+      "fixtureId": 85319,
+      "desktop": true,
+      "id": "542:56879"
+    },
+    {
+      "fixtureId": 67722,
+      "desktop": false,
+      "id": "542:56910"
+    },
+    {
+      "fixtureId": 67722,
+      "desktop": true,
+      "id": "542:56941"
+    },
+    {
+      "fixtureId": 124384,
+      "desktop": false,
+      "id": "542:56972"
+    },
+    {
+      "fixtureId": 124384,
+      "desktop": true,
+      "id": "542:57003"
+    },
+    {
+      "fixtureId": 96594,
+      "desktop": false,
+      "id": "542:57034"
+    },
+    {
+      "fixtureId": 96594,
+      "desktop": true,
+      "id": "542:57065"
+    },
+    {
+      "fixtureId": 46781,
+      "desktop": false,
+      "id": "542:57096"
+    },
+    {
+      "fixtureId": 46781,
+      "desktop": true,
+      "id": "542:57127"
+    },
+    {
+      "fixtureId": 46789,
+      "desktop": false,
+      "id": "542:57158"
+    },
+    {
+      "fixtureId": 46789,
+      "desktop": true,
+      "id": "542:57189"
+    },
+    {
+      "fixtureId": 46785,
+      "desktop": false,
+      "id": "542:57220"
+    },
+    {
+      "fixtureId": 46785,
+      "desktop": true,
+      "id": "542:57251"
+    },
+    {
+      "fixtureId": 73953,
+      "desktop": false,
+      "id": "542:57282"
+    },
+    {
+      "fixtureId": 73953,
+      "desktop": true,
+      "id": "542:57313"
+    },
+    {
+      "fixtureId": 96592,
+      "desktop": false,
+      "id": "542:57344"
+    },
+    {
+      "fixtureId": 96592,
+      "desktop": true,
+      "id": "542:57375"
+    },
+    {
+      "fixtureId": 53847,
+      "desktop": false,
+      "id": "542:57406"
+    },
+    {
+      "fixtureId": 53847,
+      "desktop": true,
+      "id": "542:57437"
+    },
+    {
+      "fixtureId": 131924,
+      "desktop": false,
+      "id": "542:57468"
+    },
+    {
+      "fixtureId": 131924,
+      "desktop": true,
+      "id": "542:57499"
+    },
+    {
+      "fixtureId": 66423,
+      "desktop": false,
+      "id": "542:57530"
+    },
+    {
+      "fixtureId": 66423,
+      "desktop": true,
+      "id": "542:57561"
+    },
+    {
+      "fixtureId": 67726,
+      "desktop": false,
+      "id": "542:57592"
+    },
+    {
+      "fixtureId": 67726,
+      "desktop": true,
+      "id": "542:57622"
+    },
+    {
+      "fixtureId": 79906,
+      "desktop": false,
+      "id": "542:57652"
+    },
+    {
+      "fixtureId": 79906,
+      "desktop": true,
+      "id": "542:57683"
+    },
+    {
+      "fixtureId": 85194,
+      "desktop": false,
+      "id": "542:57714"
+    },
+    {
+      "fixtureId": 85194,
+      "desktop": true,
+      "id": "542:57745"
+    },
+    {
+      "fixtureId": 124379,
+      "desktop": false,
+      "id": "542:57776"
+    },
+    {
+      "fixtureId": 124379,
+      "desktop": true,
+      "id": "542:57807"
+    },
+    {
+      "fixtureId": 79911,
+      "desktop": false,
+      "id": "542:57838"
+    },
+    {
+      "fixtureId": 79911,
+      "desktop": true,
+      "id": "542:57869"
+    },
+    {
+      "fixtureId": 102516,
+      "desktop": false,
+      "id": "542:57900"
+    },
+    {
+      "fixtureId": 102516,
+      "desktop": true,
+      "id": "542:57931"
+    },
+    {
+      "fixtureId": 45066,
+      "desktop": false,
+      "id": "542:57962"
+    },
+    {
+      "fixtureId": 45066,
+      "desktop": true,
+      "id": "542:57993"
+    },
+    {
+      "fixtureId": 55124,
+      "desktop": false,
+      "id": "542:58024"
+    },
+    {
+      "fixtureId": 55124,
+      "desktop": true,
+      "id": "542:58055"
+    },
+    {
+      "fixtureId": 60893,
+      "desktop": false,
+      "id": "542:58086"
+    },
+    {
+      "fixtureId": 60893,
+      "desktop": true,
+      "id": "542:58117"
+    },
+    {
+      "fixtureId": 66422,
+      "desktop": false,
+      "id": "542:58148"
+    },
+    {
+      "fixtureId": 66422,
+      "desktop": true,
+      "id": "542:58179"
+    },
+    {
+      "fixtureId": 86065,
+      "desktop": false,
+      "id": "542:58210"
+    },
+    {
+      "fixtureId": 86065,
+      "desktop": true,
+      "id": "542:58241"
+    },
+    {
+      "fixtureId": 124380,
+      "desktop": false,
+      "id": "542:58272"
+    },
+    {
+      "fixtureId": 124380,
+      "desktop": true,
+      "id": "542:58303"
+    },
+    {
+      "fixtureId": 126483,
+      "desktop": false,
+      "id": "542:58334"
+    },
+    {
+      "fixtureId": 126483,
+      "desktop": true,
+      "id": "542:58365"
+    },
+    {
+      "fixtureId": 110191,
+      "desktop": false,
+      "id": "542:58396"
+    },
+    {
+      "fixtureId": 110191,
+      "desktop": true,
+      "id": "542:58427"
+    },
+    {
+      "fixtureId": 42664,
+      "desktop": false,
+      "id": "542:58458"
+    },
+    {
+      "fixtureId": 42664,
+      "desktop": true,
+      "id": "542:58489"
+    },
+    {
+      "fixtureId": 44633,
+      "desktop": false,
+      "id": "542:58520"
+    },
+    {
+      "fixtureId": 44633,
+      "desktop": true,
+      "id": "542:58551"
+    },
+    {
+      "fixtureId": 66424,
+      "desktop": false,
+      "id": "542:58582"
+    },
+    {
+      "fixtureId": 66424,
+      "desktop": true,
+      "id": "542:58613"
+    },
+    {
+      "fixtureId": 66426,
+      "desktop": false,
+      "id": "542:58644"
+    },
+    {
+      "fixtureId": 66426,
+      "desktop": true,
+      "id": "542:58674"
+    },
+    {
+      "fixtureId": 107537,
+      "desktop": false,
+      "id": "542:58704"
+    },
+    {
+      "fixtureId": 107537,
+      "desktop": true,
+      "id": "542:58735"
+    },
+    {
+      "fixtureId": 128052,
+      "desktop": false,
+      "id": "542:58766"
+    },
+    {
+      "fixtureId": 128052,
+      "desktop": true,
+      "id": "542:58797"
+    },
+    {
+      "fixtureId": 79908,
+      "desktop": false,
+      "id": "542:58828"
+    },
+    {
+      "fixtureId": 79908,
+      "desktop": true,
+      "id": "542:58859"
+    },
+    {
+      "fixtureId": 62005,
+      "desktop": false,
+      "id": "542:58890"
+    },
+    {
+      "fixtureId": 62005,
+      "desktop": true,
+      "id": "542:58921"
+    },
+    {
+      "fixtureId": 53844,
+      "desktop": false,
+      "id": "542:58952"
+    },
+    {
+      "fixtureId": 53844,
+      "desktop": true,
+      "id": "542:58983"
+    },
+    {
+      "fixtureId": 81810,
+      "desktop": false,
+      "id": "542:59014"
+    },
+    {
+      "fixtureId": 81810,
+      "desktop": true,
+      "id": "542:59045"
+    }
+  ],
+  "source": "experiments/standout-cutoffs-2026-10-06/source.json.gz",
+  "note": "80 snapshot fixtures, desktop and mobile. Paired logo/name rows; source-backed overview details."
+}

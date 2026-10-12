@@ -1,0 +1,18 @@
+Ballistics test run — 2026-10-04 16:47 UTC
+Command: python -m pytest tests --ignore=tests/test_extract_metadata_tiers.py -rs (sandbox; that file fails to import over the mounted folder, unrelated to calibration)
+
+.............................................................. [ 31%]
+...................................................sssssss......sss..... [ 69%]
+............................................................             [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_forecast_api.py:110: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_api.py:89: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_api.py:123: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_api.py:104: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_api.py:130: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_api.py:137: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_api.py:156: requires isolated FORECAST_API_TEST_DSN
+SKIPPED [1] tests/test_forecast_history.py:118: requires isolated FORECAST_TEST_DSN
+SKIPPED [1] tests/test_forecast_history.py:164: requires isolated FORECAST_TEST_DSN
+SKIPPED [1] tests/test_forecast_history.py:197: requires isolated FORECAST_TEST_DSN
+184 passed, 10 skipped, 10 subtests passed in 29.49s
