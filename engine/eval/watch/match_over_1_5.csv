@@ -1,0 +1,5 @@
+logged_at,report_stamp,market,source,n,avg_predicted,hit_rate,overconfidence,brier,flag
+2026-10-12T18:24:12Z,2026-10-08-before-refit,Match Over 1.5,all,3769,0.763,0.7854,-0.0223,0.1668,
+2026-10-12T18:24:12Z,2026-10-08-before-refit,Match Over 1.5,dixon_coles_only,95,0.7126,0.7789,-0.0663,0.1731,
+2026-10-12T18:24:12Z,2026-10-12T17:36Z-refit,Match Over 1.5,all,3556,0.7752,0.7868,-0.0116,0.1663,
+2026-10-12T18:24:12Z,2026-10-12T17:36Z-refit,Match Over 1.5,dixon_coles_only,851,0.7424,0.7615,-0.0191,0.1796,

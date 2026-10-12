@@ -50,7 +50,7 @@ default_args = {
     doc_md=__doc__,
 )
 def engine_calibration_dag():
-    DockerOperator(
+    calibration_wf = DockerOperator(
         task_id="calibration_wf",
         image="ballistics-engine:latest",
         api_version="auto",
@@ -62,6 +62,22 @@ def engine_calibration_dag():
         working_dir="/opt",
         command=["python", "-m", "engine.eval.calibration_wf"],
     )
+
+    # D116: log watched markets (Match Over 1.5, all vs Dixon-Coles alone) after
+    # every refit; appends engine/eval/watch/*.csv and prints FLAG lines on drift.
+    market_watch = DockerOperator(
+        task_id="market_watch",
+        image="ballistics-engine:latest",
+        api_version="auto",
+        auto_remove=True,
+        mount_tmp_dir=False,
+        network_mode="ballistics_network",
+        mounts=ENGINE_MOUNTS,
+        environment=DB_ENV,
+        working_dir="/opt",
+        command=["python", "-m", "engine.eval.diagnostics.market_watch"],
+    )
+    calibration_wf >> market_watch
 
 
 engine_calibration_dag()

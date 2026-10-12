@@ -1,5 +1,7 @@
 # Decision log
 
+2026-10-12 — D116 (agreed): Watch "Match Over 1.5" after every calibration refit. Since Poisson was retired, most Over 1.5 picks rest on Dixon–Coles alone (95 → 851 in the eval window). `engine/eval/diagnostics/market_watch.py` runs as `market_watch` after `calibration_wf` in the weekly engine_calibration DAG (and in scripts/refit_and_rerun.sh), appending to `engine/eval/watch/match_over_1_5.csv` for two slices: all sources and Dixon–Coles only. Flags when |overconfidence| > 3 pts or Brier rises > 0.010 over the first baseline with ≥100 picks. Baseline (Oct 12 refit): all 3,556 picks, predicted 77.5% vs hit 78.7% (−1.2 pts), Brier 0.1663; DC-only 851 picks, 74.2% vs 76.2% (−1.9 pts), Brier 0.1796. Both slightly under-confident, not over.
+
 2026-10-12 — D118 (requested): Active mobile flow uses canonical Discover 592:54464 (Goals 592:55227, Patterns 592:56017). Repaired Sign in 325:48306 and older onboarding completion 324:48031 to canonical Strength. Older Discover frames retained as reference, unreachable from current teaser/Discover roots. Owner teaser edits preserved.
 
 2026-10-12 — D117 (requested; Figma-only): Teaser-detail info control now uses a muted 18px ⓘ with no outer stroke, retaining its 44×44 hit area. Opens short explanation 1099:58002 with Read full Methodology and Back to match. Scope is teaser clone 1033:57869; shared source and owner-edited teaser preserved. Design label: How these numbers work; production accessible name and desktop tooltip remain implementation requirements.
