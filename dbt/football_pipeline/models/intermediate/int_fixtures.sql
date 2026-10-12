@@ -8,13 +8,12 @@
 -- Incrementally builds the fixtures dimension by upserting from staging models
 --------------------------------------------------------------------------------
 
--- dim_teams is grained team x league_season (it carries standings), so a team
--- playing in two seasons has two rows. int_fixtures only needs the surrogate
--- key and name, so join a distinct lookup — joining dim_teams directly on
--- api_team_id fans every fixture out by (home copies x away copies).
+-- Look teams up from stg_dim_teams (one row per team, every season loaded).
+-- Not dim_teams: it inner-joins current standings, so relegated or defunct
+-- teams are missing and their historical fixtures were silently dropped.
 WITH teams AS (
-    SELECT DISTINCT api_team_id, team_id, team_name
-    FROM {{ ref('dim_teams') }}
+    SELECT DISTINCT api_team_id, team_id, initcap(team_name) AS team_name
+    FROM {{ ref('stg_dim_teams') }}
 )
 
 SELECT

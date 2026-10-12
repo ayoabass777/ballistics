@@ -62,7 +62,7 @@ models:
           - not_null
           - relationships:
               arguments:
-                to: ref('dim_teams')      # your INT teams model (schema=int)
+                to: ref('stg_dim_teams')
                 field: team_id
 
       - name: away_team_id
@@ -71,7 +71,7 @@ models:
           - not_null
           - relationships:
               arguments:
-                to: ref('dim_teams')
+                to: ref('stg_dim_teams')
                 field: team_id
 
       - name: is_played
