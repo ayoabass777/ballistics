@@ -342,6 +342,7 @@ LEAGUE_GAP_SOME = 0.05            # ≥ +5 pts → above; within ±5 → typical
 #   strength = Big dog win rate for its gap band − league win rate for the
 #              favourite's venue (all-games rate when the venue split is missing)
 DISCOVER_DC_MIN_PROB = 0.70  # standouts only (owner, 2026-10-07); the Goals outlook section still shows ≥ 65%
+DISCOVER_SECTION_DC_MIN_PROB = 0.65  # D121: Goals outlook section floor (D101)
 DISCOVER_PATTERN_PRIOR_MATCHES = 15  # D77: historical ranking; separate from prediction rating
 DISCOVER_GOALS_WEIGHT = 0.76
 STANDOUT_MIN_SCORE = 0.15  # D78: inclusive adjusted percentage-point gap
@@ -780,13 +781,17 @@ def _fixture_favourite(fixture: dict, strength: dict | None) -> str | None:
 
 
 def discover_candidates(fixture: dict, strength: dict | None,
-                        group: dict | None, rates: dict) -> list[dict]:
-    """Every Discover-eligible event for one fixture, scored on one scale (D71)."""
+                        group: dict | None, rates: dict,
+                        goals_min_prob: float = DISCOVER_DC_MIN_PROB) -> list[dict]:
+    """Every Discover-eligible event for one fixture, scored on one scale (D71).
+
+    goals_min_prob: 0.70 for standouts (D101), 0.65 for the Goals section (D121).
+    """
     out = []
     for r in fixture.get("dixon_coles") or []:
         market = r.get("market", "")
         if (market.endswith(" Win") or r.get("league_gap") is None
-                or (r.get("probability") or 0) < DISCOVER_DC_MIN_PROB
+                or (r.get("probability") or 0) < goals_min_prob
                 or r.get("league_comparison") in _NO_COMPARISON):
             continue
         out.append({"list": "goals",
@@ -867,6 +872,91 @@ def attach_discover_picks(analysis: list[dict], shortlist: list[dict],
             "runner_up": ({"list": ranked[1]["list"], "score": round(ranked[1]["score"], 4)}
                           if len(ranked) > 1 else None),
             "candidates": len(ranked)}
+        fixture["discover_sections"] = section_picks(
+            discover_candidates(fixture, strength, group, rates,
+                                goals_min_prob=DISCOVER_SECTION_DC_MIN_PROB),
+            fav, strength.get("favourite") if strength else None)
+
+
+def section_picks(cands: list[dict], fav: str | None,
+                  big_dog: str | None) -> dict:
+    """D121: each Discover section shows a fixture once, on its strongest item
+    in that section, independent of the other sections (D71 revised).
+
+    Same scores as the standout pick. A fixture is in a section when its best
+    item there scores above 0 (above its league); no 15-point standout floor.
+    Ties go to the favourite's side, as for the standout pick.
+    """
+    out = {}
+    for lst in _DISCOVER_PRIORITY:
+        mine = [c for c in cands if c["list"] == lst and c["score"] > 0]
+        if not mine:
+            continue
+        best = max(mine, key=lambda c: (c["score"], c.get("team") == fav))
+        out[lst] = {**best, "score": round(best["score"], 4), "big_dog": big_dog,
+                    "candidates": len(mine)}
+    return out
+
+
+def _rolling_window(now: datetime | None, timezone_name: str):
+    """Today through the end of the sixth following local day (calendar days)."""
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("now must include a timezone")
+    zone = ZoneInfo(timezone_name)
+    first_day = now.astimezone(zone).date()
+    end = datetime.combine(first_day + timedelta(days=7), time.min, tzinfo=zone)
+    return now, zone, first_day, end
+
+
+def _window_row(fixture: dict, pick: dict, now: datetime, zone, end: datetime):
+    """One list row for an upcoming fixture inside the window, else None."""
+    try:
+        kickoff = datetime.fromisoformat(str(fixture.get("kickoff", "")).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if kickoff.tzinfo is None or kickoff.utcoffset() is None:
+        return None
+    if not now < kickoff < end or fixture.get("fixture_id") is None:
+        return None
+    local = kickoff.astimezone(zone)
+    return {**{key: fixture.get(key) for key in
+               ("fixture_id", "home", "away", "league", "country", "kickoff")},
+            "fixture_date": local.date().isoformat(),
+            "kickoff_local": local.isoformat(), "pick": dict(pick)}
+
+
+def select_rolling_sections(analysis: list[dict], *,
+                            now: datetime | None = None,
+                            timezone_name: str = "UTC") -> dict:
+    """D121: the three Discover section lists for the same window as standouts.
+
+    Each list has a fixture at most once, on its best item for that section
+    (`discover_sections`), ranked by that section's score, highest first; ties
+    by earlier kickoff, then fixture id. No cap: the client pages the list.
+    Call on read as well as export to drop started fixtures between refreshes.
+    """
+    now, zone, first_day, end = _rolling_window(now, timezone_name)
+    lists = {lst: {} for lst in _DISCOVER_PRIORITY}
+    for fixture in analysis:
+        for lst, pick in (fixture.get("discover_sections") or {}).items():
+            if lst not in lists or not pick or pick.get("score", 0) <= 0:
+                continue
+            row = _window_row(fixture, pick, now, zone, end)
+            if row is None:
+                continue
+            old = lists[lst].get(row["fixture_id"])
+            if old is None or pick["score"] > old["pick"]["score"]:
+                lists[lst][row["fixture_id"]] = row
+    out = {"timezone": timezone_name, "as_of": now.isoformat(),
+           "start_date": first_day.isoformat(),
+           "end_date": (first_day + timedelta(days=6)).isoformat(),
+           "end_exclusive": end.isoformat()}
+    for lst, rows in lists.items():
+        items = sorted(rows.values(), key=lambda r: (
+            -r["pick"]["score"], r["kickoff"], str(r["fixture_id"])))
+        out[lst] = {"count": len(items), "items": items}
+    return out
 
 
 def select_rolling_standouts(analysis: list[dict], *,
@@ -877,30 +967,15 @@ def select_rolling_standouts(analysis: list[dict], *,
     Call on read as well as export to remove started fixtures between refreshes.
     The export defaults to UTC; user-facing callers pass their IANA timezone.
     """
-    now = now or datetime.now(timezone.utc)
-    if now.tzinfo is None or now.utcoffset() is None:
-        raise ValueError("now must include a timezone")
-    zone = ZoneInfo(timezone_name)
-    first_day = now.astimezone(zone).date()
-    end = datetime.combine(first_day + timedelta(days=7), time.min, tzinfo=zone)
+    now, zone, first_day, end = _rolling_window(now, timezone_name)
     unique = {}
     for fixture in analysis:
         pick = fixture.get("discover_pick")
         if not pick or pick.get("score", 0) < STANDOUT_MIN_SCORE:
             continue
-        try:
-            kickoff = datetime.fromisoformat(str(fixture.get("kickoff", "")).replace("Z", "+00:00"))
-        except ValueError:
+        row = _window_row(fixture, pick, now, zone, end)
+        if row is None:
             continue
-        if kickoff.tzinfo is None or kickoff.utcoffset() is None:
-            continue
-        if not now < kickoff < end or fixture.get("fixture_id") is None:
-            continue
-        local = kickoff.astimezone(zone)
-        row = {**{key: fixture.get(key) for key in
-                  ("fixture_id", "home", "away", "league", "country", "kickoff")},
-               "fixture_date": local.date().isoformat(),
-               "kickoff_local": local.isoformat(), "pick": dict(pick)}
         old = unique.get(row["fixture_id"])
         if old is None or pick["score"] > old["pick"]["score"]:
             unique[row["fixture_id"]] = row
@@ -2771,6 +2846,8 @@ def save_slips(
 
     output["fixture_analysis"] = result.get("fixture_analysis", [])
     output["standouts"] = select_rolling_standouts(
+        output["fixture_analysis"], now=generated_at, timezone_name=standout_timezone)
+    output["discover_sections"] = select_rolling_sections(
         output["fixture_analysis"], now=generated_at, timezone_name=standout_timezone)
     # Each curated section is rebuilt from the current run's ranked pool and
     # fixture analysis. Persist an auditable refresh marker even when a section

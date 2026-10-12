@@ -173,7 +173,7 @@ def test_historical_pattern_still_requires_sample_and_baseline():
 @pytest.mark.parametrize("score,qualifies", [(0.14999, False), (0.15, True), (0.15001, True)])
 def test_standout_cutoff_is_inclusive_before_rounding(monkeypatch, section, score, qualifies):
     monkeypatch.setattr("engine.eval.consensus_slips.discover_candidates",
-                        lambda *args: [{"list": section, "score": score}])
+                        lambda *args, **kw: [{"list": section, "score": score}])
     fixtures = [fixture(fixture_id=i) for i in range(7)]
     attach_discover_picks(fixtures, [], None, RATES)
     # Seven qualifying fixtures in the same section are all retained: no quota/cap.
