@@ -13,7 +13,7 @@ airflow/logs/
 /data/
 *.db
 docker-compose.override.yml
-dbt/football_pipeline/target/
+dbt/football_pipeline/target*/
 dbt/football_pipeline/logs/
 .dbt/profiles.yml
 .vscode/
