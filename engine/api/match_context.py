@@ -1,0 +1,160 @@
+"""Match page Context: league standings and head-to-head for one fixture.
+
+Contract: docs/product/match-detail-contract.md §3.2 and §5. Reads dbt models
+only (raw.fact_fixtures, raw_mart.mart_league_standings, raw.fact_head_to_head),
+warehouse ids only. Standings and H2H are a current snapshot (D69); the
+payload carries standings_updated_at so the page can show it.
+
+CLI (prints the payload for one fixture):
+    FORECAST_API_DSN=... python -m engine.api.match_context 126487
+"""
+import json
+import sys
+
+H2H_LIMIT = 5
+
+FIXTURE_SQL = """
+SELECT fixture_id, league_season_id, league_id, league_name, country_name,
+       kickoff_utc, home_team_id, away_team_id, home_team_name, away_team_name
+FROM raw.fact_fixtures WHERE fixture_id = %(fixture_id)s
+"""
+
+STANDINGS_SQL = """
+SELECT team_id, team_name, group_name, group_order, rank, games_played, wins,
+       draws, losses, goals_for, goals_against, goal_diff, points, form,
+       description, standings_updated_at, standings_format, n_groups,
+       ranks_repeat, is_team_current_group
+FROM raw_mart.mart_league_standings
+WHERE league_season_id = %(league_season_id)s
+ORDER BY group_order, rank, team_name
+"""
+
+# One row per meeting, seen from today's home team. Played only (fact filter).
+H2H_SQL = """
+SELECT fixture_id, kickoff_utc, is_home, goals_for, goals_against,
+       team_name, opponent_name
+FROM raw.fact_head_to_head
+WHERE team_id = %(home_team_id)s AND opponent_id = %(away_team_id)s
+  AND kickoff_utc < %(cutoff)s
+ORDER BY kickoff_utc DESC
+LIMIT %(limit)s
+"""
+
+
+def team_position(rows, team_id):
+    """The team's row in its current group, or None ("Not in table yet")."""
+    if team_id is None:
+        return None
+    mine = [r for r in rows if r["team_id"] == team_id and r["is_team_current_group"]]
+    if not mine:
+        return None
+    r = mine[0]
+    group = [g for g in rows if g["group_name"] == r["group_name"]]
+    return {
+        "team_id": team_id, "group_name": r["group_name"],
+        "show_group_name": (r["n_groups"] or 1) > 1,
+        "rank": None if r["ranks_repeat"] else r["rank"],
+        "group_size": len(group), "points": r["points"],
+        "games_played": r["games_played"], "wins": r["wins"],
+        "draws": r["draws"], "losses": r["losses"], "goal_diff": r["goal_diff"],
+        "form": r["form"], "description": r["description"],
+        "ranks_repeat": bool(r["ranks_repeat"]),
+    }
+
+
+def summarise_h2h(meetings, home_name, away_name):
+    """Tally and goal stats from newest-first meetings seen from today's home team."""
+    n = len(meetings)
+    if n == 0:
+        return {"meetings": 0, "games": [], "message": "No previous meetings in our records"}
+    home_w = sum(m["goals_for"] > m["goals_against"] for m in meetings)
+    away_w = sum(m["goals_for"] < m["goals_against"] for m in meetings)
+    games = []
+    for m in meetings:
+        h, a = (home_name, away_name) if m["is_home"] else (away_name, home_name)
+        hg, ag = (m["goals_for"], m["goals_against"]) if m["is_home"] else (m["goals_against"], m["goals_for"])
+        winner = h if hg > ag else a if ag > hg else None
+        games.append({"fixture_id": m["fixture_id"], "kickoff_utc": _iso(m["kickoff_utc"]),
+                      "home": h, "away": a, "home_goals": hg, "away_goals": ag, "winner": winner})
+    out = {"meetings": n, "since": games[-1]["kickoff_utc"],
+           "tally": {"home_wins": home_w, "draws": n - home_w - away_w, "away_wins": away_w},
+           "games": games}
+    if n >= 3:
+        totals = [m["goals_for"] + m["goals_against"] for m in meetings]
+        at_home = [m for m in meetings if m["is_home"]]
+        out["stats"] = {
+            "goals_per_game": round(sum(totals) / n, 1),
+            "over_2_5": sum(t > 2.5 for t in totals),
+            "both_scored": sum(m["goals_for"] > 0 and m["goals_against"] > 0 for m in meetings),
+            "at_home_team": {
+                "meetings": len(at_home),
+                "home_wins": sum(m["goals_for"] > m["goals_against"] for m in at_home),
+                "draws": sum(m["goals_for"] == m["goals_against"] for m in at_home),
+                "away_wins": sum(m["goals_for"] < m["goals_against"] for m in at_home)}}
+    else:
+        out["stats"] = None
+        out["stats_note"] = "too few for goal stats"
+    return out
+
+
+def _iso(v):
+    return v.isoformat() if hasattr(v, "isoformat") else v
+
+
+def build_context(cur, fixture_id):
+    """Payload for one fixture, or None when the fixture is unknown."""
+    cur.execute(FIXTURE_SQL, {"fixture_id": fixture_id})
+    fx = cur.fetchone()
+    if fx is None:
+        return None
+    cur.execute(STANDINGS_SQL, {"league_season_id": fx["league_season_id"]})
+    rows = cur.fetchall()
+    home_id, away_id = fx["home_team_id"], fx["away_team_id"]
+    h2h = {"meetings": 0, "games": [], "message": "No previous meetings in our records"}
+    if home_id is not None and away_id is not None:
+        cur.execute(H2H_SQL, {"home_team_id": home_id, "away_team_id": away_id,
+                              "cutoff": fx["kickoff_utc"], "limit": H2H_LIMIT})
+        h2h = summarise_h2h(cur.fetchall(), fx["home_team_name"], fx["away_team_name"])
+    home_pos, away_pos = team_position(rows, home_id), team_position(rows, away_id)
+    same_group = bool(home_pos and away_pos and home_pos["group_name"] == away_pos["group_name"])
+    hidden = {r["group_name"] for r in rows if r["ranks_repeat"]}
+    return {
+        "fixture": {"fixture_id": fx["fixture_id"], "league_id": fx["league_id"],
+                    "league": fx["league_name"], "country": fx["country_name"],
+                    "kickoff_utc": _iso(fx["kickoff_utc"]),
+                    "home": fx["home_team_name"], "away": fx["away_team_name"],
+                    "home_team_id": home_id, "away_team_id": away_id},
+        "standings_updated_at": _iso(rows[0]["standings_updated_at"]) if rows else None,
+        "position": {"home": home_pos, "away": away_pos,
+                     "points_gap": abs(home_pos["points"] - away_pos["points"]) if same_group else None},
+        "table": {"available": bool(rows) and not (home_pos and home_pos["group_name"] in hidden),
+                  "standings_format": rows[0]["standings_format"] if rows else None,
+                  "groups": _groups(rows)},
+        "h2h": h2h,
+    }
+
+
+def _groups(rows):
+    groups = {}
+    for r in rows:
+        g = groups.setdefault(r["group_name"], {"group_name": r["group_name"],
+                                                "group_order": r["group_order"], "rows": []})
+        g["rows"].append({k: r[k] for k in ("rank", "team_id", "team_name", "games_played",
+                                            "goal_diff", "points", "description")})
+    return sorted(groups.values(), key=lambda g: g["group_order"] or 0)
+
+
+def main(argv):
+    from engine.api.forecast_records import read_cursor
+    fixture_id = int(argv[1])
+    with read_cursor() as cur:
+        payload = build_context(cur, fixture_id)
+    if payload is None:
+        print(f"fixture {fixture_id} not found", file=sys.stderr)
+        return 1
+    print(json.dumps(payload, indent=2, default=str))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

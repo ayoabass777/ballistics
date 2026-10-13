@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, Query, Response
 import psycopg2
 
 from engine.api import forecast_records as records
+from engine.api import match_context
 
 app = FastAPI(title="Ballistics Forecast Record", version="0.1.0")
 log = logging.getLogger(__name__)
@@ -51,4 +52,15 @@ def forecast_history(response: Response, entry_id: int, as_of: datetime | None =
     result = read(records.history,response,entry_id=entry_id,as_of=as_of,after_id=after_id,limit=limit)
     if result is None:
         raise HTTPException(404,"Forecast entry not found")
+    return result
+
+
+@app.get("/api/match/{fixture_id}/context")
+def match_context_view(response: Response, fixture_id: int):
+    """Standings and head-to-head for the match page Context card."""
+    if fixture_id < 1:
+        raise HTTPException(422, "fixture_id must be positive")
+    result = read(match_context.build_context, response, fixture_id=fixture_id)
+    if result is None:
+        raise HTTPException(404, "Fixture not found")
     return result
