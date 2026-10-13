@@ -1,5 +1,57 @@
 # UI data contract
 
+2026-10-12 — Owner rejected the extra probability-above-league trial. Active review uses only the existing Bayes display eligibility gate; observed records and league baselines inform presentation. Keep Results Winless/Unbeaten and Attack/defence pair. AEK Over 1.5 returns to Also alongside Atromitos Under 3.5; three records remain expanded. Explicit More/Less often than the league average wording retained; Atromitos Under 4.5 uses Around the league average. Nine unique records total. The 80% trial and diagnostic files are historical, not active requirements. Figma-only; no production algorithm changed.
+
+2026-10-12 — Explicit comparison wording is More often than the league average. The two-stage cross-fixture check (patterns-two-stage-review.md) counts candidates before category placement; absence of above-average evidence must not be labelled statistical typicality. Below-average unusualness is not tested by the current one-sided rule.
+
+2026-10-12 — Two-stage trial requested: retain nine display-eligible records, use P(theta > fixed league base)=1-I_base(alpha,beta) >=0.80 for prominence. Saved rounded Beta parameters give Results Winless/Unbeaten 0.8717; attack/defence and Under 3.5 0.8293. Four remaining records expand; no second gate on expansion. Figma 1196:62044 now has four main records, one Also and four expanded, without duplication. Neutral comparison on AEK Over 1.5 and Under 4.5; common-league wording on Atromitos Under 4.5 does not assert statistical equivalence. Trial assumes fixed baseline and is not a validated production rule. Evidence: mock/patterns-111915-two-stage-trial.json. Canvas structure checked; backend unchanged.
+
+## Team patterns: top Results and top Attack/defence — 2026-10-12
+
+Latest owner direction: select the leading Results and Attack/defence findings separately. A category is not a fixed event pair: Results must not mean only Won/Lost. This supersedes the conflicting “No pairs / Top 4” presentation rule in the detailed contract for this review. Delivery remains separate from intent.
+
+| Slot | Candidate events | Meaning |
+|---|---|---|
+| Top Results | `win`, `loss`, `draw`, `winless`, `unbeaten` | Leading qualified full-time result record for each team. Winless = draw or loss; unbeaten = win or draw. Neither means a winning/losing streak. |
+| Top Attack/defence | `score_1goal`, `score_2goals`, `goalless`, `concede_1`, `concede_2`, `clean_sheet` | Leading qualified scoring/conceding evidence. Match an attack event against the opponent’s corresponding defence event when both qualify: scored 1+/conceded 1+, scored 2+/conceded 2+, failed to score/clean sheet. Evaluate both team directions. |
+| Remaining records | Unselected qualified results, attack/defence, match-total Over/Under and BTTS records | Also and expanded list; match totals and BTTS must not be misclassified as one team’s attack or defence. |
+
+Selection contract:
+
+1. Resolve fixture, team identity, season and selected scope before selection. Home/Away uses home-team home records and away-team away records; All venues uses each team's `all` records. Use the same-event, same-scope league baseline and source snapshot.
+2. Apply the shared qualification rule to every candidate before selecting either top category, Also or expanded rows. Never retain an unqualified counterpart just to complete a pair; never qualify on observed hit rate alone.
+3. “Top” means the strongest supported unusual finding within its category, not the highest occurrence frequency across all events. Do not hardcode Won/Lost, favour positive results, or rank by the visible rounded percentage. Exact unusualness scoring, tie-breaks and the minimum meaningful difference remain implementation decisions to reconcile; do not present them as already agreed or implemented.
+4. Select at most one result per team in Top Results. For Attack/defence, prefer a coherent corresponding pair; do not imply that unrelated events are counterparts. If only one side qualifies, show one record without inventing the other. Omit a top category when it has no eligible unusual evidence.
+5. Deduplicate by fixture, team, event and scope. Once selected in a top category, a record cannot also appear in Also or the expansion. Also contains up to three remaining unusual findings, with no padding requirement. Expansion contains the remaining qualified typical and unusual records; no reserved Over 1.5 or Under 4.5 slots. Counts derive from the actual remaining records.
+6. Keep historical `k/n`, league comparison and consecutive `streak` distinct. Preserve each record’s provenance and eligibility reason internally; do not display model/gate internals.
+
+Expected review example (fixture 111915, frozen `mock/patterns-111915-qualified.json`): Top Results = Atromitos Winless 6/6 and AEK Unbeaten 6/6; Top Attack/defence = Atromitos Conceded 1+ 6/6 and AEK Scored 1+ 6/6. Remove Winless/Unbeaten from Also when promoted. The four records are unique; Lost/Won do not return merely to fill Results.
+
+Qualification reconciliation required: the current review uses the export’s `display_eligible` flag (calibrated/boosted posterior >= 0.75). The detailed contract separately records P(team rate > league rate) computed from Beta alpha/beta, with 0.80/0.75 gates. These are different quantities and are not interchangeable. The category definition above does not resolve or implement that statistical conflict. Retain the frozen sample’s recorded gate provenance until reconciled.
+
+
+2026-10-12 — Review pattern pool now sourced from fixture_analysis for 111915 in Oct 12 consensus export, generated Oct 13 00:35 UTC: context all and display_eligible=true (saved 0.75 gate). All nine records frozen in mock/patterns-111915-qualified.json. Counts are historical k/n, not posterior probabilities; display eligibility is distinct from consensus/betting eligibility. Under 4.5 near-average editorial wording retained; universal typical/unusual classification boundary remains undefined.
+
+2026-10-12 — Team patterns labels describe comparison to the same-event, same-scope league baseline, not prediction confidence. Review copy now uses More often than usual / Around the league average. Sample-specific near-average labels do not establish a production cutoff; evidence-aware classification and Bayes eligibility remain pending.
+
+2026-10-12 — Pattern scope must use home-team home records versus away-team away records with corresponding league baselines, or both all-venues records/baselines. No relabelling of overall numbers as venue figures. Current Figma sample implements All venues plus an unavailable venue-pattern state; qualifying Bayes list rebuild remains pending.
+
+2026-10-12 — League Strength win/sample count remains source data only, excluded from the reviewed user-facing presentation. Pattern hit/total and league rates remain visible in expanded patterns, including high-frequency outcomes close to baseline. Main-list eligibility and expanded-list availability are separate presentation decisions; no revised numerical cutoff implemented.
+
+2026-10-12 — Team patterns review exposes existing saved AEK Over 1.5 match goals (6/6, league 80%) and Atromitos Under 4.5 match goals (6/6, league 93%). These are historical match-total patterns in each team’s fixtures, not team-scoring forecasts. No new values calculated; league Strength count remains 160/214 behind disclosure.
+
+2026-10-12 — Sample fixture switched from Radnicki 1923 / FK Crvena Zvezda (126487, played 10 Oct) to Atromitos / AEK Athens FC (111915, 17 Oct), the top standout in the 12 Oct run. Detail frames 841:57932, 1030:57748, 1033:57869 and teaser cards 1030:57675, 1016:57666 now use run 2026-10-12 (strength, ranks, patterns with league rates, goals, Big dog record 160/214) plus standings/H2H from `data/context-111915.json` (12th 2 pts v 2nd 14 pts; H2H AEK 4 · D 1 · Atromitos 0 since Jan 2024). Table 1168:62503 and H2H sheet 1168:62671 refilled. Source gap: Volos NFC points null in standings. Figma only.
+
+2026-10-12 — Discover date review freezes Today at 10 Oct 2026, Next 7 days at 10–16 Oct inclusive, Tomorrow at 11 Oct (UTC). Only existing 10 Oct saved findings are supplied. Seven-day display is a partial saved sample, not exhaustive coverage; no new qualification or ranking computed. Missing saved dates must not be described as no qualifying real-world standouts. No new API implemented.
+
+2026-10-12 — Radnicki 1923 / FK Crvena Zvezda (126487) Context now uses real standings and H2H from `GET /api/match/{id}/context` (snapshot 12 Oct, `data/context-126487.json`). Context cards 1168:62813 (mobile v2), 1168:62971 (D112 sample), 1168:63129 (D112 teaser) were detached from 841:57562 and show position 5th/14 (17 pts) vs 1st/14 (31 pts) plus an H2H line (Crvena Zvezda 4 · Draws 0 · Radnicki 1, since Sep 2024). New screens: league table 1168:62503, H2H sheet 1168:62671. Attack/defence ranks and venue splits stay "—" (not in the frozen sample). Figma only.
+
+2026-10-12 — Calendar widens selectable preview dates to Sep–Nov 2026, without expanding saved fixture coverage beyond the five 10 October examples. Today is frozen to review date 12 October 2026, not a live clock. Other dates show unavailable saved data.
+
+2026-10-12 — Compact date preview: 9 and 11 October have no supplied saved fixture data; this does not mean no real fixtures exist. Five selected 10 October fixtures remain the only population. Date is shared Figma session state across compact screens; no new data retrieval.
+
+2026-10-12 — D117 saved fixture provenance: mock/standouts-figma-2026-10-06.json, fixture_date 2026-10-10. Selected IDs 60892 (11:00), 79909 (13:30), 71009 (14:00), 126487 (16:00), 81893 (17:00), all UTC. Selected from the standout export, displayed chronologically; not a full matchday population or new live query. Your leagues is a fixed Super Liga review; search is a clickable Riga example. Existing integrated-detail routes reused, with current 841:57932 for Radnicki.
+
 2026-10-12 — D116 onboarding adds only session-local visibility state for a first-detail tip. Existing saved fixture evidence unchanged. No account persistence or production first-visit tracking added.
 
 2026-10-11 — D112 teaser samples: Radnicki detail clones D107 frozen evidence unchanged. Fortaleza/Nautico uses D53 saved 1–4 goals estimate 83.2% and league rate 84.4% (difference −1.2 percentage points); Cuiaba/Ponte Preta uses D53 observed 14/15 away losses and league rate 45.0%. Dates and sample status are visible. Brazilian previews explicitly limit coverage to supplied findings; no additional evidence or current forecasts inferred. Save opens membership, with no save action performed.

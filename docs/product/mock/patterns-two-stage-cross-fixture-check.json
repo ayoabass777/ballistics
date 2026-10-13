@@ -1,0 +1,223 @@
+{
+  "source": "engine/eval/consensus_slips_2026-10-12.json",
+  "generated": "2026-10-13 00:35 UTC",
+  "scope": "all venues only; n>=6, k>0, display_eligible; exclude halftime_win; unique side/event/context",
+  "counts": {
+    "fixtures": 559,
+    "with_qualified": 545,
+    "qualified_no_prominent": 96,
+    "one_or_two_prominent": 272,
+    "sensitivity": {
+      "0.75": 492,
+      "0.8": 449,
+      "0.85": 374,
+      "0.9": 227
+    }
+  },
+  "cases": {
+    "no_prominent": {
+      "id": 42670,
+      "match": "AIK Stockholm vs IFK Goteborg",
+      "qualified": 8,
+      "prominent": 0,
+      "max_n": 23,
+      "rows": [
+        {
+          "team": "Aik Stockholm",
+          "side": "home",
+          "event": "Over_1_5",
+          "k": 19,
+          "n": 23,
+          "base_rate": 0.8043,
+          "league_rate_matches": 184,
+          "p_above": 0.6158160062562077,
+          "gap": 0.02178695652173912
+        },
+        {
+          "team": "Aik Stockholm",
+          "side": "home",
+          "event": "Under_4_5",
+          "k": 18,
+          "n": 23,
+          "base_rate": 0.8261,
+          "league_rate_matches": 184,
+          "p_above": 0.3686098867683033,
+          "gap": -0.043491304347826
+        },
+        {
+          "team": "Aik Stockholm",
+          "side": "home",
+          "event": "concede_1",
+          "k": 19,
+          "n": 23,
+          "base_rate": 0.7391,
+          "league_rate_matches": 184,
+          "p_above": 0.7965355236945708,
+          "gap": 0.08698695652173916
+        },
+        {
+          "team": "Aik Stockholm",
+          "side": "home",
+          "event": "score_1goal",
+          "k": 18,
+          "n": 23,
+          "base_rate": 0.7391,
+          "league_rate_matches": 184,
+          "p_above": 0.669781321778739,
+          "gap": 0.04350869565217397
+        },
+        {
+          "team": "Ifk Goteborg",
+          "side": "away",
+          "event": "Over_1_5",
+          "k": 19,
+          "n": 23,
+          "base_rate": 0.8043,
+          "league_rate_matches": 184,
+          "p_above": 0.6158160062562077,
+          "gap": 0.02178695652173912
+        },
+        {
+          "team": "Ifk Goteborg",
+          "side": "away",
+          "event": "Under_4_5",
+          "k": 17,
+          "n": 23,
+          "base_rate": 0.8261,
+          "league_rate_matches": 184,
+          "p_above": 0.22692214141083866,
+          "gap": -0.0869695652173913
+        },
+        {
+          "team": "Ifk Goteborg",
+          "side": "away",
+          "event": "concede_1",
+          "k": 19,
+          "n": 23,
+          "base_rate": 0.7391,
+          "league_rate_matches": 184,
+          "p_above": 0.7965355236945708,
+          "gap": 0.08698695652173916
+        },
+        {
+          "team": "Ifk Goteborg",
+          "side": "away",
+          "event": "score_1goal",
+          "k": 17,
+          "n": 23,
+          "base_rate": 0.7391,
+          "league_rate_matches": 184,
+          "p_above": 0.5237626928018118,
+          "gap": 3.0434782608668165e-05
+        }
+      ]
+    },
+    "sparse": {
+      "id": 62046,
+      "match": "Panev\u0117\u017eys vs Banga",
+      "qualified": 2,
+      "prominent": 1,
+      "max_n": 30,
+      "rows": [
+        {
+          "team": "Panev\u0117\u017eys",
+          "side": "home",
+          "event": "Under_4_5",
+          "k": 26,
+          "n": 29,
+          "base_rate": 0.8611,
+          "league_rate_matches": 144,
+          "p_above": 0.7180808272495878,
+          "gap": 0.03545172413793107
+        },
+        {
+          "team": "Banga",
+          "side": "away",
+          "event": "Under_4_5",
+          "k": 28,
+          "n": 30,
+          "base_rate": 0.8611,
+          "league_rate_matches": 144,
+          "p_above": 0.8687436711792831,
+          "gap": 0.07223333333333337
+        }
+      ]
+    },
+    "large_sample": {
+      "id": 59580,
+      "match": "Wexford vs UCD",
+      "qualified": 6,
+      "prominent": 1,
+      "max_n": 35,
+      "rows": [
+        {
+          "team": "Wexford",
+          "side": "home",
+          "event": "Under_4_5",
+          "k": 31,
+          "n": 35,
+          "base_rate": 0.8743,
+          "league_rate_matches": 175,
+          "p_above": 0.6113511070079991,
+          "gap": 0.01141428571428571
+        },
+        {
+          "team": "Wexford",
+          "side": "home",
+          "event": "concede_1",
+          "k": 28,
+          "n": 35,
+          "base_rate": 0.7429,
+          "league_rate_matches": 175,
+          "p_above": 0.7640607102094132,
+          "gap": 0.05710000000000004
+        },
+        {
+          "team": "Wexford",
+          "side": "home",
+          "event": "Over_1_5",
+          "k": 27,
+          "n": 35,
+          "base_rate": 0.7714,
+          "league_rate_matches": 175,
+          "p_above": 0.5245184387676141,
+          "gap": 2.8571428571488866e-05
+        },
+        {
+          "team": "Ucd",
+          "side": "away",
+          "event": "Over_1_5",
+          "k": 29,
+          "n": 35,
+          "base_rate": 0.7714,
+          "league_rate_matches": 175,
+          "p_above": 0.7763747885000915,
+          "gap": 0.05717142857142865
+        },
+        {
+          "team": "Ucd",
+          "side": "away",
+          "event": "score_1goal",
+          "k": 29,
+          "n": 35,
+          "base_rate": 0.7429,
+          "league_rate_matches": 175,
+          "p_above": 0.8563521924677122,
+          "gap": 0.08567142857142862
+        },
+        {
+          "team": "Ucd",
+          "side": "away",
+          "event": "Under_4_5",
+          "k": 28,
+          "n": 35,
+          "base_rate": 0.8743,
+          "league_rate_matches": 175,
+          "p_above": 0.16670411384954864,
+          "gap": -0.07429999999999992
+        }
+      ]
+    }
+  },
+  "limitations": "Snapshot selection diagnostic, not outcome validation. Fixed league baseline, rounded saved Beta parameters, no meaningful-effect floor; shared teams across fixtures are not independent."
+}

@@ -1,5 +1,41 @@
 # Prototype links and versions
 
+Desktop review variants: [1440px](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1226-62085&starting-point-node-id=1226%3A62085) · [1280px](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1235-62127&starting-point-node-id=1235%3A62127) · [1024px](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1235-62521&starting-point-node-id=1235%3A62521).
+
+2026-10-12 — Desktop follow-up QA completed for review variants: 1440px `1226:62085`, 1280px `1235:62127`, 1024px `1235:62521`. Narrow view stacks Context subcolumns and evidence sections; 1280/1440 retain Patterns left and Strength/Goals right. Fixed Context scope controls changing width between states, misleading fixed bold styling on the All venues pattern label, and excessive fixed-height gaps in the 1024px layout. Added wrapping for Context team names and the attack/defence pair label. Browser clicked both Context scopes and both Pattern scopes in both directions; confirmed their state independence, venue unavailable message, restoration of all-venues records, See all, and bottom Show fewer returning to Patterns. Separate synthetic QA cards cover long names with twelve expanded rows (`1240:62211`), one-sided Results without Also (`1240:62397`), and empty categories (`1240:62538`); visually checked at the narrower 560px pattern-card width. Synthetic QA records are layout fixtures, not qualified football evidence. Figma-only; these are separate breakpoint frames, not responsive frontend implementation. External sidebar/detail navigation still retains legacy routes and is not fully regression-tested. Additional isolated long-name checks passed for the 736px match header (`1243:62211`) and 408px Strength card (`1243:62241`); Strength wraps to two lines without overlap.
+
+2026-10-12 — First [desktop Match details review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1226-62085&starting-point-node-id=1226%3A62085) built at 1226:62085 using current mobile cards and existing desktop shell. Context across top; Patterns 680px left; Strength/Goals stacked right. Nine qualified patterns preserved, one limitations block. Browser verified expansion, bottom collapse returning to Patterns, and Home/Away unavailable state; Goals remains in place during expansion. Screenshot checked at 1440px. Narrower layouts, long-name/list stress cases and exhaustive external navigation remain pending. Inherited sidebar and external detail links retain existing prototype destinations, including older/mobile flows. Figma-only, no frontend implementation.
+
+2026-10-12 — Team strength review 1196:62157: added lime underline beneath Big dog team name; replaced Reliable here with Big dogs usually win in this league and supporting Based on results across several seasons. Hid redundant reliability dots to keep the claim explicit. No numerical league count restored. Figma-only; source/canonical card retained. Structural text-fit check passed.
+
+2026-10-12 — Owner rejected the extra probability-above-league trial. Active review uses only the existing Bayes display eligibility gate; observed records and league baselines inform presentation. Keep Results Winless/Unbeaten and Attack/defence pair. AEK Over 1.5 returns to Also alongside Atromitos Under 3.5; three records remain expanded. Explicit More/Less often than the league average wording retained; Atromitos Under 4.5 uses Around the league average. Nine unique records total. The 80% trial and diagnostic files are historical, not active requirements. Figma-only; no production algorithm changed.
+
+2026-10-12 — Existing review 1196:62044 uses explicit league-average wording. Other-fixture trial is documented in patterns-two-stage-review.md; no new prototype routes created.
+
+2026-10-12 — Two-stage trial requested: retain nine display-eligible records, use P(theta > fixed league base)=1-I_base(alpha,beta) >=0.80 for prominence. Saved rounded Beta parameters give Results Winless/Unbeaten 0.8717; attack/defence and Under 3.5 0.8293. Four remaining records expand; no second gate on expansion. Figma 1196:62044 now has four main records, one Also and four expanded, without duplication. Neutral comparison on AEK Over 1.5 and Under 4.5; common-league wording on Atromitos Under 4.5 does not assert statistical equivalence. Trial assumes fixed baseline and is not a validated production rule. Evidence: mock/patterns-111915-two-stage-trial.json. Canvas structure checked; backend unchanged.
+
+2026-10-12 — Review 1196:62044 now displays nine Bayes-qualified patterns, with four additional records behind See all patterns. All three former 3/6 rows and the unqualified Lost/Won pair are hidden. Source snapshot recorded in implementation status.
+
+2026-10-12 — Team patterns wording updated in review 1196:62044: More often than usual versus Around the league average; see expanded Under 4.5 and Atromitos Over 2.5 rows for typical examples.
+
+2026-10-12 — [Inline patterns expansion review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1196-62044&starting-point-node-id=1196%3A62044): Patterns → See all patterns. Nine additional rows expand inline; bottom Show fewer returns to the heading. Browser verified.
+
+2026-10-12 — [Team patterns venue-toggle review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1196-62044&starting-point-node-id=1196%3A62044): tap Patterns, then Home / Away or All venues. Current sample defaults overall and explains immature venue samples.
+
+2026-10-12 — Corrected [Strength and patterns review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1196-62044&starting-point-node-id=1196%3A62044): owner Strength styling restored, no league count/disclosure CTA, goal-total patterns returned to See all patterns.
+
+2026-10-12 — [Updated Strength and Team patterns review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1196-62044&starting-point-node-id=1196%3A62044): See league evidence opens historical count; Over 1.5 and Under 4.5 appear before See all patterns.
+
+2026-10-12 — [Team strength evidence preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1196-62044&starting-point-node-id=1196%3A62044). Tap Strength. Separate comparison with clearer league claim and 160/214 historical record; current canonical design unchanged.
+
+2026-10-12 — [Discover shared date scope review](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1169-62199&starting-point-node-id=1169%3A62199). Next 7 days / Today / Tomorrow / Date. Scope shared across category and All standouts review clones; original canonical flow preserved.
+
+2026-10-12 — [Calendar preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1155-62270&starting-point-node-id=1155%3A62115): tap date for month calendar. Replaces three-button picker in compact review; old panel 1158:62177 preserved.
+
+2026-10-12 — [Compact Matches date preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1155-62115&starting-point-node-id=1155%3A62115): previous/next and date picker above league scope, bounded to 9–11 October.
+
+2026-10-12 — D117 [Compact Matches with real saved fixtures](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1155-62115&starting-point-node-id=1155%3A62115). Five saved 10 Oct examples in kickoff order; Your leagues shows Serbia, Search/Filters offers a Riga example. Separate review; original flow unchanged.
+
 2026-10-12 — D118 [Current Discover](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=592-54464&starting-point-node-id=1030%3A57675). Teaser sign-in and reachable onboarding completion now converge here; legacy Discover designs preserved outside the active flow.
 
 2026-10-12 — D117: [Teaser detail info preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=1033-57869&starting-point-node-id=1030%3A57675). Tap muted ⓘ beside Save for the short explanation; Read full Methodology opens existing methodology.

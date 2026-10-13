@@ -1,5 +1,7 @@
 # Match detail — data contract (v2)
 
+2026-10-12 latest owner correction: extra probability-above-league gate rejected. Use the Bayes display-eligible pool and separate Results / Attack-defence categories as described in data-contract.md. Earlier Beta exceedance thresholds and no-pairs rules below are superseded history, not active selection requirements.
+
 Status: **proposal for the frontend build** (2026-10-07; sources and IDs updated 2026-10-11). Design: Figma section "Match detail v2 · fixes 1–6" (668:57671) and "Match detail v2 · weak states" (698:57342); decisions D102–D104. Nothing here is deployed. Field names below are the real engine/database names unless marked **NEW**.
 
 ## 1. Sources
@@ -80,6 +82,9 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 Never show the rating gap number or a win percentage (D61).
 
 ### 3.4 Team patterns (`bayesian[]`)
+
+**2026-10-12 latest category amendment:** [Top Results and Top Attack/defence](data-contract.md#team-patterns-top-results-and-top-attackdefence--2026-10-12) defines the current review intent and supersedes the “No pairs / Top 4” presentation below. That older rule is retained as history. The Bayes gate discrepancy described in the amendment remains unresolved; do not equate the export display probability with probability of exceeding the league rate.
+
 - Use rows with `primary: true` (the engine's context for that team: home team at home or all venues, away team away or all) and `n ≥ 6`.
 - Record: `k / n` (large). Team rate: `round(100·k/n)%`. League rate: `round(100·base_rate)%`, from `league_rate_matches` current-season fixtures.
 - The engine sets `league_comparison: too_few_matches` when the team has `n < 6` **or** the league rate has `league_rate_matches < 20` (same floor as goals). Either way: keep the record, hide the comparison line.
@@ -96,6 +101,14 @@ Never show the rating gap number or a win percentage (D61).
 
 - Order: largest `|league_gap|` first (gap value itself not shown).
 - Pairing: put mirror events side by side — home `loss` ↔ away `win` (and vice versa), home `concede_N` ↔ away `score_N`, home `score_N` ↔ away `concede_N`. Remaining rows go under "Also" (max 3). Drop the weaker of complements (`win`/`winless`, `loss`/`unbeaten`, `Over_x`/`Under_x`) when both appear (D73). D106 owner clarification: loss/winless and win/unbeaten are distinct, non-complementary events and may both remain; do not discard them as duplicate evidence.
+- Never show a record with `k = 0` (e.g. "0 / 6"), in pairs, "Also" or the full list (owner, 2026-10-12).
+- Selection (owner, 2026-10-12). No pairs.
+  - Qualify: primary context per view, `n ≥ 6`, `k > 0`, and Bayes gate: P(team rate > league rate) from the record's Beta posterior (`alpha`, `beta`). No hit-rate floor.
+  - Top 4: gate ≥ 0.80, ranked by `league_gap` (largest first). One rung per ladder per team (scored N+, conceded N+, over x, under x, results); where rungs compete, the larger gap wins.
+  - "See all (N)": every other record with gate ≥ 0.75, ranked by hit rate `k/n`, then `n`, then `league_gap`.
+  - Both views (venue and all venues) are ranked server-side and sent in the payload; the Home / Away | All venues switch is frontend only and opens on the engine's primary view.
+  - The gate value is never shown to users (D115).
+- Event labels (user-facing): `goalless` → "Failed to score" (never "Goalless", which reads as 0–0), `score_1goal` → "Scored 1+", `score_2goals` → "Scored 2+", `concede_1` → "Conceded 1+", `concede_2` → "Conceded 2+", `clean_sheet` → "Clean sheet", `BTTS` → "Both teams scored", `Over_x_5` / `Under_x_5` → "Over / Under x.5 goals", `win` → "Won", `loss` → "Lost", `draw` → "Drew", `winless` → "Winless", `unbeaten` → "Unbeaten".
 - Current run: `streak`, shown only when > 0.
 - Exclude `halftime_win` (D80).
 - Empty states: both teams `n < 6` → one card "Too early for patterns" with "{n} of 6 matches played"; one team short → show the other, "Not enough matches · {n} of 6".
@@ -126,9 +139,9 @@ Never show the rating gap number or a win percentage (D61).
 3. ~~Pattern league sample size~~ — done 2026-10-11: `bayesian[]` rows carry `league_rate_matches`; under 20 → `too_few_matches`. Follow-up idea: blend last season into thin early-season league rates.
 4. ~~Standings mart~~ — built 2026-10-11: `mart_league_standings`. The ETL now keeps each API table as a group (`group_name`, `group_order`, `description`) instead of overwriting; `standings_format` (single / conferences / split) is derived per league season from the standings themselves, no league config. Pending: first refresh with groups.
 5. **Crests** — `logo_file_id` exists in the dimensions but the loader that fills it is not in the repo, so coverage is unknown. Until it is, the API resolves `crest_url` server-side (it may proxy the provider image); the frontend contract does not change when storage does.
-6. **H2H stats** — computed on read from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
+6. ~~H2H stats~~ — computed on read (see 8) from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
 7. **One snapshot rule** — standings/H2H are a current DB snapshot, not point-in-time with the forecast (D69); page must show both dates.
-8. **API** — no match endpoint exists; `engine/api/` only serves the Forecast record.
+8. **API** — partly done 2026-10-12: `GET /api/match/{fixture_id}/context` (`engine/api/match_context.py`) serves position, full table groups and H2H (tally, stats at 3+ meetings) from the dbt models above; H2H cutoff is the fixture kickoff. CLI: `python -m engine.api.match_context <fixture_id>`. Strength, Patterns and Goals still come from the export only.
 
 ## 7. Worked example — Zlin v Slavia Praha (90863), run 2026-10-07
 - Context (Home/Away): Zlin 0.40 / 1.80, #16 / #13 of 16; Slavia 2.50 / 0.25, #1 / #1. All venues: Zlin 0.89 / 2.11, #12 / #16; Slavia 2.78 / 0.67, #1 / #2. Position 16th 1 pt vs 1st 23 pts (snapshot 2026-10-05).

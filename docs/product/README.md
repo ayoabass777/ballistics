@@ -26,6 +26,8 @@ Start here before continuing design or frontend work:
 
 ## Immediate handoff
 
+2026-10-12: Desktop Match details has a first Figma review: [layout, carry-over rules and remaining verification checklist](desktop-match-details-todo.md). Frontend implementation remains pending.
+
 2026-10-07: **Biggest standouts design is pending review** (D82). Existing Discover, full-list and detail prototypes are preserved; Figma delivery does not imply design approval.
 
 2026-10-04 update: the owner requested the real Forecast record page. It is now
