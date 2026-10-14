@@ -11,7 +11,7 @@ Status: **proposal for the frontend build** (2026-10-07; sources and IDs updated
 | Engine run export | Strength splits, patterns, goal estimates, Big dog label and league record; warehouse `home_team_id`, `away_team_id`, `league_id` | `engine/eval/consensus_slips_<run_ds>.json` → `fixture_analysis[]`, `elo_gap_shortlist[]`, `elo_gap_group.big_dog_leagues[]` |
 | League standings | Position, played, W/D/L, goal difference, points, form, group (conference / split round) | dbt `raw_mart.mart_league_standings`: warehouse ids, latest refresh per league season (D69), one row per group and team; `standings_updated_at` is the ETL refresh time |
 | Head-to-head | Completed meetings between the two teams | dbt `raw.fact_head_to_head` (warehouse ids, played only): rows where `team_id` = one team and `opponent_id` = the other, either venue, `kickoff_utc` before the export cutoff, newest 5 |
-| Crests | Team badge image | API returns `crest_url` per team; the frontend never builds provider URLs. Backed by `logo_file_id` (see §6); initials if missing |
+| Crests | Team badge image | S3 `crests/teams/<logo_file_id>` (public read, immutable). `raw.fact_fixtures.home/away_logo_file_id` → API builds `home/away_crest_url` from `CREST_BASE_URL`; the frontend never builds provider URLs; initials if `null` |
 | User state | Saved, followed leagues, venue preference | Account (not built) |
 
 **ID rule** (`docs/contracts/ids.md`): everything this page receives uses warehouse ids (`fixture_id`, `team_id`, `league_id`). No API-Football ids reach the frontend, and no source here reads `raw.raw_fixtures` or `raw.raw_league_standings` directly.
@@ -24,7 +24,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 {
   "fixture": { "fixture_id": 90863, "home": "Zlin", "away": "Slavia Praha",
                "home_team_id": "<team_id>", "away_team_id": "<team_id>",   // warehouse ids (in export since 2026-10-11)
-               "home_crest_url": "/api/crest/<team_id>", "away_crest_url": "/api/crest/<team_id>",   // NEW
+               "home_crest_url": "https://<assets>/crests/teams/<uuid>", "away_crest_url": null,   // null = initials
                "league": "Czech Liga", "country": "Czech-Republic", "league_id": "<league_id>",
                "kickoff_utc": "2026-10-09T16:00:00Z", "run_ds": "2026-10-07",
                "standings_updated_at": "2026-10-05T00:09:10Z" },
@@ -138,7 +138,7 @@ Never show the rating gap number or a win percentage (D61).
 2. ~~Team IDs in the engine export~~ — done 2026-10-11: `fixture_analysis[]` carries warehouse `home_team_id`, `away_team_id`, `league_id` (engine reads dbt `fact_fixtures`).
 3. ~~Pattern league sample size~~ — done 2026-10-11: `bayesian[]` rows carry `league_rate_matches`; under 20 → `too_few_matches`. Follow-up idea: blend last season into thin early-season league rates.
 4. ~~Standings mart~~ — built 2026-10-11: `mart_league_standings`. The ETL now keeps each API table as a group (`group_name`, `group_order`, `description`) instead of overwriting; `standings_format` (single / conferences / split) is derived per league season from the standings themselves, no league config. Pending: first refresh with groups.
-5. **Crests** — `logo_file_id` exists in the dimensions but the loader that fills it is not in the repo, so coverage is unknown. Until it is, the API resolves `crest_url` server-side (it may proxy the provider image); the frontend contract does not change when storage does.
+5. **Crests** — decided 2026-10-13: store our own copies in S3 (not a provider proxy). `etl/src/update_logos.py` (ported from football_stats_project) fetches from the API-Sports media CDN by provider id (no API quota) and writes `crests/<kind>/<uuid>` with Content-Type, no extension; only rows without a `logo_file_id` are fetched. The old project's disk files were not reused (their UUIDs only mapped to teams in the old database). `fact_fixtures` carries `home/away_logo_file_id`; `/context` returns `home/away_crest_url` (`engine/api/crests.py`). `CREST_BASE_URL` can point at a CDN later without a payload change. Apply: `scripts/apply_crests_s3.sh`. Pending: first run and coverage numbers.
 6. ~~H2H stats~~ — computed on read (see 8) from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
 7. **One snapshot rule** — standings/H2H are a current DB snapshot, not point-in-time with the forecast (D69); page must show both dates.
 8. **API** — partly done 2026-10-12: `GET /api/match/{fixture_id}/context` (`engine/api/match_context.py`) serves position, full table groups and H2H (tally, stats at 3+ meetings) from the dbt models above; H2H cutoff is the fixture kickoff. CLI: `python -m engine.api.match_context <fixture_id>`. Strength, Patterns and Goals still come from the export only.
