@@ -83,7 +83,7 @@ Never show the rating gap number or a win percentage (D61).
 
 ### 3.4 Team patterns (`bayesian[]`)
 
-**2026-10-12 latest category amendment:** [Top Results and Top Attack/defence](data-contract.md#team-patterns-top-results-and-top-attackdefence--2026-10-12) defines the current review intent and supersedes the “No pairs / Top 4” presentation below. That older rule is retained as history. The Bayes gate discrepancy described in the amendment remains unresolved; do not equate the export display probability with probability of exceeding the league rate.
+Rules below are current as of 2026-10-14 (D122). Category intent and examples: [data-contract.md](data-contract.md#team-patterns-top-results-and-top-attackdefence--2026-10-12).
 
 - Use rows with `primary: true` (the engine's context for that team: home team at home or all venues, away team away or all) and `n ≥ 6`.
 - Record: `k / n` (large). Team rate: `round(100·k/n)%`. League rate: `round(100·base_rate)%`, from `league_rate_matches` current-season fixtures.
@@ -99,15 +99,15 @@ Never show the rating gap number or a win percentage (D61).
 | `well_below` | Much less often than usual | Much less likely than usual |
 | `too_few_matches` / `unavailable` | hide the row | hide the row |
 
-- Order: largest `|league_gap|` first (gap value itself not shown).
-- Pairing: put mirror events side by side — home `loss` ↔ away `win` (and vice versa), home `concede_N` ↔ away `score_N`, home `score_N` ↔ away `concede_N`. Remaining rows go under "Also" (max 3). Drop the weaker of complements (`win`/`winless`, `loss`/`unbeaten`, `Over_x`/`Under_x`) when both appear (D73). D106 owner clarification: loss/winless and win/unbeaten are distinct, non-complementary events and may both remain; do not discard them as duplicate evidence.
-- Never show a record with `k = 0` (e.g. "0 / 6"), in pairs, "Also" or the full list (owner, 2026-10-12).
-- Selection (owner, 2026-10-12). No pairs.
-  - Qualify: primary context per view, `n ≥ 6`, `k > 0`, and Bayes gate: P(team rate > league rate) from the record's Beta posterior (`alpha`, `beta`). No hit-rate floor.
-  - Top 4: gate ≥ 0.80, ranked by `league_gap` (largest first). One rung per ladder per team (scored N+, conceded N+, over x, under x, results); where rungs compete, the larger gap wins.
-  - "See all (N)": every other record with gate ≥ 0.75, ranked by hit rate `k/n`, then `n`, then `league_gap`.
-  - Both views (venue and all venues) are ranked server-side and sent in the payload; the Home / Away | All venues switch is frontend only and opens on the engine's primary view.
-  - The gate value is never shown to users (D115).
+- Never show a record with `k = 0` (e.g. "0 / 6") anywhere (owner, 2026-10-12).
+- **Qualify** (every placement): primary context per view, `n ≥ 6`, `k > 0`, `display_eligible` (engine posterior ≥ 0.75). No hit-rate floor. Common records (e.g. Under 4.5, Over 1.5) may qualify.
+- **Top Results** — events `win`, `loss`, `draw`, `winless`, `unbeaten`. At most one per team. Needs league-difference confidence ≥ 0.75: P(θ > league base) when the team is above the league, P(θ < league base) when below, from the record's Beta(`alpha`, `beta`). Pick by largest `|league_gap|`; confidence breaks ties. Winless/Unbeaten count as results; do not hardcode Won/Lost.
+- **Top Attack/defence** — events `score_1goal`, `score_2goals`, `goalless`, `concede_1`, `concede_2`, `clean_sheet`. Same confidence gate and ranking. Prefer a corresponding pair across the two teams (scored N+ ↔ conceded N+, failed to score ↔ clean sheet) when both pass; if only one side passes, show it alone; never fill with an unqualified counterpart.
+- One rung per ladder per team (scored 1+/2+, conceded 1+/2+, over x, under x): where rungs compete for the same slot, the larger gap wins.
+- Omit a top category when nothing passes its gate.
+- **Also** (max 3, no padding) and **See all (N)**: every remaining qualified record, including match totals (`Over_x_5`, `Under_x_5`) and `BTTS`, which never take a top slot. Ranked by hit rate `k/n`, then `n`, then `|league_gap|`. A record shown in a top category is not repeated.
+- Both views (venue and all venues) are selected server-side and sent in the payload; the Home / Away | All venues switch is frontend only and opens on the engine's primary view.
+- Neither gate value is shown to users (D115).
 - Event labels (user-facing): `goalless` → "Failed to score" (never "Goalless", which reads as 0–0), `score_1goal` → "Scored 1+", `score_2goals` → "Scored 2+", `concede_1` → "Conceded 1+", `concede_2` → "Conceded 2+", `clean_sheet` → "Clean sheet", `BTTS` → "Both teams scored", `Over_x_5` / `Under_x_5` → "Over / Under x.5 goals", `win` → "Won", `loss` → "Lost", `draw` → "Drew", `winless` → "Winless", `unbeaten` → "Unbeaten".
 - Current run: `streak`, shown only when > 0.
 - Exclude `halftime_win` (D80).

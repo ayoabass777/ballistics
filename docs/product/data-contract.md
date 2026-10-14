@@ -27,7 +27,7 @@ Selection contract:
 
 Expected review example (fixture 111915, frozen `mock/patterns-111915-qualified.json`): Top Results = Atromitos Winless 6/6 and AEK Unbeaten 6/6; Top Attack/defence = Atromitos Conceded 1+ 6/6 and AEK Scored 1+ 6/6. Remove Winless/Unbeaten from Also when promoted. The four records are unique; Lost/Won do not return merely to fill Results.
 
-Qualification reconciliation required: the current review uses the export’s `display_eligible` flag (calibrated/boosted posterior >= 0.75). The detailed contract separately records P(team rate > league rate) computed from Beta alpha/beta, with 0.80/0.75 gates. These are different quantities and are not interchangeable. The category definition above does not resolve or implement that statistical conflict. Retain the frozen sample’s recorded gate provenance until reconciled.
+Qualification reconciliation: resolved 2026-10-14 (D122). `display_eligible` qualifies every placement; league-difference confidence (Beta posterior vs fixed league base, ≥ 0.75, direction follows the gap) gates the two top categories only and breaks ties on equal gaps. See match-detail-contract.md §3.4.
 
 
 2026-10-12 — Review pattern pool now sourced from fixture_analysis for 111915 in Oct 12 consensus export, generated Oct 13 00:35 UTC: context all and display_eligible=true (saved 0.75 gate). All nine records frozen in mock/patterns-111915-qualified.json. Counts are historical k/n, not posterior probabilities; display eligibility is distinct from consensus/betting eligibility. Under 4.5 near-average editorial wording retained; universal typical/unusual classification boundary remains undefined.
