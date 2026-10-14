@@ -4,12 +4,16 @@ Input: one fixture's ``bayesian[]`` rows after ``attach_league_comparisons``
 (each row has side, team, event, k, n, alpha, beta, base_rate, context,
 display_eligible, league_gap, league_comparison, streak).
 
-Two gates, two jobs:
-  * ``display_eligible`` (engine posterior >= 0.75) qualifies a record for any
-    placement.
-  * League-difference confidence >= 0.75 is required for the two top slots
-    only: P(theta > league base) when the team is above the league, P(theta <
-    base) when below, from the record's Beta(alpha, beta). It also breaks ties.
+Qualification depends on the event family (D123):
+  * Results and Attack/defence (team events): above the league average and
+    league-difference confidence >= 0.75 -- P(theta > league base) when the team is above the league,
+    P(theta < base) when below, from the record's Beta(alpha, beta). The
+    engine's calibrated score is not used here: it is fitted on betting
+    events only and floors rare events, so it cannot see e.g. Lost 9/10.
+  * Match goals (Over/Under, BTTS): ``display_eligible`` (calibrated engine
+    score >= 0.75), where that calibration is validated. These never take a
+    top slot.
+Top slots rank by |league gap|; confidence breaks ties.
 
 Output per view ("venue": home team at home, away team away; "all": both
 teams all venues): top_results, top_attack_defence, also (max 3), see_all.
@@ -87,24 +91,36 @@ def _rate(r: dict) -> float:
     return r["k"] / r["n"]
 
 
+def _confidence(r: dict) -> float | None:
+    conf = r.get("league_confidence")
+    return conf if conf is not None else league_confidence(r)
+
+
+def _team_event(event: str) -> bool:
+    return event in RESULT_EVENTS or event in ATTACK_DEFENCE_EVENTS
+
+
 def _qualifies(r: dict) -> bool:
-    return (r.get("event") not in EXCLUDED_EVENTS
-            and (r.get("n") or 0) >= MIN_N
-            and (r.get("k") or 0) > 0
-            and bool(r.get("display_eligible")))
+    if (r.get("event") in EXCLUDED_EVENTS or (r.get("n") or 0) < MIN_N
+            or (r.get("k") or 0) <= 0):
+        return False
+    if _team_event(r["event"]):
+        # Above the league only: a below-league team record is the mirror of
+        # an above-league one already shown (Won 2/10 <-> Winless 8/10).
+        if r.get("league_comparison") in NO_COMPARISON or (r.get("league_gap") or 0) <= 0:
+            return False
+        conf = _confidence(r)
+        return conf is not None and conf >= TOP_CONFIDENCE
+    return bool(r.get("display_eligible"))
 
 
 def _top_ok(r: dict) -> bool:
-    if r.get("league_comparison") in NO_COMPARISON:
-        return False
-    conf = r.get("league_confidence")
-    if conf is None:
-        conf = league_confidence(r)
-    return conf is not None and conf >= TOP_CONFIDENCE
+    """Team events qualify on confidence already; match goals never top."""
+    return _team_event(r["event"]) and _qualifies(r)
 
 
 def _top_key(r: dict):
-    return (_gap(r), r.get("league_confidence") or league_confidence(r) or 0.0, r["n"])
+    return (_gap(r), _confidence(r) or 0.0, r["n"])
 
 
 def _dedupe_ladders(rows: list[dict]) -> list[dict]:
@@ -154,8 +170,10 @@ def _pick_attack_defence(cands: list[dict]) -> list[dict]:
 
 def select_view(rows: list[dict]) -> dict:
     """Top Results, Top Attack/defence, Also and See all for one view."""
-    qualified = _dedupe_ladders([r for r in rows if _qualifies(r)])
+    qualified = [r for r in rows if _qualifies(r)]
 
+    # Tops are picked before ladders collapse, so a corresponding pair
+    # (e.g. Conceded 1+ <-> Scored 1+) survives even if a higher rung exists.
     top_results = []
     for side in ("home", "away"):
         cands = [r for r in qualified
@@ -166,9 +184,12 @@ def select_view(rows: list[dict]) -> dict:
     ad_cands = [r for r in qualified if r["event"] in ATTACK_DEFENCE_EVENTS and _top_ok(r)]
     top_ad = _pick_attack_defence(ad_cands)
 
-    used = {id(r) for r in top_results + top_ad}
-    rest = sorted((r for r in qualified if id(r) not in used),
-                  key=lambda r: (_rate(r), r["n"], _gap(r)), reverse=True)
+    tops = top_results + top_ad
+    used = {id(r) for r in tops}
+    used_ladders = {(r["side"], ladder(r["event"])) for r in tops if ladder(r["event"])}
+    rest = _dedupe_ladders([r for r in qualified if id(r) not in used
+                            and (r["side"], ladder(r["event"])) not in used_ladders])
+    rest.sort(key=lambda r: (_rate(r), r["n"], _gap(r)), reverse=True)
     return {
         "top_results": [_public(r) for r in top_results],
         "top_attack_defence": [_public(r) for r in top_ad],
