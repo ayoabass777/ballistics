@@ -60,7 +60,7 @@ class SelectionTests(unittest.TestCase):
         rec("away", "score_1goal", 6, 6, 0.65, team="AEK"),
         rec("away", "Over_1_5", 5, 6, 0.70, team="AEK"),
         rec("away", "win", 0, 6, 0.30, team="AEK"),                      # k = 0: never shown
-        rec("away", "clean_sheet", 3, 6, 0.30, team="AEK", eligible=False),  # not eligible
+        rec("away", "clean_sheet", 2, 6, 0.30, team="AEK"),             # gap too small to qualify
         rec("home", "halftime_win", 4, 6, 0.2, team="Atromitos"),        # excluded event
     ]
 
@@ -112,15 +112,40 @@ class SelectionTests(unittest.TestCase):
         view = tp.select_view(rows)
         self.assertEqual([r["event"] for r in view["top_attack_defence"]], ["goalless"])
 
-    def test_category_omitted_when_nothing_passes(self):
+    def test_weak_team_record_does_not_qualify(self):
+        # Unbeaten 5/7 vs 60%: gap too uncertain -> nowhere, not even See all.
         view = tp.select_view([rec("home", "unbeaten", 5, 7, 0.6)])
-        self.assertEqual(view["top_results"], [])
-        self.assertEqual([r["event"] for r in view["also"]], ["unbeaten"])
+        self.assertEqual(sum(len(v) for v in view.values()), 0)
 
-    def test_no_comparison_cannot_be_top(self):
+    def test_no_comparison_team_record_hidden(self):
         view = tp.select_view([rec("home", "winless", 6, 6, 0.55, comparison="too_few_matches")])
-        self.assertEqual(view["top_results"], [])
-        self.assertEqual(len(view["also"]), 1)
+        self.assertEqual(sum(len(v) for v in view.values()), 0)
+
+    def test_team_events_ignore_engine_score(self):
+        # D123: Zlin Lost 9/10 vs 40% has engine score 0.62 (not eligible) but qualifies.
+        rows = [rec("away", "loss", 9, 10, 0.40, eligible=False, team="Zlin"),
+                rec("away", "winless", 10, 10, 0.60, team="Zlin")]
+        view = tp.select_view(rows)
+        self.assertEqual([r["event"] for r in view["top_results"]], ["loss"])
+        self.assertEqual([r["event"] for r in view["also"]], ["winless"])
+
+    def test_below_league_team_records_hidden(self):
+        # Won 1/10 vs 40% is confidently below the league: not shown (mirror of Winless).
+        view = tp.select_view([rec("home", "win", 1, 10, 0.40)])
+        self.assertEqual(sum(len(v) for v in view.values()), 0)
+
+    def test_pair_survives_higher_rung(self):
+        rows = [rec("home", "concede_1", 6, 6, 0.71), rec("away", "score_1goal", 6, 6, 0.71),
+                rec("away", "score_2goals", 4, 6, 0.38)]
+        view = tp.select_view(rows)
+        self.assertEqual([r["event"] for r in view["top_attack_defence"]], ["concede_1", "score_1goal"])
+        self.assertNotIn("score_2goals", [r["event"] for r in view["also"] + view["see_all"]])
+
+    def test_match_goals_use_engine_score(self):
+        typical = rec("home", "Under_4_5", 6, 6, 0.90)                  # eligible, typical
+        unusual = rec("home", "Over_2_5", 6, 6, 0.50, eligible=False)  # not eligible
+        view = tp.select_view([typical, unusual])
+        self.assertEqual([r["event"] for r in view["also"]], ["Under_4_5"])
 
 
 class ViewTests(unittest.TestCase):
