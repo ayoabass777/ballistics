@@ -1,0 +1,126 @@
+# Dataset registry: every dataset in the daily chain, who produces it, what it
+# depends on, and how the daily flow check decides it arrived for a day (ds).
+#
+# ds is the Airflow logical date. fixture_update_dag and engine_predict are
+# @daily, so the runs that fire at 00:00 UTC on 14 Oct carry ds 2026-10-13.
+#
+# check types (etl/src/data_detector/daily_flow.py):
+#   pipeline_task  data_detector.pipeline_runs has `task_id` of `dag_id` in
+#                  `success` for ds (failed/missing otherwise)
+#   movement       data_detector.data_movements has a successful
+#                  `movement_type` from a `dag_id` run for ds
+#   run_ds_rows    `table` has >= min_rows rows where `column` = ds
+#                  (optional `where` SQL filter)
+#   derived        no data of its own (e.g. an API view): ok when every
+#                  upstream is ok
+#
+# Synced to data_detector.datasets / data_detector.dataset_dependencies on every
+# check run. Add a dataset here when a new table joins the daily chain.
+
+datasets:
+  - id: api.fixture_updates
+    layer: source
+    description: Fixture updates fetched from API-Sports
+    producer: {dag: fixture_update_dag, task: extract_updates}
+    upstream: []
+    check: {type: movement, dag: fixture_update_dag, movement_type: api_to_s3}
+
+  - id: raw.raw_fixtures
+    layer: raw
+    description: Fixtures loaded from the S3 landing file
+    producer: {dag: fixture_update_dag, task: load_updates}
+    upstream: [api.fixture_updates]
+    check: {type: movement, dag: fixture_update_dag, movement_type: s3_to_raw}
+
+  - id: raw.raw_fixtures.corrections
+    layer: raw
+    description: Rescheduled kickoff corrections applied to raw fixtures
+    producer: {dag: fixture_update_dag, task: fixture_corrections}
+    upstream: [raw.raw_fixtures]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: fixture_corrections}
+
+  - id: raw.fixture_xg
+    layer: raw
+    description: Expected goals for played fixtures
+    producer: {dag: fixture_update_dag, task: extract_xg_task}
+    upstream: [raw.raw_fixtures.corrections]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: extract_xg_task}
+
+  - id: raw.raw_league_standings
+    layer: raw
+    description: League tables from API-Sports (one group per table)
+    producer: {dag: fixture_update_dag, task: update_standings_task}
+    upstream: [raw.fixture_xg]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: update_standings_task}
+
+  - id: dbt.run
+    layer: dbt
+    description: dbt build of staging, facts and marts
+    producer: {dag: fixture_update_dag, task: run_dbt}
+    upstream: [raw.raw_fixtures.corrections, raw.fixture_xg, raw.raw_league_standings]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: run_dbt}
+
+  - id: raw.fact_fixtures
+    layer: dbt
+    description: Fixture fact (warehouse ids, crest ids); the engine's only fixture source
+    producer: {dag: fixture_update_dag, task: run_dbt}
+    upstream: [dbt.run]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: run_dbt}
+
+  - id: raw.fact_head_to_head
+    layer: dbt
+    description: Played meetings per team pair (engine training, match page H2H)
+    producer: {dag: fixture_update_dag, task: run_dbt}
+    upstream: [dbt.run]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: run_dbt}
+
+  - id: raw_mart.mart_league_standings
+    layer: dbt
+    description: League standings mart behind the match page Context
+    producer: {dag: fixture_update_dag, task: run_dbt}
+    upstream: [dbt.run]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: run_dbt}
+
+  - id: raw.model_runs
+    layer: engine
+    description: One readiness row per model (mismatch, bayesian, dixon_coles)
+    producer: {dag: engine_predict, task: model_*}
+    upstream: [raw.fact_fixtures, raw.fact_head_to_head]
+    check: {type: run_ds_rows, table: raw.model_runs, column: run_ds,
+            where: "status IN ('ok', 'empty')", min_rows: 3}
+
+  - id: raw.model_picks
+    layer: engine
+    description: Model signals feeding consensus
+    producer: {dag: engine_predict, task: model_*}
+    upstream: [raw.model_runs]
+    check: {type: run_ds_rows, table: raw.model_picks, column: run_ds, min_rows: 1}
+
+  - id: raw.consensus_pool
+    layer: engine
+    description: Ranked consensus pool for the day
+    producer: {dag: engine_predict, task: consensus}
+    upstream: [raw.model_picks]
+    check: {type: run_ds_rows, table: raw.consensus_pool, column: run_ds, min_rows: 1}
+
+  - id: raw.engine_runs
+    layer: engine
+    description: Run marked complete once match pages are written
+    producer: {dag: engine_predict, task: consensus}
+    upstream: [raw.consensus_pool]
+    check: {type: run_ds_rows, table: raw.engine_runs, column: run_ds,
+            where: "status = 'complete'", min_rows: 1}
+
+  - id: raw.match_analysis
+    layer: engine
+    description: Page-ready Strength, Patterns, Goals per fixture
+    producer: {dag: engine_predict, task: consensus}
+    upstream: [raw.engine_runs]
+    check: {type: run_ds_rows, table: raw.match_analysis, column: run_ds, min_rows: 1}
+
+  - id: api.match_page
+    layer: api
+    description: GET /api/match/{id} (engine sections + live Context)
+    producer: {dag: null, task: null}
+    upstream: [raw.match_analysis, raw_mart.mart_league_standings, raw.fact_head_to_head]
+    check: {type: derived}
