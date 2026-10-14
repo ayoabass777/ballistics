@@ -10,7 +10,15 @@ set -a; source .env; set +a
 out=logs/match_store.txt
 mkdir -p logs
 psql_run() { docker exec -i ballistics_postgres psql -U "$DB_USER" -d "$DB_NAME" "$@"; }
-engine() { docker exec -w /opt/airflow ballistics_airflow_scheduler python -m "$@"; }
+# The engine image (not the Airflow scheduler) has the engine's dependencies
+# (scipy etc.); run exactly as engine_predict's consensus task does.
+engine() {
+  docker run --rm --network ballistics_network \
+    -v "$PWD/engine:/opt/engine" -v "$PWD/etl:/opt/etl" -v "$PWD/data:/opt/data" \
+    -e DB_NAME -e DB_USER -e DB_PASSWORD -e DB_PORT \
+    -e DB_HOST=ballistics_postgres -e ENGINE_DB_HOST=ballistics_postgres -w /opt \
+    ballistics-engine:latest python -m "$@"
+}
 latest=$(ls engine/eval/consensus_slips_20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].json 2>/dev/null | sort | tail -1)
 {
   echo "== $(date)  latest export: ${latest:-none}"
