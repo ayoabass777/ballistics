@@ -2877,6 +2877,11 @@ def save_slips(
         from engine.eval.forecast_history import capture, init_schema
         init_schema()
         capture(output)
+        # Page-ready match sections for the API (raw.match_analysis), written
+        # atomically and marked complete before the JSON file is replaced.
+        from engine.eval.match_store import write_match_analysis
+        n_match = write_match_analysis(ds, output)
+        print(f"  wrote {n_match} match pages to raw.match_analysis (run_ds={ds})")
 
     # Publish atomically so the dashboard never reads a half-written daily file.
     temp_path = out_path.with_suffix(out_path.suffix + ".tmp")

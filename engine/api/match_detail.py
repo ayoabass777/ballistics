@@ -1,13 +1,15 @@
 """Full match page payload: GET /api/match/{fixture_id} (match-detail-contract.md).
 
 Two sources, each with its own date on the page (D69):
-  * Context (standings position, table, H2H, crests) -- database snapshot via
-    engine.api.match_context, dated by ``standings_updated_at``.
-  * Strength, Team patterns, Goals and the Context form rows -- the latest
-    engine export (consensus_slips_<run_ds>.json), dated by ``run_ds``.
+  * Context (standings position, table, H2H, crests) -- live database snapshot
+    via engine.api.match_context, dated by ``standings_updated_at``.
+  * Strength, Team patterns, Goals and the Context form rows -- page-ready
+    sections the export writes to ``raw.match_analysis`` for each run
+    (engine/eval/match_store.py). Only the latest *complete* run in
+    ``raw.engine_runs`` is read, dated by ``run_ds`` and ``run_finished_at``.
 
 A fixture that is not in the latest run still returns its Context; the
-engine sections are null and ``run_ds`` is null.
+engine sections are null. The section builders below run at export time.
 
 Nothing here exposes engine internals (D61, D115): no rating gaps, posteriors,
 calibration values, shrunk rates or Big dog counts reach the payload.
@@ -35,7 +37,7 @@ _lock = threading.Lock()
 
 
 # ---------------------------------------------------------------------------
-# Export loading
+# Export loading (export time and backfill only; the API reads the database)
 # ---------------------------------------------------------------------------
 
 def export_dir() -> Path:
@@ -163,23 +165,58 @@ def discover_section(f: dict) -> dict | None:
 # Payload
 # ---------------------------------------------------------------------------
 
-def build_match(cur, fixture_id: int, export: dict | None) -> dict | None:
+def engine_sections(f: dict, export: dict) -> dict:
+    """Page-ready engine sections for one fixture (written per run)."""
+    return {
+        "strength": strength_section(f, export),
+        "patterns": patterns_section(f),
+        "goals": goals_section(f),
+        "form": form_rows(f.get("strength")),
+        "discover": discover_section(f),
+    }
+
+
+LATEST_SQL = """
+SELECT r.run_ds, r.finished_at, m.payload
+FROM (SELECT run_ds, finished_at FROM raw.engine_runs
+      WHERE status = 'complete' ORDER BY run_ds DESC LIMIT 1) r
+LEFT JOIN raw.match_analysis m
+  ON m.run_ds = r.run_ds AND m.fixture_id = %(fixture_id)s
+"""
+
+
+def read_engine_sections(cur, fixture_id: int) -> tuple[dict | None, dict | None]:
+    """(run info, sections) from the latest complete run; Nones if absent."""
+    cur.execute("SELECT to_regclass('raw.engine_runs') IS NOT NULL AS ready")
+    if not cur.fetchone()["ready"]:
+        return None, None                       # store not created yet
+    cur.execute(LATEST_SQL, {"fixture_id": fixture_id})
+    row = cur.fetchone()
+    if row is None:
+        return None, None                       # no complete run yet
+    run = {"run_ds": row["run_ds"], "finished_at": row["finished_at"]}
+    return run, row["payload"]
+
+
+def build_match(cur, fixture_id: int) -> dict | None:
     ctx = match_context.build_context(cur, fixture_id)
     if ctx is None:
         return None
-    f = (export or {}).get("fixtures", {}).get(int(fixture_id))
+    run, sec = read_engine_sections(cur, fixture_id)
+    sec = sec or {}
     fixture = dict(ctx["fixture"])
-    fixture["run_ds"] = export.get("run_ds") if f else None
+    fixture["run_ds"] = match_context._iso(run["run_ds"]) if run and sec else None
+    fixture["run_finished_at"] = match_context._iso(run["finished_at"]) if run and sec else None
     fixture["standings_updated_at"] = ctx["standings_updated_at"]
     context = {k: v for k, v in ctx.items() if k not in ("fixture", "standings_updated_at")}
-    context["form"] = form_rows(f.get("strength")) if f else None
+    context["form"] = sec.get("form")
     return {
         "fixture": fixture,
         "context": context,
-        "strength": strength_section(f, export) if f else None,
-        "patterns": patterns_section(f) if f else None,
-        "goals": goals_section(f) if f else None,
-        "discover": discover_section(f) if f else None,
+        "strength": sec.get("strength"),
+        "patterns": sec.get("patterns"),
+        "goals": sec.get("goals"),
+        "discover": sec.get("discover"),
     }
 
 
@@ -187,7 +224,7 @@ def main(argv):
     from engine.api.forecast_records import read_cursor
     fixture_id = int(argv[1])
     with read_cursor() as cur:
-        payload = build_match(cur, fixture_id, load_export())
+        payload = build_match(cur, fixture_id)
     if payload is None:
         print(f"fixture {fixture_id} not found", file=sys.stderr)
         return 1

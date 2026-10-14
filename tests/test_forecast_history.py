@@ -85,9 +85,18 @@ class ForecastRulesTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "archive failed"):
                     save_slips(result, "2026-10-02", Path(td), record_history=True)
                 self.assertFalse(target.exists())
-            with patch.object(fh, "init_schema"), patch.object(fh, "capture", return_value=1) as capture:
+            from engine.eval import match_store
+            with patch.object(fh, "init_schema"), patch.object(fh, "capture", return_value=1), \
+                    patch.object(match_store, "write_match_analysis", side_effect=RuntimeError("store failed")):
+                with self.assertRaisesRegex(RuntimeError, "store failed"):
+                    save_slips(result, "2026-10-02", Path(td), record_history=True)
+                self.assertFalse(target.exists())
+            with patch.object(fh, "init_schema"), patch.object(fh, "capture", return_value=1) as capture, \
+                    patch.object(match_store, "write_match_analysis", return_value=0) as store:
                 save_slips(result, "2026-10-02", Path(td), record_history=True)
                 capture.assert_called_once()
+                store.assert_called_once()
+                self.assertEqual(store.call_args[0][0], "2026-10-02")
                 self.assertTrue(target.exists())
 
 

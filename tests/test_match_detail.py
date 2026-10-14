@@ -136,32 +136,65 @@ class LoadTests(unittest.TestCase):
         self.assertIsNone(md.latest_export_path(Path("/nonexistent")))
 
 
+class FakeCursor:
+    """Answers the two engine-store queries; Context is patched separately."""
+    def __init__(self, ready=True, row=None):
+        self.ready, self.row, self.calls = ready, row, []
+        self._next = None
+    def execute(self, sql, params=None):
+        self.calls.append(sql)
+        self._next = {"ready": self.ready} if "to_regclass" in sql else self.row
+    def fetchone(self):
+        return self._next
+
+
+def stored_row(fid=90876):
+    export = md.index_export(EXPORT_RAW)
+    payload = json.loads(json.dumps(md.engine_sections(export["fixtures"][fid], export)))
+    return {"run_ds": datetime(2026, 10, 13).date(),
+            "finished_at": datetime(2026, 10, 14, 7, 5, tzinfo=timezone.utc), "payload": payload}
+
+
 class BuildTests(unittest.TestCase):
-    def test_full_payload(self):
-        export = md.index_export(EXPORT_RAW)
-        with patch.object(md.match_context, "build_context", return_value=context_payload()):
-            p = md.build_match(None, 90876, export)
+    def build(self, cur, fid=90876):
+        with patch.object(md.match_context, "build_context", return_value=context_payload(fid)):
+            return md.build_match(cur, fid)
+
+    def test_full_payload_from_store(self):
+        p = self.build(FakeCursor(row=stored_row()))
         self.assertEqual(p["fixture"]["run_ds"], "2026-10-13")
+        self.assertEqual(p["fixture"]["run_finished_at"], "2026-10-14T07:05:00+00:00")
         self.assertEqual(p["fixture"]["standings_updated_at"], "2026-10-12T00:00:00+00:00")
         self.assertEqual(p["strength"], {"state": "close"})
+        self.assertEqual(p["patterns"]["all"]["top_results"][0]["label"], "Lost")
         self.assertEqual(p["context"]["form"]["away_team"]["overall"]["league_size"], 16)
         self.assertIn("h2h", p["context"])
         text = json.dumps(p)
         for secret in ("alpha", "posterior", "shrunk", "elo_gap", "league_confidence", "\"gap\""):
             self.assertNotIn(secret, text)
 
-    def test_fixture_not_in_run_keeps_context(self):
-        export = md.index_export(EXPORT_RAW)
-        with patch.object(md.match_context, "build_context", return_value=context_payload(1)):
-            p = md.build_match(None, 1, export)
+    def test_fixture_not_in_latest_run_keeps_context(self):
+        row = dict(stored_row(), payload=None)          # latest run exists, fixture absent
+        p = self.build(FakeCursor(row=row), fid=1)
         self.assertIsNone(p["fixture"]["run_ds"])
         self.assertIsNone(p["strength"])
         self.assertIsNone(p["patterns"])
         self.assertIsNotNone(p["context"]["h2h"])
 
+    def test_store_not_created_or_empty(self):
+        for cur in (FakeCursor(ready=False), FakeCursor(row=None)):
+            p = self.build(cur)
+            self.assertIsNone(p["goals"])
+            self.assertIsNone(p["fixture"]["run_ds"])
+
+    def test_only_latest_complete_run_is_read(self):
+        sql = md.LATEST_SQL
+        self.assertIn("status = 'complete'", sql)
+        self.assertIn("ORDER BY run_ds DESC LIMIT 1", sql)
+
     def test_unknown_fixture(self):
         with patch.object(md.match_context, "build_context", return_value=None):
-            self.assertIsNone(md.build_match(None, 5, None))
+            self.assertIsNone(md.build_match(FakeCursor(), 5))
 
 
 class HTTPTests(unittest.TestCase):
@@ -172,22 +205,19 @@ class HTTPTests(unittest.TestCase):
 
     def test_db_down_does_not_leak(self):
         with TestClient(app) as client, \
-                patch.object(records, "connect", side_effect=RuntimeError("secret-dsn")), \
-                patch.object(md, "load_export", return_value=None):
+                patch.object(records, "connect", side_effect=RuntimeError("secret-dsn")):
             r = client.get("/api/match/90876")
             self.assertEqual(r.status_code, 503)
             self.assertNotIn("secret", r.text)
 
-    def test_broken_export_still_serves(self):
+    def test_serves_from_store(self):
         with TestClient(app) as client, \
-                patch.object(md, "load_export", side_effect=ValueError("bad json")), \
                 patch.object(records, "read_cursor") as rc, \
                 patch.object(md.match_context, "build_context", return_value=context_payload()):
-            rc.return_value.__enter__.return_value = None
+            rc.return_value.__enter__.return_value = FakeCursor(row=stored_row())
             r = client.get("/api/match/90876")
             self.assertEqual(r.status_code, 200)
-            self.assertIsNone(r.json()["strength"])
-
+            self.assertEqual(r.json()["strength"], {"state": "close"})
 
 if __name__ == "__main__":
     unittest.main()

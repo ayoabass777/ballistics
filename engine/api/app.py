@@ -67,22 +67,13 @@ def match_context_view(response: Response, fixture_id: int):
     return result
 
 
-def _latest_export():
-    """Latest engine export, or None: the page still renders Context without it."""
-    try:
-        return match_detail.load_export()
-    except (OSError, ValueError) as exc:
-        log.warning("Engine export unavailable (%s)", type(exc).__name__)
-        return None
-
 
 @app.get("/api/match/{fixture_id}")
 def match_view(response: Response, fixture_id: int):
     """Full match page: Context (DB snapshot) + Strength, Patterns, Goals (latest run)."""
     if fixture_id < 1:
         raise HTTPException(422, "fixture_id must be positive")
-    result = read(match_detail.build_match, response, fixture_id=fixture_id,
-                  export=_latest_export())
+    result = read(match_detail.build_match, response, fixture_id=fixture_id)
     if result is None:
         raise HTTPException(404, "Fixture not found")
     return result

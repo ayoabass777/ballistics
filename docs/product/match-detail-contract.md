@@ -27,6 +27,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
                 "home_crest_url": "https://<assets>/crests/teams/<uuid>", "away_crest_url": null,  // null = initials
                 "league": "Czech Liga", "country": "Czech-Republic", "kickoff_utc": "2026-10-17T13:00:00+00:00",
                 "run_ds": "2026-10-13",                       // engine run behind Strength/Patterns/Goals; null if not in run
+                "run_finished_at": "2026-10-14T03:07:00Z",    // when that run was written (run_ds is the Airflow interval start)
                 "standings_updated_at": "2026-10-12T00:00:00Z" },   // DB snapshot behind Context (D69)
   "context":  { "position": {...}, "table": {...}, "h2h": {...},      // as /context (§3.2)
                 "form": { "home_team": {"overall": {...}, "home": {...}, "away": {...}}, "away_team": {...} } },
@@ -40,8 +41,8 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 }
 ```
 
-- Context comes from the database on every request; Strength, Patterns, Goals and `context.form` from the latest export (`ENGINE_EXPORT_DIR`, default `engine/eval`, newest `consensus_slips_<date>.json`, re-read when the file changes).
-- A fixture not in the latest run returns Context with the engine sections null. A missing or unreadable export never fails the request.
+- Context comes from the live database snapshot. Strength, Patterns, Goals, `context.form` and `discover` come from `raw.match_analysis` (page-ready jsonb per `run_ds`, `fixture_id`), read only from the latest run marked `complete` in `raw.engine_runs` (`engine/eval/match_store.py`). The consensus task writes both in one transaction before publishing the JSON file, so the page shows a whole run or the previous one, never a partial. `run_ds` is Airflow `{{ ds }}` (an @daily run firing on 14 Oct carries 2026-10-13), hence `run_finished_at`. Backfill old runs: `scripts/apply_match_store.sh`. The JSON export stays as a debug copy; the API no longer reads it.
+- A fixture not in the latest complete run returns Context with the engine sections null (no fallback to an older run). Before the tables exist, the engine sections are null rather than an error.
 - Not in the payload (D61, D115): rating gaps, posteriors, calibration values, shrunk/percentile rates, Big dog counts, Discover scores. `entry` (where the user came from) and `user` (saved, followed, venue preference) are frontend/account state, not served here.
 
 ## 3. Sections
