@@ -38,3 +38,7 @@ engine/eval/big_dog_leagues_state.json
 
 # Large experiment data: regenerate from each experiment's source query
 docs/product/experiments/**/*.gz
+
+# Analysis outputs and automatic calibration backups (regenerate locally)
+analysis/
+engine/eval/calibration_backup_*/
