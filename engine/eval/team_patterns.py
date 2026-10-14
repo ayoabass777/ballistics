@@ -31,7 +31,8 @@ ALSO_MAX = 3
 RESULT_EVENTS = ("win", "loss", "draw", "winless", "unbeaten")
 ATTACK_DEFENCE_EVENTS = ("score_1goal", "score_2goals", "goalless",
                          "concede_1", "concede_2", "clean_sheet")
-EXCLUDED_EVENTS = {"halftime_win"}  # D80
+EXCLUDED_EVENTS = {"halftime_win",            # D80
+                   "Over_4_5", "Under_1_5"}   # D124: never qualified; dropped
 NO_COMPARISON = {"too_few_matches", "unavailable", None}
 
 # Attack event for one team <-> defence event for the other.

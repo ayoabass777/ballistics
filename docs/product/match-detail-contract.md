@@ -111,7 +111,8 @@ Rules below are current as of 2026-10-14 (D122). Category intent and examples: [
 - **Built 2026-10-14** (`engine/eval/team_patterns.py`, called after `attach_league_comparisons` in the export): each fixture gets `patterns = {default_view: "venue"|"all", venue: {...}|null, all: {...}}`, each view with `top_results`, `top_attack_defence`, `also`, `see_all`. Records carry `side, team, event, label, k, n, rate, league_rate, league_comparison, streak, context` only — no posterior, Beta parameters, gap or confidence. `venue` is null when neither team has a venue sample; `default_view` is `venue` only when both teams' primary rows are venue rows. `bayesian[]` rows also gain `league_confidence` (internal). Check on the 13 Oct run after D123: fixture 111915 reproduces the review example; Zlin (90876) shows Lost 9/10 in Top Results; 592 fixtures, Top Results present in 82%, Top Attack/defence in 87%, median 6 records per fixture.
 - Event labels (user-facing): `goalless` → "Failed to score" (never "Goalless", which reads as 0–0), `score_1goal` → "Scored 1+", `score_2goals` → "Scored 2+", `concede_1` → "Conceded 1+", `concede_2` → "Conceded 2+", `clean_sheet` → "Clean sheet", `BTTS` → "Both teams scored", `Over_x_5` / `Under_x_5` → "Over / Under x.5 goals", `win` → "Won", `loss` → "Lost", `draw` → "Drew", `winless` → "Winless", `unbeaten` → "Unbeaten".
 - Current run: `streak`, shown only when > 0.
-- Exclude `halftime_win` (D80).
+- Exclude `halftime_win` (D80), `Over_4_5` and `Under_1_5` (D124: never qualified on the 13 Oct run). `draw` stays in Results.
+- Attack/defence stays one category with a corresponding pair across the teams (D124); a single record when only one side qualifies.
 - Empty states: both teams `n < 6` → one card "Too early for patterns" with "{n} of 6 matches played"; one team short → show the other, "Not enough matches · {n} of 6".
 
 ### 3.5 Goals outlook (`dixon_coles[]`)

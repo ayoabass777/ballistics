@@ -141,6 +141,11 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual([r["event"] for r in view["top_attack_defence"]], ["concede_1", "score_1goal"])
         self.assertNotIn("score_2goals", [r["event"] for r in view["also"] + view["see_all"]])
 
+    def test_dropped_lines_never_shown(self):
+        rows = [rec("home", "Over_4_5", 6, 6, 0.10), rec("home", "Under_1_5", 6, 6, 0.20)]
+        view = tp.select_view(rows)
+        self.assertEqual(sum(len(v) for v in view.values()), 0)
+
     def test_match_goals_use_engine_score(self):
         typical = rec("home", "Under_4_5", 6, 6, 0.90)                  # eligible, typical
         unusual = rec("home", "Over_2_5", 6, 6, 0.50, eligible=False)  # not eligible
