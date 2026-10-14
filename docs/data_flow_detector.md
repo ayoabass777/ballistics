@@ -253,3 +253,19 @@ Check types: `pipeline_task` (task succeeded in `pipeline_runs` for the logical 
 - Notifications: `etl/src/data_detector/notify.py` — Slack webhook and/or SMTP email from env (`ALERT_SLACK_WEBHOOK_URL`, `ALERT_EMAIL_TO`, `SMTP_*`); a recovery note when earlier failures clear. With no channel configured the alert is logged and the Airflow task still fails.
 
 Manual run: `python -m etl.src.data_detector.daily_flow 2026-10-13 [--no-notify]` (exit 1 when anything failed or is missing). When a table joins the daily chain, add it to `datasets.yml`.
+
+### Engine coverage (2026-10-14)
+
+`engine_predict` now carries the same `pipeline_run_*` callbacks as the ETL DAGs, so every engine task (Elo refresh, the three models, quorum, consensus, shortlist validation, forecast init/settle) is recorded in `pipeline_runs`. The registry tracks `engine.refresh_elo`, `raw.model_runs`, `raw.model_picks`, `raw.consensus_pool`, `raw.engine_runs`, `raw.match_analysis`, `engine.daily_shortlists` and `engine.forecast_settlement`. Engine table checks name their producing task(s): when rows are short and a producer failed, the dataset is `failed` with the task's error in the alert, not just `missing`.
+
+### Alert reference
+
+| Check | Severity | Fires when | Resolves when |
+|---|---|---|---|
+| `daily_flow` | error | A dataset in the registry failed or is missing for the day (root cause only; downstream marked blocked) | That dataset flows on a later check |
+| `raw_fixture_stale` | warning | Current seasons have unresolved past fixtures and `raw_fixtures` not updated in 26 h | Next update within the window |
+| `standings_stale` | warning | A current league has no standings update in 7 days | Standings refresh |
+| `s3_load_failed` | error | A landing file fails to load (bootstrap) and goes to the DLQ | Replay loads it |
+| `dlq_not_empty` | warning | DLQ still has entries after the replay DAG | DLQ empty |
+
+Only `daily_flow` sends notifications; the others are recorded in `data_quality_events` and surface in `mart_data_flow_health_summary`.

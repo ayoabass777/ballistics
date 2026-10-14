@@ -136,6 +136,9 @@ class PostgresFlowTests(unittest.TestCase):
             self.pipeline("fixture_update_dag", t, "success")
 
     def engine(self, models=3):
+        for t in ("refresh_elo", "verify_daily_shortlists", "settle_forecast_history",
+                  "model_mismatch", "model_bayesian", "model_dixon_coles", "consensus"):
+            self.pipeline("engine_predict", t, "success")
         cur = self.conn.cursor()
         for m in ("mismatch", "bayesian", "dixon_coles")[:models]:
             cur.execute("INSERT INTO raw.model_runs VALUES (%s, %s, 'ok')", (DS, m))
@@ -188,6 +191,36 @@ class PostgresFlowTests(unittest.TestCase):
         self.assertEqual(summary["events"]["resolved"], ["raw.match_analysis"])
         alert.assert_called_once()                                              # recovery note
         self.assertTrue(all(v == "ok" for v in self.statuses().values()))
+
+    def test_failed_engine_task_reports_failed_with_error(self):
+        self.full_etl()
+        for t in ("refresh_elo", "settle_forecast_history", "model_mismatch", "model_bayesian",
+                  "model_dixon_coles"):
+            self.pipeline("engine_predict", t, "success")
+        cur = self.conn.cursor()
+        for m in ("mismatch", "bayesian", "dixon_coles"):
+            cur.execute("INSERT INTO raw.model_runs VALUES (%s, %s, 'ok')", (DS, m))
+        cur.execute("INSERT INTO raw.model_picks VALUES (%s)", (DS,))
+        self.conn.commit()
+        self.pipeline("engine_predict", "consensus", "failed")
+        cur.execute("UPDATE data_detector.pipeline_runs SET error_message = 'KeyError: league_gap' "
+                    "WHERE task_id = 'consensus'")
+        self.conn.commit()
+        summary, alert = self.run_check()
+        st = self.statuses()
+        self.assertEqual(st["raw.consensus_pool"], "failed")          # not just "missing"
+        self.assertEqual(st["raw.engine_runs"], "blocked")
+        self.assertEqual(st["engine.daily_shortlists"], "blocked")
+        self.assertEqual(summary["failed_or_missing"], ["raw.consensus_pool"])
+        body = alert.call_args[0][1]
+        self.assertIn("KeyError: league_gap", body)
+        self.assertIn("engine_predict.consensus", body)
+
+    def test_engine_dag_not_run_is_missing_with_task_states(self):
+        self.full_etl()
+        summary, _ = self.run_check()
+        self.assertIn("engine.refresh_elo", summary["failed_or_missing"])
+        self.assertIn("raw.model_runs", summary["blocked"])
 
     def test_partial_models_is_missing(self):
         self.full_etl()

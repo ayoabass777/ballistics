@@ -10,7 +10,9 @@
 #   movement       data_detector.data_movements has a successful
 #                  `movement_type` from a `dag_id` run for ds
 #   run_ds_rows    `table` has >= min_rows rows where `column` = ds
-#                  (optional `where` SQL filter)
+#                  (optional `where` SQL filter). With `dag` + `task`/`tasks`,
+#                  a shortfall is reported as `failed` (with the task error)
+#                  when a producing task failed, else `missing`
 #   derived        no data of its own (e.g. an API view): ok when every
 #                  upstream is ok
 #
@@ -81,27 +83,37 @@ datasets:
     upstream: [dbt.run]
     check: {type: pipeline_task, dag: fixture_update_dag, task: run_dbt}
 
+  - id: engine.refresh_elo
+    layer: engine
+    description: Elo ratings rebuilt from fixture facts (feeds the Mismatch model)
+    producer: {dag: engine_predict, task: refresh_elo}
+    upstream: [raw.fact_fixtures]
+    check: {type: pipeline_task, dag: engine_predict, task: refresh_elo}
+
   - id: raw.model_runs
     layer: engine
     description: One readiness row per model (mismatch, bayesian, dixon_coles)
     producer: {dag: engine_predict, task: model_*}
-    upstream: [raw.fact_fixtures, raw.fact_head_to_head]
+    upstream: [engine.refresh_elo, raw.fact_fixtures, raw.fact_head_to_head]
     check: {type: run_ds_rows, table: raw.model_runs, column: run_ds,
-            where: "status IN ('ok', 'empty')", min_rows: 3}
+            where: "status IN ('ok', 'empty')", min_rows: 3,
+            dag: engine_predict, tasks: [model_mismatch, model_bayesian, model_dixon_coles]}
 
   - id: raw.model_picks
     layer: engine
     description: Model signals feeding consensus
     producer: {dag: engine_predict, task: model_*}
     upstream: [raw.model_runs]
-    check: {type: run_ds_rows, table: raw.model_picks, column: run_ds, min_rows: 1}
+    check: {type: run_ds_rows, table: raw.model_picks, column: run_ds, min_rows: 1,
+            dag: engine_predict, tasks: [model_mismatch, model_bayesian, model_dixon_coles]}
 
   - id: raw.consensus_pool
     layer: engine
     description: Ranked consensus pool for the day
     producer: {dag: engine_predict, task: consensus}
     upstream: [raw.model_picks]
-    check: {type: run_ds_rows, table: raw.consensus_pool, column: run_ds, min_rows: 1}
+    check: {type: run_ds_rows, table: raw.consensus_pool, column: run_ds, min_rows: 1,
+            dag: engine_predict, task: consensus}
 
   - id: raw.engine_runs
     layer: engine
@@ -109,14 +121,29 @@ datasets:
     producer: {dag: engine_predict, task: consensus}
     upstream: [raw.consensus_pool]
     check: {type: run_ds_rows, table: raw.engine_runs, column: run_ds,
-            where: "status = 'complete'", min_rows: 1}
+            where: "status = 'complete'", min_rows: 1, dag: engine_predict, task: consensus}
 
   - id: raw.match_analysis
     layer: engine
     description: Page-ready Strength, Patterns, Goals per fixture
     producer: {dag: engine_predict, task: consensus}
     upstream: [raw.engine_runs]
-    check: {type: run_ds_rows, table: raw.match_analysis, column: run_ds, min_rows: 1}
+    check: {type: run_ds_rows, table: raw.match_analysis, column: run_ds, min_rows: 1,
+            dag: engine_predict, task: consensus}
+
+  - id: engine.daily_shortlists
+    layer: engine
+    description: Validation of the day's curated shortlists (Discover)
+    producer: {dag: engine_predict, task: verify_daily_shortlists}
+    upstream: [raw.consensus_pool]
+    check: {type: pipeline_task, dag: engine_predict, task: verify_daily_shortlists}
+
+  - id: engine.forecast_settlement
+    layer: engine
+    description: Forecast record initialised and past forecasts settled
+    producer: {dag: engine_predict, task: settle_forecast_history}
+    upstream: [raw.fact_fixtures]
+    check: {type: pipeline_task, dag: engine_predict, task: settle_forecast_history}
 
   - id: api.match_page
     layer: api
