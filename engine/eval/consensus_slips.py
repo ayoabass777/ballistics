@@ -46,6 +46,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from engine.eval.team_patterns import attach_team_patterns
 from engine.eval.predict_upcoming import _tier
 from engine.eval.predict_mismatch import predict_mismatch, _market_label
 from engine.eval.predict_dixon_coles import predict_dixon_coles
@@ -2006,6 +2007,7 @@ def build_consensus_from_signals(signals: list[dict],
     analysis = _analysis_from_signals(signals, fixture_meta, fixture_strength_all,
                                       gate_status, bayesian_analysis)
     attach_league_comparisons(analysis, league_event_rates)
+    attach_team_patterns(analysis)  # contract §3.4, D122
     slips = _build_slips(ranked, target_odds, bankroll=bankroll)
     bounds_shortlist = _build_bounds_1_4_shortlist(
         ranked, end_date=shortlist_end_date)
@@ -2315,6 +2317,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
                      or v["dixon_coles"]]
     analysis_list.sort(key=lambda x: x.get("kickoff", ""))
     attach_league_comparisons(analysis_list, league_event_rates)
+    attach_team_patterns(analysis_list)  # contract §3.4, D122
 
     # ── Assemble slips ──────────────────────────────────────────────────
     slips = _build_slips(ranked, target_odds, bankroll=bankroll)
