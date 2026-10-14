@@ -13,7 +13,7 @@
 -- Team names are the provider's names from staging (dim names are initcap'd).
 
 with teams as (
-    select api_team_id, team_id
+    select api_team_id, team_id, logo_file_id
     from {{ ref('stg_dim_teams') }}
 ),
 
@@ -65,6 +65,9 @@ select
     rf.is_played,
     ht.team_id                      as home_team_id,
     at.team_id                      as away_team_id,
+    -- Crest image ids (S3 crests/teams/<id>); the API turns them into URLs.
+    ht.logo_file_id                 as home_logo_file_id,
+    at.logo_file_id                 as away_logo_file_id,
     rf.home_team_name,
     rf.away_team_name,
     rf.home_team_halftime_goal,

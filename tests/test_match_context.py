@@ -84,7 +84,8 @@ class FakeCursor:
 class BuildTests(unittest.TestCase):
     FX = {"fixture_id": 90863, "league_season_id": 7, "league_id": 3, "league_name": "Czech Liga",
           "country_name": "Czech-Republic", "kickoff_utc": datetime(2026, 10, 9, 16, tzinfo=timezone.utc),
-          "home_team_id": 1, "away_team_id": 2, "home_team_name": "Zlin", "away_team_name": "Slavia"}
+          "home_team_id": 1, "away_team_id": 2, "home_team_name": "Zlin", "away_team_name": "Slavia",
+          "home_logo_file_id": "u1", "away_logo_file_id": None}
 
     def test_payload(self):
         cur = FakeCursor([self.FX, [row(1, 16, 1), row(2, 1, 23)], H2HTests.GAMES])
@@ -93,6 +94,8 @@ class BuildTests(unittest.TestCase):
         self.assertEqual(p["h2h"]["meetings"], 5)
         self.assertEqual(cur.calls[2]["cutoff"], self.FX["kickoff_utc"])
         self.assertTrue(p["table"]["available"])
+        self.assertTrue(p["fixture"]["home_crest_url"].endswith("/crests/teams/u1"))
+        self.assertIsNone(p["fixture"]["away_crest_url"])
 
     def test_unknown_fixture(self):
         self.assertIsNone(mc.build_context(FakeCursor([None]), 1))

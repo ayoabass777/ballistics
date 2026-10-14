@@ -11,11 +11,14 @@ CLI (prints the payload for one fixture):
 import json
 import sys
 
+from engine.api.crests import crest_url
+
 H2H_LIMIT = 5
 
 FIXTURE_SQL = """
 SELECT fixture_id, league_season_id, league_id, league_name, country_name,
-       kickoff_utc, home_team_id, away_team_id, home_team_name, away_team_name
+       kickoff_utc, home_team_id, away_team_id, home_team_name, away_team_name,
+       home_logo_file_id, away_logo_file_id
 FROM raw.fact_fixtures WHERE fixture_id = %(fixture_id)s
 """
 
@@ -123,7 +126,9 @@ def build_context(cur, fixture_id):
                     "league": fx["league_name"], "country": fx["country_name"],
                     "kickoff_utc": _iso(fx["kickoff_utc"]),
                     "home": fx["home_team_name"], "away": fx["away_team_name"],
-                    "home_team_id": home_id, "away_team_id": away_id},
+                    "home_team_id": home_id, "away_team_id": away_id,
+                    "home_crest_url": crest_url("teams", fx.get("home_logo_file_id")),
+                    "away_crest_url": crest_url("teams", fx.get("away_logo_file_id"))},
         "standings_updated_at": _iso(rows[0]["standings_updated_at"]) if rows else None,
         "position": {"home": home_pos, "away": away_pos,
                      "points_gap": abs(home_pos["points"] - away_pos["points"]) if same_group else None},
