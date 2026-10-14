@@ -263,9 +263,11 @@ Manual run: `python -m etl.src.data_detector.daily_flow 2026-10-13 [--no-notify]
 | Check | Severity | Fires when | Resolves when |
 |---|---|---|---|
 | `daily_flow` | error | A dataset in the registry failed or is missing for the day (root cause only; downstream marked blocked) | That dataset flows on a later check |
+| `daily_flow` on `s3.crests.coverage` | warning | A team or league in the next 14 days of fixtures has no crest id (alert names up to 10) | Crests loaded for them |
+| `daily_flow` on `s3.crests.reachable` | error | A sample of 5 team + 2 league crest URLs does not answer 200 with an image (bucket policy changed, objects deleted, bucket renamed) | Sample loads again |
 | `raw_fixture_stale` | warning | Current seasons have unresolved past fixtures and `raw_fixtures` not updated in 26 h | Next update within the window |
 | `standings_stale` | warning | A current league has no standings update in 7 days | Standings refresh |
 | `s3_load_failed` | error | A landing file fails to load (bootstrap) and goes to the DLQ | Replay loads it |
 | `dlq_not_empty` | warning | DLQ still has entries after the replay DAG | DLQ empty |
 
-Only `daily_flow` sends notifications; the others are recorded in `data_quality_events` and surface in `mart_data_flow_health_summary`.
+Warnings are alerted but do not fail the `data_flow_check` task; errors do. Crest checks are current-state (not tied to the day) and do not block the match page, which falls back to initials. Only `daily_flow` sends notifications; the others are recorded in `data_quality_events` and surface in `mart_data_flow_health_summary`.

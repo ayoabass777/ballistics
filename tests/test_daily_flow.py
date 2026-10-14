@@ -102,6 +102,18 @@ class PostgresFlowTests(unittest.TestCase):
                     "DROP SCHEMA IF EXISTS raw_mart CASCADE; CREATE SCHEMA raw; CREATE SCHEMA raw_mart;")
         cur.execute((ROOT / "etl/sql/bootstrap_data_detector_schema.sql").read_text())
         cur.execute("""
+            CREATE SCHEMA IF NOT EXISTS dim;
+            DROP TABLE IF EXISTS dim.dim_teams, dim.dim_leagues;
+            CREATE TABLE dim.dim_teams (team_id int, logo_file_id uuid);
+            CREATE TABLE dim.dim_leagues (league_id int, league_name text, logo_file_id uuid);
+            INSERT INTO dim.dim_teams VALUES (1, gen_random_uuid()), (2, gen_random_uuid());
+            INSERT INTO dim.dim_leagues VALUES (9, 'Czech Liga', gen_random_uuid());
+            CREATE TABLE raw.fact_fixtures (kickoff_utc timestamptz, league_id int,
+                home_team_id int, home_team_name text, home_logo_file_id uuid,
+                away_team_id int, away_team_name text, away_logo_file_id uuid);
+            INSERT INTO raw.fact_fixtures
+              SELECT now() + interval '2 days', 9, 1, 'Pardubice', t1.logo_file_id, 2, 'Zlin', t2.logo_file_id
+              FROM dim.dim_teams t1, dim.dim_teams t2 WHERE t1.team_id = 1 AND t2.team_id = 2;
             CREATE TABLE raw.model_runs (run_ds date, model text, status text);
             CREATE TABLE raw.model_picks (run_ds date);
             CREATE TABLE raw.consensus_pool (run_ds date);
@@ -147,10 +159,42 @@ class PostgresFlowTests(unittest.TestCase):
         cur.execute("INSERT INTO raw.engine_runs VALUES (%s, 'complete')", (DS,))
         self.conn.commit()
 
-    def run_check(self):
-        with patch.object(notify, "send_alert", return_value=[]) as alert:
+    def run_check(self, crest_status=200):
+        class Resp:
+            status_code = crest_status
+            headers = {"Content-Type": "image/png" if crest_status == 200 else "application/xml"}
+        with patch.object(notify, "send_alert", return_value=[]) as alert, \
+                patch("requests.head", return_value=Resp()) as head:
             summary = flow.run(DS, conn=self.conn, registry=self.registry)
+        self.head_calls = head.call_args_list
         return summary, alert
+
+    def test_crest_gap_is_a_warning_not_a_failure(self):
+        self.full_etl()
+        self.engine()
+        cur = self.conn.cursor()
+        cur.execute("CREATE TABLE raw.match_analysis (run_ds date); INSERT INTO raw.match_analysis VALUES (%s);"
+                    "UPDATE raw.fact_fixtures SET away_logo_file_id = NULL", (DS,))
+        self.conn.commit()
+        summary, alert = self.run_check()
+        self.assertEqual(summary["failed_or_missing"], [])
+        self.assertEqual(summary["warnings"], ["s3.crests.coverage"])
+        self.assertEqual(self.statuses()["api.match_page"], "ok")      # initials, page unaffected
+        self.assertIn("team: Zlin", alert.call_args[0][1])
+        cur.execute("SELECT severity FROM data_detector.data_quality_events WHERE table_name = 'crests.coverage'")
+        self.assertEqual(cur.fetchone()[0], "warning")
+
+    def test_unreachable_crests_fail(self):
+        self.full_etl()
+        self.engine()
+        cur = self.conn.cursor()
+        cur.execute("CREATE TABLE raw.match_analysis (run_ds date); INSERT INTO raw.match_analysis VALUES (%s)", (DS,))
+        self.conn.commit()
+        summary, alert = self.run_check(crest_status=403)
+        self.assertEqual(summary["failed_or_missing"], ["s3.crests.reachable"])
+        self.assertEqual(len(self.head_calls), 3)                      # 2 teams + 1 league sampled
+        self.assertIn("/crests/teams/", self.head_calls[0][0][0])
+        self.assertIn("403", alert.call_args[0][1])
 
     def statuses(self):
         cur = self.conn.cursor()

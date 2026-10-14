@@ -13,6 +13,12 @@
 #                  (optional `where` SQL filter). With `dag` + `task`/`tasks`,
 #                  a shortfall is reported as `failed` (with the task error)
 #                  when a producing task failed, else `missing`
+#   sql_assert     current-state rule: `sql` returns (bad_count, sample);
+#                  ok when bad_count <= max_bad (default 0); independent of ds
+#   crest_urls     `sql` returns (kind, logo_file_id) rows; each public crest
+#                  URL must answer 200 with an image content type
+#   severity       optional on any check: error (default) or warning; sets the
+#                  quality event severity and marks the alert line
 #   derived        no data of its own (e.g. an API view): ok when every
 #                  upstream is ok
 #
@@ -144,6 +150,48 @@ datasets:
     producer: {dag: engine_predict, task: settle_forecast_history}
     upstream: [raw.fact_fixtures]
     check: {type: pipeline_task, dag: engine_predict, task: settle_forecast_history}
+
+  - id: s3.crests.coverage
+    layer: api
+    description: Every team and league in the next 14 days of fixtures has a crest id
+    producer: {dag: bootstrap_dag, task: extract_metadata}
+    upstream: [raw.fact_fixtures]
+    check:
+      type: sql_assert
+      severity: warning              # a missing crest shows initials; page still works
+      max_bad: 0
+      sql: |
+        WITH upcoming AS (
+          SELECT * FROM raw.fact_fixtures
+          WHERE kickoff_utc >= now() AND kickoff_utc < now() + interval '14 days'
+        ), missing AS (
+          SELECT DISTINCT 'team: ' || name AS item
+          FROM upcoming f
+          CROSS JOIN LATERAL (VALUES (home_team_id, home_team_name, home_logo_file_id),
+                                     (away_team_id, away_team_name, away_logo_file_id)) v(id, name, logo)
+          WHERE v.id IS NOT NULL AND v.logo IS NULL
+          UNION
+          SELECT DISTINCT 'league: ' || l.league_name
+          FROM upcoming f JOIN dim.dim_leagues l ON l.league_id = f.league_id
+          WHERE l.logo_file_id IS NULL
+        )
+        SELECT (SELECT count(*) FROM missing),
+               (SELECT string_agg(item, ', ') FROM (SELECT item FROM missing ORDER BY item LIMIT 10) s)
+
+  - id: s3.crests.reachable
+    layer: api
+    description: A sample of public crest URLs answers 200 with an image (bucket policy, objects present)
+    producer: {dag: bootstrap_dag, task: extract_metadata}
+    upstream: []                     # checked even when coverage has gaps
+    check:
+      type: crest_urls
+      severity: error
+      sql: |
+        (SELECT 'teams', logo_file_id::text FROM dim.dim_teams
+          WHERE logo_file_id IS NOT NULL ORDER BY random() LIMIT 5)
+        UNION ALL
+        (SELECT 'leagues', logo_file_id::text FROM dim.dim_leagues
+          WHERE logo_file_id IS NOT NULL ORDER BY random() LIMIT 2)
 
   - id: api.match_page
     layer: api

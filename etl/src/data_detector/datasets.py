@@ -21,7 +21,7 @@ from typing import Iterable
 import yaml
 
 REGISTRY_PATH = Path(__file__).with_name("datasets.yml")
-CHECK_TYPES = {"pipeline_task", "movement", "run_ds_rows", "derived"}
+CHECK_TYPES = {"pipeline_task", "movement", "run_ds_rows", "derived", "sql_assert", "crest_urls"}
 LAYERS = {"source", "raw", "dbt", "engine", "api"}
 
 DDL = """
@@ -123,6 +123,8 @@ def validate(raw: dict) -> list[str]:
             errors.append(f"{did}: pipeline_task needs dag and task")
         if check.get("type") == "movement" and not (check.get("dag") and check.get("movement_type")):
             errors.append(f"{did}: movement needs dag and movement_type")
+        if check.get("type") in ("sql_assert", "crest_urls") and not check.get("sql"):
+            errors.append(f"{did}: {check.get('type')} needs sql")
         if check.get("type") == "run_ds_rows" and not (check.get("table") and check.get("column")):
             errors.append(f"{did}: run_ds_rows needs table and column")
         for up in d.get("upstream") or []:
