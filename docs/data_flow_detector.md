@@ -232,3 +232,24 @@ The movement, snapshot, and quality contracts are documented in:
 - If content fingerprinting is added, store it in `data_detector.table_snapshots` and compute it in `etl/src/data_detector/table_snapshots.py`.
 - Build dashboards/API endpoints on top of `mart_data_flow_health_summary` and the four detail marts before adding Kafka.
 - Consider Kafka only when the project needs event replay, async consumers, external monitoring, or fan-out beyond Postgres-backed operational analytics.
+
+## Daily Flow Check And Dataset Tracker (2026-10-14)
+
+The tables above record what each task did. The daily flow check answers the end-to-end question: **for each day, did data reach every dataset in the chain, and if not, where did it stop?**
+
+**Dataset tracker** — `etl/src/data_detector/datasets.yml` is the registry of every dataset in the daily chain (API → S3 → raw → dbt → engine → match page): layer, producer DAG/task, upstream datasets and the rule that decides it arrived for a day. It is validated (known upstreams, no cycles, complete check specs) and synced on every check into `data_detector.datasets` and `data_detector.dataset_dependencies`, so lineage is queryable in SQL. CLI:
+
+```text
+python -m etl.src.data_detector.datasets validate
+python -m etl.src.data_detector.datasets lineage raw.consensus_pool
+```
+
+Check types: `pipeline_task` (task succeeded in `pipeline_runs` for the logical date in `metadata.logical_date`), `movement` (a successful `data_movements` row of that type from that day's DAG run), `run_ds_rows` (table has rows for `run_ds`, optional filter) and `derived` (ok when every upstream is ok; used for the API page).
+
+**Daily flow check** — `etl/src/data_detector/daily_flow.py`, scheduled by `airflow/dags/data_flow_check_dag.py` at 09:00 UTC for the same logical date as the 00:00 UTC pipeline runs. Each dataset is `ok`, `failed`, `missing` or `blocked`; a dataset that is not ok because something upstream is not ok is `blocked` and blamed on the furthest-upstream root, so one dbt failure produces one alert, not ten.
+
+- History: `data_detector.daily_flow_checks` (one row per day and dataset).
+- Alerts: one open `daily_flow` quality event per root failure (no duplicates on rerun), resolved automatically when that dataset flows again.
+- Notifications: `etl/src/data_detector/notify.py` — Slack webhook and/or SMTP email from env (`ALERT_SLACK_WEBHOOK_URL`, `ALERT_EMAIL_TO`, `SMTP_*`); a recovery note when earlier failures clear. With no channel configured the alert is logged and the Airflow task still fails.
+
+Manual run: `python -m etl.src.data_detector.daily_flow 2026-10-13 [--no-notify]` (exit 1 when anything failed or is missing). When a table joins the daily chain, add it to `datasets.yml`.

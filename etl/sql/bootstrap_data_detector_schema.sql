@@ -109,3 +109,32 @@ CREATE INDEX IF NOT EXISTS data_detector_quality_events_severity_idx
 
 CREATE INDEX IF NOT EXISTS data_detector_quality_events_table_idx
   ON data_detector.data_quality_events (table_schema, table_name, detected_at DESC);
+
+-- Dataset tracker (etl/src/data_detector/datasets.py; synced from datasets.yml)
+CREATE TABLE IF NOT EXISTS data_detector.datasets (
+  dataset_id    TEXT        PRIMARY KEY,
+  layer         TEXT        NOT NULL,
+  description   TEXT,
+  producer_dag  TEXT,
+  producer_task TEXT,
+  check_spec    JSONB       NOT NULL,
+  synced_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS data_detector.dataset_dependencies (
+  dataset_id    TEXT        NOT NULL REFERENCES data_detector.datasets(dataset_id) ON DELETE CASCADE,
+  upstream_id   TEXT        NOT NULL REFERENCES data_detector.datasets(dataset_id) ON DELETE CASCADE,
+  PRIMARY KEY (dataset_id, upstream_id)
+);
+
+-- Daily flow history (etl/src/data_detector/daily_flow.py)
+CREATE TABLE IF NOT EXISTS data_detector.daily_flow_checks (
+  check_date   DATE        NOT NULL,
+  dataset_id   TEXT        NOT NULL,
+  layer        TEXT        NOT NULL,
+  status       TEXT        NOT NULL,       -- ok | failed | missing | blocked
+  blocked_by   TEXT[]      NOT NULL DEFAULT '{}',
+  details      JSONB       NOT NULL DEFAULT '{}'::jsonb,
+  checked_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (check_date, dataset_id)
+);
