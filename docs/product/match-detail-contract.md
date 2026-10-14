@@ -18,23 +18,31 @@ Status: **proposal for the frontend build** (2026-10-07; sources and IDs updated
 
 One page = one `fixture_id`. Every value on the page must come from **one engine run** (`run_ds`) plus **one standings/H2H snapshot** (`standings_updated_at`). Both dates are shown on the page.
 
-## 2. Payload (proposed `GET /api/match/{fixture_id}`)
+## 2. Payload — `GET /api/match/{fixture_id}` (built 2026-10-14, `engine/api/match_detail.py`)
 
 ```jsonc
 {
-  "fixture": { "fixture_id": 90863, "home": "Zlin", "away": "Slavia Praha",
-               "home_team_id": "<team_id>", "away_team_id": "<team_id>",   // warehouse ids (in export since 2026-10-11)
-               "home_crest_url": "https://<assets>/crests/teams/<uuid>", "away_crest_url": null,   // null = initials
-               "league": "Czech Liga", "country": "Czech-Republic", "league_id": "<league_id>",
-               "kickoff_utc": "2026-10-09T16:00:00Z", "run_ds": "2026-10-07",
-               "standings_updated_at": "2026-10-05T00:09:10Z" },
-  "entry":    { "from": "discover|standouts|matches|saved", "section": "strength|goals|patterns|null",
-                "highlight": { "section": "patterns", "team": "Zlin", "event": "loss" },
-                "why": "Slavia Praha · Big dog, #1 on today's strength shortlist" },   // only when from Discover/standouts
-  "context":  { ... }, "strength": { ... }, "patterns": { ... }, "goals": { ... },
-  "user":     { "saved": false, "league_followed": true, "venue_view": "home_away|all" }
+  "fixture":  { "fixture_id": 90876, "home": "Pardubice", "away": "Zlin",
+                "home_team_id": 26815, "away_team_id": 26802, "league_id": 233,     // warehouse ids
+                "home_crest_url": "https://<assets>/crests/teams/<uuid>", "away_crest_url": null,  // null = initials
+                "league": "Czech Liga", "country": "Czech-Republic", "kickoff_utc": "2026-10-17T13:00:00+00:00",
+                "run_ds": "2026-10-13",                       // engine run behind Strength/Patterns/Goals; null if not in run
+                "standings_updated_at": "2026-10-12T00:00:00Z" },   // DB snapshot behind Context (D69)
+  "context":  { "position": {...}, "table": {...}, "h2h": {...},      // as /context (§3.2)
+                "form": { "home_team": {"overall": {...}, "home": {...}, "away": {...}}, "away_team": {...} } },
+                // form rows: attack_rate, defense_rate, attack_rank, defense_rank, league_size only
+  "strength": { "state": "big_dog", "favourite": "AEK Athens FC", "underdog": "Atromitos" },  // §3.3
+  "patterns": { "default_view": "all", "venue": null, "all": { "top_results": [], "top_attack_defence": [], "also": [], "see_all": [] } },  // §3.4
+  "goals":    { "rows": [ {"market": "Match Goals 1-4", "probability": 0.8, "league_rate": 0.85,
+                           "league_rate_context": "all", "league_comparison": "typical"} ],
+                "nothing_stands_out": false },                                         // §3.5; null = hide card
+  "discover": { "list": "patterns", "team": "Zlin", "event": "loss" }   // entry highlight / "Why it's here"; null if not on Discover
 }
 ```
+
+- Context comes from the database on every request; Strength, Patterns, Goals and `context.form` from the latest export (`ENGINE_EXPORT_DIR`, default `engine/eval`, newest `consensus_slips_<date>.json`, re-read when the file changes).
+- A fixture not in the latest run returns Context with the engine sections null. A missing or unreadable export never fails the request.
+- Not in the payload (D61, D115): rating gaps, posteriors, calibration values, shrunk/percentile rates, Big dog counts, Discover scores. `entry` (where the user came from) and `user` (saved, followed, venue preference) are frontend/account state, not served here.
 
 ## 3. Sections
 
@@ -72,14 +80,14 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 **League table page**: rows of the team's current group from `mart_league_standings` (`rank`, `team_name`, `games_played`, `goal_diff`, `points`); both teams highlighted; `group_name` as the table title when `n_groups > 1`, with the other groups as tabs; "This match" card with position, points, W/D/L (`wins`/`draws`/`losses`), GD and points gap (gap only when both teams share a group). `description` (e.g. "Promotion - Champions League") can mark zone rows.
 
 ### 3.3 Strength
-| State | Condition | Shown |
+| `state` | Condition | Shown |
 |---|---|---|
-| Big dog | fixture in `elo_gap_shortlist[]` (league `status: in` in `big_dog_leagues[]`) | `favourite` · Big dog, `underdog` · Underdog; league record from `league_big_dog_won` / `league_big_dog_matches` (win %, drew/lost from `elo_gap_group.by_league[]` `drew`/`lost`, lower bound `win_rate_low`) |
-| Label off for league | `mismatch[0].gap` > 250 but league `status: out` | "No Big dog label" + why + league record from `by_league[]` (`won`/`matches`, `win_rate_low` vs 60%) |
-| Close ratings | gap ≤ 250 | "No Big dog label" — ratings are close |
-| No rating | no `mismatch` rows | Card hidden |
+| `big_dog` | fixture in `elo_gap_shortlist[]` | `favourite` · Big dog, `underdog` · Underdog; "Big dogs usually win in this league" (no counts, owner 2026-10-12) |
+| `no_label` | rating gap > 250, league not in Big dog list | "No Big dog label" + `reason`: `top_flight_only`, `not_enough_matches` or `unpredictable` |
+| `close` | gap ≤ 250, or no rating rows (the engine writes them only for gaps ≥ 100) | "No Big dog label" — ratings are close |
+| null | no team data | Card hidden |
 
-Never show the rating gap number or a win percentage (D61).
+Never show the rating gap number, a win percentage or league counts (D61). 13 Oct run: close 561, big_dog 26, no_label 5.
 
 ### 3.4 Team patterns (`bayesian[]`)
 
@@ -143,7 +151,7 @@ Rules below are current as of 2026-10-14 (D122). Category intent and examples: [
 5. **Crests** — decided 2026-10-13: store our own copies in S3 (not a provider proxy). `etl/src/update_logos.py` (ported from football_stats_project) fetches from the API-Sports media CDN by provider id (no API quota) and writes `crests/<kind>/<uuid>` with Content-Type, no extension; only rows without a `logo_file_id` are fetched. The old project's disk files were not reused (their UUIDs only mapped to teams in the old database). `fact_fixtures` carries `home/away_logo_file_id`; `/context` returns `home/away_crest_url` (`engine/api/crests.py`). `CREST_BASE_URL` can point at a CDN later without a payload change. Apply: `scripts/apply_crests_s3.sh`. Pending: first run and coverage numbers.
 6. ~~H2H stats~~ — computed on read (see 8) from the meeting list; no stored table. Fine for 5 rows; cutoff `kickoff_utc < export cutoff`.
 7. **One snapshot rule** — standings/H2H are a current DB snapshot, not point-in-time with the forecast (D69); page must show both dates.
-8. **API** — partly done 2026-10-12: `GET /api/match/{fixture_id}/context` (`engine/api/match_context.py`) serves position, full table groups and H2H (tally, stats at 3+ meetings) from the dbt models above; H2H cutoff is the fixture kickoff. CLI: `python -m engine.api.match_context <fixture_id>`. Strength, Patterns and Goals still come from the export only.
+8. ~~API~~ — done 2026-10-14: `GET /api/match/{fixture_id}` (§2) combines `/context` with the latest export. CLI: `python -m engine.api.match_detail <fixture_id>`. `/context` stays for Context-only refreshes.
 
 ## 7. Worked example — Zlin v Slavia Praha (90863), run 2026-10-07
 - Context (Home/Away): Zlin 0.40 / 1.80, #16 / #13 of 16; Slavia 2.50 / 0.25, #1 / #1. All venues: Zlin 0.89 / 2.11, #12 / #16; Slavia 2.78 / 0.67, #1 / #2. Position 16th 1 pt vs 1st 23 pts (snapshot 2026-10-05).
