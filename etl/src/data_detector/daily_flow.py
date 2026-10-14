@@ -100,18 +100,42 @@ def check_movement(cur, spec: dict, ds: date) -> dict:
     return {"status": "failed", "details": {"movements": len(rows)}}
 
 
+def _producer_tasks(spec: dict) -> list[str]:
+    if spec.get("tasks"):
+        return list(spec["tasks"])
+    return [spec["task"]] if spec.get("task") else []
+
+
+def _explain_shortfall(cur, spec: dict, ds: date, details: dict) -> dict:
+    """Rows are short: if a producing task failed, say so (failed beats missing)."""
+    tasks = _producer_tasks(spec)
+    if not tasks or not spec.get("dag"):
+        return {"status": "missing", "details": details}
+    failed, states = [], {}
+    for task_id in tasks:
+        cur.execute(PIPELINE_SQL, (spec["dag"], task_id, ds))
+        row = cur.fetchone()
+        states[task_id] = row[0] if row else "not run"
+        if row and row[0] in ("failed", "upstream_failed"):
+            failed.append({"task": task_id, "error": (row[2] or "")[:300]})
+    details = {**details, "tasks": states}
+    if failed:
+        return {"status": "failed", "details": {**details, "failed_tasks": failed}}
+    return {"status": "missing", "details": details}
+
+
 def check_run_ds_rows(cur, spec: dict, ds: date) -> dict:
     table, column = _ident(spec["table"]), _ident(spec["column"])
     cur.execute("SELECT to_regclass(%s) IS NOT NULL", (table,))
     if not cur.fetchone()[0]:
-        return {"status": "missing", "details": {"reason": f"{table} does not exist"}}
+        return _explain_shortfall(cur, spec, ds, {"reason": f"{table} does not exist"})
     where = f" AND ({spec['where']})" if spec.get("where") else ""
     cur.execute(f"SELECT count(*) FROM {table} WHERE {column} = %s{where}", (ds,))
     n = cur.fetchone()[0]
     need = int(spec.get("min_rows", 1))
     if n >= need:
         return {"status": "ok", "details": {"rows": n}}
-    return {"status": "missing", "details": {"rows": n, "min_rows": need}}
+    return _explain_shortfall(cur, spec, ds, {"rows": n, "min_rows": need})
 
 
 CHECKS = {"pipeline_task": check_pipeline_task, "movement": check_movement,

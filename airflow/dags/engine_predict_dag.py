@@ -30,6 +30,13 @@ from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.providers.docker.operators.docker import DockerOperator
 from docker.types import Mount
 
+from etl.src.data_detector import (
+    pipeline_run_failed,
+    pipeline_run_skipped,
+    pipeline_run_started,
+    pipeline_run_succeeded,
+)
+
 # Poisson GLM retired 2026-10-11 (not used by the product; slips retired).
 MODELS = ("mismatch", "bayesian", "dixon_coles")
 QUORUM = 2                          # proceed once this many models are ready
@@ -72,6 +79,13 @@ default_args = {
     "start_date": datetime(2025, 4, 20),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
+    # Data detector: every task's start/success/failure lands in
+    # data_detector.pipeline_runs (best effort; never fails a task), so the
+    # daily flow check can tell a failed engine task from data that never came.
+    "on_execute_callback": pipeline_run_started,
+    "on_success_callback": pipeline_run_succeeded,
+    "on_failure_callback": pipeline_run_failed,
+    "on_skipped_callback": pipeline_run_skipped,
 }
 
 
