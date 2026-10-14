@@ -138,8 +138,59 @@ def check_run_ds_rows(cur, spec: dict, ds: date) -> dict:
     return _explain_shortfall(cur, spec, ds, {"rows": n, "min_rows": need})
 
 
+def check_sql_assert(cur, spec: dict, ds: date) -> dict:
+    """Registry SQL returns (bad_count, sample); ok when bad_count <= max_bad.
+
+    For current-state checks (e.g. crest coverage) that do not depend on ds.
+    The SQL comes from the reviewed registry file, never from user input.
+    """
+    cur.execute(spec["sql"])
+    bad, sample = cur.fetchone()
+    bad = int(bad or 0)
+    details = {"bad": bad}
+    if sample:
+        details["sample"] = sample
+    if bad <= int(spec.get("max_bad", 0)):
+        return {"status": "ok", "details": details}
+    return {"status": "failed", "details": details}
+
+
+def crest_base_url() -> str:
+    import os
+    explicit = os.getenv("CREST_BASE_URL")
+    if explicit:
+        return explicit.rstrip("/")
+    bucket = os.getenv("ASSETS_BUCKET", "ballistics-assets")
+    region = os.getenv("AWS_DEFAULT_REGION", "ca-central-1")
+    return f"https://{bucket}.s3.{region}.amazonaws.com"
+
+
+def check_crest_urls(cur, spec: dict, ds: date) -> dict:
+    """HEAD a sample of public crest URLs: each must answer 200 with an image."""
+    import requests
+    cur.execute(spec["sql"])                       # returns (kind, logo_file_id) rows
+    rows = cur.fetchall()
+    if not rows:
+        return {"status": "missing", "details": {"reason": "no crests to sample"}}
+    base, broken = crest_base_url(), []
+    for kind, file_id in rows:
+        url = f"{base}/crests/{kind}/{file_id}"
+        try:
+            r = requests.head(url, timeout=10)
+            ctype = r.headers.get("Content-Type", "")
+            if r.status_code != 200 or not ctype.startswith("image/"):
+                broken.append(f"{kind}/{file_id}: {r.status_code} {ctype}".strip())
+        except requests.RequestException as exc:
+            broken.append(f"{kind}/{file_id}: {type(exc).__name__}")
+    details = {"sampled": len(rows), "base_url": base}
+    if broken:
+        return {"status": "failed", "details": {**details, "broken": broken[:5]}}
+    return {"status": "ok", "details": details}
+
+
 CHECKS = {"pipeline_task": check_pipeline_task, "movement": check_movement,
-          "run_ds_rows": check_run_ds_rows}
+          "run_ds_rows": check_run_ds_rows, "sql_assert": check_sql_assert,
+          "crest_urls": check_crest_urls}
 
 
 def evaluate(cur, registry: Registry, ds: date) -> dict[str, dict]:
@@ -214,8 +265,9 @@ def sync_events(cur, ds: date, results: dict[str, dict], registry: Registry) -> 
         cur.execute(
             """INSERT INTO data_detector.data_quality_events
                    (dag_id, task_id, severity, check_name, table_schema, table_name, status, details, error_message)
-               VALUES (%s, %s, 'error', %s, %s, %s, 'open', %s, %s)""",
-            (registry[dataset_id].producer_dag, registry[dataset_id].producer_task, CHECK_NAME,
+               VALUES (%s, %s, %s, %s, %s, %s, 'open', %s, %s)""",
+            (registry[dataset_id].producer_dag, registry[dataset_id].producer_task,
+             registry[dataset_id].check.get("severity", "error"), CHECK_NAME,
              schema, name,
              json.dumps({"check_date": str(ds), "status": r["status"], **r["details"],
                          "blocks": registry.downstream(dataset_id)}, default=str),
@@ -247,7 +299,8 @@ def format_alert(ds: date, results: dict[str, dict], registry: Registry) -> tupl
     for dataset_id in bad:
         r, d = results[dataset_id], registry[dataset_id]
         producer = f"{d.producer_dag}.{d.producer_task}" if d.producer_dag else "-"
-        lines.append(f"✗ {dataset_id} — {r['status']} (producer {producer})")
+        mark = "!" if d.check.get("severity") == "warning" else "✗"
+        lines.append(f"{mark} {dataset_id} — {r['status']} (producer {producer})")
         for key, value in r["details"].items():
             lines.append(f"    {key}: {value}")
         downstream = [x for x in registry.downstream(dataset_id) if results[x]["status"] == "blocked"]
@@ -279,6 +332,8 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
         if own:
             conn.close()
     bad = roots(results)
+    warnings = [d for d in bad if registry[d].check.get("severity") == "warning"]
+    errors = [d for d in bad if d not in warnings]
     sent: list[str] = []
     if notify and bad:
         sent = send_alert(*format_alert(ds, results, registry))
@@ -286,7 +341,8 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
         sent = send_alert(f"Ballistics data flow {ds}: recovered",
                           "Flowing again: " + ", ".join(events["resolved"]))
     summary = {"check_date": str(ds), "ok": sum(v["status"] == "ok" for v in results.values()),
-               "failed_or_missing": bad,
+               "failed_or_missing": errors,          # fails the Airflow task
+               "warnings": warnings,                 # alerted, does not fail the task
                "blocked": [k for k, v in results.items() if v["status"] == "blocked"],
                "events": events, "alert_channels": sent}
     print(json.dumps(summary, indent=2))
