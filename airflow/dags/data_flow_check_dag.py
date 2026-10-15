@@ -43,6 +43,20 @@ def check_date(context, now=None):
     return (now - timedelta(hours=9)).date() - timedelta(days=1)
 
 
+def airflow_task_state(dag_id: str, task_id: str, ds: date):
+    """Airflow's own state for a @daily task on logical date ds (None if no run).
+
+    Fallback for the detector: tasks that ran before their pipeline_run_*
+    callbacks were deployed, or whose callback failed, still count."""
+    from airflow.models import DagRun
+    logical = datetime(ds.year, ds.month, ds.day, tzinfo=timezone.utc)
+    runs = DagRun.find(dag_id=dag_id, execution_date=logical)
+    if not runs:
+        return None
+    ti = runs[0].get_task_instance(task_id)
+    return ti.state if ti is not None else None
+
+
 @dag(
     dag_id="data_flow_check",
     default_args=default_args,
@@ -58,7 +72,7 @@ def data_flow_check_dag():
     def check_daily_flow(**context) -> dict:
         from etl.src.data_detector.daily_flow import run
         ds = check_date(context)
-        summary = run(ds)
+        summary = run(ds, task_state=airflow_task_state)
         if summary["failed_or_missing"]:
             raise AirflowException(
                 f"Data did not flow for {ds}: {', '.join(summary['failed_or_missing'])}")
