@@ -19,8 +19,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
-from datetime import date
+from datetime import date, timedelta
 from typing import Any
 
 from etl.src.data_detector.common import logger
@@ -311,8 +312,72 @@ def format_alert(ds: date, results: dict[str, dict], registry: Registry) -> tupl
     return subject, "\n".join(lines)
 
 
+METRIC_SQL = {
+    "match_pages": ("SELECT n_fixtures, to_char(COALESCE(generated_at, finished_at) AT TIME ZONE 'UTC', "
+                    "'Dy HH24:MI \"UTC\"') FROM raw.engine_runs WHERE run_ds = %s AND status = 'complete'"),
+    "pool_rows": "SELECT count(*), NULL FROM raw.consensus_pool WHERE run_ds = %s",
+    "crest_coverage": """
+        SELECT count(*) FILTER (WHERE logo IS NOT NULL), count(*) FROM (
+          SELECT DISTINCT v.id, v.logo FROM raw.fact_fixtures f
+          CROSS JOIN LATERAL (VALUES (home_team_id, home_logo_file_id),
+                                     (away_team_id, away_logo_file_id)) v(id, logo)
+          WHERE v.id IS NOT NULL
+            AND f.kickoff_utc >= now() AND f.kickoff_utc < now() + interval '14 days') t""",
+}
+
+
+def collect_metrics(cur, ds: date, results: dict[str, dict]) -> dict:
+    """Headline numbers for the daily report. A missing table just leaves a dash."""
+    metrics: dict = {"fixtures_loaded": (results.get("raw.raw_fixtures") or {}).get("details", {}).get("rows")}
+    for key, sql in METRIC_SQL.items():
+        cur.execute("SAVEPOINT flow_metric")
+        try:
+            cur.execute(sql, (ds,) if "%s" in sql else None)
+            row = cur.fetchone()
+            cur.execute("RELEASE SAVEPOINT flow_metric")
+        except Exception as exc:
+            cur.execute("ROLLBACK TO SAVEPOINT flow_metric")
+            logger.warning("daily_flow metric %s unavailable: %s", key, exc)
+            continue
+        if not row:
+            continue
+        if key == "match_pages":
+            metrics["match_pages"], metrics["engine_built"] = row[0], (f"built {row[1]}" if row[1] else "")
+        elif key == "crest_coverage":
+            metrics["crest_coverage"] = (row[0], row[1]) if row[1] else None
+        else:
+            metrics[key] = row[0]
+    return metrics
+
+
+def collect_history(cur, ds: date, days: int = 7) -> list[dict]:
+    """Worst status per day for the last `days` days ending at ds (oldest first)."""
+    cur.execute(
+        """SELECT c.check_date,
+                  CASE WHEN bool_or(c.status IN ('failed', 'missing')
+                                    AND coalesce(d.check_spec->>'severity', 'error') <> 'warning') THEN 'failed'
+                       WHEN bool_or(c.status IN ('failed', 'missing')) THEN 'warning'
+                       WHEN bool_or(c.status = 'blocked') THEN 'blocked'
+                       ELSE 'ok' END
+           FROM data_detector.daily_flow_checks c
+           LEFT JOIN data_detector.datasets d USING (dataset_id)
+           WHERE c.check_date > %s::date - %s AND c.check_date <= %s
+           GROUP BY c.check_date""", (ds, days, ds))
+    by_day = {r[0]: r[1] for r in cur.fetchall()}
+    out = []
+    for i in range(days - 1, -1, -1):
+        day = ds - timedelta(days=i)
+        out.append({"date": day, "label": day.strftime("%a %d"), "status": by_day.get(day, "none")})
+    return out
+
+
+def daily_report_enabled() -> bool:
+    return os.getenv("ALERT_DAILY_REPORT", "true").strip().lower() not in ("0", "false", "no", "off")
+
+
 def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool = True) -> dict:
     """Check one day end to end. Returns the summary; raises nothing on data problems."""
+    from etl.src.data_detector.email_templates import render
     from etl.src.data_detector.notify import send_alert
     registry = registry or load_registry()
     own = conn is None
@@ -328,6 +393,10 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
             save_results(cur, ds, results)
             events = sync_events(cur, ds, results, registry)
         conn.commit()
+        with conn.cursor() as cur:
+            metrics = collect_metrics(cur, ds, results)
+            history = collect_history(cur, ds)
+        conn.rollback()
     finally:
         if own:
             conn.close()
@@ -335,17 +404,17 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
     warnings = [d for d in bad if registry[d].check.get("severity") == "warning"]
     errors = [d for d in bad if d not in warnings]
     sent: list[str] = []
-    if notify and bad:
-        sent = send_alert(*format_alert(ds, results, registry))
-    elif notify and events["resolved"]:
-        sent = send_alert(f"Ballistics data flow {ds}: recovered",
-                          "Flowing again: " + ", ".join(events["resolved"]))
+    # Problems and recoveries always send; a clean day sends only with the daily report on.
+    if notify and (bad or events["resolved"] or daily_report_enabled()):
+        subject, text, html = render(ds, results, registry, metrics=metrics, history=history,
+                                     resolved=events["resolved"])
+        sent = send_alert(subject, text, html=html)
     summary = {"check_date": str(ds), "ok": sum(v["status"] == "ok" for v in results.values()),
                "failed_or_missing": errors,          # fails the Airflow task
                "warnings": warnings,                 # alerted, does not fail the task
                "blocked": [k for k, v in results.items() if v["status"] == "blocked"],
-               "events": events, "alert_channels": sent}
-    print(json.dumps(summary, indent=2))
+               "events": events, "metrics": metrics, "alert_channels": sent}
+    print(json.dumps(summary, indent=2, default=str))
     return summary
 
 

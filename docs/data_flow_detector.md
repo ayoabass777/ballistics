@@ -251,6 +251,7 @@ Check types: `pipeline_task` (task succeeded in `pipeline_runs` for the logical 
 - History: `data_detector.daily_flow_checks` (one row per day and dataset).
 - Alerts: one open `daily_flow` quality event per root failure (no duplicates on rerun), resolved automatically when that dataset flows again.
 - Notifications: `etl/src/data_detector/notify.py` — Slack webhook and/or SMTP email from env (`ALERT_SLACK_WEBHOOK_URL`, `ALERT_EMAIL_TO`, `SMTP_*`); a recovery note when earlier failures clear. With no channel configured the alert is logged and the Airflow task still fails.
+- Daily report email: `etl/src/data_detector/email_templates.py` renders one email per day after the 09:00 UTC check (HTML with a plain-text fallback; Slack gets the text). The subject and header follow the day's state — all clear, warnings, failed, recovered — and failures lead the body with the producer, the error and what they block. Below that: datasets ok, fixtures loaded (`s3_to_raw` rows), match pages (`raw.engine_runs.n_fixtures`), consensus pool rows, per-layer status, a 7-day strip from `daily_flow_checks` and upcoming crest coverage. `ALERT_DAILY_REPORT=false` keeps clean days silent; failures, warnings and recoveries always send.
 
 Manual run: `python -m etl.src.data_detector.daily_flow 2026-10-13 [--no-notify]` (exit 1 when anything failed or is missing). When a table joins the daily chain, add it to `datasets.yml`.
 
