@@ -75,19 +75,26 @@ def _ident(name: str) -> str:
     return name
 
 
-def check_pipeline_task(cur, spec: dict, ds: date) -> dict:
+def check_pipeline_task(cur, spec: dict, ds: date, task_state=None) -> dict:
+    """Task state from data_detector.pipeline_runs; when the detector has no
+    record (callback missed or not yet deployed), ask Airflow via task_state."""
     cur.execute(PIPELINE_SQL, (spec["dag"], spec["task"], ds))
     row = cur.fetchone()
+    source = {}
+    if row is None and task_state is not None:
+        state = task_state(spec["dag"], spec["task"], ds)
+        if state:
+            row, source = (state, None, None), {"source": "airflow (no detector record)"}
     if row is None:
         return {"status": "missing", "details": {"reason": "task did not run for this day"}}
     status, finished_at, error = row
     if status == "success":
-        return {"status": "ok", "details": {"finished_at": str(finished_at)}}
+        return {"status": "ok", "details": {**({"finished_at": str(finished_at)} if finished_at else {}), **source}}
     if status == "skipped":
-        return {"status": "ok", "details": {"note": "task skipped by the DAG"}}
+        return {"status": "ok", "details": {"note": "task skipped by the DAG", **source}}
     if status in ("failed", "upstream_failed"):
-        return {"status": "failed", "details": {"error": (error or "")[:300]}}
-    return {"status": "missing", "details": {"reason": f"task state {status}"}}
+        return {"status": "failed", "details": {"error": (error or "")[:300], **source}}
+    return {"status": "missing", "details": {"reason": f"task state {status}", **source}}
 
 
 def check_movement(cur, spec: dict, ds: date) -> dict:
@@ -194,7 +201,7 @@ CHECKS = {"pipeline_task": check_pipeline_task, "movement": check_movement,
           "crest_urls": check_crest_urls}
 
 
-def evaluate(cur, registry: Registry, ds: date) -> dict[str, dict]:
+def evaluate(cur, registry: Registry, ds: date, task_state=None) -> dict[str, dict]:
     """Status per dataset for ds, with blame pushed to the furthest-upstream root."""
     results: dict[str, dict] = {}
     for dataset_id in registry.topological():
@@ -205,7 +212,10 @@ def evaluate(cur, registry: Registry, ds: date) -> dict[str, dict]:
         else:
             cur.execute("SAVEPOINT flow_check")
             try:
-                res = CHECKS[kind](cur, d.check, ds)
+                if kind == "pipeline_task":
+                    res = check_pipeline_task(cur, d.check, ds, task_state)
+                else:
+                    res = CHECKS[kind](cur, d.check, ds)
                 cur.execute("RELEASE SAVEPOINT flow_check")
             except Exception as exc:          # a broken check is a finding, not a crash
                 cur.execute("ROLLBACK TO SAVEPOINT flow_check")
@@ -375,8 +385,12 @@ def daily_report_enabled() -> bool:
     return os.getenv("ALERT_DAILY_REPORT", "true").strip().lower() not in ("0", "false", "no", "off")
 
 
-def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool = True) -> dict:
-    """Check one day end to end. Returns the summary; raises nothing on data problems."""
+def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool = True,
+        task_state=None) -> dict:
+    """Check one day end to end. Returns the summary; raises nothing on data problems.
+
+    task_state(dag_id, task_id, ds) -> state | None: fallback for pipeline_task
+    checks when pipeline_runs has no row (the DAG passes Airflow's own state)."""
     from etl.src.data_detector.email_templates import render
     from etl.src.data_detector.notify import send_alert
     registry = registry or load_registry()
@@ -387,7 +401,7 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
     try:
         sync_registry(conn, registry)
         with conn.cursor() as cur:
-            results = evaluate(cur, registry, ds)
+            results = evaluate(cur, registry, ds, task_state)
         conn.rollback()                      # reads only above; start clean for writes
         with conn.cursor() as cur:
             save_results(cur, ds, results)

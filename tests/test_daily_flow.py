@@ -315,6 +315,25 @@ class PostgresFlowTests(unittest.TestCase):
             _, alert = self.run_check()
         alert.assert_not_called()
 
+    def test_airflow_state_covers_missing_detector_record(self):
+        # 13 Oct: engine tasks ran before their callbacks were deployed.
+        self.ready_day()
+        cur = self.conn.cursor()
+        cur.execute("DELETE FROM data_detector.pipeline_runs WHERE task_id IN "
+                    "('refresh_elo', 'verify_daily_shortlists', 'settle_forecast_history')")
+        self.conn.commit()
+        states = {"refresh_elo": "success", "verify_daily_shortlists": "success",
+                  "settle_forecast_history": "failed"}
+        with patch.object(notify, "send_alert", return_value=[]), patch("requests.head") as head:
+            head.return_value.status_code = 200
+            head.return_value.headers = {"Content-Type": "image/png"}
+            summary = flow.run(DS, conn=self.conn, registry=self.registry,
+                               task_state=lambda dag, task, ds: states.get(task))
+        self.assertEqual(summary["failed_or_missing"], ["engine.forecast_settlement"])
+        cur.execute("SELECT details->>'source' FROM data_detector.daily_flow_checks "
+                    "WHERE dataset_id = 'engine.refresh_elo'")
+        self.assertEqual(cur.fetchone()[0], "airflow (no detector record)")
+
     def test_failed_engine_task_reports_failed_with_error(self):
         self.full_etl()
         for t in ("refresh_elo", "settle_forecast_history", "model_mismatch", "model_bayesian",
