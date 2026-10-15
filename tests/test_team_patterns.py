@@ -153,6 +153,33 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual([r["event"] for r in view["also"]], ["Under_4_5"])
 
 
+class LabelTests(unittest.TestCase):
+    """D126: evidence decides the comparison wording."""
+
+    def lab(self, k, n, base, **kw):
+        return tp.comparison_label(rec("home", "win", k, n, base, **kw))
+
+    def test_strong_evidence_above_and_below(self):
+        self.assertEqual(self.lab(9, 10, 0.40), "well_above")      # Zlin Lost 9/10
+        self.assertEqual(self.lab(30, 40, 0.65), "above")          # +10 pts over 40 games
+        self.assertEqual(self.lab(3, 10, 0.73), "well_below")
+
+    def test_small_sample_big_gap_is_not_typical(self):
+        self.assertEqual(self.lab(4, 6, 0.50), "inconclusive")     # 67% vs 50%, 6 games
+
+    def test_typical_needs_twelve_games(self):
+        self.assertEqual(self.lab(7, 9, 0.80), "inconclusive")     # close, but only 9 games
+        self.assertEqual(self.lab(10, 12, 0.80), "typical")        # close, 12 games
+        self.assertEqual(self.lab(9, 15, 0.62), "typical")
+
+    def test_no_league_rate_passes_through(self):
+        self.assertEqual(self.lab(9, 10, 0.40, comparison="too_few_matches"), "too_few_matches")
+
+    def test_public_record_uses_new_label(self):
+        view = tp.select_view([rec("home", "Under_4_5", 7, 9, 0.80)])     # close, 9 games
+        self.assertEqual(view["also"][0]["league_comparison"], "inconclusive")
+
+
 class ViewTests(unittest.TestCase):
     def test_views_and_default(self):
         rows = [rec("home", "winless", 6, 6, 0.55),
