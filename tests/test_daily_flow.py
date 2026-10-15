@@ -85,9 +85,62 @@ class NotifyTests(unittest.TestCase):
     def test_slack_failure_does_not_stop_email(self):
         env = {"ALERT_SLACK_WEBHOOK_URL": "https://hook", "ALERT_EMAIL_TO": "a@b.c", "SMTP_HOST": "smtp"}
         with patch.dict(os.environ, env, clear=True), \
-                patch.dict(notify.SENDERS, {"slack": lambda s, b: (_ for _ in ()).throw(OSError("down")),
-                                            "email": lambda s, b: None}):
+                patch.dict(notify.SENDERS, {"slack": lambda s, b, h=None: (_ for _ in ()).throw(OSError("down")),
+                                            "email": lambda s, b, h=None: None}):
             self.assertEqual(notify.send_alert("s", "b"), ["email"])
+
+
+class EmailTemplateTests(unittest.TestCase):
+    def setUp(self):
+        from etl.src.data_detector import email_templates as et
+        self.et = et
+        self.reg = mini_registry([{"id": "raw.w", "layer": "api", "upstream": [],
+                                   "check": {"type": "derived", "severity": "warning"}}])
+        self.history = [{"date": DS, "label": "Tue 13", "status": "ok"}]
+        self.metrics = {"fixtures_loaded": 1234, "match_pages": 812, "pool_rows": 40,
+                        "crest_coverage": (98, 100)}
+
+    def results(self, **status):
+        out = {}
+        for k in ("api.a", "raw.b", "raw.c", "raw.w"):
+            out[k] = {"status": status.get(k.replace(".", "_"), "ok"), "details": {},
+                      "layer": self.reg[k].layer, "blocked_by": []}
+        return out
+
+    def render(self, results, resolved=()):
+        return self.et.render(DS, results, self.reg, metrics=self.metrics, history=self.history,
+                              resolved=list(resolved))
+
+    def test_all_clear(self):
+        subject, text, html = self.render(self.results())
+        self.assertEqual(subject, "✓ Ballistics 2026-10-13: all clear")
+        self.assertIn("All clear", html)
+        self.assertIn("1,234", html)
+        self.assertIn("98 of 100", text)
+        self.assertNotIn("Needs attention", html)
+
+    def test_failure_leads_and_is_escaped(self):
+        r = self.results(raw_b="failed", raw_c="blocked")
+        r["raw.b"]["details"] = {"error": "<script>alert(1)</script>"}
+        subject, text, html = self.render(r)
+        self.assertTrue(subject.startswith("✗ Ballistics 2026-10-13: 1 failed, 1 blocked"))
+        self.assertIn("Needs attention", html)
+        self.assertNotIn("<script>", html)
+        self.assertIn("&lt;script&gt;", html)
+        self.assertIn("Blocks: raw.c", html)
+        self.assertLess(html.index("Needs attention"), html.index("Datasets ok"))
+
+    def test_warning_only_and_recovered(self):
+        self.assertTrue(self.render(self.results(raw_w="missing"))[0].startswith("! Ballistics"))
+        subject, _, html = self.render(self.results(), resolved=["raw.b"])
+        self.assertEqual(subject, "✓ Ballistics 2026-10-13: recovered")
+        self.assertIn("Flowing again: raw.b", html)
+
+    def test_missing_metrics_show_dash(self):
+        self.metrics = {}
+        _, text, html = self.render(self.results())
+        self.assertIn("Match pages: —", text)
+        self.assertIn("Crest coverage unavailable", html)
 
 
 @unittest.skipUnless(os.getenv("FLOW_TEST_DSN"), "requires FLOW_TEST_DSN (throwaway database)")
@@ -117,7 +170,8 @@ class PostgresFlowTests(unittest.TestCase):
             CREATE TABLE raw.model_runs (run_ds date, model text, status text);
             CREATE TABLE raw.model_picks (run_ds date);
             CREATE TABLE raw.consensus_pool (run_ds date);
-            CREATE TABLE raw.engine_runs (run_ds date, status text);
+            CREATE TABLE raw.engine_runs (run_ds date, status text, n_fixtures int,
+                generated_at timestamptz, finished_at timestamptz);
         """)  # raw.match_analysis deliberately absent
         self.conn.commit()
         self.registry = dsets.load_registry()
@@ -156,7 +210,7 @@ class PostgresFlowTests(unittest.TestCase):
             cur.execute("INSERT INTO raw.model_runs VALUES (%s, %s, 'ok')", (DS, m))
         cur.execute("INSERT INTO raw.model_picks VALUES (%s)", (DS,))
         cur.execute("INSERT INTO raw.consensus_pool VALUES (%s)", (DS,))
-        cur.execute("INSERT INTO raw.engine_runs VALUES (%s, 'complete')", (DS,))
+        cur.execute("INSERT INTO raw.engine_runs VALUES (%s, 'complete', 812, now(), now())", (DS,))
         self.conn.commit()
 
     def run_check(self, crest_status=200):
@@ -235,6 +289,31 @@ class PostgresFlowTests(unittest.TestCase):
         self.assertEqual(summary["events"]["resolved"], ["raw.match_analysis"])
         alert.assert_called_once()                                              # recovery note
         self.assertTrue(all(v == "ok" for v in self.statuses().values()))
+
+    def ready_day(self):
+        self.full_etl()
+        self.engine()
+        cur = self.conn.cursor()
+        cur.execute("CREATE TABLE raw.match_analysis (run_ds date); INSERT INTO raw.match_analysis VALUES (%s)", (DS,))
+        self.conn.commit()
+
+    def test_clean_day_sends_daily_report(self):
+        self.ready_day()
+        summary, alert = self.run_check()
+        alert.assert_called_once()
+        subject, text = alert.call_args[0]
+        html = alert.call_args[1]["html"]
+        self.assertEqual(subject, f"✓ Ballistics {DS}: all clear")
+        self.assertIn("812", html)                                     # match pages
+        self.assertEqual(summary["metrics"]["fixtures_loaded"], 40)
+        self.assertEqual(summary["metrics"]["crest_coverage"], (2, 2))
+        self.assertEqual(text.count(":ok"), 1)                         # only today in the 7-day strip
+
+    def test_clean_day_silent_with_report_off(self):
+        self.ready_day()
+        with patch.dict(os.environ, {"ALERT_DAILY_REPORT": "false"}):
+            _, alert = self.run_check()
+        alert.assert_not_called()
 
     def test_failed_engine_task_reports_failed_with_error(self):
         self.full_etl()

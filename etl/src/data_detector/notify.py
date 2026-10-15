@@ -4,6 +4,11 @@
   Email:  ALERT_EMAIL_TO (comma-separated), SMTP_HOST, SMTP_PORT (587),
           SMTP_USER, SMTP_PASSWORD, ALERT_EMAIL_FROM (defaults to SMTP_USER)
 
+Email goes out as multipart: an HTML part (email_templates.render) with the
+plain-text body as fallback. Slack always gets the plain text.
+ALERT_DAILY_REPORT (default true): send the daily report even on clean days;
+false sends only on failures, warnings and recoveries.
+
 With no channel configured the message is logged only; the daily flow check
 still records quality events and fails its Airflow task, so nothing is silent.
 """
@@ -27,18 +32,20 @@ def configured_channels() -> list[str]:
     return channels
 
 
-def _send_slack(subject: str, body: str) -> None:
+def _send_slack(subject: str, body: str, html: str | None = None) -> None:
     resp = requests.post(os.environ["ALERT_SLACK_WEBHOOK_URL"],
                          json={"text": f"*{subject}*\n{body}"}, timeout=10)
     resp.raise_for_status()
 
 
-def _send_email(subject: str, body: str) -> None:
+def _send_email(subject: str, body: str, html: str | None = None) -> None:
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["From"] = os.getenv("ALERT_EMAIL_FROM") or os.getenv("SMTP_USER") or "ballistics@localhost"
     msg["To"] = os.environ["ALERT_EMAIL_TO"]
     msg.set_content(body)
+    if html:
+        msg.add_alternative(html, subtype="html")
     with smtplib.SMTP(os.environ["SMTP_HOST"], int(os.getenv("SMTP_PORT", "587")), timeout=20) as smtp:
         smtp.starttls()
         if os.getenv("SMTP_USER"):
@@ -49,7 +56,7 @@ def _send_email(subject: str, body: str) -> None:
 SENDERS = {"slack": _send_slack, "email": _send_email}
 
 
-def send_alert(subject: str, body: str) -> list[str]:
+def send_alert(subject: str, body: str, *, html: str | None = None) -> list[str]:
     """Send through every configured channel; return the channels that succeeded."""
     sent = []
     channels = configured_channels()
@@ -59,7 +66,7 @@ def send_alert(subject: str, body: str) -> list[str]:
         return sent
     for name in channels:
         try:
-            SENDERS[name](subject, body)
+            SENDERS[name](subject, body, html)
             sent.append(name)
         except Exception as exc:   # one broken channel must not hide the alert elsewhere
             logger.error("Alert via %s failed: %s", name, exc)
