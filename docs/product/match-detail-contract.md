@@ -97,7 +97,7 @@ Rules below are current as of 2026-10-14 (D122). Category intent and examples: [
 - Use rows with `primary: true` (the engine's context for that team: home team at home or all venues, away team away or all) and `n ≥ 6`.
 - Record: `k / n` (large). Team rate: `round(100·k/n)%`. League rate: `round(100·base_rate)%`, from `league_rate_matches` current-season fixtures.
 - The engine sets `league_comparison: too_few_matches` when the team has `n < 6` **or** the league rate has `league_rate_matches < 20` (same floor as goals). Either way: keep the record, hide the comparison line.
-- Label from `league_comparison` (bands: |gap| < 5 pts typical, 5–15 above/below, ≥ 15 much; `LEAGUE_GAP_SOME` / `LEAGUE_GAP_WELL`):
+- Label from `league_comparison`. **Team patterns (D126): evidence decides, not gap size alone.** More/less often = league-difference confidence ≥ 0.75 in that direction (Beta posterior vs league base); "much" = also |gap| ≥ 15 pts. Typical = |gap| < 5 pts **and** at least 12 games. Anything else = `inconclusive`: the record is shown without a comparison line (a big gap on few games is not called typical). Games needed to reach 0.75 at a steady rate: about 5–7 for a 20+ pt gap, 8–16 for 10–15 pts, 25–50 for 5 pts. Goals outlook keeps the gap bands (|gap| < 5 pts typical, 5–15 above/below, ≥ 15 much; `LEAGUE_GAP_SOME` / `LEAGUE_GAP_WELL`):
 
 | `league_comparison` | Patterns text (D104) | Goals text (D62) |
 |---|---|---|
@@ -106,6 +106,7 @@ Rules below are current as of 2026-10-14 (D122). Category intent and examples: [
 | `typical` | Typical for this league | Typical for this league |
 | `below` | Less often than usual | Less likely than usual |
 | `well_below` | Much less often than usual | Much less likely than usual |
+| `inconclusive` (patterns only, D126) | show the record, no comparison line | — |
 | `too_few_matches` / `unavailable` | hide the row | hide the row |
 
 - Never show a record with `k = 0` (e.g. "0 / 6") anywhere (owner, 2026-10-12).

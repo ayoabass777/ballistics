@@ -35,6 +35,15 @@ EXCLUDED_EVENTS = {"halftime_win",            # D80
                    "Over_4_5", "Under_1_5"}   # D124: never qualified; dropped
 NO_COMPARISON = {"too_few_matches", "unavailable", None}
 
+# Comparison wording (D126). Evidence, not gap size alone, decides the label:
+#   more/less often  league-difference confidence >= 0.75 in that direction
+#   much ...         and |gap| >= 15 points
+#   typical          |gap| < 5 points with at least TYPICAL_MIN_N games
+#   inconclusive     anything else: the page shows the record, no comparison line
+TYPICAL_MIN_N = 12
+TYPICAL_MAX_GAP = 0.05
+WELL_GAP = 0.15
+
 # Attack event for one team <-> defence event for the other.
 CORRESPONDING = {
     "score_1goal": "concede_1", "concede_1": "score_1goal",
@@ -139,13 +148,30 @@ def _dedupe_ladders(rows: list[dict]) -> list[dict]:
     return out + list(best.values())
 
 
+def comparison_label(r: dict) -> str | None:
+    """League comparison wording for one record, decided by evidence (D126)."""
+    current = r.get("league_comparison")
+    gap = r.get("league_gap")
+    if current in NO_COMPARISON or gap is None:
+        return current                      # too few league matches / unavailable
+    conf = _confidence(r)
+    if conf is not None and conf >= TOP_CONFIDENCE and gap != 0:
+        much = abs(gap) >= WELL_GAP
+        if gap > 0:
+            return "well_above" if much else "above"
+        return "well_below" if much else "below"
+    if abs(gap) < TYPICAL_MAX_GAP and (r.get("n") or 0) >= TYPICAL_MIN_N:
+        return "typical"
+    return "inconclusive"
+
+
 def _public(r: dict) -> dict:
     return {
         "side": r["side"], "team": r.get("team"), "event": r["event"],
         "label": label(r["event"]), "k": r["k"], "n": r["n"],
         "rate": round(_rate(r), 4),
         "league_rate": r.get("base_rate"),
-        "league_comparison": r.get("league_comparison"),
+        "league_comparison": comparison_label(r),
         "streak": r.get("streak") or 0,
         "context": r.get("context"),
     }
