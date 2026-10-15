@@ -178,7 +178,8 @@ def engine_sections(f: dict, export: dict) -> dict:
 
 LATEST_SQL = """
 SELECT r.run_ds, r.finished_at, m.payload
-FROM (SELECT run_ds, finished_at FROM raw.engine_runs
+FROM (SELECT run_ds, COALESCE(generated_at, finished_at) AS finished_at  -- engine build time
+      FROM raw.engine_runs
       WHERE status = 'complete' ORDER BY run_ds DESC LIMIT 1) r
 LEFT JOIN raw.match_analysis m
   ON m.run_ds = r.run_ds AND m.fixture_id = %(fixture_id)s
