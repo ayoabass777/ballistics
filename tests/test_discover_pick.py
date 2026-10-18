@@ -9,6 +9,7 @@ from engine.eval.consensus_slips import (
     attach_discover_picks,
     elo_group_win_rate,
     league_win_rate,
+    DISCOVER_GOALS_WEIGHT,
 )
 
 LG = "Czech Liga (Czech-Republic)"
@@ -65,7 +66,7 @@ def test_strength_beats_goals_when_its_gap_is_larger():
     assert pick["list"] == "strength" and pick["score"] == pytest.approx(0.75 - 0.394)
     assert short[0]["league_big_dog_matches"] == 200 and short[0]["league_record_ok"]
     assert pick["big_dog"] == "Slavia Praha"
-    assert pick["runner_up"] == {"list": "goals", "score": round(0.312 * 0.76, 4)}
+    assert pick["runner_up"] == {"list": "goals", "score": round(0.312 * DISCOVER_GOALS_WEIGHT, 4)}
     assert short[0]["discover_score"] == pick["score"]
     assert short[0]["league_win_context"] == "all"
 
@@ -247,3 +248,20 @@ def test_goals_standout_needs_seventy_percent():
          "league_comparison": "well_above"}])
     attach_discover_picks([fx], [], None, RATES)
     assert fx["discover_pick"]["market"] == "Match Over 1.5"   # 67% row is below the bar
+
+
+def test_strength_standout_not_limited_by_shortlist_cap():
+    """A Big dog fixture beyond the 40-row shortlist still gets its strength pick."""
+    from engine.eval.consensus_slips import _cap_elo_gap_shortlist
+    vol = {("Czech Liga", "Czech-Republic"): {"matches": 500, "upset_rate": 0.2}}
+    fixtures = [fixture(fixture_id=i, home=f"H{i}", away=f"A{i}",
+                        kickoff="2030-01-01 12:00:00+00:00",
+                        mismatch=[{"market": f"A{i} Win", "probability": 0.8,
+                                   "gap": 400 - i * 3}])          # last: gap 268, 45th
+                for i in range(45)]
+    full = _build_elo_gap_shortlist(fixtures, vol, limit=None, group=GROUP)
+    capped = _cap_elo_gap_shortlist(full, limit=40, per_league_limit=50)
+    assert len(full) == 45 and len(capped) == 40
+    assert 44 not in {p["fixture_id"] for p in capped}
+    attach_discover_picks(fixtures, full, GROUP, RATES)
+    assert fixtures[44]["discover_pick"]["list"] == "strength"

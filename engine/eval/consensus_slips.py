@@ -48,6 +48,7 @@ import pandas as pd
 
 from engine.eval.team_patterns import attach_team_patterns
 from engine.eval.predict_upcoming import _tier
+from engine.eval.goals_league_blend import blend_probability
 from engine.eval.predict_mismatch import predict_mismatch, _market_label
 from engine.eval.predict_dixon_coles import predict_dixon_coles
 from engine.eval.scrape_sportybet import odds_for_pick
@@ -342,10 +343,10 @@ LEAGUE_GAP_SOME = 0.05            # ≥ +5 pts → above; within ±5 → typical
 # that earlier validation does not establish performance for the new setting.
 #   strength = Big dog win rate for its gap band − league win rate for the
 #              favourite's venue (all-games rate when the venue split is missing)
-DISCOVER_DC_MIN_PROB = 0.70  # standouts only (owner, 2026-10-07); the Goals outlook section still shows ≥ 65%
-DISCOVER_SECTION_DC_MIN_PROB = 0.65  # D121: Goals outlook section floor (D101)
+DISCOVER_DC_MIN_PROB = 0.70  # standouts only (owner, 2026-10-07)
+DISCOVER_SECTION_DC_MIN_PROB = 0.75  # Owner, 2026-10-17: Discover Goals section
 DISCOVER_PATTERN_PRIOR_MATCHES = 15  # D77: historical ranking; separate from prediction rating
-DISCOVER_GOALS_WEIGHT = 0.76
+DISCOVER_GOALS_WEIGHT = 1.0  # D128: was 0.76 (D71); the D127 league blend now makes goals gaps honest (re-measured 1.01 at 70%+)
 STANDOUT_MIN_SCORE = 0.15  # D78: inclusive adjusted percentage-point gap
 ELO_GAP_BANDS = ((250, 300), (300, 400), (400, None))   # (lower excl., upper incl.)
 ELO_BAND_MIN_MATCHES = 100        # thinner band → fall back to the overall group rate
@@ -500,6 +501,19 @@ def attach_league_comparisons(analysis: list[dict], rates: dict) -> None:
                            league_rate_context=None, league_gap=None,
                            league_comparison="unavailable")
                 continue
+            # League blend (2026-10-17): for markets where high-gap chances
+            # proved overconfident, the shown chance leans toward the league
+            # rate. The pre-blend chance is kept for audit; gap, comparison and
+            # Discover ranking all use the blended chance.
+            blended = (blend_probability(row.get("market", ""),
+                                         row.get("probability"), ref["rate"])
+                       if ref["matches"] >= LEAGUE_RATE_MIN_MATCHES else None)
+            if blended is not None:
+                row["probability_pre_blend"] = row["probability"]
+                row["probability"] = round(blended, 4)
+                row["league_blend"] = True
+                if "tier" in row:
+                    row["tier"] = _tier(row["probability"])
             gap = float(row["probability"]) - ref["rate"]
             row.update(
                 league_rate=round(ref["rate"], 4),
@@ -786,7 +800,7 @@ def discover_candidates(fixture: dict, strength: dict | None,
                         goals_min_prob: float = DISCOVER_DC_MIN_PROB) -> list[dict]:
     """Every Discover-eligible event for one fixture, scored on one scale (D71).
 
-    goals_min_prob: 0.70 for standouts (D101), 0.65 for the Goals section (D121).
+    goals_min_prob: 0.70 for standouts (D101), 0.75 for the Goals section (2026-10-17).
     """
     out = []
     for r in fixture.get("dixon_coles") or []:
@@ -890,7 +904,8 @@ def section_picks(cands: list[dict], fav: str | None,
     """
     out = {}
     for lst in _DISCOVER_PRIORITY:
-        mine = [c for c in cands if c["list"] == lst and c["score"] > 0]
+        mine = [c for c in cands if c["list"] == lst and c["score"] > 0
+                and (lst != "goals" or c.get("league_comparison") != "typical")]
         if not mine:
             continue
         best = max(mine, key=lambda c: (c["score"], c.get("team") == fav))
@@ -1751,7 +1766,7 @@ def _build_over_1_5_shortlist(
 
 def _build_elo_gap_shortlist(
         fixture_analysis: list[dict], league_volatility: dict,
-        limit: int = ELO_GAP_SHORTLIST_LIMIT,
+        limit: int | None = ELO_GAP_SHORTLIST_LIMIT,
         per_league_limit: int = ELO_GAP_PER_LEAGUE_LIMIT,
         end_date: str | None = None,
         group: dict | None = None) -> list[dict]:
@@ -1827,6 +1842,15 @@ def _build_elo_gap_shortlist(
         -(p["best_signal_confidence"] or 0),
         p.get("kickoff", ""),
     ))
+    if limit is None:   # every qualifying Big dog fixture, uncapped and unranked
+        return candidates
+    return _cap_elo_gap_shortlist(candidates, limit, per_league_limit)
+
+
+def _cap_elo_gap_shortlist(candidates: list[dict],
+                           limit: int = ELO_GAP_SHORTLIST_LIMIT,
+                           per_league_limit: int = ELO_GAP_PER_LEAGUE_LIMIT) -> list[dict]:
+    """The published shortlist: top `limit` by gap, at most `per_league_limit` per league."""
     shortlist = []
     league_counts = defaultdict(int)
     for pick in candidates:
@@ -2015,11 +2039,16 @@ def build_consensus_from_signals(signals: list[dict],
         ranked, over_1_5_league_rates, end_date=shortlist_end_date)
     if elo_gap_group is None:
         print("  WARN Big dog record unavailable: Strength uses volatility rule only")
-    elo_gap_shortlist = _build_elo_gap_shortlist(
-        analysis, league_elo_volatility, end_date=shortlist_end_date,
-        group=elo_gap_group)
-    attach_discover_picks(analysis, elo_gap_shortlist, elo_gap_group,
+    # Strength standouts consider every qualifying Big dog fixture; the 40 /
+    # 7-per-league caps only shape the published shortlist (D-fix 2026-10-17:
+    # Forest v Arsenal, gap 252, fell off a capped list and lost its standout).
+    big_dog_fixtures = _build_elo_gap_shortlist(
+        analysis, league_elo_volatility, limit=None, group=elo_gap_group)
+    attach_discover_picks(analysis, big_dog_fixtures, elo_gap_group,
                           league_event_rates)
+    elo_gap_shortlist = _cap_elo_gap_shortlist(
+        [p for p in big_dog_fixtures
+         if _within_shortlist_end_date(p.get("kickoff"), shortlist_end_date)])
 
     if run_ds:
         from engine.eval.picks_store import write_consensus_pool
@@ -2327,11 +2356,16 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         ranked, over_1_5_league_rates, end_date=shortlist_end_date)
     if elo_gap_group is None:
         print("  WARN Big dog record unavailable: Strength uses volatility rule only")
-    elo_gap_shortlist = _build_elo_gap_shortlist(
-        analysis_list, league_elo_volatility, end_date=shortlist_end_date,
-        group=elo_gap_group)
-    attach_discover_picks(analysis_list, elo_gap_shortlist, elo_gap_group,
+    # Strength standouts consider every qualifying Big dog fixture; the 40 /
+    # 7-per-league caps only shape the published shortlist (D-fix 2026-10-17:
+    # Forest v Arsenal, gap 252, fell off a capped list and lost its standout).
+    big_dog_fixtures = _build_elo_gap_shortlist(
+        analysis_list, league_elo_volatility, limit=None, group=elo_gap_group)
+    attach_discover_picks(analysis_list, big_dog_fixtures, elo_gap_group,
                           league_event_rates)
+    elo_gap_shortlist = _cap_elo_gap_shortlist(
+        [p for p in big_dog_fixtures
+         if _within_shortlist_end_date(p.get("kickoff"), shortlist_end_date)])
     return {"pool": ranked, "near_threshold": near_threshold,
             "shortlist_end_date": shortlist_end_date,
             "bounds_1_4_shortlist": bounds_shortlist,

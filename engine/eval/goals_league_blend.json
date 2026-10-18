@@ -1,0 +1,36 @@
+{
+  "fitted_at": "2026-10-17T22:21:36+00:00",
+  "source": "raw_preds.json",
+  "data_range": [
+    "2026-06-05",
+    "2026-10-02"
+  ],
+  "min_probability": 0.6,
+  "formula": "sigmoid(a + b*logit(calibrated) + c*logit(league_rate))",
+  "weights": {
+    "dixon_coles_team_over_1_5": {
+      "a": 0.1611,
+      "b": 0.5805,
+      "c": 0.229,
+      "rows": 872
+    },
+    "dixon_coles_team_score": {
+      "a": 0.1035,
+      "b": 0.8736,
+      "c": 0.0219,
+      "rows": 6178
+    },
+    "dixon_coles_under_3_5": {
+      "a": 0.1559,
+      "b": 0.4498,
+      "c": 0.3101,
+      "rows": 2629
+    },
+    "dixon_coles_over_2_5": {
+      "a": -0.086,
+      "b": 0.7816,
+      "c": 0.1773,
+      "rows": 1084
+    }
+  }
+}
