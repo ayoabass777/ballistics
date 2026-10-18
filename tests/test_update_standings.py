@@ -91,3 +91,12 @@ def test_prune_does_nothing_for_empty_payload():
     cur = _Cur()
     assert us.prune_stale_rows(cur, []) == 0
     assert cur.calls == []
+
+
+def test_rows_without_team_id_are_split_out():
+    rows = us.extract_standings(_payload(
+        [_row(1, 1, "Clausura"), _row(None, 2, "Clausura"), _row(3, 3, "Clausura")],
+    ))
+    kept, missing = us.drop_rows_without_team_id(rows)
+    assert [r["api_team_id"] for r in kept] == [1, 3]
+    assert [r["rank"] for r in missing] == [2]

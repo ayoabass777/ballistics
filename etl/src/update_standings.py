@@ -105,6 +105,19 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return flattened
 
 
+def drop_rows_without_team_id(rows: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Split rows into (usable, missing team id).
+
+    The API occasionally sends a standings row with team.id null (Club León,
+    Liga MX, 15 Oct 2026). api_team_id is part of the primary key, so one such
+    row used to fail the whole league's upsert and, with it, the standings task
+    and every stage downstream.
+    """
+    kept = [r for r in rows if r.get("api_team_id") is not None]
+    missing = [r for r in rows if r.get("api_team_id") is None]
+    return kept, missing
+
+
 def _table_label(table: List[Dict[str, Any]], group_order: int) -> str:
     """Table label ("Eastern Conference", "Championship Round") from the
     /standings rows; tables without one are named by position so parallel
@@ -225,7 +238,7 @@ def prune_stale_rows(cur: psycopg2.extensions.cursor, rows: List[Dict[str, Any]]
     return deleted
 
 
-def upsert_standings(rows: List[Dict[str, Any]]) -> int:
+def upsert_standings(rows: List[Dict[str, Any]], prune: bool = True) -> int:
     """
     Upsert standings rows into RAW_TABLE, one row per (league season, group,
     team). One transaction per call, so a league season's refresh shares one
@@ -274,7 +287,9 @@ def upsert_standings(rows: List[Dict[str, Any]]) -> int:
             DO UPDATE SET {set_clause}, updated_at = NOW()
         """
         execute_values(cur, insert_sql, values, page_size=500)
-        pruned = prune_stale_rows(cur, deduped)
+        # Skip pruning when rows were dropped, or the dropped team's last good
+        # row would be deleted as "no longer in the API response".
+        pruned = prune_stale_rows(cur, deduped) if prune else 0
         conn.commit()
         if pruned:
             logger.info("Pruned %d standings rows no longer in the API response.", pruned)
@@ -327,7 +342,15 @@ def update_standings(
                 row["league_season_id"] = league_season_id
                 row["api_league_id"] = api_league_id
                 row["season"] = season
-            inserted = upsert_standings(extracted)
+            extracted, missing = drop_rows_without_team_id(extracted)
+            if missing:
+                logger.warning(
+                    "league_season_id=%s: skipped %d standings row(s) with no team id (%s); "
+                    "kept existing rows for that league (no prune).",
+                    league_season_id, len(missing),
+                    ", ".join(str(r.get("team_name")) for r in missing),
+                )
+            inserted = upsert_standings(extracted, prune=not missing)
             total_rows += inserted
             leagues_updated.append(
                 {
