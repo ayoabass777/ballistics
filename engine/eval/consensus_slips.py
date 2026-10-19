@@ -107,6 +107,7 @@ ELO_HUGE_GAP_MIN = 250  # Big dog: gap strictly above this (D27/D44, 2026-10-02;
 BIG_DOG_HOME_EDGE = 65
 # D138: slight favourites (venue-adjusted gap 100 < g <= 250) split in two levels.
 # 3 seasons top flight: 100-175 won 51% (drew 26%), 175-250 won 62% (drew 23%).
+# Shown as a label only (owner: no "x in 10" on strength).
 SLIGHT_FAV_MIN_GAP = 100          # at or below: "close" (flat gap, D27)
 SLIGHT_EDGE_MAX_GAP = 175         # 100-175 "slight edge", 175-250 "favourite"
 # D138: league tiers (Top / Middle / Bottom) as match-page context only. k-means
@@ -602,57 +603,12 @@ def _load_comparison_context(conn, league_volatility: dict) -> tuple[dict, dict 
         conn.rollback()
         print(f"  WARN elo gap group record unavailable: {exc}")
         group = None
-    if group is not None:
-        try:
-            group["slight_favourite"] = _load_slight_favourite_record(conn)
-        except Exception as exc:  # pragma: no cover
-            conn.rollback()
-            print(f"  WARN slight favourite record unavailable: {exc}")
     return rates, group
-
-
-SLIGHT_FAVOURITE_SQL = """
-    WITH matches AS (
-        SELECT f.goals_for AS home_goals, f.goals_against AS away_goals,
-               COALESCE(eh.rating_before_flat, eh.rating_before) + %s
-                 - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
-        FROM raw.engine_head_to_head f
-        JOIN elo.team_elo_history eh ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
-        JOIN elo.team_elo_history ea ON ea.fixture_id = f.fixture_id AND ea.team_id = f.opponent_id
-        WHERE f.is_played AND f.is_home
-    )
-    SELECT CASE WHEN ABS(diff) <= %s THEN 'slight_edge' ELSE 'favourite' END AS level,
-           COUNT(*),
-           SUM(CASE WHEN (diff > 0 AND home_goals > away_goals)
-                      OR (diff < 0 AND away_goals > home_goals) THEN 1 ELSE 0 END),
-           SUM(CASE WHEN home_goals = away_goals THEN 1 ELSE 0 END)
-    FROM matches
-    WHERE ABS(diff) > %s AND ABS(diff) <= %s
-    GROUP BY 1
-"""
 
 
 def slight_favourite_level(gap: float) -> str:
     """D138: 'slight_edge' (about 5 in 10) or 'favourite' (about 6 in 10)."""
     return "slight_edge" if gap <= SLIGHT_EDGE_MAX_GAP else "favourite"
-
-
-def aggregate_slight_record(rows) -> dict:
-    out = {}
-    for level, n, won, drew in rows:
-        n, won, drew = int(n), int(won or 0), int(drew or 0)
-        out[level] = {"matches": n, "won": won, "drew": drew,
-                      "win_rate": round(won / n, 4) if n else None,
-                      "draw_rate": round(drew / n, 4) if n else None}
-    return out
-
-
-def _load_slight_favourite_record(conn) -> dict:
-    """How slight favourites finished, per level (venue-adjusted gap, all leagues)."""
-    with conn.cursor() as cur:
-        cur.execute(SLIGHT_FAVOURITE_SQL, (BIG_DOG_HOME_EDGE, SLIGHT_EDGE_MAX_GAP,
-                                           SLIGHT_FAV_MIN_GAP, ELO_HUGE_GAP_MIN))
-        return aggregate_slight_record(cur.fetchall())
 
 
 TEAM_TIERS_SQL = """

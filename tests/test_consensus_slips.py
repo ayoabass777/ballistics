@@ -339,13 +339,10 @@ if __name__ == "__main__":
 
 
 class SlightAndTierTests(unittest.TestCase):
-    def test_slight_level_and_record(self):
-        from engine.eval.consensus_slips import slight_favourite_level, aggregate_slight_record
+    def test_slight_level(self):
+        from engine.eval.consensus_slips import slight_favourite_level
         self.assertEqual(slight_favourite_level(175), "slight_edge")
         self.assertEqual(slight_favourite_level(176), "favourite")
-        rec = aggregate_slight_record([("slight_edge", 100, 51, 26), ("favourite", 50, 31, 0)])
-        self.assertEqual(rec["slight_edge"]["win_rate"], 0.51)
-        self.assertEqual(rec["favourite"]["draw_rate"], 0.0)
 
     def test_tier_labels_and_attach(self):
         from engine.eval.consensus_slips import attach_team_tiers, tier_labels

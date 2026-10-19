@@ -65,7 +65,6 @@ def index_export(raw: dict) -> dict:
         "gap_min": group.get("gap_min", 250),
         # D137: Big dog gaps are venue-adjusted; exports before it have no edge.
         "home_edge": (raw.get("thresholds") or {}).get("big_dog_home_edge", 0),
-        "slight_record": group.get("slight_favourite") or {},
     }
 
 
@@ -103,10 +102,6 @@ def form_rows(strength: dict | None) -> dict | None:
 SLIGHT_EDGE_MAX_GAP = 175   # D138, mirrors engine.eval.consensus_slips
 
 
-def _in_10(rate) -> int | None:
-    return None if rate is None else int(round(float(rate) * 10))
-
-
 def _tier_context(f: dict) -> dict | None:
     """D138: league tiers as plain labels, never with numbers of their own."""
     t = f.get("tiers") or {}
@@ -124,16 +119,10 @@ def strength_section(f: dict, export: dict) -> dict | None:
 
 
 def _slight(favourite: str, f: dict, gap: float, export: dict) -> dict:
-    """D138: slight favourite split by venue-adjusted gap, with how such games ended."""
-    level = "slight_edge" if gap <= SLIGHT_EDGE_MAX_GAP else "favourite"
-    rec = (export.get("slight_record") or {}).get(level) or {}
-    out = {"state": "slight_favourite", "favourite": favourite,
-           "underdog": f.get("away") if favourite == f.get("home") else f.get("home"),
-           "level": level}
-    if rec.get("win_rate") is not None:
-        out["won_in_10"] = _in_10(rec["win_rate"])
-        out["drew_in_10"] = _in_10(rec.get("draw_rate"))
-    return out
+    """D138: slight favourite split by venue-adjusted gap; a label, no rates."""
+    return {"state": "slight_favourite", "favourite": favourite,
+            "underdog": f.get("away") if favourite == f.get("home") else f.get("home"),
+            "level": "slight_edge" if gap <= SLIGHT_EDGE_MAX_GAP else "favourite"}
 
 
 def _strength_state(f: dict, export: dict) -> dict | None:
