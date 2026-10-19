@@ -257,7 +257,7 @@ def test_strength_standout_not_limited_by_shortlist_cap():
     fixtures = [fixture(fixture_id=i, home=f"H{i}", away=f"A{i}",
                         kickoff="2030-01-01 12:00:00+00:00",
                         mismatch=[{"market": f"A{i} Win", "probability": 0.8,
-                                   "gap": 400 - i * 3}])          # last: gap 268, 45th
+                                   "gap": 465 - i * 3}])          # away (D137 -65): last 268, 45th
                 for i in range(45)]
     full = _build_elo_gap_shortlist(fixtures, vol, limit=None, group=GROUP)
     capped = _cap_elo_gap_shortlist(full, limit=40, per_league_limit=50)

@@ -49,10 +49,12 @@ class EloGapShortlistTests(unittest.TestCase):
         }
 
     def test_requires_gap_above_250_and_low_league_upset_rate(self):
+        # Favourites here play away: D137 takes the home edge off their gap.
         fixtures = [
-            self.fixture(1, "Stable", gap=251),
+            self.fixture(1, "Stable", gap=316),     # 316 - 65 = 251
             self.fixture(2, "Volatile", gap=400),
-            self.fixture(3, "Stable", gap=250),
+            self.fixture(3, "Stable", gap=315),     # 250: not above
+            self.fixture(4, "Stable", gap=265),     # Bayern-at-Freiburg case: 200
         ]
         volatility = {
             ("Stable", "Testland"): {"upset_rate": 0.27, "matches": 500},
@@ -65,9 +67,20 @@ class EloGapShortlistTests(unittest.TestCase):
         self.assertEqual(shortlist[0]["favourite"], "Favourite 1")
         self.assertEqual(shortlist[0]["underdog"], "Home 1")
         self.assertEqual(shortlist[0]["elo_gap"], 251)
+        self.assertEqual(shortlist[0]["elo_gap_flat"], 316)
         self.assertEqual(shortlist[0]["gap_bin"], ">250")
         self.assertEqual(shortlist[0]["best_signal"], "Favourite 1 Over 0.5")
         self.assertEqual(shortlist[0]["win_confidence"], 0.81)
+
+    def test_home_favourite_gets_the_home_edge(self):
+        f = self.fixture(5, "Stable", gap=190)          # 190 + 65 = 255
+        f["home"], f["away"] = "Favourite 5", "Away 5"
+        g = self.fixture(6, "Stable", gap=185)          # 250: not above
+        g["home"], g["away"] = "Favourite 6", "Away 6"
+        volatility = {("Stable", "Testland"): {"upset_rate": 0.2, "matches": 500}}
+        shortlist = _build_elo_gap_shortlist([f, g], volatility)
+        self.assertEqual([p["favourite"] for p in shortlist], ["Favourite 5"])
+        self.assertEqual(shortlist[0]["elo_gap"], 255)
 
 
 class ConsensusGoalModelRuleTests(unittest.TestCase):
@@ -323,3 +336,27 @@ class WeightedSlipGraphTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SlightAndTierTests(unittest.TestCase):
+    def test_slight_level_and_record(self):
+        from engine.eval.consensus_slips import slight_favourite_level, aggregate_slight_record
+        self.assertEqual(slight_favourite_level(175), "slight_edge")
+        self.assertEqual(slight_favourite_level(176), "favourite")
+        rec = aggregate_slight_record([("slight_edge", 100, 51, 26), ("favourite", 50, 31, 0)])
+        self.assertEqual(rec["slight_edge"]["win_rate"], 0.51)
+        self.assertEqual(rec["favourite"]["draw_rate"], 0.0)
+
+    def test_tier_labels_and_attach(self):
+        from engine.eval.consensus_slips import attach_team_tiers, tier_labels
+        ratings = {i: r for i, r in enumerate([1800, 1790, 1810, 1600, 1610, 1590, 1605, 1400, 1410, 1395])}
+        t = tier_labels(ratings)
+        self.assertEqual({t[0], t[1], t[2]}, {"Top"})
+        self.assertEqual(t[4], "Middle")
+        self.assertEqual(t[9], "Bottom")
+        self.assertEqual(tier_labels({1: 1500, 2: 1600}), {})       # too few teams
+        fx = [{"league": "L", "country": "C", "home_team_id": 0, "away_team_id": 9},
+              {"league": "L", "country": "C", "home_team_id": 0, "away_team_id": 99}]
+        attach_team_tiers(fx, {("L", "C"): t})
+        self.assertEqual(fx[0]["tiers"], {"home": "Top", "away": "Bottom"})
+        self.assertIsNone(fx[1]["tiers"])

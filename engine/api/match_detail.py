@@ -63,6 +63,9 @@ def index_export(raw: dict) -> dict:
         "big_dog_leagues": {(r.get("league"), r.get("country")): r
                             for r in group.get("big_dog_leagues") or []},
         "gap_min": group.get("gap_min", 250),
+        # D137: Big dog gaps are venue-adjusted; exports before it have no edge.
+        "home_edge": (raw.get("thresholds") or {}).get("big_dog_home_edge", 0),
+        "slight_record": group.get("slight_favourite") or {},
     }
 
 
@@ -97,8 +100,43 @@ def form_rows(strength: dict | None) -> dict | None:
     return out
 
 
+SLIGHT_EDGE_MAX_GAP = 175   # D138, mirrors engine.eval.consensus_slips
+
+
+def _in_10(rate) -> int | None:
+    return None if rate is None else int(round(float(rate) * 10))
+
+
+def _tier_context(f: dict) -> dict | None:
+    """D138: league tiers as plain labels, never with numbers of their own."""
+    t = f.get("tiers") or {}
+    return {"home": t["home"], "away": t["away"]} if t.get("home") and t.get("away") else None
+
+
 def strength_section(f: dict, export: dict) -> dict | None:
-    """Big dog state without counts or rating gaps (D61; owner 2026-10-12)."""
+    """Strength state plus tier context (D138). Never counts or rating gaps (D61)."""
+    out = _strength_state(f, export)
+    if out is not None:
+        tiers = _tier_context(f)
+        if tiers:
+            out["tiers"] = tiers
+    return out
+
+
+def _slight(favourite: str, f: dict, gap: float, export: dict) -> dict:
+    """D138: slight favourite split by venue-adjusted gap, with how such games ended."""
+    level = "slight_edge" if gap <= SLIGHT_EDGE_MAX_GAP else "favourite"
+    rec = (export.get("slight_record") or {}).get(level) or {}
+    out = {"state": "slight_favourite", "favourite": favourite,
+           "underdog": f.get("away") if favourite == f.get("home") else f.get("home"),
+           "level": level}
+    if rec.get("win_rate") is not None:
+        out["won_in_10"] = _in_10(rec["win_rate"])
+        out["drew_in_10"] = _in_10(rec.get("draw_rate"))
+    return out
+
+
+def _strength_state(f: dict, export: dict) -> dict | None:
     mm = f.get("mismatch") or []
     if not mm:
         # The engine writes rating rows only for gaps >= 100, so no rows with
@@ -114,14 +152,16 @@ def strength_section(f: dict, export: dict) -> dict | None:
     gap = abs(gap)
     if gap <= 100:
         return {"state": "close"}
+    # Favourite = the side named in any rating row (match-level rows name nobody).
+    favourite = next((team for m in mm for team in (f.get("home"), f.get("away"))
+                      if team and str(m.get("market", "")).startswith(f"{team} ")), None)
+    edge = export.get("home_edge", 0)
+    if favourite is not None:   # D137: the Big dog line uses the venue-adjusted gap
+        gap = gap + edge if favourite == f.get("home") else gap - edge
     if gap <= export["gap_min"]:
-        market = str(mm[0].get("market", ""))
-        favourite = next((team for team in (f.get("home"), f.get("away"))
-                          if team and market.startswith(f"{team} ")), None)
         if favourite is None:
             return None
-        return {"state": "slight_favourite", "favourite": favourite,
-                "underdog": f.get("away") if favourite == f.get("home") else f.get("home")}
+        return _slight(favourite, f, gap, export)
 
     league = export["big_dog_leagues"].get((f.get("league"), f.get("country"))) or {}
     reason = league.get("reason") or ""

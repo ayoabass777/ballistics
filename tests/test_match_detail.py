@@ -79,7 +79,7 @@ class SectionTests(unittest.TestCase):
 
     def test_strength_states(self):
         f = dict(FIXTURE)
-        self.assertEqual(md.strength_section(f, self.export), {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin"})
+        self.assertEqual(md.strength_section(f, self.export), {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin", "level": "slight_edge"})
         self.assertEqual(md.strength_section(dict(f, mismatch=[]), self.export), {"state": "close"})
         self.assertIsNone(md.strength_section(dict(f, mismatch=[], strength=None), self.export))
         big = dict(f, fixture_id=60898)
@@ -101,6 +101,28 @@ class SectionTests(unittest.TestCase):
                 self.assertEqual(result["favourite"], "Zlin")
                 self.assertEqual(result["underdog"], "Pardubice")
         self.assertIsNone(md.strength_section(dict(FIXTURE, mismatch=[{"market": "Zlin Over 0.5"}]), self.export))
+
+    def test_away_favourite_uses_venue_gap(self):
+        # D137: Zlin is away; flat 265 - 65 = 200 is a slight favourite, not "no label".
+        export = dict(self.export, home_edge=65)
+        f = dict(FIXTURE, mismatch=[{"market": "Zlin Over 0.5", "gap": 265}])
+        self.assertEqual(md.strength_section(f, export)["state"], "slight_favourite")
+        self.assertEqual(md.strength_section(f, self.export)["state"], "no_label")   # old export: no edge
+
+    def test_slight_levels_records_and_tiers(self):
+        export = dict(self.export, home_edge=65, slight_record={
+            "slight_edge": {"win_rate": 0.51, "draw_rate": 0.26},
+            "favourite": {"win_rate": 0.62, "draw_rate": 0.23}})
+        tiers = {"home": "Bottom", "away": "Top"}
+        f = dict(FIXTURE, mismatch=[{"market": "Zlin Win", "gap": 250}], tiers=tiers)   # away: 185
+        s = md.strength_section(f, export)
+        self.assertEqual(s, {"state": "slight_favourite", "favourite": "Zlin", "underdog": "Pardubice",
+                             "level": "favourite", "won_in_10": 6, "drew_in_10": 2, "tiers": tiers})
+        s = md.strength_section(dict(f, mismatch=[{"market": "Zlin Win", "gap": 240}]), export)   # 175
+        self.assertEqual((s["level"], s["won_in_10"], s["drew_in_10"]), ("slight_edge", 5, 3))
+        big = md.strength_section(dict(FIXTURE, fixture_id=60898, tiers=tiers), export)
+        self.assertEqual(big["tiers"], tiers)
+        self.assertNotIn("tiers", md.strength_section(dict(f, tiers={"home": "Top"}), export))
 
     def test_strength_never_exposes_counts_or_gap(self):
         s = md.strength_section(dict(FIXTURE, fixture_id=60898), self.export)
@@ -175,7 +197,7 @@ class BuildTests(unittest.TestCase):
         self.assertEqual(p["fixture"]["run_ds"], "2026-10-13")
         self.assertEqual(p["fixture"]["run_finished_at"], "2026-10-14T07:05:00+00:00")
         self.assertEqual(p["fixture"]["standings_updated_at"], "2026-10-12T00:00:00+00:00")
-        self.assertEqual(p["strength"], {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin"})
+        self.assertEqual(p["strength"], {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin", "level": "slight_edge"})
         self.assertEqual(p["patterns"]["all"]["top_results"][0]["label"], "Lost")
         self.assertEqual(p["context"]["form"]["away_team"]["overall"]["league_size"], 16)
         self.assertIn("h2h", p["context"])
@@ -227,7 +249,7 @@ class HTTPTests(unittest.TestCase):
             rc.return_value.__enter__.return_value = FakeCursor(row=stored_row())
             r = client.get("/api/match/90876")
             self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.json()["strength"], {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin"})
+            self.assertEqual(r.json()["strength"], {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin", "level": "slight_edge"})
 
 if __name__ == "__main__":
     unittest.main()

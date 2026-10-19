@@ -44,6 +44,7 @@ from datetime import datetime, timezone, timedelta, time
 from zoneinfo import ZoneInfo
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from engine.eval.team_patterns import attach_team_patterns
@@ -99,6 +100,22 @@ OVER_1_5_MIN_ODDS = 1.17
 OVER_1_5_SHORTLIST_LIMIT = 40
 OVER_1_5_PER_LEAGUE_LIMIT = 7
 ELO_HUGE_GAP_MIN = 250  # Big dog: gap strictly above this (D27/D44, 2026-10-02; was >= 300)
+# D137: the Big dog gap is venue-adjusted: (home Elo + BIG_DOG_HOME_EDGE) - away Elo.
+# Flat gaps treated home and away favourites alike although away favourites won
+# 10 pts less (71% vs 81%, 3 seasons top flight). With +65 both win ~77% and Big
+# dogs rise 2,189 -> 2,628 (engine/eval/diagnostics/strength_home_adv.py).
+BIG_DOG_HOME_EDGE = 65
+# D138: slight favourites (venue-adjusted gap 100 < g <= 250) split in two levels.
+# 3 seasons top flight: 100-175 won 51% (drew 26%), 175-250 won 62% (drew 23%).
+SLIGHT_FAV_MIN_GAP = 100          # at or below: "close" (flat gap, D27)
+SLIGHT_EDGE_MAX_GAP = 175         # 100-175 "slight edge", 175-250 "favourite"
+# D138: league tiers (Top / Middle / Bottom) as match-page context only. k-means
+# k=3 on current flat Elo of the league's latest season; at the same gap, tier
+# matchups changed slight-favourite win rates by <= 5 pts, so no numbers of
+# their own (engine/eval/diagnostics/tier_slight_fav.py, tier_context.py).
+TIER_MIN_TEAMS = 9
+TIER_MIN_GAMES = 3
+TIER_NAMES = ("Bottom", "Middle", "Top")
 ELO_LOW_VOLATILITY_MAX = 0.27
 ELO_VOLATILITY_MIN_HISTORY = 50
 ELO_GAP_SHORTLIST_LIMIT = 40
@@ -585,7 +602,129 @@ def _load_comparison_context(conn, league_volatility: dict) -> tuple[dict, dict 
         conn.rollback()
         print(f"  WARN elo gap group record unavailable: {exc}")
         group = None
+    if group is not None:
+        try:
+            group["slight_favourite"] = _load_slight_favourite_record(conn)
+        except Exception as exc:  # pragma: no cover
+            conn.rollback()
+            print(f"  WARN slight favourite record unavailable: {exc}")
     return rates, group
+
+
+SLIGHT_FAVOURITE_SQL = """
+    WITH matches AS (
+        SELECT f.goals_for AS home_goals, f.goals_against AS away_goals,
+               COALESCE(eh.rating_before_flat, eh.rating_before) + %s
+                 - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
+        FROM raw.engine_head_to_head f
+        JOIN elo.team_elo_history eh ON eh.fixture_id = f.fixture_id AND eh.team_id = f.team_id
+        JOIN elo.team_elo_history ea ON ea.fixture_id = f.fixture_id AND ea.team_id = f.opponent_id
+        WHERE f.is_played AND f.is_home
+    )
+    SELECT CASE WHEN ABS(diff) <= %s THEN 'slight_edge' ELSE 'favourite' END AS level,
+           COUNT(*),
+           SUM(CASE WHEN (diff > 0 AND home_goals > away_goals)
+                      OR (diff < 0 AND away_goals > home_goals) THEN 1 ELSE 0 END),
+           SUM(CASE WHEN home_goals = away_goals THEN 1 ELSE 0 END)
+    FROM matches
+    WHERE ABS(diff) > %s AND ABS(diff) <= %s
+    GROUP BY 1
+"""
+
+
+def slight_favourite_level(gap: float) -> str:
+    """D138: 'slight_edge' (about 5 in 10) or 'favourite' (about 6 in 10)."""
+    return "slight_edge" if gap <= SLIGHT_EDGE_MAX_GAP else "favourite"
+
+
+def aggregate_slight_record(rows) -> dict:
+    out = {}
+    for level, n, won, drew in rows:
+        n, won, drew = int(n), int(won or 0), int(drew or 0)
+        out[level] = {"matches": n, "won": won, "drew": drew,
+                      "win_rate": round(won / n, 4) if n else None,
+                      "draw_rate": round(drew / n, 4) if n else None}
+    return out
+
+
+def _load_slight_favourite_record(conn) -> dict:
+    """How slight favourites finished, per level (venue-adjusted gap, all leagues)."""
+    with conn.cursor() as cur:
+        cur.execute(SLIGHT_FAVOURITE_SQL, (BIG_DOG_HOME_EDGE, SLIGHT_EDGE_MAX_GAP,
+                                           SLIGHT_FAV_MIN_GAP, ELO_HUGE_GAP_MIN))
+        return aggregate_slight_record(cur.fetchall())
+
+
+TEAM_TIERS_SQL = """
+    WITH seasons AS (
+        SELECT f.league_name, COALESCE(rf.country_name, '') AS country, f.league_season_id,
+               ROW_NUMBER() OVER (PARTITION BY f.league_name, COALESCE(rf.country_name, '')
+                                  ORDER BY MAX(f.kickoff_utc) DESC) AS rn
+        FROM raw.engine_head_to_head f
+        JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
+        WHERE f.is_played
+        GROUP BY 1, 2, 3
+    ), teams AS (
+        SELECT s.league_name, s.country, f.team_id
+        FROM seasons s
+        JOIN raw.engine_head_to_head f
+          ON f.league_season_id = s.league_season_id AND f.is_played
+        WHERE s.rn = 1
+        GROUP BY 1, 2, 3
+        HAVING COUNT(*) >= %s
+    )
+    SELECT t.league_name, t.country, t.team_id, e.rating
+    FROM teams t
+    JOIN LATERAL (
+        SELECT COALESCE(h.rating_after_flat, h.rating_after) AS rating
+        FROM elo.team_elo_history h
+        WHERE h.team_id = t.team_id
+        ORDER BY h.kickoff_utc DESC
+        LIMIT 1
+    ) e ON TRUE
+"""
+
+
+def tier_labels(ratings: dict) -> dict:
+    """{team_id: 'Top'|'Middle'|'Bottom'} by 1-D k-means (k=3) on Elo; {} if too few."""
+    if len(ratings) < TIER_MIN_TEAMS:
+        return {}
+    teams = list(ratings)
+    x = np.array([float(ratings[t]) for t in teams])
+    centres = np.quantile(x, [1 / 6, 1 / 2, 5 / 6])
+    for _ in range(50):
+        lab = np.abs(x[:, None] - centres[None]).argmin(1)
+        new = np.array([x[lab == i].mean() if (lab == i).any() else centres[i] for i in range(3)])
+        if np.allclose(new, centres):
+            break
+        centres = new
+    rank = np.argsort(np.argsort(centres))
+    return {t: TIER_NAMES[int(rank[l])] for t, l in zip(teams, lab)}
+
+
+def _load_team_tiers(conn) -> dict:
+    """{(league, country): {team_id: tier}}; empty on failure (context only)."""
+    try:
+        with conn.cursor() as cur:
+            cur.execute(TEAM_TIERS_SQL, (TIER_MIN_GAMES,))
+            rows = cur.fetchall()
+    except Exception as exc:  # pragma: no cover
+        conn.rollback()
+        print(f"  WARN team tiers unavailable: {exc}")
+        return {}
+    by_league = defaultdict(dict)
+    for league, country, team_id, rating in rows:
+        if rating is not None:
+            by_league[(league, country or "")][int(team_id)] = rating
+    return {k: tier_labels(v) for k, v in by_league.items()}
+
+
+def attach_team_tiers(analysis: list[dict], tiers: dict) -> None:
+    """fixture["tiers"] = {"home": tier, "away": tier} when both teams have one."""
+    for f in analysis:
+        league = tiers.get((f.get("league"), f.get("country") or "")) or {}
+        h, a = league.get(f.get("home_team_id")), league.get(f.get("away_team_id"))
+        f["tiers"] = {"home": h, "away": a} if h and a else None
 
 
 # ── Strength group record ────────────────────────────────────────────────
@@ -594,8 +733,8 @@ def _load_elo_gap_group_record(
         max_upset: float | None = None) -> dict:
     """How favourites like the Strength shortlist actually finished.
 
-    Same population rules as _build_elo_gap_shortlist: pre-match flat Elo gap
-    strictly above gap_min, in leagues whose upset rate is ≤ max_upset over
+    Same population rules as _build_elo_gap_shortlist: pre-match flat Elo gap,
+    venue-adjusted by BIG_DOG_HOME_EDGE (D137), strictly above gap_min, in leagues whose upset rate is ≤ max_upset over
     enough history. Used for "favourites like this won X in 10" copy instead
     of a per-match win %, which did not separate stronger from weaker
     favourites (numbers audit §5).
@@ -613,7 +752,7 @@ def _load_elo_gap_group_record(
                     COALESCE(rf.country_name, '') AS country,
                     f.goals_for AS home_goals,
                     f.goals_against AS away_goals,
-                    COALESCE(eh.rating_before_flat, eh.rating_before)
+                    COALESCE(eh.rating_before_flat, eh.rating_before) + %s
                       - COALESCE(ea.rating_before_flat, ea.rating_before) AS diff
                 FROM raw.engine_head_to_head f
                 JOIN raw.fact_fixtures rf ON rf.fixture_id = f.fixture_id
@@ -633,7 +772,7 @@ def _load_elo_gap_group_record(
             FROM matches
             WHERE ABS(diff) > %s
             GROUP BY league, country, band
-        """.replace("_ELO_BAND_SQL", _elo_band_sql()), (gap_min,))
+        """.replace("_ELO_BAND_SQL", _elo_band_sql()), (BIG_DOG_HOME_EDGE, gap_min))
         rows = cur.fetchall()
     return aggregate_elo_gap_group(rows, eligible, gap_min, max_upset)
 
@@ -1836,6 +1975,11 @@ def dc_favourite_win(fixture: dict, favourite: str | None) -> float | None:
     return round(sum(pf[i] * pd_[j] for i in range(11) for j in range(i)), 4)
 
 
+def venue_gap(flat_gap: float, favourite_is_home: bool) -> float:
+    """D137 Big dog gap: the home side counts BIG_DOG_HOME_EDGE Elo points stronger."""
+    return flat_gap + BIG_DOG_HOME_EDGE if favourite_is_home else flat_gap - BIG_DOG_HOME_EDGE
+
+
 def _build_elo_gap_shortlist(
         fixture_analysis: list[dict], league_volatility: dict,
         limit: int | None = ELO_GAP_SHORTLIST_LIMIT,
@@ -1865,11 +2009,12 @@ def _build_elo_gap_shortlist(
             if volatility["upset_rate"] > ELO_LOW_VOLATILITY_MAX:
                 continue
 
+        # D137: a home favourite can qualify from a flat gap down to 250 - edge.
         mismatch = [m for m in fixture.get("mismatch", [])
-                    if (m.get("gap") or 0) > ELO_HUGE_GAP_MIN]
+                    if (m.get("gap") or 0) > ELO_HUGE_GAP_MIN - BIG_DOG_HOME_EDGE]
         if not mismatch:
             continue
-        gap = max(m["gap"] for m in mismatch)
+        flat_gap = max(m["gap"] for m in mismatch)
         favourite = None
         favourite_rows = []
         for team in (fixture.get("home", ""), fixture.get("away", "")):
@@ -1880,6 +2025,9 @@ def _build_elo_gap_shortlist(
                 favourite_rows = team_rows
                 break
         if not favourite:
+            continue
+        gap = round(venue_gap(flat_gap, favourite == fixture.get("home")))
+        if gap <= ELO_HUGE_GAP_MIN:
             continue
         underdog = (fixture.get("away") if favourite == fixture.get("home")
                     else fixture.get("home"))
@@ -1899,7 +2047,8 @@ def _build_elo_gap_shortlist(
             "country": fixture.get("country", ""),
             "favourite": favourite,
             "underdog": underdog,
-            "elo_gap": gap,
+            "elo_gap": gap,                 # D137 venue-adjusted
+            "elo_gap_flat": flat_gap,
             "gap_bin": f">{ELO_HUGE_GAP_MIN}",
             "league_upset_rate": volatility["upset_rate"],
             "league_matches": volatility["matches"],
@@ -2095,6 +2244,7 @@ def build_consensus_from_signals(signals: list[dict],
         league_elo_volatility = _load_league_elo_volatility(conn)
         league_event_rates, elo_gap_group = _load_comparison_context(
             conn, league_elo_volatility)
+        team_tiers = _load_team_tiers(conn)
     finally:
         conn.close()
 
@@ -2107,6 +2257,7 @@ def build_consensus_from_signals(signals: list[dict],
                                       gate_status, bayesian_analysis)
     attach_league_comparisons(analysis, league_event_rates)
     attach_team_patterns(analysis)  # contract §3.4, D122
+    attach_team_tiers(analysis, team_tiers)  # D138 context
     slips = _build_slips(ranked, target_odds, bankroll=bankroll)
     bounds_shortlist = _build_bounds_1_4_shortlist(
         ranked, end_date=shortlist_end_date)
@@ -2295,6 +2446,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
         league_elo_volatility = _load_league_elo_volatility(conn)
         league_event_rates, elo_gap_group = _load_comparison_context(
             conn, league_elo_volatility)
+        team_tiers = _load_team_tiers(conn)
     finally:
         conn.close()
 
@@ -2422,6 +2574,7 @@ def run_consensus(days: int = 10, target_odds: float = TARGET_ODDS,
     analysis_list.sort(key=lambda x: x.get("kickoff", ""))
     attach_league_comparisons(analysis_list, league_event_rates)
     attach_team_patterns(analysis_list)  # contract §3.4, D122
+    attach_team_tiers(analysis_list, team_tiers)  # D138 context
 
     # ── Assemble slips ──────────────────────────────────────────────────
     slips = _build_slips(ranked, target_odds, bankroll=bankroll)
@@ -2815,6 +2968,7 @@ def save_slips(
             "over_1_5_min_belief": OVER_1_5_MIN_BELIEF,
             "over_1_5_min_odds": OVER_1_5_MIN_ODDS,
             "elo_huge_gap_min": ELO_HUGE_GAP_MIN,
+            "big_dog_home_edge": BIG_DOG_HOME_EDGE,
             "elo_low_volatility_max": ELO_LOW_VOLATILITY_MAX,
             "duo": DUO_THRESHOLD,
             "trio": TRIO_THRESHOLD,
@@ -2889,6 +3043,7 @@ def save_slips(
             "favourite": p["favourite"],
             "underdog": p["underdog"],
             "elo_gap": p["elo_gap"],
+            "elo_gap_flat": p.get("elo_gap_flat"),
             "gap_bin": p["gap_bin"],
             "league_upset_rate": p["league_upset_rate"],
             "league_matches": p["league_matches"],
