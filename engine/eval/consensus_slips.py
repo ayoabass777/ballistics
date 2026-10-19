@@ -346,6 +346,16 @@ LEAGUE_GAP_SOME = 0.05            # ≥ +5 pts → above; within ±5 → typical
 DISCOVER_DC_MIN_PROB = 0.70  # standouts only (owner, 2026-10-07)
 DISCOVER_SECTION_DC_MIN_PROB = 0.75  # Owner, 2026-10-17: Discover Goals section
 DISCOVER_PATTERN_PRIOR_MATCHES = 15  # D77: historical ranking; separate from prediction rating
+# D129: the prior is set per (league, event, venue context) from how much that
+# league's teams really differ on the event (empirical Bayes, method of
+# moments): M = p(1-p)/tau^2 - 1, tau^2 = observed variance of team rates minus
+# luck variance. Clamped to [FLOOR, CAP]; DISCOVER_PATTERN_PRIOR_MATCHES is the
+# fallback when too few teams. Walk-forward: standout-size claims realised 0.80
+# of their size (fixed 15: 0.74); engine/eval/diagnostics/pattern_shrink_variable.py.
+PATTERN_PRIOR_FLOOR = 15
+PATTERN_PRIOR_CAP = 30
+PATTERN_PRIOR_MIN_TEAMS = 10
+PATTERN_PRIOR_MIN_GAMES = 5
 DISCOVER_GOALS_WEIGHT = 1.0  # D128: was 0.76 (D71); the D127 league blend now makes goals gaps honest (re-measured 1.01 at 70%+)
 STANDOUT_MIN_SCORE = 0.15  # D78: inclusive adjusted percentage-point gap
 ELO_GAP_BANDS = ((250, 300), (300, 400), (400, None))   # (lower excl., upper incl.)
@@ -795,9 +805,45 @@ def _fixture_favourite(fixture: dict, strength: dict | None) -> str | None:
     return None
 
 
+def pattern_prior_matches(analysis: list[dict]) -> dict:
+    """D129: {(league, event, context): prior matches} from the run's team records.
+
+    Uses every team record carried in the run's `bayesian` rows (one per team,
+    league, event and venue context). Keys with fewer than
+    PATTERN_PRIOR_MIN_TEAMS teams on PATTERN_PRIOR_MIN_GAMES+ games are left
+    out, so callers fall back to DISCOVER_PATTERN_PRIOR_MATCHES.
+    """
+    teams: dict = defaultdict(dict)
+    for fixture in analysis:
+        for b in fixture.get("bayesian") or []:
+            k, n = b.get("k"), b.get("n")
+            if k is None or not n or not b.get("team"):
+                continue
+            key = (b.get("league"), b.get("event"), b.get("context") or "all")
+            teams[key][b["team"]] = (int(k), int(n))
+    out = {}
+    for key, recs in teams.items():
+        rows = [(k, n) for k, n in recs.values() if n >= PATTERN_PRIOR_MIN_GAMES]
+        if len(rows) < PATTERN_PRIOR_MIN_TEAMS:
+            continue
+        k_all = sum(k for k, _ in rows); n_all = sum(n for _, n in rows)
+        p = k_all / n_all
+        if p <= 0 or p >= 1:
+            continue
+        rates_ = [k / n for k, n in rows]
+        mean = sum(rates_) / len(rates_)
+        observed = sum((r - mean) ** 2 for r in rates_) / (len(rates_) - 1)
+        luck = sum(p * (1 - p) / n for _, n in rows) / len(rows)
+        tau2 = observed - luck
+        m = PATTERN_PRIOR_CAP if tau2 <= 0 else p * (1 - p) / tau2 - 1
+        out[key] = round(min(max(m, PATTERN_PRIOR_FLOOR), PATTERN_PRIOR_CAP), 2)
+    return out
+
+
 def discover_candidates(fixture: dict, strength: dict | None,
                         group: dict | None, rates: dict,
-                        goals_min_prob: float = DISCOVER_DC_MIN_PROB) -> list[dict]:
+                        goals_min_prob: float = DISCOVER_DC_MIN_PROB,
+                        pattern_priors: dict | None = None) -> list[dict]:
     """Every Discover-eligible event for one fixture, scored on one scale (D71).
 
     goals_min_prob: 0.70 for standouts (D101), 0.75 for the Goals section (2026-10-17).
@@ -814,18 +860,21 @@ def discover_candidates(fixture: dict, strength: dict | None,
                     "market": market, "probability": r["probability"],
                     "league_rate": r.get("league_rate"),
                     "league_comparison": r.get("league_comparison")})
-    m = DISCOVER_PATTERN_PRIOR_MATCHES
     for p in fixture.get("bayesian") or []:
         k, n, base = p.get("k"), p.get("n"), p.get("base_rate")
         if (not n or k is None or base is None
                 or n < PATTERN_COMPARE_MIN_N
                 or p.get("league_comparison") in _NO_COMPARISON):
             continue
+        m = (pattern_priors or {}).get(
+            (p.get("league"), p.get("event"), p.get("context") or "all"),
+            DISCOVER_PATTERN_PRIOR_MATCHES)
         shrunk = (k + m * float(base)) / (n + m)
         out.append({"list": "patterns", "score": shrunk - float(base),
                     "team": p.get("team"), "event": p.get("event"),
                     "context": p.get("context"), "k": k, "n": n,
                     "base_rate": base, "shrunk_rate": round(shrunk, 4),
+                    "prior_matches": m,
                     "league_comparison": p.get("league_comparison")})
     if strength:
         rec = elo_league_record(group, fixture.get("league"), fixture.get("country"))
@@ -854,10 +903,12 @@ def attach_discover_picks(analysis: list[dict], shortlist: list[dict],
     favourite is carried as `big_dog` so any winning card can show the badge.
     """
     by_fid = {s["fixture_id"]: s for s in shortlist}
+    priors = pattern_prior_matches(analysis)   # D129
     for fixture in analysis:
         strength = by_fid.get(fixture.get("fixture_id"))
         fav = _fixture_favourite(fixture, strength)
-        cands = discover_candidates(fixture, strength, group, rates)
+        cands = discover_candidates(fixture, strength, group, rates,
+                                    pattern_priors=priors)
         if strength:
             s = next((c for c in cands if c["list"] == "strength"), None)
             rec = elo_league_record(group, fixture.get("league"),
@@ -889,7 +940,8 @@ def attach_discover_picks(analysis: list[dict], shortlist: list[dict],
             "candidates": len(ranked)}
         fixture["discover_sections"] = section_picks(
             discover_candidates(fixture, strength, group, rates,
-                                goals_min_prob=DISCOVER_SECTION_DC_MIN_PROB),
+                                goals_min_prob=DISCOVER_SECTION_DC_MIN_PROB,
+                                pattern_priors=priors),
             fav, strength.get("favourite") if strength else None)
 
 
