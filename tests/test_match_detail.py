@@ -79,7 +79,7 @@ class SectionTests(unittest.TestCase):
 
     def test_strength_states(self):
         f = dict(FIXTURE)
-        self.assertEqual(md.strength_section(f, self.export), {"state": "close"})
+        self.assertEqual(md.strength_section(f, self.export), {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin"})
         self.assertEqual(md.strength_section(dict(f, mismatch=[]), self.export), {"state": "close"})
         self.assertIsNone(md.strength_section(dict(f, mismatch=[], strength=None), self.export))
         big = dict(f, fixture_id=60898)
@@ -91,6 +91,16 @@ class SectionTests(unittest.TestCase):
                                      ("Wild", "Z", "unpredictable")):
             s = md.strength_section(dict(f, mismatch=wide, league=league, country=country), self.export)
             self.assertEqual(s, {"state": "no_label", "reason": why})
+
+    def test_slight_favourite_boundaries_and_missing_gap(self):
+        for gap, state in [(100, "close"), (101, "slight_favourite"), (250, "slight_favourite")]:
+            f = dict(FIXTURE, mismatch=[{"market": "Zlin Over 0.5", "gap": gap}])
+            result = md.strength_section(f, self.export)
+            self.assertEqual(result["state"], state)
+            if state == "slight_favourite":
+                self.assertEqual(result["favourite"], "Zlin")
+                self.assertEqual(result["underdog"], "Pardubice")
+        self.assertIsNone(md.strength_section(dict(FIXTURE, mismatch=[{"market": "Zlin Over 0.5"}]), self.export))
 
     def test_strength_never_exposes_counts_or_gap(self):
         s = md.strength_section(dict(FIXTURE, fixture_id=60898), self.export)
@@ -165,7 +175,7 @@ class BuildTests(unittest.TestCase):
         self.assertEqual(p["fixture"]["run_ds"], "2026-10-13")
         self.assertEqual(p["fixture"]["run_finished_at"], "2026-10-14T07:05:00+00:00")
         self.assertEqual(p["fixture"]["standings_updated_at"], "2026-10-12T00:00:00+00:00")
-        self.assertEqual(p["strength"], {"state": "close"})
+        self.assertEqual(p["strength"], {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin"})
         self.assertEqual(p["patterns"]["all"]["top_results"][0]["label"], "Lost")
         self.assertEqual(p["context"]["form"]["away_team"]["overall"]["league_size"], 16)
         self.assertIn("h2h", p["context"])
@@ -217,7 +227,7 @@ class HTTPTests(unittest.TestCase):
             rc.return_value.__enter__.return_value = FakeCursor(row=stored_row())
             r = client.get("/api/match/90876")
             self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.json()["strength"], {"state": "close"})
+            self.assertEqual(r.json()["strength"], {"state": "slight_favourite", "favourite": "Pardubice", "underdog": "Zlin"})
 
 if __name__ == "__main__":
     unittest.main()

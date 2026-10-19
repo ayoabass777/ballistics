@@ -1,0 +1,2853 @@
+{
+  "run_ds": "2026-10-17",
+  "strength": {
+    "79914": {
+      "state": "close"
+    },
+    "79929": {
+      "state": "close"
+    },
+    "71017": {
+      "state": "close"
+    },
+    "79922": {
+      "state": "close"
+    },
+    "79919": {
+      "state": "close"
+    },
+    "79925": {
+      "state": "close"
+    },
+    "79915": {
+      "state": "close"
+    },
+    "67740": {
+      "state": "close"
+    },
+    "79920": {
+      "state": "close"
+    },
+    "107566": {
+      "state": "close"
+    },
+    "102534": {
+      "state": "close"
+    },
+    "119650": {
+      "state": "close"
+    },
+    "85199": {
+      "state": "close"
+    },
+    "85198": {
+      "state": "close"
+    },
+    "117229": {
+      "state": "close"
+    },
+    "117227": {
+      "state": "close"
+    },
+    "75666": {
+      "state": "close"
+    },
+    "85202": {
+      "state": "close"
+    },
+    "85200": {
+      "state": "close"
+    },
+    "85201": {
+      "state": "close"
+    },
+    "83675": {
+      "state": "close"
+    },
+    "55133": {
+      "state": "close"
+    },
+    "81765": {
+      "state": "close"
+    },
+    "45070": {
+      "state": "close"
+    },
+    "117235": {
+      "state": "close"
+    },
+    "86074": {
+      "state": "close"
+    },
+    "75667": {
+      "state": "close"
+    },
+    "75668": {
+      "state": "close"
+    },
+    "80244": {
+      "state": "close"
+    },
+    "80240": {
+      "state": "close"
+    },
+    "63554": {
+      "state": "close"
+    },
+    "70774": {
+      "state": "close"
+    },
+    "68118": {
+      "state": "close"
+    },
+    "75670": {
+      "state": "close"
+    },
+    "107544": {
+      "state": "close"
+    },
+    "68555": {
+      "state": "close"
+    },
+    "85330": {
+      "state": "close"
+    },
+    "56315": {
+      "state": "close"
+    },
+    "73961": {
+      "state": "close"
+    },
+    "110197": {
+      "state": "close"
+    },
+    "110202": {
+      "state": "close"
+    },
+    "79482": {
+      "state": "close"
+    },
+    "45072": {
+      "state": "close"
+    },
+    "128066": {
+      "state": "close"
+    },
+    "90871": {
+      "state": "close"
+    },
+    "90876": {
+      "state": "close"
+    },
+    "85693": {
+      "state": "close"
+    },
+    "70777": {
+      "state": "close"
+    },
+    "68120": {
+      "state": "big_dog",
+      "underdog": "Ipswich",
+      "favourite": "Manchester City"
+    },
+    "68117": {
+      "state": "close"
+    },
+    "68122": {
+      "state": "close"
+    },
+    "81772": {
+      "state": "close"
+    },
+    "40122": {
+      "state": "close"
+    },
+    "107553": {
+      "state": "close"
+    },
+    "107547": {
+      "state": "close"
+    },
+    "107552": {
+      "state": "close"
+    },
+    "68561": {
+      "state": "close"
+    },
+    "68565": {
+      "state": "close"
+    },
+    "68556": {
+      "state": "close"
+    },
+    "45069": {
+      "state": "close"
+    },
+    "71014": {
+      "state": "close"
+    },
+    "71013": {
+      "state": "close"
+    },
+    "131938": {
+      "state": "close"
+    },
+    "131937": {
+      "state": "close"
+    },
+    "131934": {
+      "state": "close"
+    },
+    "131935": {
+      "state": "close"
+    },
+    "131939": {
+      "state": "close"
+    },
+    "124389": {
+      "state": "close"
+    },
+    "85327": {
+      "state": "close"
+    },
+    "79475": {
+      "state": "close"
+    },
+    "122101": {
+      "state": "close"
+    },
+    "62047": {
+      "state": "close"
+    },
+    "63555": {
+      "state": "close"
+    },
+    "42670": {
+      "state": "close"
+    },
+    "56314": {
+      "state": "close"
+    },
+    "126491": {
+      "state": "close"
+    },
+    "128059": {
+      "state": "close"
+    },
+    "43940": {
+      "state": "close"
+    },
+    "85695": {
+      "state": "close"
+    },
+    "44253": {
+      "state": "big_dog",
+      "underdog": "Bologna",
+      "favourite": "Inter"
+    },
+    "86070": {
+      "state": "close"
+    },
+    "68115": {
+      "state": "close"
+    },
+    "111915": {
+      "state": "big_dog",
+      "underdog": "Atromitos",
+      "favourite": "AEK Athens FC"
+    },
+    "79479": {
+      "state": "close"
+    },
+    "126492": {
+      "state": "close"
+    },
+    "102532": {
+      "state": "close"
+    },
+    "110201": {
+      "state": "close"
+    },
+    "80239": {
+      "state": "close"
+    },
+    "44252": {
+      "state": "close"
+    },
+    "58454": {
+      "state": "close"
+    },
+    "85326": {
+      "state": "close"
+    },
+    "71016": {
+      "state": "big_dog",
+      "underdog": "Dundee",
+      "favourite": "Rangers"
+    },
+    "79473": {
+      "state": "close"
+    },
+    "67732": {
+      "state": "close"
+    },
+    "43937": {
+      "state": "close"
+    },
+    "102540": {
+      "state": "close"
+    },
+    "102537": {
+      "state": "close"
+    },
+    "96618": {
+      "state": "close"
+    },
+    "55132": {
+      "state": "big_dog",
+      "underdog": "Kuressaare",
+      "favourite": "FC Levadia Tallinn"
+    },
+    "48597": {
+      "state": "close"
+    },
+    "67736": {
+      "state": "close"
+    },
+    "66435": {
+      "state": "close"
+    },
+    "67735": {
+      "state": "close"
+    },
+    "66434": {
+      "state": "close"
+    },
+    "66433": {
+      "state": "close"
+    },
+    "119652": {
+      "state": "close"
+    },
+    "96622": {
+      "state": "close"
+    },
+    "66436": {
+      "state": "close"
+    },
+    "66437": {
+      "state": "close"
+    },
+    "66438": {
+      "state": "close"
+    },
+    "96625": {
+      "state": "close"
+    },
+    "96626": {
+      "state": "close"
+    },
+    "66439": {
+      "state": "close"
+    },
+    "67738": {
+      "state": "close"
+    },
+    "66440": {
+      "state": "close"
+    },
+    "66441": {
+      "state": "close"
+    },
+    "66442": {
+      "state": "close"
+    },
+    "96629": {
+      "state": "close"
+    },
+    "66443": {
+      "state": "close"
+    },
+    "117236": {
+      "state": "close"
+    },
+    "83677": {
+      "state": "close"
+    },
+    "85205": {
+      "state": "close"
+    },
+    "83674": {
+      "state": "close"
+    },
+    "73964": {
+      "state": "close"
+    },
+    "79483": {
+      "state": "close"
+    },
+    "75671": {
+      "state": "close"
+    },
+    "70772": {
+      "state": "big_dog",
+      "underdog": "Akhmat",
+      "favourite": "Zenit"
+    },
+    "75672": {
+      "state": "close"
+    },
+    "80241": {
+      "state": "close"
+    },
+    "80245": {
+      "state": "close"
+    },
+    "80242": {
+      "state": "close"
+    },
+    "72368": {
+      "state": "close"
+    },
+    "72374": {
+      "state": "close"
+    },
+    "42667": {
+      "state": "close"
+    },
+    "43815": {
+      "state": "close"
+    },
+    "40127": {
+      "state": "close"
+    },
+    "103807": {
+      "state": "close"
+    },
+    "68123": {
+      "state": "close"
+    },
+    "68121": {
+      "state": "close"
+    },
+    "68116": {
+      "state": "close"
+    },
+    "90874": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "81766": {
+      "state": "close"
+    },
+    "85692": {
+      "state": "close"
+    },
+    "56312": {
+      "state": "close"
+    },
+    "61898": {
+      "state": "close"
+    },
+    "81770": {
+      "state": "close"
+    },
+    "71012": {
+      "state": "close"
+    },
+    "62049": {
+      "state": "close"
+    },
+    "79480": {
+      "state": "close"
+    },
+    "85329": {
+      "state": "close"
+    },
+    "79477": {
+      "state": "close"
+    },
+    "42672": {
+      "state": "close"
+    },
+    "42669": {
+      "state": "close"
+    },
+    "79916": {
+      "state": "close"
+    },
+    "40124": {
+      "state": "close"
+    },
+    "70663": {
+      "state": "close"
+    },
+    "128061": {
+      "state": "close"
+    },
+    "103808": {
+      "state": "close"
+    },
+    "124388": {
+      "state": "close"
+    },
+    "85690": {
+      "state": "close"
+    },
+    "68124": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "44249": {
+      "state": "close"
+    },
+    "86069": {
+      "state": "close"
+    },
+    "43812": {
+      "state": "close"
+    },
+    "55134": {
+      "state": "close"
+    },
+    "85328": {
+      "state": "close"
+    },
+    "79478": {
+      "state": "close"
+    },
+    "79476": {
+      "state": "close"
+    },
+    "45074": {
+      "state": "close"
+    },
+    "43939": {
+      "state": "close"
+    },
+    "48602": {
+      "state": "close"
+    },
+    "86649": {
+      "state": "close"
+    },
+    "85331": {
+      "state": "close"
+    },
+    "79481": {
+      "state": "close"
+    },
+    "96631": {
+      "state": "close"
+    },
+    "66444": {
+      "state": "close"
+    },
+    "86645": {
+      "state": "close"
+    },
+    "45073": {
+      "state": "close"
+    },
+    "60901": {
+      "state": "close"
+    },
+    "124390": {
+      "state": "close"
+    },
+    "45068": {
+      "state": "close"
+    },
+    "56313": {
+      "state": "close"
+    },
+    "62048": {
+      "state": "close"
+    },
+    "44258": {
+      "state": "close"
+    },
+    "70778": {
+      "state": "close"
+    },
+    "86072": {
+      "state": "close"
+    },
+    "60898": {
+      "state": "big_dog",
+      "underdog": "Tukums",
+      "favourite": "R\u012bgas FS"
+    },
+    "42673": {
+      "state": "close"
+    },
+    "92828": {
+      "state": "close"
+    },
+    "103953": {
+      "state": "close"
+    },
+    "103952": {
+      "state": "close"
+    },
+    "124387": {
+      "state": "close"
+    },
+    "122105": {
+      "state": "close"
+    },
+    "110204": {
+      "state": "close"
+    },
+    "68119": {
+      "state": "close"
+    },
+    "58446": {
+      "state": "close"
+    },
+    "85334": {
+      "state": "close"
+    },
+    "81838": {
+      "state": "close"
+    },
+    "48604": {
+      "state": "close"
+    },
+    "86650": {
+      "state": "close"
+    },
+    "103956": {
+      "state": "big_dog",
+      "underdog": "El Geish",
+      "favourite": "Pyramids FC"
+    },
+    "107556": {
+      "state": "close"
+    },
+    "107565": {
+      "state": "close"
+    },
+    "107555": {
+      "state": "close"
+    },
+    "131946": {
+      "state": "close"
+    },
+    "107558": {
+      "state": "close"
+    },
+    "131943": {
+      "state": "close"
+    },
+    "131947": {
+      "state": "close"
+    },
+    "131951": {
+      "state": "close"
+    },
+    "131944": {
+      "state": "close"
+    },
+    "131953": {
+      "state": "close"
+    },
+    "131948": {
+      "state": "close"
+    },
+    "131945": {
+      "state": "close"
+    },
+    "48603": {
+      "state": "close"
+    },
+    "117245": {
+      "state": "close"
+    },
+    "117242": {
+      "state": "close"
+    },
+    "117240": {
+      "state": "close"
+    },
+    "117244": {
+      "state": "close"
+    },
+    "103960": {
+      "state": "close"
+    },
+    "131954": {
+      "state": "close"
+    },
+    "66307": {
+      "state": "close"
+    },
+    "67625": {
+      "state": "close"
+    },
+    "119662": {
+      "state": "close"
+    },
+    "86082": {
+      "state": "close"
+    },
+    "56320": {
+      "state": "close"
+    },
+    "80249": {
+      "state": "close"
+    },
+    "63557": {
+      "state": "close"
+    },
+    "42682": {
+      "state": "close"
+    },
+    "103813": {
+      "state": "close"
+    },
+    "110210": {
+      "state": "close"
+    },
+    "110212": {
+      "state": "close"
+    },
+    "110209": {
+      "state": "close"
+    },
+    "110214": {
+      "state": "close"
+    },
+    "110208": {
+      "state": "close"
+    },
+    "92843": {
+      "state": "close"
+    },
+    "79488": {
+      "state": "close"
+    },
+    "67825": {
+      "state": "close"
+    },
+    "58458": {
+      "state": "close"
+    },
+    "58455": {
+      "state": "close"
+    },
+    "43951": {
+      "state": "close"
+    },
+    "68130": {
+      "state": "close"
+    },
+    "58459": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "85342": {
+      "state": "close"
+    },
+    "102542": {
+      "state": "close"
+    },
+    "48615": {
+      "state": "close"
+    },
+    "53857": {
+      "state": "close"
+    },
+    "119667": {
+      "state": "close"
+    },
+    "85206": {
+      "state": "close"
+    },
+    "83684": {
+      "state": "close"
+    },
+    "83683": {
+      "state": "close"
+    },
+    "83685": {
+      "state": "close"
+    },
+    "83680": {
+      "state": "close"
+    },
+    "83681": {
+      "state": "close"
+    },
+    "117247": {
+      "state": "close"
+    },
+    "75674": {
+      "state": "close"
+    },
+    "73972": {
+      "state": "close"
+    },
+    "73967": {
+      "state": "close"
+    },
+    "73971": {
+      "state": "close"
+    },
+    "73970": {
+      "state": "close"
+    },
+    "73974": {
+      "state": "close"
+    },
+    "70786": {
+      "state": "close"
+    },
+    "60903": {
+      "state": "close"
+    },
+    "81820": {
+      "state": "close"
+    },
+    "81817": {
+      "state": "close"
+    },
+    "86085": {
+      "state": "close"
+    },
+    "80250": {
+      "state": "close"
+    },
+    "80247": {
+      "state": "close"
+    },
+    "81816": {
+      "state": "close"
+    },
+    "63558": {
+      "state": "close"
+    },
+    "63559": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "56319": {
+      "state": "close"
+    },
+    "68132": {
+      "state": "close"
+    },
+    "107569": {
+      "state": "close"
+    },
+    "110206": {
+      "state": "close"
+    },
+    "63561": {
+      "state": "close"
+    },
+    "63560": {
+      "state": "close"
+    },
+    "79487": {
+      "state": "close"
+    },
+    "81814": {
+      "state": "close"
+    },
+    "42676": {
+      "state": "close"
+    },
+    "90880": {
+      "state": "close"
+    },
+    "90883": {
+      "state": "close"
+    },
+    "90882": {
+      "state": "close"
+    },
+    "86084": {
+      "state": "close"
+    },
+    "85700": {
+      "state": "close"
+    },
+    "85698": {
+      "state": "close"
+    },
+    "85701": {
+      "state": "close"
+    },
+    "85704": {
+      "state": "close"
+    },
+    "79930": {
+      "state": "close"
+    },
+    "79931": {
+      "state": "close"
+    },
+    "68134": {
+      "state": "close"
+    },
+    "68127": {
+      "state": "close"
+    },
+    "68567": {
+      "state": "close"
+    },
+    "67826": {
+      "state": "close"
+    },
+    "107573": {
+      "state": "close"
+    },
+    "107571": {
+      "state": "close"
+    },
+    "107574": {
+      "state": "close"
+    },
+    "68572": {
+      "state": "close"
+    },
+    "131960": {
+      "state": "close"
+    },
+    "131965": {
+      "state": "close"
+    },
+    "131961": {
+      "state": "close"
+    },
+    "131966": {
+      "state": "close"
+    },
+    "71021": {
+      "state": "big_dog",
+      "underdog": "ST Johnstone",
+      "favourite": "Rangers"
+    },
+    "71023": {
+      "state": "close"
+    },
+    "71022": {
+      "state": "close"
+    },
+    "85345": {
+      "state": "close"
+    },
+    "79485": {
+      "state": "close"
+    },
+    "81908": {
+      "state": "close"
+    },
+    "62051": {
+      "state": "close"
+    },
+    "81909": {
+      "state": "close"
+    },
+    "89085": {
+      "state": "close"
+    },
+    "89088": {
+      "state": "close"
+    },
+    "45076": {
+      "state": "close"
+    },
+    "45075": {
+      "state": "close"
+    },
+    "45079": {
+      "state": "close"
+    },
+    "46803": {
+      "state": "close"
+    },
+    "46807": {
+      "state": "close"
+    },
+    "46802": {
+      "state": "close"
+    },
+    "46804": {
+      "state": "close"
+    },
+    "128073": {
+      "state": "close"
+    },
+    "128069": {
+      "state": "close"
+    },
+    "53851": {
+      "state": "close"
+    },
+    "42679": {
+      "state": "close"
+    },
+    "111922": {
+      "state": "close"
+    },
+    "44261": {
+      "state": "close"
+    },
+    "40036": {
+      "state": "close"
+    },
+    "86086": {
+      "state": "close"
+    },
+    "55138": {
+      "state": "close"
+    },
+    "126500": {
+      "state": "big_dog",
+      "underdog": "OFK Beograd",
+      "favourite": "FK Crvena Zvezda"
+    },
+    "126498": {
+      "state": "close"
+    },
+    "67821": {
+      "state": "close"
+    },
+    "68128": {
+      "state": "close"
+    },
+    "85339": {
+      "state": "close"
+    },
+    "79484": {
+      "state": "close"
+    },
+    "79486": {
+      "state": "close"
+    },
+    "124400": {
+      "state": "close"
+    },
+    "124394": {
+      "state": "close"
+    },
+    "124396": {
+      "state": "close"
+    },
+    "124393": {
+      "state": "close"
+    },
+    "124397": {
+      "state": "close"
+    },
+    "124398": {
+      "state": "close"
+    },
+    "102546": {
+      "state": "close"
+    },
+    "92838": {
+      "state": "close"
+    },
+    "67829": {
+      "state": "close"
+    },
+    "79490": {
+      "state": "close"
+    },
+    "86662": {
+      "state": "close"
+    },
+    "86664": {
+      "state": "close"
+    },
+    "86655": {
+      "state": "close"
+    },
+    "81907": {
+      "state": "big_dog",
+      "underdog": "GIL Vicente",
+      "favourite": "FC Porto"
+    },
+    "67741": {
+      "state": "close"
+    },
+    "67742": {
+      "state": "close"
+    },
+    "66445": {
+      "state": "close"
+    },
+    "48613": {
+      "state": "close"
+    },
+    "48610": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "96634": {
+      "state": "close"
+    },
+    "86660": {
+      "state": "close"
+    },
+    "86656": {
+      "state": "close"
+    },
+    "67743": {
+      "state": "close"
+    },
+    "66446": {
+      "state": "close"
+    },
+    "86659": {
+      "state": "close"
+    },
+    "53853": {
+      "state": "close"
+    },
+    "66449": {
+      "state": "close"
+    },
+    "66448": {
+      "state": "close"
+    },
+    "66447": {
+      "state": "close"
+    },
+    "119669": {
+      "state": "close"
+    },
+    "96638": {
+      "state": "close"
+    },
+    "96635": {
+      "state": "close"
+    },
+    "67747": {
+      "state": "close"
+    },
+    "66452": {
+      "state": "close"
+    },
+    "66451": {
+      "state": "close"
+    },
+    "68125": {
+      "state": "close"
+    },
+    "66453": {
+      "state": "close"
+    },
+    "66455": {
+      "state": "close"
+    },
+    "66454": {
+      "state": "close"
+    },
+    "66456": {
+      "state": "close"
+    },
+    "96644": {
+      "state": "close"
+    },
+    "67748": {
+      "state": "close"
+    },
+    "85210": {
+      "state": "close"
+    },
+    "85208": {
+      "state": "close"
+    },
+    "85209": {
+      "state": "close"
+    },
+    "117254": {
+      "state": "close"
+    },
+    "117251": {
+      "state": "close"
+    },
+    "85213": {
+      "state": "close"
+    },
+    "85212": {
+      "state": "close"
+    },
+    "85211": {
+      "state": "close"
+    },
+    "117256": {
+      "state": "close"
+    },
+    "81815": {
+      "state": "close"
+    },
+    "75679": {
+      "state": "close"
+    },
+    "60905": {
+      "state": "big_dog",
+      "underdog": "Ogre United",
+      "favourite": "Auda"
+    },
+    "81819": {
+      "state": "close"
+    },
+    "92837": {
+      "state": "close"
+    },
+    "117231": {
+      "state": "close"
+    },
+    "75681": {
+      "state": "close"
+    },
+    "75680": {
+      "state": "close"
+    },
+    "60906": {
+      "state": "close"
+    },
+    "71018": {
+      "state": "close"
+    },
+    "128064": {
+      "state": "close"
+    },
+    "62052": {
+      "state": "close"
+    },
+    "80253": {
+      "state": "close"
+    },
+    "80255": {
+      "state": "close"
+    },
+    "67827": {
+      "state": "close"
+    },
+    "80254": {
+      "state": "close"
+    },
+    "55141": {
+      "state": "close"
+    },
+    "81818": {
+      "state": "close"
+    },
+    "63563": {
+      "state": "close"
+    },
+    "86079": {
+      "state": "close"
+    },
+    "85338": {
+      "state": "close"
+    },
+    "43822": {
+      "state": "close"
+    },
+    "43817": {
+      "state": "no_label",
+      "reason": "not_enough_matches"
+    },
+    "79494": {
+      "state": "close"
+    },
+    "103817": {
+      "state": "close"
+    },
+    "68126": {
+      "state": "close"
+    },
+    "68131": {
+      "state": "close"
+    },
+    "68129": {
+      "state": "close"
+    },
+    "81813": {
+      "state": "close"
+    },
+    "111916": {
+      "state": "big_dog",
+      "underdog": "Kalamata",
+      "favourite": "Olympiakos Piraeus"
+    },
+    "71020": {
+      "state": "close"
+    },
+    "79926": {
+      "state": "close"
+    },
+    "85341": {
+      "state": "close"
+    },
+    "79491": {
+      "state": "close"
+    },
+    "79489": {
+      "state": "close"
+    },
+    "53850": {
+      "state": "close"
+    },
+    "42681": {
+      "state": "close"
+    },
+    "60902": {
+      "state": "close"
+    },
+    "40131": {
+      "state": "close"
+    },
+    "40134": {
+      "state": "close"
+    },
+    "40133": {
+      "state": "close"
+    },
+    "40130": {
+      "state": "close"
+    },
+    "40136": {
+      "state": "close"
+    },
+    "70670": {
+      "state": "close"
+    },
+    "111921": {
+      "state": "big_dog",
+      "underdog": "Volos NFC",
+      "favourite": "Panathinaikos"
+    },
+    "111913": {
+      "state": "close"
+    },
+    "86081": {
+      "state": "close"
+    },
+    "43946": {
+      "state": "close"
+    },
+    "43949": {
+      "state": "close"
+    },
+    "43952": {
+      "state": "close"
+    },
+    "68133": {
+      "state": "close"
+    },
+    "61899": {
+      "state": "close"
+    },
+    "44267": {
+      "state": "close"
+    },
+    "90879": {
+      "state": "close"
+    },
+    "67824": {
+      "state": "close"
+    },
+    "85343": {
+      "state": "close"
+    },
+    "79492": {
+      "state": "close"
+    },
+    "53856": {
+      "state": "close"
+    },
+    "111920": {
+      "state": "close"
+    },
+    "81902": {
+      "state": "big_dog",
+      "underdog": "Nacional",
+      "favourite": "SC Braga"
+    },
+    "102548": {
+      "state": "close"
+    },
+    "85336": {
+      "state": "close"
+    },
+    "53852": {
+      "state": "close"
+    },
+    "81905": {
+      "state": "big_dog",
+      "underdog": "Academico Viseu",
+      "favourite": "Sporting CP"
+    },
+    "53855": {
+      "state": "close"
+    },
+    "56318": {
+      "state": "close"
+    },
+    "102554": {
+      "state": "close"
+    },
+    "60904": {
+      "state": "close"
+    },
+    "86078": {
+      "state": "close"
+    },
+    "63564": {
+      "state": "close"
+    },
+    "86083": {
+      "state": "close"
+    },
+    "110213": {
+      "state": "close"
+    },
+    "62050": {
+      "state": "close"
+    },
+    "43818": {
+      "state": "close"
+    },
+    "86080": {
+      "state": "close"
+    },
+    "79493": {
+      "state": "close"
+    },
+    "102545": {
+      "state": "close"
+    },
+    "117233": {
+      "state": "close"
+    },
+    "53854": {
+      "state": "close"
+    },
+    "86657": {
+      "state": "close"
+    },
+    "48614": {
+      "state": "close"
+    },
+    "119649": {
+      "state": "close"
+    },
+    "119651": {
+      "state": "close"
+    },
+    "117228": {
+      "state": "close"
+    },
+    "117232": {
+      "state": "close"
+    },
+    "117230": {
+      "state": "close"
+    },
+    "117234": {
+      "state": "close"
+    },
+    "128060": {
+      "state": "close"
+    },
+    "46794": {
+      "state": "close"
+    },
+    "73960": {
+      "state": "close"
+    },
+    "131933": {
+      "state": "close"
+    },
+    "60897": {
+      "state": "close"
+    },
+    "75669": {
+      "state": "close"
+    },
+    "80238": {
+      "state": "close"
+    },
+    "46792": {
+      "state": "close"
+    },
+    "81769": {
+      "state": "close"
+    },
+    "62046": {
+      "state": "close"
+    },
+    "107543": {
+      "state": "close"
+    },
+    "46795": {
+      "state": "close"
+    },
+    "68560": {
+      "state": "close"
+    },
+    "68563": {
+      "state": "close"
+    },
+    "131932": {
+      "state": "close"
+    },
+    "85688": {
+      "state": "close"
+    },
+    "73962": {
+      "state": "close"
+    },
+    "73963": {
+      "state": "close"
+    },
+    "86075": {
+      "state": "close"
+    },
+    "40129": {
+      "state": "big_dog",
+      "underdog": "Ham-Kam",
+      "favourite": "Bodo/Glimt"
+    },
+    "46790": {
+      "state": "close"
+    },
+    "81768": {
+      "state": "close"
+    },
+    "63556": {
+      "state": "close"
+    },
+    "46796": {
+      "state": "close"
+    },
+    "92834": {
+      "state": "close"
+    },
+    "79921": {
+      "state": "big_dog",
+      "underdog": "Union Berlin",
+      "favourite": "Borussia Dortmund"
+    },
+    "44256": {
+      "state": "close"
+    },
+    "86071": {
+      "state": "big_dog",
+      "underdog": "Gen\u00e7lerbirli\u011fi S.K.",
+      "favourite": "Galatasaray"
+    },
+    "90870": {
+      "state": "big_dog",
+      "underdog": "Hradec Kr\u00e1lov\u00e9",
+      "favourite": "Slavia Praha"
+    },
+    "90877": {
+      "state": "close"
+    },
+    "85689": {
+      "state": "close"
+    },
+    "85694": {
+      "state": "close"
+    },
+    "126494": {
+      "state": "close"
+    },
+    "107554": {
+      "state": "close"
+    },
+    "107546": {
+      "state": "close"
+    },
+    "107545": {
+      "state": "close"
+    },
+    "107551": {
+      "state": "close"
+    },
+    "107550": {
+      "state": "close"
+    },
+    "107549": {
+      "state": "close"
+    },
+    "107548": {
+      "state": "close"
+    },
+    "111912": {
+      "state": "close"
+    },
+    "68566": {
+      "state": "close"
+    },
+    "68564": {
+      "state": "close"
+    },
+    "68562": {
+      "state": "close"
+    },
+    "68559": {
+      "state": "close"
+    },
+    "68558": {
+      "state": "close"
+    },
+    "71015": {
+      "state": "close"
+    },
+    "131940": {
+      "state": "close"
+    },
+    "131942": {
+      "state": "close"
+    },
+    "131936": {
+      "state": "close"
+    },
+    "131941": {
+      "state": "close"
+    },
+    "44642": {
+      "state": "big_dog",
+      "underdog": "ADO Den Haag",
+      "favourite": "PSV Eindhoven"
+    },
+    "103812": {
+      "state": "big_dog",
+      "underdog": "Austria Lustenau",
+      "favourite": "Lask Linz"
+    },
+    "92832": {
+      "state": "close"
+    },
+    "40128": {
+      "state": "close"
+    },
+    "90873": {
+      "state": "close"
+    },
+    "85332": {
+      "state": "close"
+    },
+    "70773": {
+      "state": "close"
+    },
+    "103811": {
+      "state": "close"
+    },
+    "85691": {
+      "state": "close"
+    },
+    "44644": {
+      "state": "big_dog",
+      "underdog": "Telstar",
+      "favourite": "Feyenoord"
+    },
+    "92831": {
+      "state": "close"
+    },
+    "124391": {
+      "state": "close"
+    },
+    "96617": {
+      "state": "close"
+    },
+    "43942": {
+      "state": "close"
+    },
+    "43938": {
+      "state": "close"
+    },
+    "44645": {
+      "state": "close"
+    },
+    "48598": {
+      "state": "close"
+    },
+    "86646": {
+      "state": "close"
+    },
+    "86652": {
+      "state": "close"
+    },
+    "67733": {
+      "state": "close"
+    },
+    "67734": {
+      "state": "close"
+    },
+    "86651": {
+      "state": "close"
+    },
+    "102535": {
+      "state": "close"
+    },
+    "102528": {
+      "state": "close"
+    },
+    "119653": {
+      "state": "close"
+    },
+    "96623": {
+      "state": "close"
+    },
+    "96619": {
+      "state": "close"
+    },
+    "96620": {
+      "state": "close"
+    },
+    "96621": {
+      "state": "close"
+    },
+    "67737": {
+      "state": "close"
+    },
+    "86648": {
+      "state": "close"
+    },
+    "96624": {
+      "state": "close"
+    },
+    "67739": {
+      "state": "close"
+    },
+    "119654": {
+      "state": "close"
+    },
+    "119655": {
+      "state": "close"
+    },
+    "96630": {
+      "state": "close"
+    },
+    "96628": {
+      "state": "close"
+    },
+    "44250": {
+      "state": "close"
+    },
+    "96627": {
+      "state": "close"
+    },
+    "119656": {
+      "state": "close"
+    },
+    "85204": {
+      "state": "close"
+    },
+    "83679": {
+      "state": "close"
+    },
+    "85203": {
+      "state": "close"
+    },
+    "83676": {
+      "state": "close"
+    },
+    "83678": {
+      "state": "close"
+    },
+    "46798": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "81767": {
+      "state": "close"
+    },
+    "128065": {
+      "state": "close"
+    },
+    "122102": {
+      "state": "close"
+    },
+    "92827": {
+      "state": "close"
+    },
+    "44646": {
+      "state": "close"
+    },
+    "86073": {
+      "state": "close"
+    },
+    "73965": {
+      "state": "close"
+    },
+    "90875": {
+      "state": "close"
+    },
+    "81771": {
+      "state": "close"
+    },
+    "56311": {
+      "state": "close"
+    },
+    "75673": {
+      "state": "close"
+    },
+    "55135": {
+      "state": "close"
+    },
+    "73966": {
+      "state": "close"
+    },
+    "72371": {
+      "state": "close"
+    },
+    "126493": {
+      "state": "close"
+    },
+    "72369": {
+      "state": "close"
+    },
+    "72372": {
+      "state": "close"
+    },
+    "72370": {
+      "state": "close"
+    },
+    "72373": {
+      "state": "close"
+    },
+    "42674": {
+      "state": "close"
+    },
+    "46791": {
+      "state": "close"
+    },
+    "45067": {
+      "state": "close"
+    },
+    "85335": {
+      "state": "close"
+    },
+    "43811": {
+      "state": "close"
+    },
+    "70660": {
+      "state": "close"
+    },
+    "70665": {
+      "state": "close"
+    },
+    "103810": {
+      "state": "close"
+    },
+    "44648": {
+      "state": "close"
+    },
+    "92829": {
+      "state": "close"
+    },
+    "44254": {
+      "state": "close"
+    },
+    "60900": {
+      "state": "big_dog",
+      "underdog": "Super Nova",
+      "favourite": "Riga"
+    },
+    "60899": {
+      "state": "close"
+    },
+    "86077": {
+      "state": "close"
+    },
+    "46793": {
+      "state": "close"
+    },
+    "70775": {
+      "state": "close"
+    },
+    "79917": {
+      "state": "close"
+    },
+    "111911": {
+      "state": "big_dog",
+      "underdog": "Panetolikos",
+      "favourite": "Olympiakos Piraeus"
+    },
+    "43814": {
+      "state": "close"
+    },
+    "55136": {
+      "state": "big_dog",
+      "underdog": "Trans Narva",
+      "favourite": "Paide"
+    },
+    "126490": {
+      "state": "big_dog",
+      "underdog": "Mladost Lucani",
+      "favourite": "FK Crvena Zvezda"
+    },
+    "44649": {
+      "state": "close"
+    },
+    "42671": {
+      "state": "close"
+    },
+    "111909": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "68577": {
+      "state": "close"
+    },
+    "122103": {
+      "state": "close"
+    },
+    "40126": {
+      "state": "close"
+    },
+    "40125": {
+      "state": "close"
+    },
+    "70659": {
+      "state": "close"
+    },
+    "43944": {
+      "state": "close"
+    },
+    "70661": {
+      "state": "close"
+    },
+    "70666": {
+      "state": "close"
+    },
+    "70662": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "70664": {
+      "state": "close"
+    },
+    "103954": {
+      "state": "close"
+    },
+    "43941": {
+      "state": "close"
+    },
+    "43943": {
+      "state": "close"
+    },
+    "92830": {
+      "state": "close"
+    },
+    "70771": {
+      "state": "close"
+    },
+    "90872": {
+      "state": "close"
+    },
+    "126496": {
+      "state": "close"
+    },
+    "111914": {
+      "state": "close"
+    },
+    "40123": {
+      "state": "close"
+    },
+    "85686": {
+      "state": "close"
+    },
+    "102527": {
+      "state": "close"
+    },
+    "124385": {
+      "state": "close"
+    },
+    "111910": {
+      "state": "close"
+    },
+    "44647": {
+      "state": "close"
+    },
+    "44643": {
+      "state": "close"
+    },
+    "70776": {
+      "state": "close"
+    },
+    "44251": {
+      "state": "close"
+    },
+    "48606": {
+      "state": "close"
+    },
+    "48601": {
+      "state": "close"
+    },
+    "86647": {
+      "state": "close"
+    },
+    "107557": {
+      "state": "close"
+    },
+    "102541": {
+      "state": "close"
+    },
+    "102533": {
+      "state": "close"
+    },
+    "48600": {
+      "state": "close"
+    },
+    "86653": {
+      "state": "close"
+    },
+    "102529": {
+      "state": "close"
+    },
+    "119657": {
+      "state": "close"
+    },
+    "128062": {
+      "state": "close"
+    },
+    "103951": {
+      "state": "close"
+    },
+    "45071": {
+      "state": "big_dog",
+      "underdog": "Arsenal",
+      "favourite": "Dinamo Minsk"
+    },
+    "43816": {
+      "state": "close"
+    },
+    "122106": {
+      "state": "close"
+    },
+    "122104": {
+      "state": "close"
+    },
+    "44257": {
+      "state": "close"
+    },
+    "58447": {
+      "state": "close"
+    },
+    "102538": {
+      "state": "close"
+    },
+    "102536": {
+      "state": "close"
+    },
+    "102539": {
+      "state": "close"
+    },
+    "103958": {
+      "state": "close"
+    },
+    "103955": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "107562": {
+      "state": "close"
+    },
+    "107561": {
+      "state": "close"
+    },
+    "107560": {
+      "state": "close"
+    },
+    "107564": {
+      "state": "close"
+    },
+    "107563": {
+      "state": "close"
+    },
+    "107559": {
+      "state": "close"
+    },
+    "68496": {
+      "state": "close"
+    },
+    "131950": {
+      "state": "close"
+    },
+    "131952": {
+      "state": "close"
+    },
+    "131949": {
+      "state": "close"
+    },
+    "119661": {
+      "state": "close"
+    },
+    "119658": {
+      "state": "close"
+    },
+    "119659": {
+      "state": "close"
+    },
+    "117246": {
+      "state": "close"
+    },
+    "119660": {
+      "state": "close"
+    },
+    "117237": {
+      "state": "close"
+    },
+    "117239": {
+      "state": "close"
+    },
+    "117238": {
+      "state": "close"
+    },
+    "117243": {
+      "state": "close"
+    },
+    "117241": {
+      "state": "close"
+    },
+    "103957": {
+      "state": "close"
+    },
+    "70638": {
+      "state": "close"
+    },
+    "103959": {
+      "state": "big_dog",
+      "underdog": "Olympic El Qanah",
+      "favourite": "Al Ahly"
+    },
+    "85299": {
+      "state": "close"
+    },
+    "67617": {
+      "state": "close"
+    },
+    "96515": {
+      "state": "close"
+    },
+    "66408": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "119664": {
+      "state": "close"
+    },
+    "119663": {
+      "state": "close"
+    },
+    "119665": {
+      "state": "close"
+    },
+    "119666": {
+      "state": "close"
+    },
+    "92844": {
+      "state": "close"
+    },
+    "56317": {
+      "state": "close"
+    },
+    "80252": {
+      "state": "close"
+    },
+    "70784": {
+      "state": "close"
+    },
+    "42678": {
+      "state": "close"
+    },
+    "43819": {
+      "state": "close"
+    },
+    "122108": {
+      "state": "close"
+    },
+    "122115": {
+      "state": "close"
+    },
+    "122109": {
+      "state": "close"
+    },
+    "122111": {
+      "state": "close"
+    },
+    "122110": {
+      "state": "close"
+    },
+    "122114": {
+      "state": "close"
+    },
+    "122113": {
+      "state": "close"
+    },
+    "122107": {
+      "state": "close"
+    },
+    "122112": {
+      "state": "close"
+    },
+    "44650": {
+      "state": "close"
+    },
+    "85697": {
+      "state": "close"
+    },
+    "79928": {
+      "state": "close"
+    },
+    "44265": {
+      "state": "close"
+    },
+    "58457": {
+      "state": "close"
+    },
+    "58456": {
+      "state": "close"
+    },
+    "68573": {
+      "state": "close"
+    },
+    "81901": {
+      "state": "close"
+    },
+    "119668": {
+      "state": "close"
+    },
+    "102555": {
+      "state": "close"
+    },
+    "86661": {
+      "state": "close"
+    },
+    "48607": {
+      "state": "close"
+    },
+    "102547": {
+      "state": "close"
+    },
+    "83682": {
+      "state": "close"
+    },
+    "117248": {
+      "state": "close"
+    },
+    "73973": {
+      "state": "close"
+    },
+    "73968": {
+      "state": "close"
+    },
+    "73969": {
+      "state": "close"
+    },
+    "75675": {
+      "state": "close"
+    },
+    "85207": {
+      "state": "close"
+    },
+    "92842": {
+      "state": "close"
+    },
+    "80251": {
+      "state": "close"
+    },
+    "68571": {
+      "state": "close"
+    },
+    "75676": {
+      "state": "close"
+    },
+    "75677": {
+      "state": "close"
+    },
+    "75678": {
+      "state": "close"
+    },
+    "107568": {
+      "state": "close"
+    },
+    "107567": {
+      "state": "close"
+    },
+    "68576": {
+      "state": "close"
+    },
+    "131956": {
+      "state": "close"
+    },
+    "131955": {
+      "state": "close"
+    },
+    "55137": {
+      "state": "close"
+    },
+    "110207": {
+      "state": "close"
+    },
+    "85344": {
+      "state": "close"
+    },
+    "70673": {
+      "state": "close"
+    },
+    "70785": {
+      "state": "close"
+    },
+    "92840": {
+      "state": "close"
+    },
+    "44268": {
+      "state": "close"
+    },
+    "44260": {
+      "state": "close"
+    },
+    "42677": {
+      "state": "close"
+    },
+    "90885": {
+      "state": "close"
+    },
+    "85703": {
+      "state": "close"
+    },
+    "79924": {
+      "state": "close"
+    },
+    "79927": {
+      "state": "close"
+    },
+    "40031": {
+      "state": "big_dog",
+      "underdog": "Valerenga",
+      "favourite": "Bodo/Glimt"
+    },
+    "107577": {
+      "state": "close"
+    },
+    "107570": {
+      "state": "close"
+    },
+    "107575": {
+      "state": "close"
+    },
+    "107572": {
+      "state": "close"
+    },
+    "107576": {
+      "state": "close"
+    },
+    "68569": {
+      "state": "close"
+    },
+    "68575": {
+      "state": "close"
+    },
+    "68574": {
+      "state": "close"
+    },
+    "68570": {
+      "state": "close"
+    },
+    "68578": {
+      "state": "close"
+    },
+    "68568": {
+      "state": "close"
+    },
+    "131963": {
+      "state": "close"
+    },
+    "131957": {
+      "state": "close"
+    },
+    "131964": {
+      "state": "close"
+    },
+    "131958": {
+      "state": "close"
+    },
+    "131962": {
+      "state": "close"
+    },
+    "131959": {
+      "state": "close"
+    },
+    "71019": {
+      "state": "close"
+    },
+    "55139": {
+      "state": "big_dog",
+      "underdog": "Laagri",
+      "favourite": "FC Levadia Tallinn"
+    },
+    "70783": {
+      "state": "close"
+    },
+    "122116": {
+      "state": "close"
+    },
+    "44651": {
+      "state": "close"
+    },
+    "46800": {
+      "state": "close"
+    },
+    "89086": {
+      "state": "close"
+    },
+    "89082": {
+      "state": "close"
+    },
+    "89084": {
+      "state": "close"
+    },
+    "89087": {
+      "state": "close"
+    },
+    "89083": {
+      "state": "close"
+    },
+    "103818": {
+      "state": "close"
+    },
+    "128072": {
+      "state": "close"
+    },
+    "128067": {
+      "state": "close"
+    },
+    "128071": {
+      "state": "close"
+    },
+    "128074": {
+      "state": "close"
+    },
+    "45081": {
+      "state": "close"
+    },
+    "45077": {
+      "state": "close"
+    },
+    "45080": {
+      "state": "big_dog",
+      "underdog": "Naftan",
+      "favourite": "FC Isloch Minsk R."
+    },
+    "45078": {
+      "state": "close"
+    },
+    "45082": {
+      "state": "close"
+    },
+    "46799": {
+      "state": "close"
+    },
+    "46801": {
+      "state": "close"
+    },
+    "46805": {
+      "state": "close"
+    },
+    "46806": {
+      "state": "close"
+    },
+    "56316": {
+      "state": "close"
+    },
+    "128068": {
+      "state": "big_dog",
+      "underdog": "Kudrivka",
+      "favourite": "Dynamo Kyiv"
+    },
+    "128070": {
+      "state": "close"
+    },
+    "85705": {
+      "state": "close"
+    },
+    "43950": {
+      "state": "close"
+    },
+    "42675": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "92841": {
+      "state": "close"
+    },
+    "90878": {
+      "state": "big_dog",
+      "underdog": "Mlada Boleslav",
+      "favourite": "Slavia Praha"
+    },
+    "126501": {
+      "state": "close"
+    },
+    "126499": {
+      "state": "close"
+    },
+    "126502": {
+      "state": "close"
+    },
+    "126497": {
+      "state": "close"
+    },
+    "94876": {
+      "state": "close"
+    },
+    "94878": {
+      "state": "close"
+    },
+    "126503": {
+      "state": "close"
+    },
+    "111918": {
+      "state": "close"
+    },
+    "70781": {
+      "state": "close"
+    },
+    "44652": {
+      "state": "close"
+    },
+    "124395": {
+      "state": "close"
+    },
+    "124399": {
+      "state": "close"
+    },
+    "111917": {
+      "state": "big_dog",
+      "underdog": "Panetolikos",
+      "favourite": "AEK Athens FC"
+    },
+    "96632": {
+      "state": "no_label",
+      "reason": "not_enough_matches"
+    },
+    "103815": {
+      "state": "close"
+    },
+    "85702": {
+      "state": "close"
+    },
+    "110211": {
+      "state": "close"
+    },
+    "80248": {
+      "state": "close"
+    },
+    "94874": {
+      "state": "close"
+    },
+    "67822": {
+      "state": "close"
+    },
+    "44259": {
+      "state": "close"
+    },
+    "43953": {
+      "state": "close"
+    },
+    "48612": {
+      "state": "close"
+    },
+    "85337": {
+      "state": "close"
+    },
+    "44653": {
+      "state": "close"
+    },
+    "48616": {
+      "state": "close"
+    },
+    "48611": {
+      "state": "close"
+    },
+    "96633": {
+      "state": "close"
+    },
+    "102549": {
+      "state": "close"
+    },
+    "102551": {
+      "state": "close"
+    },
+    "67744": {
+      "state": "close"
+    },
+    "67745": {
+      "state": "close"
+    },
+    "96637": {
+      "state": "close"
+    },
+    "96636": {
+      "state": "close"
+    },
+    "67746": {
+      "state": "close"
+    },
+    "66450": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "86658": {
+      "state": "close"
+    },
+    "119670": {
+      "state": "close"
+    },
+    "96642": {
+      "state": "close"
+    },
+    "96643": {
+      "state": "close"
+    },
+    "96641": {
+      "state": "close"
+    },
+    "96639": {
+      "state": "close"
+    },
+    "96640": {
+      "state": "close"
+    },
+    "102544": {
+      "state": "close"
+    },
+    "96645": {
+      "state": "close"
+    },
+    "117250": {
+      "state": "close"
+    },
+    "103814": {
+      "state": "close"
+    },
+    "119671": {
+      "state": "close"
+    },
+    "117249": {
+      "state": "close"
+    },
+    "117253": {
+      "state": "close"
+    },
+    "117252": {
+      "state": "close"
+    },
+    "117255": {
+      "state": "close"
+    },
+    "70782": {
+      "state": "close"
+    },
+    "44654": {
+      "state": "close"
+    },
+    "44266": {
+      "state": "big_dog",
+      "underdog": "Fiorentina",
+      "favourite": "Inter"
+    },
+    "70672": {
+      "state": "close"
+    },
+    "63562": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "90884": {
+      "state": "close"
+    },
+    "55140": {
+      "state": "close"
+    },
+    "42680": {
+      "state": "close"
+    },
+    "70779": {
+      "state": "close"
+    },
+    "94877": {
+      "state": "close"
+    },
+    "70668": {
+      "state": "close"
+    },
+    "40035": {
+      "state": "close"
+    },
+    "70671": {
+      "state": "close"
+    },
+    "44655": {
+      "state": "close"
+    },
+    "44656": {
+      "state": "close"
+    },
+    "92836": {
+      "state": "close"
+    },
+    "44263": {
+      "state": "close"
+    },
+    "44264": {
+      "state": "close"
+    },
+    "90881": {
+      "state": "big_dog",
+      "underdog": "Slov\u00e1cko",
+      "favourite": "Sparta Praha"
+    },
+    "85699": {
+      "state": "close"
+    },
+    "43948": {
+      "state": "close"
+    },
+    "67823": {
+      "state": "close"
+    },
+    "43820": {
+      "state": "close"
+    },
+    "62053": {
+      "state": "close"
+    },
+    "44657": {
+      "state": "close"
+    },
+    "81906": {
+      "state": "close"
+    },
+    "70780": {
+      "state": "big_dog",
+      "underdog": "Dinamo Makhachkala",
+      "favourite": "Zenit"
+    },
+    "94875": {
+      "state": "close"
+    },
+    "94873": {
+      "state": "close"
+    },
+    "40034": {
+      "state": "close"
+    },
+    "40033": {
+      "state": "close"
+    },
+    "70667": {
+      "state": "close"
+    },
+    "70669": {
+      "state": "no_label",
+      "reason": "top_flight_only"
+    },
+    "40030": {
+      "state": "close"
+    },
+    "40029": {
+      "state": "close"
+    },
+    "103816": {
+      "state": "close"
+    },
+    "70674": {
+      "state": "close"
+    },
+    "85696": {
+      "state": "close"
+    },
+    "43947": {
+      "state": "close"
+    },
+    "92839": {
+      "state": "close"
+    },
+    "79923": {
+      "state": "no_label",
+      "reason": "unpredictable"
+    },
+    "43821": {
+      "state": "close"
+    },
+    "111919": {
+      "state": "close"
+    },
+    "102552": {
+      "state": "close"
+    },
+    "81903": {
+      "state": "close"
+    },
+    "67828": {
+      "state": "big_dog",
+      "underdog": "Cercle Brugge",
+      "favourite": "Union St. Gilloise"
+    },
+    "40032": {
+      "state": "close"
+    },
+    "44658": {
+      "state": "close"
+    },
+    "44262": {
+      "state": "close"
+    },
+    "43954": {
+      "state": "close"
+    },
+    "102543": {
+      "state": "close"
+    },
+    "119673": {
+      "state": "close"
+    },
+    "119672": {
+      "state": "close"
+    },
+    "102556": {
+      "state": "close"
+    },
+    "96646": {
+      "state": "close"
+    },
+    "119674": {
+      "state": "close"
+    },
+    "119675": {
+      "state": "close"
+    },
+    "81904": {
+      "state": "big_dog",
+      "underdog": "Santa Clara",
+      "favourite": "Benfica"
+    },
+    "107578": {
+      "state": "close"
+    },
+    "85340": {
+      "state": "close"
+    },
+    "48608": {
+      "state": "close"
+    },
+    "86663": {
+      "state": "close"
+    }
+  }
+}

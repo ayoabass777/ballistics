@@ -77,3 +77,17 @@ def match_view(response: Response, fixture_id: int):
     if result is None:
         raise HTTPException(404, "Fixture not found")
     return result
+
+
+@app.get("/api/discover")
+def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
+                  scope: Literal["week", "today", "tomorrow", "date"] = "week",
+                  day: date | None = None, leagues: str = Query("", max_length=2000)):
+    from engine.api.discover import build_discover
+    try:
+        ids = tuple(int(x) for x in leagues.split(",") if x)
+        if any(x < 1 for x in ids):
+            raise ValueError()
+    except ValueError as exc:
+        raise HTTPException(422, "Invalid league IDs") from exc
+    return read(build_discover, response, zone=zone, scope=scope, day=day, leagues=ids)

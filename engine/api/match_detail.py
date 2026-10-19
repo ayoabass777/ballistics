@@ -108,9 +108,21 @@ def strength_section(f: dict, export: dict) -> dict | None:
     if shortlisted:
         return {"state": "big_dog", "favourite": shortlisted.get("favourite"),
                 "underdog": shortlisted.get("underdog")}
-    gap = mm[0].get("gap") or 0
-    if gap <= export["gap_min"]:
+    gap = mm[0].get("gap")
+    if gap is None:
+        return None
+    gap = abs(gap)
+    if gap <= 100:
         return {"state": "close"}
+    if gap <= export["gap_min"]:
+        market = str(mm[0].get("market", ""))
+        favourite = next((team for team in (f.get("home"), f.get("away"))
+                          if team and market.startswith(f"{team} ")), None)
+        if favourite is None:
+            return None
+        return {"state": "slight_favourite", "favourite": favourite,
+                "underdog": f.get("away") if favourite == f.get("home") else f.get("home")}
+
     league = export["big_dog_leagues"].get((f.get("league"), f.get("country"))) or {}
     reason = league.get("reason") or ""
     if "tier" in reason:

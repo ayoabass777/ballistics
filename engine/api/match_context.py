@@ -16,10 +16,12 @@ from engine.api.crests import crest_url
 H2H_LIMIT = 5
 
 FIXTURE_SQL = """
-SELECT fixture_id, league_season_id, league_id, league_name, country_name,
+SELECT f.fixture_id, f.league_season_id, f.league_id, f.league_name, f.country_name,
        kickoff_utc, home_team_id, away_team_id, home_team_name, away_team_name,
-       home_logo_file_id, away_logo_file_id
-FROM raw.fact_fixtures WHERE fixture_id = %(fixture_id)s
+       home_logo_file_id, away_logo_file_id, l.logo_file_id AS league_logo_file_id
+FROM raw.fact_fixtures f
+LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id
+WHERE f.fixture_id = %(fixture_id)s
 """
 
 STANDINGS_SQL = """
@@ -38,8 +40,9 @@ SELECT fixture_id, kickoff_utc, is_home, goals_for, goals_against,
        team_name, opponent_name
 FROM raw.fact_head_to_head
 WHERE team_id = %(home_team_id)s AND opponent_id = %(away_team_id)s
-  AND kickoff_utc < %(cutoff)s
-ORDER BY kickoff_utc DESC
+  AND kickoff_utc < LEAST(%(cutoff)s, CURRENT_TIMESTAMP)
+  AND is_played AND goals_for IS NOT NULL AND goals_against IS NOT NULL
+ORDER BY kickoff_utc DESC, fixture_id DESC
 LIMIT %(limit)s
 """
 
@@ -127,14 +130,15 @@ def build_context(cur, fixture_id):
                     "kickoff_utc": _iso(fx["kickoff_utc"]),
                     "home": fx["home_team_name"], "away": fx["away_team_name"],
                     "home_team_id": home_id, "away_team_id": away_id,
+                    "league_logo_url": crest_url("leagues", fx.get("league_logo_file_id")),
                     "home_crest_url": crest_url("teams", fx.get("home_logo_file_id")),
                     "away_crest_url": crest_url("teams", fx.get("away_logo_file_id"))},
         "standings_updated_at": _iso(rows[0]["standings_updated_at"]) if rows else None,
         "position": {"home": home_pos, "away": away_pos,
-                     "points_gap": abs(home_pos["points"] - away_pos["points"]) if same_group else None},
-        "table": {"available": bool(rows) and not (home_pos and home_pos["group_name"] in hidden),
+                     "points_gap": abs(home_pos["points"] - away_pos["points"]) if same_group and home_pos["points"] is not None and away_pos["points"] is not None else None},
+        "table": {"available": any(r["group_name"] not in hidden for r in rows),
                   "standings_format": rows[0]["standings_format"] if rows else None,
-                  "groups": _groups(rows)},
+                  "groups": _groups([r for r in rows if r["group_name"] not in hidden])},
         "h2h": h2h,
     }
 

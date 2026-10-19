@@ -31,7 +31,7 @@ class StoreTests(unittest.TestCase):
         rows = ms.build_rows(EXPORT_RAW)
         self.assertEqual([fid for fid, _ in rows], [90876])
         sec = rows[0][1]
-        self.assertEqual(set(sec), {"strength", "patterns", "goals", "form", "discover"})
+        self.assertEqual(set(sec), {"strength", "patterns", "goals", "form", "discover", "discovery"})
         self.assertNotIn("alpha", json.dumps(sec))
 
     def test_write_is_one_transaction_and_marks_complete(self):

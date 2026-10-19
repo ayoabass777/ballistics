@@ -1,5 +1,7 @@
 # UI data contract
 
+2026-10-18 — Desktop signed-out Preview uses saved examples from the 10 Oct Discover card designs for Strength, Goals and Patterns; its four summary counts still describe the saved 2 Oct run. Intro copy distinguishes these dates and says the preview is not live. This is Figma sample provenance, not a refreshed API payload.
+
 2026-10-12 — Owner rejected the extra probability-above-league trial. Active review uses only the existing Bayes display eligibility gate; observed records and league baselines inform presentation. Keep Results Winless/Unbeaten and Attack/defence pair. AEK Over 1.5 returns to Also alongside Atromitos Under 3.5; three records remain expanded. Explicit More/Less often than the league average wording retained; Atromitos Under 4.5 uses Around the league average. Nine unique records total. The 80% trial and diagnostic files are historical, not active requirements. Figma-only; no production algorithm changed.
 
 2026-10-12 — Explicit comparison wording is More often than the league average. The two-stage cross-fixture check (patterns-two-stage-review.md) counts candidates before category placement; absence of above-average evidence must not be labelled statistical typicality. Below-average unusualness is not tested by the current one-sided rule.
@@ -237,3 +239,5 @@ H2H now has separate win/draw totals, aligned home/score/away rows and UTC calen
 
 
 2026-10-17 — Restored D27 slight-favourite labels in local Match details. The API had collapsed mismatch gaps ≤250 into close, and frontend schema/rendering omitted the slight state. Gaps >100 through configured Big-dog boundary (250) now return slight_favourite plus correctly oriented team names; ≤100 remains close. An explicit missing mismatch gap returns unavailable. Existing shortlisted Big dogs and no-label league gates remain unchanged; Discover Strength remains its existing shortlist. Current local run had 307 strength payloads repaired with backup mock/strength-before-label-repair-2026-10-17.json; discovery selections and forecast payloads preserved. 20 match-detail/store tests and frontend TypeScript passed. Authenticated browser verified RB Leipzig / SV Elversberg displays Slight favourite / Slight underdog; screenshot mock/slight-favourite-restored-2026-10-17.png. No Figma or deployment change.
+
+2026-10-17 — Matches league picker now renders existing league-logo assets beside league names. Discover API league directory includes nullable league_logo_url, frontend schema accepts it, shared Crest preserves text if missing/broken. Browser verified England leagues loaded logos. Seven Discover API tests and scoped TypeScript passed. Evidence: mock/matches-league-logos-2026-10-17.png. Local only.

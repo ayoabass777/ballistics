@@ -34,11 +34,23 @@ def test_fixture_appears_in_every_section_it_qualifies_for():
     assert f["discover_sections"]["patterns"]["event"] == "win"   # 9/10 beats 7/10
 
 
-def test_goals_section_uses_65_floor_but_standout_needs_70():
-    f = fx(1, dixon_coles=[dc("B Over 0.5", 0.67, 0.30)])
+def test_goals_section_uses_75_floor_on_unrounded_probability():
+    for probability, included in [(0.7499, False), (0.75, True), (0.80, True)]:
+        f = fx(1, dixon_coles=[dc("B Over 0.5", probability, 0.30)])
+        attach_discover_picks([f], [], None, {})
+        assert ("goals" in f["discover_sections"]) is included
+        assert f["discover_pick"]["list"] == "goals"  # standout floor unchanged
+
+
+def test_goals_section_reselects_best_eligible_market_and_excludes_typical():
+    f = fx(1, dixon_coles=[dc("B Over 1.5", .74, .35),
+                          dc("Match Over 1.5", .80, .10, "above"),
+                          dc("Match Under 4.5", .90, .03, "typical")])
     attach_discover_picks([f], [], None, {})
-    assert f["discover_pick"] is None                      # below the 0.70 standout floor
-    assert f["discover_sections"]["goals"]["market"] == "B Over 0.5"
+    assert f["discover_sections"]["goals"]["market"] == "Match Over 1.5"
+    f = fx(2, dixon_coles=[dc("Match Under 4.5", .90, .03, "typical")])
+    attach_discover_picks([f], [], None, {})
+    assert "goals" not in f["discover_sections"]
 
 
 def test_section_needs_score_above_zero_not_the_standout_floor():

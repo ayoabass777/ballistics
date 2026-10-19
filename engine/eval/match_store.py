@@ -53,8 +53,10 @@ def ensure_tables(conn) -> None:
 def build_rows(output: dict) -> list[tuple[int, dict]]:
     """(fixture_id, page-ready sections) for every fixture in an export."""
     from engine.api.match_detail import engine_sections, index_export
+    from engine.api.discover import snapshot
     index = index_export(output)
-    return [(fid, engine_sections(f, index)) for fid, f in index["fixtures"].items()]
+    return [(fid, {**engine_sections(f, index), "discovery": snapshot(f)})
+            for fid, f in index["fixtures"].items()]
 
 
 def _parse_generated(output: dict):

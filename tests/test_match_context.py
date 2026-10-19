@@ -97,6 +97,17 @@ class BuildTests(unittest.TestCase):
         self.assertTrue(p["fixture"]["home_crest_url"].endswith("/crests/teams/u1"))
         self.assertIsNone(p["fixture"]["away_crest_url"])
 
+    def test_missing_points_does_not_break_context(self):
+        p = mc.build_context(FakeCursor([self.FX, [row(1, 1, None), row(2, 2, 10)], []]), 90863)
+        self.assertIsNone(p["position"]["points_gap"])
+        self.assertTrue(p["table"]["available"])
+
+    def test_ambiguous_groups_are_not_exposed(self):
+        rows = [row(1, 1, 10, repeat=True), row(2, 1, 10, repeat=True)]
+        p = mc.build_context(FakeCursor([self.FX, rows, []]), 90863)
+        self.assertFalse(p["table"]["available"])
+        self.assertEqual(p["table"]["groups"], [])
+
     def test_unknown_fixture(self):
         self.assertIsNone(mc.build_context(FakeCursor([None]), 1))
 

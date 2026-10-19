@@ -1,5 +1,13 @@
 # Ballistics product memory
 
+2026-10-15 — Owner authorised frontend logo implementation. Discover, All standouts and Matches now use paired 24px club crests and 20px league logos with names; Match details uses the same sticky identity (stacked on mobile) plus 36px mobile title crests. Saved retains logo URLs for new saves; older saved records remain compatible. Discover reads fixture/league asset references from database joins; Match context adds league_logo_url. Public URLs use the existing crest store; no temporary Figma URLs or sample club substitutions. Missing/broken club images fall back to initials; missing/broken league logos leave text. Fixed screen-reader-only text escaping the carousel and causing page overflow. Live authenticated browser verified loaded asset geometry and Discover at 1440/390/320px without document overflow, plus mobile Match details. Scoped TypeScript, research contract/proxy tests and 35 backend tests passed. Evidence: mock/frontend-crests-2026-10-15.jpg. Local implementation only, not deployed.
+
+2026-10-15 — Matches navigation now opens `/matches`, a chronological list of upcoming fixtures present in the current engine snapshot with shared date/league filters, detail links and Save actions. Discover categories, All standouts and Matches reveal 12 cards per batch. Session-local expansion and vertical scroll state are keyed by route, category and filters and restored after async data rendering. Browser verified Matches loading 504 fixtures, Strength 12→24 and match/back scroll restoration, Goals 12→24 and retention after switching to Patterns (independent 12). Six backend Discover tests, research contracts/proxy checks and scoped TypeScript passed. This is snapshot coverage, not a complete raw fixture browser; no deployment claimed.
+
+2026-10-15 live integration: refreshed the real 812-fixture snapshot and connected the local frontend to the read-only API. Discover and 14 representative Match payloads validated. Signed-in Discover → Match details → Save → Saved → reopen → remove verified in the real browser on 2026-10-15. [Evidence and restart instructions](live-integration-2026-10-15.md).
+
+2026-10-15 current handoff: the owner authorised the first frontend build. Discover → Match details → Saved is now locally implemented; see [build evidence and remaining integration work](frontend-build-2026-10-15.md). Saved is explicitly browser-local, live authenticated integration and deployment remain pending. Earlier design-only statements below are historical. Standouts retain the approved lime design and existing engine ranking.
+
 Established: 2026-09-29. Owner: project owner. Scope: Ballistics 2.0 design and implementation.
 
 Start here before continuing design or frontend work:
