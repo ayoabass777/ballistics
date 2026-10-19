@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import os
 import smtplib
+import socket
+import time
 from email.message import EmailMessage
 
 import requests
@@ -55,6 +57,34 @@ def _send_email(subject: str, body: str, html: str | None = None) -> None:
 
 SENDERS = {"slack": _send_slack, "email": _send_email}
 
+# Waits (seconds) between attempts when a send fails on the network
+# (DNS, connection refused, timeout). Auth or bad-request errors don't retry.
+RETRY_WAITS = (60, 180)
+
+
+def is_network_error(exc: BaseException) -> bool:
+    if isinstance(exc, (requests.ConnectionError, requests.Timeout, socket.gaierror,
+                        smtplib.SMTPServerDisconnected, smtplib.SMTPConnectError,
+                        ConnectionError, TimeoutError)):
+        return True
+    # smtplib errors subclass OSError; only non-SMTP OSErrors are network-level.
+    return isinstance(exc, OSError) and not isinstance(exc, smtplib.SMTPException)
+
+
+def _send_with_retry(name: str, subject: str, body: str, html: str | None) -> None:
+    for attempt, wait in enumerate((*RETRY_WAITS, None), start=1):
+        try:
+            SENDERS[name](subject, body, html)
+            if attempt > 1:
+                logger.info("Alert via %s sent on attempt %d", name, attempt)
+            return
+        except Exception as exc:
+            if wait is None or not is_network_error(exc):
+                raise
+            logger.warning("Alert via %s attempt %d failed (%s: %s); retrying in %ss",
+                           name, attempt, type(exc).__name__, exc, wait)
+            time.sleep(wait)
+
 
 def send_alert(subject: str, body: str, *, html: str | None = None) -> list[str]:
     """Send through every configured channel; return the channels that succeeded."""
@@ -66,7 +96,7 @@ def send_alert(subject: str, body: str, *, html: str | None = None) -> list[str]
         return sent
     for name in channels:
         try:
-            SENDERS[name](subject, body, html)
+            _send_with_retry(name, subject, body, html)
             sent.append(name)
         except Exception as exc:   # one broken channel must not hide the alert elsewhere
             logger.error("Alert via %s failed: %s", name, exc)

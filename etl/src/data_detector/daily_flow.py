@@ -25,7 +25,7 @@ from datetime import date, timedelta
 from typing import Any
 
 from etl.src.data_detector.common import logger
-from etl.src.data_detector.datasets import Registry, load_registry, sync_registry
+from etl.src.data_detector.datasets import Registry, effective_severity, load_registry, sync_registry
 
 CHECK_NAME = "daily_flow"
 NOT_OK = {"failed", "missing", "blocked"}
@@ -173,14 +173,15 @@ def crest_base_url() -> str:
     return f"https://{bucket}.s3.{region}.amazonaws.com"
 
 
-def check_crest_urls(cur, spec: dict, ds: date) -> dict:
-    """HEAD a sample of public crest URLs: each must answer 200 with an image."""
+# Waits (seconds) before re-sampling crests when no URL answered at all.
+CREST_NETWORK_RETRY_WAITS = (30, 90)
+
+
+def _sample_crests(base: str, rows) -> tuple[list[str], list[str]]:
+    """HEAD each crest. Returns (broken, unreachable): broken = the URL answered
+    wrongly (crest problem); unreachable = no answer at all (network problem)."""
     import requests
-    cur.execute(spec["sql"])                       # returns (kind, logo_file_id) rows
-    rows = cur.fetchall()
-    if not rows:
-        return {"status": "missing", "details": {"reason": "no crests to sample"}}
-    base, broken = crest_base_url(), []
+    broken, unreachable = [], []
     for kind, file_id in rows:
         url = f"{base}/crests/{kind}/{file_id}"
         try:
@@ -188,9 +189,39 @@ def check_crest_urls(cur, spec: dict, ds: date) -> dict:
             ctype = r.headers.get("Content-Type", "")
             if r.status_code != 200 or not ctype.startswith("image/"):
                 broken.append(f"{kind}/{file_id}: {r.status_code} {ctype}".strip())
+        except (requests.ConnectionError, requests.Timeout) as exc:
+            unreachable.append(f"{kind}/{file_id}: {type(exc).__name__}: {exc}"[:200])
         except requests.RequestException as exc:
             broken.append(f"{kind}/{file_id}: {type(exc).__name__}")
+    return broken, unreachable
+
+
+def check_crest_urls(cur, spec: dict, ds: date) -> dict:
+    """HEAD a sample of public crest URLs: each must answer 200 with an image.
+
+    If no URL answers at all (DNS failure, no route), that is the network, not
+    the crests: re-sample after a wait, and if it is still down report it as a
+    warning ("network down, crests not checked") instead of a crest failure.
+    """
+    import time
+    cur.execute(spec["sql"])                       # returns (kind, logo_file_id) rows
+    rows = cur.fetchall()
+    if not rows:
+        return {"status": "missing", "details": {"reason": "no crests to sample"}}
+    base = crest_base_url()
     details = {"sampled": len(rows), "base_url": base}
+    broken, unreachable = _sample_crests(base, rows)
+    for wait in CREST_NETWORK_RETRY_WAITS:
+        if broken or len(unreachable) < len(rows):
+            break                                  # at least one answer: the network works
+        logger.warning("crest check: no URL reachable (%s); retrying in %ss", unreachable[0], wait)
+        time.sleep(wait)
+        broken, unreachable = _sample_crests(base, rows)
+    if not broken and unreachable and len(unreachable) == len(rows):
+        return {"status": "failed", "severity": "warning",
+                "details": {**details, "reason": "network down: crests not checked",
+                            "error": unreachable[0]}}
+    broken += unreachable                          # partial outage: count with the broken
     if broken:
         return {"status": "failed", "details": {**details, "broken": broken[:5]}}
     return {"status": "ok", "details": details}
@@ -278,7 +309,7 @@ def sync_events(cur, ds: date, results: dict[str, dict], registry: Registry) -> 
                    (dag_id, task_id, severity, check_name, table_schema, table_name, status, details, error_message)
                VALUES (%s, %s, %s, %s, %s, %s, 'open', %s, %s)""",
             (registry[dataset_id].producer_dag, registry[dataset_id].producer_task,
-             registry[dataset_id].check.get("severity", "error"), CHECK_NAME,
+             effective_severity(dataset_id, results, registry), CHECK_NAME,
              schema, name,
              json.dumps({"check_date": str(ds), "status": r["status"], **r["details"],
                          "blocks": registry.downstream(dataset_id)}, default=str),
@@ -310,7 +341,7 @@ def format_alert(ds: date, results: dict[str, dict], registry: Registry) -> tupl
     for dataset_id in bad:
         r, d = results[dataset_id], registry[dataset_id]
         producer = f"{d.producer_dag}.{d.producer_task}" if d.producer_dag else "-"
-        mark = "!" if d.check.get("severity") == "warning" else "✗"
+        mark = "!" if effective_severity(dataset_id, results, registry) == "warning" else "✗"
         lines.append(f"{mark} {dataset_id} — {r['status']} (producer {producer})")
         for key, value in r["details"].items():
             lines.append(f"    {key}: {value}")
@@ -417,7 +448,7 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
         if own:
             conn.close()
     bad = roots(results)
-    warnings = [d for d in bad if registry[d].check.get("severity") == "warning"]
+    warnings = [d for d in bad if effective_severity(d, results, registry) == "warning"]
     errors = [d for d in bad if d not in warnings]
     sent: list[str] = []
     # Problems and recoveries always send; a clean day sends only with the daily report on.

@@ -11,6 +11,8 @@ from __future__ import annotations
 from datetime import date
 from html import escape
 
+from etl.src.data_detector.datasets import effective_severity
+
 # Palette: Ballistics lime accent on neutral ink. Adjust here only.
 INK = "#111418"
 MUTED = "#5B6470"
@@ -33,7 +35,7 @@ FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-
 
 def day_state(results: dict, registry, resolved: list[str]) -> str:
     bad = [k for k, v in results.items() if v["status"] in ("failed", "missing")]
-    errors = [k for k in bad if registry[k].check.get("severity") != "warning"]
+    errors = [k for k in bad if effective_severity(k, results, registry) != "warning"]
     if errors:
         return "failed"
     if bad:
@@ -54,7 +56,7 @@ HEADLINES = {
 def subject_line(ds: date, state: str, results: dict, registry) -> str:
     bad = [k for k, v in results.items() if v["status"] in ("failed", "missing")]
     blocked = sum(v["status"] == "blocked" for v in results.values())
-    warns = [k for k in bad if registry[k].check.get("severity") == "warning"]
+    warns = [k for k in bad if effective_severity(k, results, registry) == "warning"]
     if state == "failed":
         extra = f", {len(warns)} warning{'s' if len(warns) != 1 else ''}" if warns else ""
         return f"✗ Ballistics {ds}: {len(bad) - len(warns)} failed{extra}, {blocked} blocked"
@@ -66,7 +68,7 @@ def subject_line(ds: date, state: str, results: dict, registry) -> str:
 
 
 def _status_of(dataset_id: str, r: dict, registry) -> str:
-    if r["status"] in ("failed", "missing") and registry[dataset_id].check.get("severity") == "warning":
+    if r["status"] in ("failed", "missing") and (r.get("severity") or registry[dataset_id].check.get("severity")) == "warning":
         return "warning"
     return r["status"]
 

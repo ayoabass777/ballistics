@@ -213,3 +213,12 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def effective_severity(dataset_id: str, results: dict, registry: "Registry") -> str:
+    """Severity of a dataset's result for this check day.
+
+    A check can downgrade its own result (e.g. crests not checked because the
+    network was down) by setting result["severity"]; otherwise the registry's.
+    """
+    return (results.get(dataset_id) or {}).get("severity") or registry[dataset_id].check.get("severity", "error")

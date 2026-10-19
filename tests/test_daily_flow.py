@@ -87,7 +87,33 @@ class NotifyTests(unittest.TestCase):
         with patch.dict(os.environ, env, clear=True), \
                 patch.dict(notify.SENDERS, {"slack": lambda s, b, h=None: (_ for _ in ()).throw(OSError("down")),
                                             "email": lambda s, b, h=None: None}):
+            with patch.object(notify, "RETRY_WAITS", (0, 0)):
+                self.assertEqual(notify.send_alert("s", "b"), ["email"])
+
+    def test_network_error_retries_then_sends(self):
+        import socket
+        calls = []
+        def flaky(s, b, h=None):
+            calls.append(1)
+            if len(calls) < 3:
+                raise socket.gaierror(-2, "Name or service not known")
+        env = {"ALERT_EMAIL_TO": "a@b.c", "SMTP_HOST": "smtp"}
+        with patch.dict(os.environ, env, clear=True), patch.dict(notify.SENDERS, {"email": flaky}), \
+                patch.object(notify, "RETRY_WAITS", (0, 0)):
             self.assertEqual(notify.send_alert("s", "b"), ["email"])
+        self.assertEqual(len(calls), 3)
+
+    def test_auth_error_does_not_retry(self):
+        import smtplib
+        calls = []
+        def bad_login(s, b, h=None):
+            calls.append(1)
+            raise smtplib.SMTPAuthenticationError(535, b"bad credentials")
+        env = {"ALERT_EMAIL_TO": "a@b.c", "SMTP_HOST": "smtp"}
+        with patch.dict(os.environ, env, clear=True), patch.dict(notify.SENDERS, {"email": bad_login}), \
+                patch.object(notify, "RETRY_WAITS", (0, 0)):
+            self.assertEqual(notify.send_alert("s", "b"), [])
+        self.assertEqual(len(calls), 1)
 
 
 class EmailTemplateTests(unittest.TestCase):
@@ -249,6 +275,23 @@ class PostgresFlowTests(unittest.TestCase):
         self.assertEqual(len(self.head_calls), 3)                      # 2 teams + 1 league sampled
         self.assertIn("/crests/teams/", self.head_calls[0][0][0])
         self.assertIn("403", alert.call_args[0][1])
+
+    def test_network_down_is_a_warning_not_a_crest_failure(self):
+        import requests
+        self.full_etl()
+        self.engine()
+        cur = self.conn.cursor()
+        cur.execute("CREATE TABLE raw.match_analysis (run_ds date); INSERT INTO raw.match_analysis VALUES (%s)", (DS,))
+        self.conn.commit()
+        down = requests.ConnectionError("[Errno -2] Name or service not known")
+        with patch.object(notify, "send_alert", return_value=[]) as alert, \
+                patch("requests.head", side_effect=down) as head, \
+                patch.object(flow, "CREST_NETWORK_RETRY_WAITS", (0, 0)):
+            summary = flow.run(DS, conn=self.conn, registry=self.registry)
+        self.assertEqual(summary["failed_or_missing"], [])             # task does not fail on crests
+        self.assertEqual(summary["warnings"], ["s3.crests.reachable"])
+        self.assertEqual(head.call_count, 9)                            # 3 URLs x (1 try + 2 retries)
+        self.assertIn("network down", alert.call_args[0][1])
 
     def statuses(self):
         cur = self.conn.cursor()
