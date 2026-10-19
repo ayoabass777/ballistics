@@ -410,6 +410,8 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
         with conn.cursor() as cur:
             metrics = collect_metrics(cur, ds, results)
             history = collect_history(cur, ds)
+            from etl.src.data_detector.model_watch import collect as collect_watch
+            watch = collect_watch(cur, ds)
         conn.rollback()
     finally:
         if own:
@@ -421,13 +423,14 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
     # Problems and recoveries always send; a clean day sends only with the daily report on.
     if notify and (bad or events["resolved"] or daily_report_enabled()):
         subject, text, html = render(ds, results, registry, metrics=metrics, history=history,
-                                     resolved=events["resolved"])
+                                     resolved=events["resolved"], watch=watch)
         sent = send_alert(subject, text, html=html)
     summary = {"check_date": str(ds), "ok": sum(v["status"] == "ok" for v in results.values()),
                "failed_or_missing": errors,          # fails the Airflow task
                "warnings": warnings,                 # alerted, does not fail the task
                "blocked": [k for k, v in results.items() if v["status"] == "blocked"],
-               "events": events, "metrics": metrics, "alert_channels": sent}
+               "events": events, "metrics": metrics, "model_watch": watch,
+               "alert_channels": sent}
     print(json.dumps(summary, indent=2, default=str))
     return summary
 

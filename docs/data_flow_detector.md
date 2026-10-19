@@ -272,3 +272,19 @@ Manual run: `python -m etl.src.data_detector.daily_flow 2026-10-13 [--no-notify]
 | `dlq_not_empty` | warning | DLQ still has entries after the replay DAG | DLQ empty |
 
 Warnings are alerted but do not fail the `data_flow_check` task; errors do. Crest checks are current-state (not tied to the day) and do not block the match page, which falls back to initials. Only `daily_flow` sends notifications; the others are recorded in `data_quality_events` and surface in `mart_data_flow_health_summary`.
+
+## Model watch (email section)
+
+The daily email ends with **Model watch**: shadow checks being tracked before a
+decision, never part of pass/fail (`etl/src/data_detector/model_watch.py`).
+
+- **Match Over 1.5 (D120)** — latest weekly refit from
+  `engine/eval/watch/match_over_1_5.csv` (written by `engine_calibration.market_watch`):
+  claimed vs hit for all models and Dixon–Coles alone, change since the previous refit, drift flag.
+- **Big dog Dixon–Coles cross-check (D136)** — `raw.big_dog_watch` holds each published
+  Big dog (latest pre-kickoff values) with `dc_win_prob` (DC win chance for the Elo
+  favourite) and `dc_confirms` (≥ 65%), written by the consensus run
+  (`engine/eval/big_dog_watch.py`). Settled against `raw.engine_head_to_head`; the email
+  shows confirmed vs not-confirmed win rates with 90% ranges, a verdict
+  (collecting until 100 confirmed settle; FLAG if confirmed favourites do not win more),
+  and the Big dogs played that day.

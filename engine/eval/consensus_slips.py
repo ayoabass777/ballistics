@@ -360,6 +360,11 @@ DISCOVER_GOALS_WEIGHT = 1.0  # D128: was 0.76 (D71); the D127 league blend now m
 STANDOUT_MIN_SCORE = 0.15  # D78: inclusive adjusted percentage-point gap
 ELO_GAP_BANDS = ((250, 300), (300, 400), (400, None))   # (lower excl., upper incl.)
 ELO_BAND_MIN_MATCHES = 100        # thinner band → fall back to the overall group rate
+# D136 (shadow, not user-facing): Dixon-Coles cross-check on Big dogs. Backtest
+# Jun-Oct 2026 (engine/eval/diagnostics/strength_dc_check.py): favourites DC
+# also backs at >= 65% won 76% vs 69% for the rest; ranges overlap, so it is
+# logged to raw.big_dog_watch and reported in the daily data email until proven.
+BIG_DOG_DC_CONFIRM = 0.65
 # Strength trust (2026-10-05 trial): each league is scored on its OWN past Big dog
 # record (gap > 250, all seasons in the DB), never the pooled 30-league rate. A
 # league needs this many past Big dog matches before its Big dogs get a score,
@@ -1816,6 +1821,21 @@ def _build_over_1_5_shortlist(
     return shortlist
 
 
+def dc_favourite_win(fixture: dict, favourite: str | None) -> float | None:
+    """Dixon-Coles win chance for `favourite` from the fixture's DC goal rates
+    (independent Poissons on lambda_home/lambda_away, no low-score correction)."""
+    rows = [r for r in fixture.get("dixon_coles") or []
+            if r.get("lambda_home") is not None and r.get("lambda_away") is not None]
+    if not rows or favourite not in (fixture.get("home"), fixture.get("away")):
+        return None
+    lh, la = float(rows[0]["lambda_home"]), float(rows[0]["lambda_away"])
+    if favourite != fixture.get("home"):
+        lh, la = la, lh
+    pf = [math.exp(-lh) * lh ** i / math.factorial(i) for i in range(11)]
+    pd_ = [math.exp(-la) * la ** j / math.factorial(j) for j in range(11)]
+    return round(sum(pf[i] * pd_[j] for i in range(11) for j in range(i)), 4)
+
+
 def _build_elo_gap_shortlist(
         fixture_analysis: list[dict], league_volatility: dict,
         limit: int | None = ELO_GAP_SHORTLIST_LIMIT,
@@ -1887,6 +1907,9 @@ def _build_elo_gap_shortlist(
             "best_signal_confidence": best_signal.get("probability"),
             "win_confidence": win_signal.get("probability") if win_signal else None,
         })
+        dc_win = dc_favourite_win(fixture, favourite)
+        candidates[-1]["dc_win_prob"] = dc_win
+        candidates[-1]["dc_confirms"] = None if dc_win is None else dc_win >= BIG_DOG_DC_CONFIRM
 
     candidates.sort(key=lambda p: (
         -p["elo_gap"],
@@ -2872,6 +2895,8 @@ def save_slips(
             "best_signal": p["best_signal"],
             "best_signal_confidence": p["best_signal_confidence"],
             "win_confidence": p.get("win_confidence"),
+            "dc_win_prob": p.get("dc_win_prob"),      # D136 shadow
+            "dc_confirms": p.get("dc_confirms"),
             "group_win_rate": p.get("group_win_rate"),
             "group_rate_source": p.get("group_rate_source"),
             "league_win_rate": p.get("league_win_rate"),
@@ -2968,6 +2993,12 @@ def save_slips(
         from engine.eval.match_store import write_match_analysis
         n_match = write_match_analysis(ds, output)
         print(f"  wrote {n_match} match pages to raw.match_analysis (run_ds={ds})")
+        try:   # D136 shadow log; monitoring must never block publication
+            from engine.eval.big_dog_watch import write_big_dog_watch
+            n_bd = write_big_dog_watch(ds, output.get("elo_gap_shortlist") or [])
+            print(f"  logged {n_bd} Big dogs to raw.big_dog_watch")
+        except Exception as exc:
+            print(f"  WARN Big dog watch not logged: {type(exc).__name__}: {exc}")
 
     # Publish atomically so the dashboard never reads a half-written daily file.
     temp_path = out_path.with_suffix(out_path.suffix + ".tmp")

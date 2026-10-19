@@ -149,8 +149,85 @@ def _layer_rows(results: dict, registry) -> str:
     return "".join(out)
 
 
+def _pct(x) -> str:
+    return "—" if x is None else f"{x:.0%}"
+
+
+def _watch_lines(watch: dict | None) -> list[str]:
+    """Plain-text Model watch block (also the source for the HTML rows)."""
+    if not watch:
+        return []
+    lines = ["", "Model watch (tracking, not live rules)"]
+    o = watch.get("over_1_5")
+    if o:
+        lines.append(f"  Match Over 1.5, refit {o['refit']}:")
+        for r in o["rows"]:
+            prev = (f", was {r['previous_overconfidence']*100:+.1f}"
+                    if r["previous_overconfidence"] is not None else "")
+            lines.append(f"    {r['source']}: n={r['n']:,} claimed {_pct(r['predicted'])} hit {_pct(r['hit'])} "
+                         f"({r['overconfidence']*100:+.1f} pts{prev})" + (f"  FLAG {r['flag']}" if r["flag"] else ""))
+    else:
+        lines.append("  Match Over 1.5: no refit logged")
+    b = watch.get("big_dogs")
+    if b:
+        y, n = b["confirmed"], b["not_confirmed"]
+        lines.append("  Big dogs, Dixon-Coles cross-check (DC >= 65% for the favourite):")
+        lines.append(f"    confirmed: {y['won']}/{y['n']} won {_pct(y['rate'])} (range {_pct(y['low'])}-{_pct(y['high'])})")
+        lines.append(f"    not confirmed: {n['won']}/{n['n']} won {_pct(n['rate'])} (range {_pct(n['low'])}-{_pct(n['high'])})")
+        lines.append(f"    {b['verdict']}")
+        for d in b["day"][:10]:
+            lines.append(f"    {d['match']} {d['score']} ({d['result']}), DC {_pct(d['dc'])}, gap {d['gap']}")
+    else:
+        lines.append("  Big dogs cross-check: no log yet")
+    return lines
+
+
+def _watch_html(watch: dict | None) -> str:
+    if not watch:
+        return ""
+    def row(label, value, status="ok"):
+        dot = STATUS[status][0]
+        return (f'<tr><td style="padding:8px 0;border-bottom:1px solid {LINE};font-size:13px;color:{INK};">'
+                f'<span style="color:{dot};">&#9679;</span>&nbsp;{escape(label)}</td>'
+                f'<td align="right" style="padding:8px 0;border-bottom:1px solid {LINE};font-size:13px;'
+                f'color:{INK};">{escape(value)}</td></tr>')
+    rows = []
+    o = watch.get("over_1_5")
+    if o:
+        for r in o["rows"]:
+            prev = (f" (was {r['previous_overconfidence']*100:+.1f})"
+                    if r["previous_overconfidence"] is not None else "")
+            rows.append(row(f"Over 1.5 · {r['source']}",
+                            f"claimed {_pct(r['predicted'])} · hit {_pct(r['hit'])} · "
+                            f"{r['overconfidence']*100:+.1f} pts{prev}",
+                            "warning" if r["flag"] else "ok"))
+    else:
+        rows.append(row("Over 1.5", "no refit logged", "none"))
+    b = watch.get("big_dogs")
+    if b:
+        y, n = b["confirmed"], b["not_confirmed"]
+        rows.append(row("Big dogs · DC backs favourite ≥ 65%",
+                        f"{y['won']}/{y['n']} won · {_pct(y['rate'])}"))
+        rows.append(row("Big dogs · DC below 65%", f"{n['won']}/{n['n']} won · {_pct(n['rate'])}",
+                        "blocked"))
+        status = "warning" if b["verdict"].startswith("FLAG") else "none"
+        rows.append(f'<tr><td colspan="2" style="padding:8px 0;font-size:12px;color:{STATUS[status][2]};">'
+                    f'{escape(b["verdict"])}</td></tr>')
+        for d in b["day"][:10]:
+            st = "ok" if d["result"] == "won" else "failed"
+            rows.append(row(f"{d['match']} {d['score']}", f"DC {_pct(d['dc'])} · gap {d['gap']}", st))
+    else:
+        rows.append(row("Big dogs cross-check", "no log yet", "none"))
+    refit = f" · Over 1.5 refit {o['refit']}" if o else ""
+    return (f'<tr><td style="padding:22px 28px 0;"><div style="font-size:13px;font-weight:700;'
+            f'letter-spacing:.04em;text-transform:uppercase;color:{MUTED};margin-bottom:2px;">Model watch</div>'
+            f'<div style="font-size:12px;color:{MUTED};margin-bottom:6px;">Tracking, not live rules{escape(refit)}</div>'
+            f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{"".join(rows)}</table>'
+            f'</td></tr>')
+
+
 def render(ds: date, results: dict, registry, *, metrics: dict, history: list[dict],
-           resolved: list[str]) -> tuple[str, str, str]:
+           resolved: list[str], watch: dict | None = None) -> tuple[str, str, str]:
     """(subject, plain text, html) for the day's email."""
     state = day_state(results, registry, resolved)
     subject = subject_line(ds, state, results, registry)
@@ -211,6 +288,7 @@ def render(ds: date, results: dict, registry, *, metrics: dict, history: list[di
     <div style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:{MUTED};margin-bottom:6px;">Pipeline</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">{_layer_rows(results, registry)}</table>
   </td></tr>
+  {_watch_html(watch)}
   <tr><td style="padding:22px 28px 0;">
     <div style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:{MUTED};margin-bottom:10px;">Last 7 days</div>
     {_history_strip(history)}
@@ -238,4 +316,5 @@ def render(ds: date, results: dict, registry, *, metrics: dict, history: list[di
               f"Match pages: {_fmt(m.get('match_pages'))}", f"Picks in pool: {_fmt(m.get('pool_rows'))}",
               crest_line,
               "Last 7 days: " + " ".join(f"{h['label']}:{h['status']}" for h in history)]
+    lines += _watch_lines(watch)
     return subject, "\n".join(lines), html
