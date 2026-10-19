@@ -18,7 +18,7 @@ Biggest standouts remains **pending review** (D82).
 | Page / surface | User's task | Entry | Next action / destination | Recorded status and review need |
 | --- | --- | --- | --- | --- |
 | Welcome | Understand the product | First visit | Preview, get started, sign in | Figma exists; review concise value and access explanation |
-| Free preview | Try the research experience | Welcome | Sample match detail; join or sign in | Figma exists; spans categories and dates, not just today's Strength top three |
+| Product tour | Understand the member workflow without fixture data | Welcome · See how it works | Get started or sign in | D131 Figma review; no signed-out standout fixtures or match evidence |
 | Onboarding and plans | Learn meanings, choose leagues, create account and get access | Get started | Discover | Figma exists; pricing and purchase behaviour unresolved; password flow supersedes OTP sign-in |
 | Discover | Find a fixture worth researching | Primary navigation / onboarding | Choose category; open match | Figma exists; fresh mobile screenshot inspected; hierarchy and scope review first |
 | Standout full list | Explore qualifying cross-category fixtures | Discover View all | Open fixture; Back to Discover | Figma only; design pending review, static snapshot |
@@ -30,7 +30,7 @@ Biggest standouts remains **pending review** (D82).
 | Forecast record | Inspect recorded forecasts and outcomes | Primary navigation | Filter fixtures; inspect event and correction history | Figma plus local frontend/API work; no deployment claimed; Saved is not a personal accuracy score |
 | How it works | Understand what numbers mean | Discover footer / contextual links | Topic detail; return to origin | Figma exists; preserve distinctions between record, estimate and ranking |
 | Account and Your leagues | Manage preferences and access | Header avatar / league Edit | Follow/remove leagues, timezone, subscription, password | Figma exists; audit returns to research context |
-| Sign-in and recovery | Regain access | Welcome / account flow | Return to intended destination | Password-based sign-in; recovery may use email link or SMS code; return destination is a proposal to verify |
+| Sign-in and recovery | Regain access | Welcome / account flow | Discover | D133 email/password Figma flow with email reset link; Discover destination agreed 2026-10-18 (D139), route verification pending |
 
 ## Research journey and return behaviour — proposal
 

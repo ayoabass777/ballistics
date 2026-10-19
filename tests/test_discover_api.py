@@ -21,6 +21,18 @@ class DiscoverTests(unittest.TestCase):
         result = assemble([row(1), unranked, row(2, league=2)], leagues=(1,), now=NOW)
         self.assertEqual([x['fixture_id'] for x in result['matches']], [3, 1])
         self.assertTrue(all(x['pick'] is None for x in result['matches']))
+        self.assertIsNone(result['matches'][0]['preview'])
+        self.assertEqual(result['matches'][1]['preview']['list'], 'patterns')
+
+    def test_matches_preview_uses_highest_section_score_without_leaking_score(self):
+        item = row()
+        item['payload']['discovery']['sections'] = {
+            'strength': {'list': 'strength', 'score': .3, 'favourite': 'Home'},
+            'goals': {'list': 'goals', 'score': .5, 'market': 'Match Over 1.5', 'probability': .76},
+            'patterns': {'list': 'patterns', 'score': .4, 'team': 'Away', 'event': 'win', 'k': 8, 'n': 10}}
+        preview = assemble([item], now=NOW)['matches'][0]['preview']
+        self.assertEqual((preview['list'], preview['market'], preview['probability']), ('goals', 'Match Over 1.5', .76))
+        self.assertNotIn('score', preview)
 
     def test_logo_urls_follow_fixture_assets_without_exposing_file_ids(self):
         item = row()
@@ -40,6 +52,12 @@ class DiscoverTests(unittest.TestCase):
         rows=[row(1,kickoff='2026-10-15T00:00:00Z'),row(2,kickoff='2026-10-16T00:00:00Z'),row(3,kickoff='2026-10-14T12:00:00Z')]
         result=assemble(rows,scope='date',day=date(2026,10,15),now=NOW)
         self.assertEqual([x['fixture_id'] for x in result['lists']['standouts']],[1])
+    def test_custom_range_includes_both_calendar_days_and_validates_order(self):
+        rows=[row(1,kickoff='2026-10-15T00:00:00Z'),row(2,kickoff='2026-10-16T23:00:00Z'),row(3,kickoff='2026-10-17T00:00:00Z')]
+        result=assemble(rows,scope='range',day=date(2026,10,15),end_day=date(2026,10,16),now=NOW)
+        self.assertEqual([x['fixture_id'] for x in result['matches']],[1,2])
+        with self.assertRaises(ValueError):
+            window('UTC','range',day=date(2026,10,16),end_day=date(2026,10,15),now=NOW)
     def test_missing_snapshot_is_explicit(self):
         self.assertEqual(assemble([{'payload':{}}],now=NOW)['coverage'],'needs_refresh')
     def test_invalid_zone(self):

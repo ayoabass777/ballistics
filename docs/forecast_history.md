@@ -103,3 +103,6 @@ Integration tests require a fresh empty database whose name starts with `forecas
 ## Engine flow
 
 See [rendered data flow](engine-data-flow.svg), [editable Graphviz source](engine-data-flow.dot), and [Mermaid source](engine-data-flow.mmd). Solid arrows describe data/control movement; dashed notes identify limitations and pending work. The diagram is a logical engine pipeline, not a deployment/network topology.
+
+
+2026-10-19 — Added [verified full/incremental S3 archival](forecast_archive.md). Original append-only tables, IDs, selection policy and API queries remain unchanged; the archive adds separate checkpoint/manifest metadata only.

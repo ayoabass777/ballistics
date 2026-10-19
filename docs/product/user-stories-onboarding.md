@@ -1,5 +1,8 @@
 # User stories, Saved workflow and onboarding
 
+2026-10-18 — D133 update: the current Figma account flow uses email address and password only, with an email reset link. Earlier phone and SMS language below records superseded prototype history.
+
+
 2026-10-11 — D109 update: Pick your leagues now supports six independent toggle rows in the review prototype; selected states use a checkmark and tinted surface. Use All leagues clears those prototype selections. This supersedes the fixed Super Liga demonstration described below. Selection variables are local to this review; downstream multi-league filtering and account persistence remain unimplemented.
 
 2026-10-11 — D108 (prototype for owner review): Refreshed onboarding in a separate mobile review flow. Welcome teaches Discover → evidence → Saved; the explainer distinguishes observed patterns, goal estimates and relative strength using the current frozen sample. Four setup steps retained. League screen is a fixed Super Liga demo, followed by phone/email account mock, unpriced plan mock and honest completion copy. Dismissible Discover and first-fixture detail tips added. Originals preserved; no account/payment/persistence functionality or desktop refresh. Pending design approval.
@@ -50,11 +53,11 @@ Draft stories if A (+ C via onboarding):
 - US8. Settled fixtures move to a Past section; I can remove any saved item.
 - US9. With nothing saved, the empty state explains what saving does and links to Discover.
 
-Persistence (agreed, D38): **account from day one.** Saved fixtures and followed leagues sync across devices. Sign-in (D48, supersedes D42): phone number or email plus password; reset by email link or SMS code. Open: signed-out browsing limits, data retention, privacy copy, SMS cost/provider for phone codes.
+Persistence (agreed, D38): **account from day one.** Saved fixtures and followed leagues should sync across devices. Current account direction (D133, supersedes D48's phone option): email address and password; reset by email link. Figma illustrates this flow, while account-backed persistence remains to be implemented. Open: data retention and privacy copy.
 
 - ~~US10. Browse before sign-up~~ — superseded by D45 (paid, no free browsing).
-- US10b. As a new user, I complete onboarding, verify my phone or email, and choose a plan before seeing Discover.
-- US10c. As a curious visitor, I can see today's top 3 Strength fixtures for free before deciding to pay (D47).
+- US10b. As a new user, I complete onboarding, create an email account, and choose a plan before seeing Discover. Email verification and purchase behaviour remain to be specified.
+- ~~US10c. As a curious visitor, I can see today's top 3 Strength fixtures for free before deciding to pay (D47).~~ Superseded by D131: signed-out visitors may view a product tour without fixture data.
 - US11. As a signed-in user, my Saved list and leagues are the same on phone and desktop.
 
 Placement proposal: Saved in primary navigation next to Discover, Matches and Forecast record. Mobile then has 4 items in the 350px row, so this needs a layout check (icons + short labels, or a bottom tab bar).

@@ -21,24 +21,26 @@ def snapshot(f):
     }
 
 
-def window(zone, scope, day=None, now=None):
+def window(zone, scope, day=None, now=None, end_day=None):
     now = now or datetime.now(timezone.utc)
     try:
         tz = ZoneInfo(zone)
     except (ZoneInfoNotFoundError, ValueError) as exc:
         raise ValueError('Unknown timezone') from exc
     today = now.astimezone(tz).date()
-    start_day = day if scope == 'date' else today + timedelta(days=scope == 'tomorrow')
+    start_day = day if scope in ('date', 'range') else today + timedelta(days=scope == 'tomorrow')
     if start_day is None:
         raise ValueError('Choose a date')
+    if scope == 'range' and (end_day is None or end_day < start_day):
+        raise ValueError('Choose a valid date range')
     start = datetime.combine(start_day, time.min, tzinfo=tz)
-    end = datetime.combine(start_day + timedelta(days=7 if scope == 'week' else 1), time.min, tzinfo=tz)
+    end = datetime.combine((end_day + timedelta(days=1)) if scope == 'range' else (start_day + timedelta(days=7 if scope == 'week' else 1)), time.min, tzinfo=tz)
     return max(start, now), end
 
 
-def assemble(rows, *, zone='UTC', scope='week', day=None, leagues=(), now=None):
+def assemble(rows, *, zone='UTC', scope='week', day=None, end_day=None, leagues=(), now=None):
     now = now or datetime.now(timezone.utc)
-    start, end = window(zone, scope, day, now)
+    start, end = window(zone, scope, day, now, end_day)
     lists = {k: [] for k in ('standouts', *KINDS)}
     matches = []
     directory = {}
@@ -61,7 +63,13 @@ def assemble(rows, *, zone='UTC', scope='week', day=None, leagues=(), now=None):
             continue
         if not inside or (leagues and f.get('league_id') not in leagues):
             continue
-        matches.append({**f, 'pick': None})
+        # Matches stays chronological. Its optional preview uses the strongest
+        # already-qualified section pick; private scores never leave the API.
+        sections = data.get('sections') or {}
+        candidates = [sections[k] for k in KINDS if sections.get(k) and isinstance(sections[k].get('score'), (int, float))]
+        leading = max(candidates, key=lambda p: p['score'], default=None)
+        matches.append({**f, 'pick': None,
+                        'preview': {k: leading.get(k) for k in PICK_FIELDS} if leading else None})
         for name, p in [('standouts', data.get('standout')), *data.get('sections', {}).items()]:
             if name in lists and p:
                 lists[name].append({**f, 'pick': {k: p.get(k) for k in PICK_FIELDS}, '_score': p['score']})
@@ -74,12 +82,12 @@ def assemble(rows, *, zone='UTC', scope='week', day=None, leagues=(), now=None):
             'window': {'from': start.isoformat(), 'to': end.isoformat()}}
 
 
-def build_discover(cur, zone='UTC', scope='week', day=None, leagues=()):
+def build_discover(cur, zone='UTC', scope='week', day=None, end_day=None, leagues=()):
     # Validate before touching the database.
-    window(zone, scope, day)
+    window(zone, scope, day, end_day=end_day)
     cur.execute("SELECT to_regclass('raw.engine_runs') IS NOT NULL AS ready")
     if not cur.fetchone()['ready']:
-        return {**assemble([], zone=zone, scope=scope, day=day, leagues=leagues), 'run_ds': None, 'run_finished_at': None, 'coverage': 'needs_refresh'}
+        return {**assemble([], zone=zone, scope=scope, day=day, end_day=end_day, leagues=leagues), 'run_ds': None, 'run_finished_at': None, 'coverage': 'needs_refresh'}
     cur.execute("""WITH latest AS (SELECT run_ds, finished_at FROM raw.engine_runs
         WHERE status = 'complete' ORDER BY run_ds DESC LIMIT 1)
         SELECT latest.run_ds, latest.finished_at, m.payload,
@@ -89,7 +97,7 @@ def build_discover(cur, zone='UTC', scope='week', day=None, leagues=()):
         LEFT JOIN raw.fact_fixtures f ON f.fixture_id = m.fixture_id
         LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id""")
     rows = cur.fetchall()
-    return {**assemble([r for r in rows if r['payload']], zone=zone, scope=scope, day=day, leagues=leagues),
+    return {**assemble([r for r in rows if r['payload']], zone=zone, scope=scope, day=day, end_day=end_day, leagues=leagues),
             **({'coverage': 'needs_refresh'} if not rows else {}),
             'run_ds': str(rows[0]['run_ds']) if rows else None,
             'run_finished_at': rows[0]['finished_at'].isoformat() if rows else None}

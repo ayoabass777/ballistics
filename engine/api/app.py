@@ -81,8 +81,8 @@ def match_view(response: Response, fixture_id: int):
 
 @app.get("/api/discover")
 def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
-                  scope: Literal["week", "today", "tomorrow", "date"] = "week",
-                  day: date | None = None, leagues: str = Query("", max_length=2000)):
+                  scope: Literal["week", "today", "tomorrow", "date", "range"] = "week",
+                  day: date | None = None, end_day: date | None = None, leagues: str = Query("", max_length=2000)):
     from engine.api.discover import build_discover
     try:
         ids = tuple(int(x) for x in leagues.split(",") if x)
@@ -90,4 +90,6 @@ def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
             raise ValueError()
     except ValueError as exc:
         raise HTTPException(422, "Invalid league IDs") from exc
-    return read(build_discover, response, zone=zone, scope=scope, day=day, leagues=ids)
+    if scope == 'range' and (day is None or end_day is None or end_day < day):
+        raise HTTPException(422, "Choose a valid date range")
+    return read(build_discover, response, zone=zone, scope=scope, day=day, end_day=end_day, leagues=ids)
