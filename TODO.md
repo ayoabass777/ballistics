@@ -23,10 +23,6 @@ links to macOS `/usr/share/zoneinfo` (2026c); the old folder is kept at
 
 ## Pipeline (DLQ, D147/D148)
 
-- [ ] A clean fixture-row DLQ replay reloads the whole league season
-  (`load_league_fixtures`: DELETE + COPY), which gives every row a new
-  `fixture_id`; forecasts, card versions, consensus pool and facts key on it.
-  Replay should replace only the parked fixtures, keeping existing ids.
 - [ ] ~110 fixtures stuck at NS from postponements (Egyptian league, USL Tormenta).
 
 ## Engine
