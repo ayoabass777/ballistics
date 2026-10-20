@@ -1,5 +1,11 @@
 # Ballistics product memory
 
+2026-10-19 — Dependency-aware engine reuse is implemented and live cold/warm/forced comparisons pass for all three active models. Inputs include shared league statistics and actual DC decay ages; unchanged outputs retain their computation version. Existing daily runner is wired to use it, with a force-recompute escape hatch. No feed was regenerated during verification. [Details and limits](../model_processing_reuse.md).
+
+2026-10-20 — Accounts are Clerk (D143). The in-house auth branch `feat/user-accounts-db` is closed; its Stripe mirror and paywall view now live in the account API (`football_stats_project/API/sql/billing.sql`), keyed on Clerk user IDs. Stripe checkout and webhook are next.
+
+2026-10-19 — Regular Discover category cards now use team identity → finding → league/kickoff → actions in the local frontend and active 1440px desktop Figma screens. The lime ranked standout cards retain their stronger treatment. The running local Discover API was verified serving the latest complete 2026-10-18 engine run (generated 2026-10-19 01:08 UTC); the dated 10 Oct Figma fixture sample remains static and linked to its historical detail examples. See [implementation status](implementation-status.md).
+
 2026-10-19 — Engine: D137 Big dog gap now counts home advantage (+65 Elo); D138 adds slight-favourite levels and league tiers as labels only (API done, frontend pending); D136 Dixon–Coles cross-check tracked in shadow in the daily email. Decision numbers were de-duplicated: product decisions moved to D139–D142, D143 reserved for user accounts, next free D144. See the top of [decisions](decisions.md) and [implementation status](implementation-status.md).
 
 2026-10-19 — Matches now has local team search, timezone day groups, an applied-scope summary and an inclusive custom date range in the code. The active desktop Figma Matches screen shows the revised hierarchy and a static two-date review overlay; it is illustrative, not a live date input. See [implementation status](implementation-status.md), [data contract](data-contract.md) and [prototype links](prototype-links.md).
