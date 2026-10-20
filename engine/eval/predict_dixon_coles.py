@@ -37,6 +37,8 @@ from engine.eval.calibration_maps import (
 )
 from etl.src.logger import get_logger
 
+from engine.eval.model_cache import cached, digest
+
 logger = get_logger(__name__)
 
 XI = 0.0065                # per-day decay → half-life ≈ 107 days
@@ -112,7 +114,7 @@ def load_dc_historical(conn) -> pd.DataFrame:
           ON r.fixture_id = f.fixture_id
         WHERE f.is_played
           AND f.is_home
-        ORDER BY f.kickoff_utc
+        ORDER BY f.kickoff_utc, f.fixture_id
     """
     return pd.read_sql(sql, conn)
 
@@ -286,6 +288,52 @@ def fixture_markets(params: dict, home_id, away_id,
 
 # ── live prediction over upcoming fixtures ──────────────────────────────────
 
+def _fixture_dc(params, row, api_league_id, threshold):
+    results = []
+    # Warehouse team ids, same space as the fitted history.
+    home_h2h, away_h2h = row["home_team_id"], row["away_team_id"]
+    if pd.isna(home_h2h) or pd.isna(away_h2h):
+        return []
+    home_h2h, away_h2h = int(home_h2h), int(away_h2h)
+    fm = fixture_markets(params, home_h2h, away_h2h,
+                         row["home_team"], row["away_team"])
+    if fm is None:
+        return []
+    for market, raw in fm["markets"].items():
+        global_cal = _calibrate(raw, market)
+        cal = _calibrate(raw, market, int(api_league_id))
+        if cal < threshold:
+            continue
+        league_adjustment = (
+            _DC_BOUNDS_1_4_LEAGUE_ADJUSTMENTS.get(str(int(api_league_id)))
+            if market == BOUNDS_1_4_MARKET else None
+        )
+        results.append({
+            "fixture_id": int(row["fixture_id"]),
+            "kickoff": row["kickoff_utc"],
+            "home": row["home_team"],
+            "away": row["away_team"],
+            "league": row["league"],
+            "api_league_id": int(api_league_id),
+            "market": market,
+            "probability": round(cal, 4),
+            "global_calibrated_probability": round(global_cal, 4),
+            "raw_probability": round(raw, 4),
+            "calibration_scope": (
+                "global+league" if league_adjustment else "global"
+            ),
+            "calibration_map": _points_for_market(market)[1],
+            "league_adjustment": (
+                round(float(league_adjustment["logit_delta"]), 6)
+                if league_adjustment else 0.0
+            ),
+            "lambda_home": round(fm["lambda_home"], 2),
+            "lambda_away": round(fm["lambda_away"], 2),
+        })
+
+    return results
+
+
 def predict_dixon_coles(days: int = 7,
                         threshold: float = CALIBRATED_THRESHOLD) -> pd.DataFrame:
     from engine.eval.predict_upcoming import (
@@ -317,50 +365,16 @@ def predict_dixon_coles(days: int = 7,
     results = []
     for api_league_id, up_lg in upcoming.groupby("api_league_id"):
         lg_hist = hist[hist["api_league_id"] == api_league_id]
-        params = fit_league_dc(lg_hist, ref_time)
+        ages = np.clip((ref_time - pd.to_datetime(lg_hist['kickoff_utc'], utc=True)).dt.days.values, 0, None)
+        params = cached('dixon_coles.league', int(api_league_id),
+            {'history': lg_hist, 'age_days': ages.tolist(), 'xi': XI},
+            lambda: fit_league_dc(lg_hist, ref_time))
         if params is None:
             continue
         for _, row in up_lg.iterrows():
-            # Warehouse team ids, same space as the fitted history.
-            home_h2h, away_h2h = row["home_team_id"], row["away_team_id"]
-            if pd.isna(home_h2h) or pd.isna(away_h2h):
-                continue
-            home_h2h, away_h2h = int(home_h2h), int(away_h2h)
-            fm = fixture_markets(params, home_h2h, away_h2h,
-                                 row["home_team"], row["away_team"])
-            if fm is None:
-                continue
-            for market, raw in fm["markets"].items():
-                global_cal = _calibrate(raw, market)
-                cal = _calibrate(raw, market, int(api_league_id))
-                if cal < threshold:
-                    continue
-                league_adjustment = (
-                    _DC_BOUNDS_1_4_LEAGUE_ADJUSTMENTS.get(str(int(api_league_id)))
-                    if market == BOUNDS_1_4_MARKET else None
-                )
-                results.append({
-                    "fixture_id": int(row["fixture_id"]),
-                    "kickoff": row["kickoff_utc"],
-                    "home": row["home_team"],
-                    "away": row["away_team"],
-                    "league": row["league"],
-                    "api_league_id": int(api_league_id),
-                    "market": market,
-                    "probability": round(cal, 4),
-                    "global_calibrated_probability": round(global_cal, 4),
-                    "raw_probability": round(raw, 4),
-                    "calibration_scope": (
-                        "global+league" if league_adjustment else "global"
-                    ),
-                    "calibration_map": _points_for_market(market)[1],
-                    "league_adjustment": (
-                        round(float(league_adjustment["logit_delta"]), 6)
-                        if league_adjustment else 0.0
-                    ),
-                    "lambda_home": round(fm["lambda_home"], 2),
-                    "lambda_away": round(fm["lambda_away"], 2),
-                })
+            results.extend(cached('dixon_coles.fixture', int(row['fixture_id']),
+                {'fixture': row, 'params': digest(params), 'threshold': threshold},
+                lambda: _fixture_dc(params, row, api_league_id, threshold)))
 
     picks = pd.DataFrame(results)
     if not picks.empty:

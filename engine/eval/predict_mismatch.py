@@ -22,7 +22,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -38,6 +38,8 @@ from engine.eval.calibration_maps import (
 )
 from engine.eval.team_strength import load_team_df, compute_team_strength
 from etl.src.logger import get_logger
+
+from engine.eval.model_cache import cached, digest
 
 logger = get_logger(__name__)
 
@@ -416,6 +418,133 @@ def _strength_adjustment(
     return 0.0
 
 
+def _fixture_mismatch(row, h_elo, a_elo, gap, bin_info, fav_is_home, fav_rf, dog_rf,
+                      hit_rates, h2h_map, strength_map):
+    picks = []
+    gap_bin, _, _ = bin_info
+    fav_name = row["home_team_name"] if fav_is_home else row["away_team_name"]
+    dog_name = row["away_team_name"] if fav_is_home else row["home_team_name"]
+    fav_elo = max(h_elo, a_elo)
+    dog_elo = min(h_elo, a_elo)
+
+    h2h_w, h2h_d, h2h_l = h2h_map.get((fav_rf, dog_rf), (0, 0, 0))
+
+    fav_strength = strength_map.get(fav_rf)
+    dog_strength = strength_map.get(dog_rf)
+
+    # Goals markets (strength-adjusted)
+    for market in ["fav_to_score", "fav_over_1.5", "over_1.5", "over_2.5"]:
+        conf, n = _lookup_hit_rate(
+            hit_rates,
+            row["league"],
+            gap_bin,
+            market,
+            api_league_id=int(row["api_league_id"]),
+        )
+        str_adj = _strength_adjustment(market, fav_strength, dog_strength)
+        adjusted = max(min(conf + str_adj, 0.99), 0.0)
+        # Gate on RAW confidence (mirrors the walk-forward backtest),
+        # then report the calibrated probability.
+        if adjusted >= MIN_CONFIDENCE and n >= MIN_SAMPLE:
+            picks.append(MismatchPick(
+                fixture_id=int(row["fixture_id"]),
+                kickoff=row["kickoff_utc"],
+                home_team=row["home_team_name"],
+                away_team=row["away_team_name"],
+                league=row["league"],
+                favourite=fav_name,
+                underdog=dog_name,
+                fav_elo=round(fav_elo),
+                dog_elo=round(dog_elo),
+                gap=round(gap),
+                gap_bin=gap_bin,
+                market=market,
+                confidence=round(
+                    _calibrate_conf(adjusted, int(row["api_league_id"])), 3
+                ),
+                sample_size=n,
+                fav_is_home=fav_is_home,
+                api_league_id=int(row["api_league_id"]),
+                country=row.get("country", "") or "",
+                h2h_wins=h2h_w,
+                h2h_draws=h2h_d,
+                h2h_losses=h2h_l,
+                strength_adj=round(str_adj, 4),
+                fav_attack_pct=fav_strength["attack_pct"] if fav_strength else 0,
+                dog_defense_pct=dog_strength["defense_pct"] if dog_strength else 0,
+            ))
+
+    # Win market
+    win_conf, win_n = _lookup_hit_rate(
+        hit_rates,
+        row["league"],
+        gap_bin,
+        "fav_win",
+        api_league_id=int(row["api_league_id"]),
+    )
+    adjusted_win = min(win_conf, 0.95)
+    if adjusted_win >= MIN_CONFIDENCE and win_n >= MIN_SAMPLE:
+        picks.append(MismatchPick(
+            fixture_id=int(row["fixture_id"]),
+            kickoff=row["kickoff_utc"],
+            home_team=row["home_team_name"],
+            away_team=row["away_team_name"],
+            league=row["league"],
+            favourite=fav_name,
+            underdog=dog_name,
+            fav_elo=round(fav_elo),
+            dog_elo=round(dog_elo),
+            gap=round(gap),
+            gap_bin=gap_bin,
+            market="fav_win",
+            confidence=round(
+                _calibrate_conf(adjusted_win, int(row["api_league_id"])), 3
+            ),
+            sample_size=win_n,
+            fav_is_home=fav_is_home,
+            api_league_id=int(row["api_league_id"]),
+            country=row.get("country", "") or "",
+            h2h_wins=h2h_w,
+            h2h_draws=h2h_d,
+            h2h_losses=h2h_l,
+        ))
+
+    # Draw market — only for gap bins where draw rate is notable (100-200)
+    draw_conf, draw_n = _lookup_hit_rate(
+        hit_rates,
+        row["league"],
+        gap_bin,
+        "draw",
+        api_league_id=int(row["api_league_id"]),
+    )
+    draw_adj = draw_conf
+    if draw_adj >= 0.25 and draw_n >= MIN_SAMPLE and gap < 200:
+        picks.append(MismatchPick(
+            fixture_id=int(row["fixture_id"]),
+            kickoff=row["kickoff_utc"],
+            home_team=row["home_team_name"],
+            away_team=row["away_team_name"],
+            league=row["league"],
+            favourite=fav_name,
+            underdog=dog_name,
+            fav_elo=round(fav_elo),
+            dog_elo=round(dog_elo),
+            gap=round(gap),
+            gap_bin=gap_bin,
+            market="draw",
+            confidence=round(draw_adj, 3),
+            sample_size=draw_n,
+            fav_is_home=fav_is_home,
+            api_league_id=int(row["api_league_id"]),
+            country=row.get("country", "") or "",
+            h2h_wins=h2h_w,
+            h2h_draws=h2h_d,
+            h2h_losses=h2h_l,
+        ))
+
+    return picks
+
+
 def predict_mismatch(
     days: int = 7, min_gap: int = 100,
 ) -> tuple[list[MismatchPick], dict]:
@@ -485,128 +614,19 @@ def predict_mismatch(
         teams_with_strength = sum(1 for fi in fixture_info if fi[6] in strength_map)
         print(f"  {teams_with_strength}/{len(fixture_info)} favourites have strength data")
 
+        rate_hashes = {league: digest(hit_rates[hit_rates['league'].isin([league, '__global__'])]
+                                            .sort_values(list(hit_rates.columns)).reset_index(drop=True))
+                       for league in upcoming['league'].unique()}
         picks = []
         for row, h_elo, a_elo, gap, bin_info, fav_is_home, fav_rf, dog_rf in fixture_info:
-            gap_bin, _, _ = bin_info
-            fav_name = row["home_team_name"] if fav_is_home else row["away_team_name"]
-            dog_name = row["away_team_name"] if fav_is_home else row["home_team_name"]
-            fav_elo = max(h_elo, a_elo)
-            dog_elo = min(h_elo, a_elo)
-
-            h2h_w, h2h_d, h2h_l = h2h_map.get((fav_rf, dog_rf), (0, 0, 0))
-
-            fav_strength = strength_map.get(fav_rf)
-            dog_strength = strength_map.get(dog_rf)
-
-            # Goals markets (strength-adjusted)
-            for market in ["fav_to_score", "fav_over_1.5", "over_1.5", "over_2.5"]:
-                conf, n = _lookup_hit_rate(
-                    hit_rates,
-                    row["league"],
-                    gap_bin,
-                    market,
-                    api_league_id=int(row["api_league_id"]),
-                )
-                str_adj = _strength_adjustment(market, fav_strength, dog_strength)
-                adjusted = max(min(conf + str_adj, 0.99), 0.0)
-                # Gate on RAW confidence (mirrors the walk-forward backtest),
-                # then report the calibrated probability.
-                if adjusted >= MIN_CONFIDENCE and n >= MIN_SAMPLE:
-                    picks.append(MismatchPick(
-                        fixture_id=int(row["fixture_id"]),
-                        kickoff=row["kickoff_utc"],
-                        home_team=row["home_team_name"],
-                        away_team=row["away_team_name"],
-                        league=row["league"],
-                        favourite=fav_name,
-                        underdog=dog_name,
-                        fav_elo=round(fav_elo),
-                        dog_elo=round(dog_elo),
-                        gap=round(gap),
-                        gap_bin=gap_bin,
-                        market=market,
-                        confidence=round(
-                            _calibrate_conf(adjusted, int(row["api_league_id"])), 3
-                        ),
-                        sample_size=n,
-                        fav_is_home=fav_is_home,
-                        api_league_id=int(row["api_league_id"]),
-                        country=row.get("country", "") or "",
-                        h2h_wins=h2h_w,
-                        h2h_draws=h2h_d,
-                        h2h_losses=h2h_l,
-                        strength_adj=round(str_adj, 4),
-                        fav_attack_pct=fav_strength["attack_pct"] if fav_strength else 0,
-                        dog_defense_pct=dog_strength["defense_pct"] if dog_strength else 0,
-                    ))
-
-            # Win market
-            win_conf, win_n = _lookup_hit_rate(
-                hit_rates,
-                row["league"],
-                gap_bin,
-                "fav_win",
-                api_league_id=int(row["api_league_id"]),
-            )
-            adjusted_win = min(win_conf, 0.95)
-            if adjusted_win >= MIN_CONFIDENCE and win_n >= MIN_SAMPLE:
-                picks.append(MismatchPick(
-                    fixture_id=int(row["fixture_id"]),
-                    kickoff=row["kickoff_utc"],
-                    home_team=row["home_team_name"],
-                    away_team=row["away_team_name"],
-                    league=row["league"],
-                    favourite=fav_name,
-                    underdog=dog_name,
-                    fav_elo=round(fav_elo),
-                    dog_elo=round(dog_elo),
-                    gap=round(gap),
-                    gap_bin=gap_bin,
-                    market="fav_win",
-                    confidence=round(
-                        _calibrate_conf(adjusted_win, int(row["api_league_id"])), 3
-                    ),
-                    sample_size=win_n,
-                    fav_is_home=fav_is_home,
-                    api_league_id=int(row["api_league_id"]),
-                    country=row.get("country", "") or "",
-                    h2h_wins=h2h_w,
-                    h2h_draws=h2h_d,
-                    h2h_losses=h2h_l,
-                ))
-
-            # Draw market — only for gap bins where draw rate is notable (100-200)
-            draw_conf, draw_n = _lookup_hit_rate(
-                hit_rates,
-                row["league"],
-                gap_bin,
-                "draw",
-                api_league_id=int(row["api_league_id"]),
-            )
-            draw_adj = draw_conf
-            if draw_adj >= 0.25 and draw_n >= MIN_SAMPLE and gap < 200:
-                picks.append(MismatchPick(
-                    fixture_id=int(row["fixture_id"]),
-                    kickoff=row["kickoff_utc"],
-                    home_team=row["home_team_name"],
-                    away_team=row["away_team_name"],
-                    league=row["league"],
-                    favourite=fav_name,
-                    underdog=dog_name,
-                    fav_elo=round(fav_elo),
-                    dog_elo=round(dog_elo),
-                    gap=round(gap),
-                    gap_bin=gap_bin,
-                    market="draw",
-                    confidence=round(draw_adj, 3),
-                    sample_size=draw_n,
-                    fav_is_home=fav_is_home,
-                    api_league_id=int(row["api_league_id"]),
-                    country=row.get("country", "") or "",
-                    h2h_wins=h2h_w,
-                    h2h_draws=h2h_d,
-                    h2h_losses=h2h_l,
-                ))
+            picks.extend(cached('mismatch.fixture', int(row['fixture_id']),
+                {'fixture': row, 'elo': [h_elo, a_elo], 'min_gap': min_gap,
+                 'rates': rate_hashes[row['league']], 'h2h': h2h_map.get((fav_rf, dog_rf)),
+                 'strength': [strength_map.get(fav_rf), strength_map.get(dog_rf)]},
+                lambda: _fixture_mismatch(row, h_elo, a_elo, gap, bin_info, fav_is_home,
+                    fav_rf, dog_rf, hit_rates, h2h_map, strength_map),
+                encode=lambda values: [asdict(p) for p in values],
+                decode=lambda values: [MismatchPick(**p) for p in values]))
 
         picks.sort(key=lambda p: (-p.confidence, p.kickoff))
 

@@ -48,6 +48,8 @@ CREATE TABLE IF NOT EXISTS raw.match_analysis (
 def ensure_tables(conn) -> None:
     with conn.cursor() as cur:
         cur.execute(DDL)
+        from engine.eval.card_versions import DDL as CARD_DDL
+        cur.execute(CARD_DDL)
 
 
 def build_rows(output: dict) -> list[tuple[int, dict]]:
@@ -78,6 +80,8 @@ def write_match_analysis(run_ds: str, output: dict, conn=None) -> int:
         with conn:                                   # one transaction
             ensure_tables(conn)
             with conn.cursor() as cur:
+                from engine.eval.card_versions import publish
+                publish(cur, rows, run_ds)
                 cur.execute("DELETE FROM raw.match_analysis WHERE run_ds = %s", (run_ds,))
                 if rows:
                     execute_values(

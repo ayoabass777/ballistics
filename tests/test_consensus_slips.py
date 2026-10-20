@@ -232,6 +232,8 @@ class BayesianFixtureAnalysisTests(unittest.TestCase):
             patch.object(
                 run_model, "_run_bayesian", return_value=(signals, audit)
             ) as runner,
+            patch.object(run_model, "get_conn"),
+            patch("engine.eval.model_cache.ModelCache"),
             patch.object(run_model.ps, "write_model_analysis") as write_analysis,
             patch.object(run_model.ps, "write_model_picks", return_value=1),
             patch.object(run_model.ps, "write_model_run") as write_run,
