@@ -267,3 +267,31 @@ class SlightAndTierTests(unittest.TestCase):
         attach_team_tiers(fx, {("L", "C"): t})
         self.assertEqual(fx[0]["tiers"], {"home": "Top", "away": "Bottom"})
         self.assertIsNone(fx[1]["tiers"])
+
+
+class MarketTeamLabelTests(unittest.TestCase):
+    """Team markets name the right club when both share a first word (2026-10-20:
+    88 pool rows since Oct 1 had the away pick labelled as the home team)."""
+
+    def label(self, unified, home, away):
+        from engine.eval.consensus_slips import _sportify_market
+        out = _sportify_market(unified, home, away)
+        return out["market"], out["selection"]
+
+    def test_shared_first_word_picks_the_named_team(self):
+        for home, away in (("VfL Bochum", "VfL Wolfsburg"), ("FC Thun", "FC Zurich"),
+                           ("CSKA 1948", "CSKA Sofia")):
+            self.assertEqual(self.label(f"{away} Over 0.5", home, away),
+                             ("Away Team Over/Under", f"{away} Over 0.5"))
+            self.assertEqual(self.label(f"{home} Over 0.5", home, away),
+                             ("Home Team Over/Under", f"{home} Over 0.5"))
+
+    def test_longest_full_name_wins(self):
+        self.assertEqual(self.label("Inter Miami Over 1.5", "Inter", "Inter Miami"),
+                         ("Away Team Over/Under", "Inter Miami Over 1.5"))
+        self.assertEqual(self.label("Real Sociedad Double Chance", "Real Madrid", "Real Sociedad"),
+                         ("Double Chance", "X2"))
+
+    def test_case_differences_still_match(self):
+        self.assertEqual(self.label("Djurgardens If Over 0.5", "Djurgardens IF", "Orgryte IS"),
+                         ("Home Team Over/Under", "Djurgardens IF Over 0.5"))
