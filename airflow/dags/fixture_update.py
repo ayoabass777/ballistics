@@ -8,7 +8,15 @@ Also corrects rescheduled kickoff times and updates league standings.
 Task graph:
 
   extract_updates ──► load_updates ──► fixture_corrections ──► extract_xg
-      ──► update_standings ──► data_quality_checks ──► dbt_seed ──► dbt_run
+      ──► update_standings ──► data_quality_checks ──► fixtures_loaded
+      ──► dbt_seed ──► dbt_run
+
+The steps after load_updates still run in order (one at a time against the
+API), but each runs even if the one before it failed, and dbt runs as long
+as the fixtures loaded: a failed correction, xG pull or standings refresh is
+reported on its own task instead of stopping dbt and the day's forecasts
+(standings failures on Oct 15 and 17 2026 cost both days). fixtures_loaded
+fails, and so stops dbt, only when extract_updates or load_updates failed.
 """
 
 import os
@@ -16,6 +24,8 @@ from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
 from airflow.decorators import dag, task
+from airflow.exceptions import AirflowFailException
+from airflow.utils.trigger_rule import TriggerRule
 from airflow.providers.docker.operators.docker import DockerOperator
 from docker.types import Mount
 from etl.src.data_detector import (
@@ -248,7 +258,7 @@ def fixture_update_dag():
     # Expected goals: fill xG for newly completed supported fixtures
     # ------------------------------------------------------------------
 
-    @task
+    @task(trigger_rule=TriggerRule.ALL_DONE)
     def extract_xg_task(**context):
         """Backfill missing recent xG and publish a freshness snapshot."""
         from etl.src.extract_xg import ingest, log_coverage_summary
@@ -276,7 +286,7 @@ def fixture_update_dag():
     # Standings: refresh league standings from API
     # ------------------------------------------------------------------
 
-    @task
+    @task(trigger_rule=TriggerRule.ALL_DONE)
     def update_standings_task(**context):
         """Fetch and upsert current league standings."""
         from etl.src.update_standings import update_standings
@@ -301,12 +311,22 @@ def fixture_update_dag():
         check_standings_stale_from_context(context)
         logger.info("Standings updated: %d rows", count_of_standing_rows)
 
-    @task
+    @task(trigger_rule=TriggerRule.ALL_DONE)
     def run_data_quality_checks(**context):
         """Run detector checks that evaluate raw data state after daily refresh."""
         from etl.src.data_detector import check_raw_fixture_stale_from_context
 
         check_raw_fixture_stale_from_context(context)
+
+    @task(trigger_rule=TriggerRule.ALL_DONE)
+    def fixtures_loaded(**context):
+        """Gate for dbt: pass when the fixture load succeeded, whatever happened
+        to the side steps (corrections, xG, standings, quality checks)."""
+        dag_run = context["dag_run"]
+        bad = [task_id for task_id in ("extract_updates", "load_updates")
+               if dag_run.get_task_instance(task_id).state != "success"]
+        if bad:
+            raise AirflowFailException(f"fixture load did not succeed ({', '.join(bad)}); not running dbt")
 
     # ------------------------------------------------------------------
     # dbt: load seeds, then run transformations
@@ -334,8 +354,9 @@ def fixture_update_dag():
     xg = extract_xg_task()
     standings = update_standings_task()
     quality_checks = run_data_quality_checks()
+    gate = fixtures_loaded()
 
-    loaded >> corrections >> xg >> standings >> quality_checks >> dbt_seed >> dbt_run
+    loaded >> corrections >> xg >> standings >> quality_checks >> gate >> dbt_seed >> dbt_run
 
 
 fixture_update_dag()
