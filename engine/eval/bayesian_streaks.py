@@ -294,11 +294,11 @@ def get_upcoming_beliefs(
     upcoming_sql = f"""
         SELECT DISTINCT team_id FROM (
             SELECT home_team_id AS team_id FROM {FIXTURES_TABLE}
-            WHERE fixture_status NOT IN ('FT','AET','PEN')
+            WHERE fixture_status = 'NS'   -- not started; same as Mismatch/DC
               AND kickoff_utc BETWEEN %(today)s AND %(cutoff)s
             UNION
             SELECT away_team_id AS team_id FROM {FIXTURES_TABLE}
-            WHERE fixture_status NOT IN ('FT','AET','PEN')
+            WHERE fixture_status = 'NS'   -- not started; same as Mismatch/DC
               AND kickoff_utc BETWEEN %(today)s AND %(cutoff)s
         ) t
         WHERE team_id IS NOT NULL
@@ -442,7 +442,9 @@ def get_fixture_beliefs(
             f.away_team_name AS opponent_name,
             f.kickoff_utc
         FROM {FIXTURES_TABLE} f
-        WHERE f.fixture_status NOT IN ('FT','AET','PEN')
+        -- Not started only, like Mismatch and Dixon-Coles: a "not finished"
+        -- filter let postponed, cancelled, orphaned and live fixtures through.
+        WHERE f.fixture_status = 'NS'
           AND f.kickoff_utc BETWEEN %(today)s AND %(cutoff)s
     """
     fixtures = pd.read_sql(fixture_sql, conn, params={"today": today, "cutoff": cutoff})
