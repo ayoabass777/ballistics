@@ -12,7 +12,7 @@
 -- Not dim_teams: it inner-joins current standings, so relegated or defunct
 -- teams are missing and their historical fixtures were silently dropped.
 WITH teams AS (
-    SELECT DISTINCT api_team_id, team_id, initcap(team_name) AS team_name
+    SELECT DISTINCT api_team_id, team_id, team_name
     FROM {{ ref('stg_dim_teams') }}
 )
 
