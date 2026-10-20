@@ -201,6 +201,9 @@ class PostgresFlowTests(unittest.TestCase):
         """)  # raw.match_analysis deliberately absent
         self.conn.commit()
         self.registry = dsets.load_registry()
+        dlq_list = patch("etl.src.s3_landing.list_dlq_entries", return_value=[])   # no S3 in tests
+        self.dlq_list = dlq_list.start()
+        self.addCleanup(dlq_list.stop)
 
     def tearDown(self):
         self.conn.close()

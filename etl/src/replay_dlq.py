@@ -7,10 +7,11 @@ etl.src.s3_landing.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
-import boto3
 import psycopg2
+
+from etl.src import dlq
 
 from etl.src.config import EXTRACT_FIXTURES_LOG
 from etl.src.data_detector import (
@@ -105,7 +106,7 @@ def replay_from_dlq(
             },
         )
 
-    count = load_fixtures_from_s3(landing_key, conn, bucket)
+    count = load_fixtures_from_s3(landing_key, conn, bucket, source="replay")
     if count == 0:
         if context is not None:
             record_data_movement_from_context(
@@ -165,10 +166,45 @@ def cleanup_dlq_entry(
     ds: str,
     bucket: str = S3_BUCKET,
 ) -> None:
-    """Remove DLQ error.json for a given entry."""
-    s3 = boto3.client("s3")
+    """Move a replayed entry's error.json to dlq/resolved/fixtures/ (audit trail)."""
     key = f"dlq/{api_league_id}/{season_year}/{ds}/error.json"
     try:
-        s3.delete_object(Bucket=bucket, Key=key)
+        entry = dlq.read_json(key, bucket)
+        if entry is None:
+            return
+        dlq.resolve_entry(key, entry, "replay", bucket, group="fixtures")
     except Exception:
         logger.warning("Failed to clean up DLQ key s3://%s/%s", bucket, key, exc_info=True)
+
+
+# ---------------------------------------------------------------------------
+# Hourly retry policy for fixture entries (D147)
+# ---------------------------------------------------------------------------
+
+def due_fixture_entries(entries: List[Dict[str, Any]], bucket: str = S3_BUCKET
+                        ) -> List[Dict[str, Any]]:
+    """Listed entries whose retry is due (open and past next_retry_at), plus
+    dead ones on their daily recheck (no nightly run re-extracts a league).
+    Entries written before D147 have no retry state and are due now."""
+    due = []
+    for entry in entries:
+        body = dlq.read_json(entry["error_key"], bucket) or {}
+        if dlq.is_due(body) or dlq.dead_recheck_due(body):
+            due.append({**entry, "state": dlq.with_state(body)})
+    return due
+
+
+def fixture_attempt_failed(entry: Dict[str, Any], error: str, bucket: str = S3_BUCKET) -> bool:
+    """Count a failed replay; after MAX_ATTEMPTS the entry is dead and alerted.
+    Returns True when the entry just became dead."""
+    key = entry["error_key"]
+    body = entry.get("state") or dlq.read_json(key, bucket) or {}
+    body, became_dead = dlq.record_failed_attempt(body, error)
+    dlq.write_json(key, body, bucket)
+    if became_dead:
+        dlq.alert_dead("fixtures", key, body,
+                       f"Fixture extraction for league {entry['api_league_id']} "
+                       f"season {entry['season_year']} (failed on {entry['ds']})",
+                       clears="Rechecked once a day: it resolves itself when the extraction succeeds. "
+                              "To force it, re-run bootstrap for that league season.")
+    return became_dead

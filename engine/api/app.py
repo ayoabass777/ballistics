@@ -61,7 +61,7 @@ def match_context_view(response: Response, fixture_id: int):
     """Standings and head-to-head for the match page Context card."""
     if fixture_id < 1:
         raise HTTPException(422, "fixture_id must be positive")
-    result = read(match_context.build_context, response, fixture_id=fixture_id)
+    result = read(match_context.build_context_page, response, fixture_id=fixture_id)
     if result is None:
         raise HTTPException(404, "Fixture not found")
     return result

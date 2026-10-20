@@ -25,7 +25,7 @@ import sys
 import threading
 from pathlib import Path
 
-from engine.api import match_context
+from engine.api import data_quality, match_context
 
 EXPORT_GLOB = re.compile(r"^consensus_slips_(\d{4}-\d{2}-\d{2})\.json$")
 DEFAULT_EXPORT_DIR = Path(__file__).resolve().parents[1] / "eval"
@@ -240,7 +240,8 @@ def read_engine_sections(cur, fixture_id: int) -> tuple[dict | None, dict | None
     return run, row["payload"]
 
 
-def build_match(cur, fixture_id: int) -> dict | None:
+def build_match_core(cur, fixture_id: int) -> dict | None:
+    """The match page without data-quality annotations (see build_match)."""
     ctx = match_context.build_context(cur, fixture_id)
     if ctx is None:
         return None
@@ -260,6 +261,18 @@ def build_match(cur, fixture_id: int) -> dict | None:
         "goals": sec.get("goals"),
         "discover": sec.get("discover"),
     }
+
+
+# Data decorators (engine/api/data_quality.py, D148): each adds one kind of
+# issue to payload["data_quality"] without the builder knowing about it.
+MATCH_PAGE = data_quality.decorate(
+    data_quality.Component(lambda cur, fixture_id: build_match_core(cur, fixture_id)),
+    data_quality.StandingsQuality, data_quality.Freshness, data_quality.FixtureRowsQuality)
+
+
+def build_match(cur, fixture_id: int) -> dict | None:
+    """Full match page payload, with its `data_quality` block."""
+    return MATCH_PAGE.build(cur, fixture_id=fixture_id)
 
 
 def main(argv):

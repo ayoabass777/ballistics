@@ -36,7 +36,8 @@ def test_full_fixtures_only_for_id_lookups():
             rest = m.group("rest")
             if p in FULL_H2H_ALLOWED:
                 continue
-            assert "fixture_id = ANY" in rest or "is_played AND league_name" in rest \
+            assert "fixture_id = ANY" in rest or "fixture_id = %(fixture_id)s" in rest \
+                or "is_played AND league_name" in rest \
                 or "fixture_status = 'NS'" in rest and "scrape_sportybet" in p \
                 or "fixture_status = 'FT'" in rest and "results_review" in p \
                 or rest.strip().startswith('"""') or rest.strip() == "", (p, rest[:80])

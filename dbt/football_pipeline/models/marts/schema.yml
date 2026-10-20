@@ -372,6 +372,16 @@ models:
         tests: [not_null]
       - name: standings_updated_at
         tests: [not_null]
+      - name: standings_incomplete
+        description: >
+          True when the league's last refresh parked rows in the S3 DLQ (D147):
+          the table may be incomplete or out of date until a clean refresh.
+        tests: [not_null]
+      - name: is_stale_row
+        description: >
+          Row kept from an earlier refresh because the API's latest row for this
+          team couldn't be loaded (e.g. no team id). Only in incomplete leagues.
+        tests: [not_null]
       - name: standings_format
         description: "Derived per league season from the standings: single | conferences | split."
         tests:

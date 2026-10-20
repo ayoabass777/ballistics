@@ -148,31 +148,36 @@ def load_fixtures_from_s3(
     s3_key: str,
     conn: psycopg2.extensions.connection,
     bucket: str = S3_BUCKET,
-) -> int:
+    source: str = "bootstrap",
+    detailed: bool = False,
+):
+    """Load a landed league season into raw.raw_fixtures.
+
+    Rows that can't be loaded (no fixture id, kickoff, status or team id) are
+    parked in the row-level DLQ instead of failing the whole COPY
+    (etl/src/fixtures_dlq.py, D148). Returns the loaded count, or with
+    detailed=True the LoadResult (loaded, parked, ...).
+    """
+    from etl.src.dlq import LoadResult
+    from etl.src.fixtures_dlq import load_league_fixtures
+
     fixtures = read_fixtures_from_s3(s3_key, bucket)
     if not fixtures:
         logger.info("Empty file at s3://%s/%s. Skipping.", bucket, s3_key)
-        return 0
+        return LoadResult(loaded=0) if detailed else 0
 
     parts = s3_key.split("/")
-    api_league_id = int(parts[1])
-    season_year = int(parts[2])
+    league = {"api_league_id": int(parts[1]), "season": int(parts[2])}
+    ds = parts[3] if len(parts) > 4 else ""
 
-    cur = conn.cursor()
     try:
-        cur.execute(
-            f"DELETE FROM {RAW_TABLE} WHERE api_league_id = %s AND season = %s",
-            (api_league_id, season_year),
-        )
-        buffer, count = _records_to_buffer(fixtures)
-        cur.copy_expert(COPY_SQL, buffer)
-        logger.info("Loaded %d fixtures from s3://%s/%s into %s", count, bucket, s3_key, RAW_TABLE)
-        return count
+        result = load_league_fixtures(fixtures, league=league, ds=ds, conn=conn, source=source)
     except Exception:
         conn.rollback()
         raise
-    finally:
-        cur.close()
+    logger.info("Loaded %d fixtures from s3://%s/%s into %s (%d parked)",
+                result.loaded, bucket, s3_key, RAW_TABLE, len(result.parked))
+    return result if detailed else result.loaded
 
 
 # ---------------------------------------------------------------------------
@@ -207,6 +212,10 @@ def write_to_dlq(
         "traceback": traceback.format_exc(),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
+    # Retry state for the hourly replay (etl/src/dlq.py, D147).
+    from etl.src.dlq import new_state
+    payload.update(new_state())
+    payload["last_error"] = str(error)[:500]
 
     s3 = boto3.client("s3")
     s3.put_object(
@@ -234,8 +243,9 @@ def list_dlq_entries(bucket: str = S3_BUCKET) -> List[Dict[str, Any]]:
             key = obj["Key"]
             if key.endswith("/error.json"):
                 parts = key.split("/")
-                # dlq/{league_id}/{season}/{ds}/error.json
-                if len(parts) == 5:
+                # dlq/{league_id}/{season}/{ds}/error.json (standings and
+                # resolved entries live under dlq/standings/, dlq/resolved/)
+                if len(parts) == 5 and parts[1].isdigit():
                     entries.append({
                         "api_league_id": int(parts[1]),
                         "season_year": int(parts[2]),
