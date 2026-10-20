@@ -2,19 +2,24 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-10-20 (after the betting workflow removal, D149).
+Updated 2026-10-20 (end of day: engine review fixes merged and pushed).
 
 ## Now
 
-- [ ] **Check tonight's engine run** (first with model reuse and card versions):
-  `raw.model_processing_state` should fill, the run should start cold, and
-  `raw.card_versions` should gain rows beyond the 5,265 backfilled on 2026-10-20.
-- [ ] **Local Python has stale tz data** (Anaconda `share/zoneinfo` is 2025b), so
-  `test_vancouver_stays_on_utc_minus_7_after_november_2026` fails and the local
-  API on port 8000 would show BC kickoffs an hour off after 2026-11-01. The
-  engine image (Debian tzdata 2026b) is correct. `conda install tzdata=2026c`
-  fails on an inconsistent base env (`pluggy`); `PYTHONTZPATH=/usr/share/zoneinfo`
-  (macOS data, 2026c) fixes it.
+- [ ] **Check tonight's engine run** (run_ds 2026-10-20, ~00:40 UTC), the first
+  with everything from today: dbt is no longer blocked by xG/standings; model
+  reuse (`raw.model_processing_state` fills, run starts cold); `raw.card_versions`
+  gains rows beyond the 5,265 backfilled (team-name fix makes ~330 teams' cards
+  new versions once); no CANC/PST/ORPHAN fixtures in the feed; Discover shows
+  provider team names ("FC Copenhagen", not "Fc Copenhagen").
+- [ ] **Match pages lose their forecast once a match starts.** `/api/match` reads
+  only the latest engine run, and runs cover not-started fixtures, so a match
+  page shows no Strength/Goals/Patterns after kickoff (and for finished matches).
+  Product question: should the page keep the last pre-kickoff forecast?
+
+Local tz data fixed 2026-10-20: Anaconda's stale `share/zoneinfo` (2025b) now
+links to macOS `/usr/share/zoneinfo` (2026c); the old folder is kept at
+`/opt/anaconda3/share/zoneinfo.2025b-backup`. The engine image was already right.
 
 ## Pipeline (DLQ, D147/D148)
 
@@ -29,19 +34,27 @@ Updated 2026-10-20 (after the betting workflow removal, D149).
 - [ ] Rename `sportybet_market` / `sportybet_selection` to neutral market names
   (pool rows, `raw.consensus_pool`, grading, dashboard, tests). Deferred in D149.
 
-- [ ] Learned stacker to replace tier voting (logistic regression per market
-  family on the models' probabilities + league base rate); also fixes the
-  double-counted Bayesian signals in `avg_conf`.
-- [ ] Gate Bayesian picks on edge over the league base rate, not an absolute 0.65.
-- [ ] Align backtest and live Bayesian base rates (current season vs all
-  history before the cutoff).
 - [ ] Smaller: unused `threshold` CLI param in `predict_upcoming`; `int(NaN)` on
   missing goals in calibration scripts; empty `IN ()` SQL edge cases.
-- [ ] Recheck Poisson bias at each calibration refresh.
+
+Parked (owner, 2026-10-20: no engine rework; flag concrete problems instead):
+learned stacker to replace tier voting (would also fix Bayesian signals counted
+twice in `avg_conf`); gating Bayesian picks on edge over the base rate;
+aligning backtest and live Bayesian base rates; Poisson bias rechecks.
 
 Done since July: Dixon-Coles feeds consensus; engine Airflow DAGs
 (`engine_predict`, `engine_calibration`); dependency-aware model result reuse
 (2026-10-19). SportyBet odds, EV and slips were built and then removed (D149).
+
+Done 2026-10-20 (engine review): Bayesian forecasts not-started fixtures only
+(18 cancelled/postponed/orphaned fixtures had been published on Oct 19) and
+consensus drops non-NS fixtures as a backstop; one team-name source in dbt
+(`stg_dim_teams`, no initcap; incremental facts full-refreshed); team markets
+labelled with the right team (88 mislabels since Oct 1); Mismatch skips teams
+with no Elo history; `fixture_update` runs dbt when side steps fail (Oct 15 and
+17 were lost to a standings failure). Forecast record checked: calibrated within
+noise in every market (4,860 settled). All database-backed tests pass on
+throwaway databases (438 + DB suites).
 
 ## Product and frontend
 
