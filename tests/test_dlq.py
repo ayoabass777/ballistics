@@ -228,6 +228,21 @@ class FixtureRetryTests(unittest.TestCase):
                                               self.listed("dlq/39/2026/2026-10-16/error.json", "2026-10-16")])
         self.assertEqual([e["ds"] for e in due], ["2026-10-16"])
 
+    def test_replay_resolves_the_entry_only_after_commit(self):
+        key = "dlq/39/2026/2026-10-15/error.json"
+        self.s3.objects[key] = {"error": "x", **dlq.new_state()}
+        conn = object.__new__(type("Conn", (), {}))
+        with patch.object(replay_dlq, "fetch_fixtures", return_value={}), \
+                patch.object(replay_dlq, "extract_fixtures_field", return_value=[{"id": 1}]), \
+                patch.object(replay_dlq, "write_fixtures_to_s3", return_value="full_load/39/2026/d/f.json"), \
+                patch.object(replay_dlq, "fixture_kickoff_watermark", return_value=(None, None, None)), \
+                patch.object(replay_dlq, "load_fixtures_from_s3", return_value=1):
+            self.assertTrue(replay_dlq.replay_from_dlq(self.listed(key), conn))
+        self.assertIn(key, self.s3.objects)                         # caller hasn't committed
+        dlq.run_after_commit(conn)
+        self.assertNotIn(key, self.s3.objects)
+        self.assertEqual(len(self.s3.list_keys("dlq/resolved/fixtures/")), 1)
+
     def test_failed_replays_die_at_24_with_one_alert(self):
         key = "dlq/39/2026/2026-10-15/error.json"
         self.s3.objects[key] = {"error": "timeout", **dlq.new_state()}

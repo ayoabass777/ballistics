@@ -107,6 +107,14 @@ def park_fixture_rows(bad: List[Dict[str, Any]], *, league: Dict[str, Any], ds: 
     return key, entry, created
 
 
+def has_open_entry(league: Dict[str, Any]) -> bool:
+    try:
+        return dlq.read_json(dlq_key(league["api_league_id"], league["season"])) is not None
+    except Exception as exc:
+        logger.error("fixture row DLQ read failed for %s: %s", league, exc)
+        return False
+
+
 def resolve_open_entry(league: Dict[str, Any], how: str) -> Optional[str]:
     key = dlq_key(league["api_league_id"], league["season"])
     try:
@@ -187,14 +195,25 @@ def load_league_fixtures(rows: List[Dict[str, Any]], *, league: Dict[str, Any], 
             cur.copy_expert(COPY_SQL, buffer)
     finally:
         cur.close()
-    resolved = None if quarantined else resolve_open_entry(league, how=source)
+    resolved = False
+    if not quarantined:             # resolve the open entry only once the caller commits
+        resolved = has_open_entry(league)
+        if resolved:
+            dlq.after_commit(conn, lambda: resolve_open_entry(league, how=source))
+    cur = conn.cursor()             # the flag commits (or rolls back) with the rows
     try:
-        set_status(league, list(quarantined), parked)
-    except Exception as exc:        # the flag must not undo the load
-        logger.error("fixture status update failed for %s: %s", league, exc)
+        cur.execute("SAVEPOINT fixtures_status")
+        try:
+            set_status(league, list(quarantined), parked, conn=conn)
+            cur.execute("RELEASE SAVEPOINT fixtures_status")
+        except Exception as exc:    # the flag must not undo the load
+            cur.execute("ROLLBACK TO SAVEPOINT fixtures_status")
+            logger.error("fixture status update failed for %s: %s", league, exc)
+    finally:
+        cur.close()
     return dlq.LoadResult(loaded=count, parked=list(quarantined),
                           dlq_key=parked[0] if parked else None,
-                          new_entry=bool(parked and parked[2]), resolved=bool(resolved),
+                          new_entry=bool(parked and parked[2]), resolved=resolved,
                           dlq_write_failed=bool(quarantined) and not parked)
 
 
@@ -245,8 +264,10 @@ def replay_fixture_rows_dlq(ds: Optional[str] = None) -> Dict[str, int]:
         try:
             _, bad = load_fixtures_from_s3(landing, conn, source="replay", detailed=True)
             conn.commit()
+            dlq.run_after_commit(conn)
         except Exception:
             conn.rollback()
+            dlq.discard_after_commit(conn)
             raise
         finally:
             conn.close()

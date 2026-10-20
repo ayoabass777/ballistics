@@ -84,13 +84,26 @@ class FixtureLoadTests(unittest.TestCase):
         self.assertTrue(result.new_entry)
         self.assertEqual(self.statuses[-1][0], 1)
 
-    def test_clean_load_replaces_league_and_resolves(self):
+    def test_clean_load_replaces_league_and_resolves_after_commit(self):
         self.load([fx(1), fx(2, home=None)])
-        result, log = self.load([fx(1), fx(2)], source="replay")
-        self.assertNotIn("ANY", log[0][1])                          # full league replace
+        conn = FakeConn()
+        result = fd.load_league_fixtures([fx(1), fx(2)], league=LEAGUE, ds="2026-10-19",
+                                         conn=conn, source="replay")
+        self.assertNotIn("ANY", conn.log[0][1])                     # full league replace
         self.assertTrue(result.resolved)
-        self.assertNotIn(KEY, self.s3.objects)
         self.assertEqual(self.statuses[-1], (0, None))
+        self.assertIn(KEY, self.s3.objects)                         # not before the caller commits
+        dlq.run_after_commit(conn)
+        self.assertNotIn(KEY, self.s3.objects)
+        self.assertEqual(len(self.s3.list_keys("dlq/resolved/")), 1)
+
+    def test_rolled_back_clean_load_keeps_the_entry(self):
+        self.load([fx(1), fx(2, home=None)])
+        conn = FakeConn()
+        fd.load_league_fixtures([fx(1), fx(2)], league=LEAGUE, ds="2026-10-19", conn=conn)
+        dlq.discard_after_commit(conn)                              # caller's commit failed
+        dlq.run_after_commit(conn)
+        self.assertIn(KEY, self.s3.objects)
 
     def test_second_sighting_is_not_new(self):
         self.load([fx(1, kickoff=None)])

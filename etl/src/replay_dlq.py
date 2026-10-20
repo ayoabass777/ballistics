@@ -38,7 +38,8 @@ def replay_from_dlq(
 ) -> bool:
     """
     Replay a single DLQ entry by re-extracting from the API and loading to Postgres.
-    On success, writes to landing zone, cleans up DLQ entry, returns True.
+    On success, writes to landing zone and returns True; the DLQ entry is
+    resolved when the caller commits conn and calls dlq.run_after_commit(conn).
     On failure, returns False (entry stays in DLQ for next attempt).
     """
     api_league_id = entry["api_league_id"]
@@ -155,8 +156,9 @@ def replay_from_dlq(
             },
         )
 
-    cleanup_dlq_entry(api_league_id, season_year, ds, bucket)
-    logger.info("Replayed %d fixtures for league %s season %s. DLQ cleaned up.", count, api_league_id, season_year)
+    # Resolve only once the caller commits (dlq.run_after_commit).
+    dlq.after_commit(conn, lambda: cleanup_dlq_entry(api_league_id, season_year, ds, bucket))
+    logger.info("Replayed %d fixtures for league %s season %s.", count, api_league_id, season_year)
     return True
 
 
