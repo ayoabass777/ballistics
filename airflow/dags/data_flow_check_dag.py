@@ -61,7 +61,7 @@ def airflow_task_state(dag_id: str, task_id: str, ds: date):
     dag_id="data_flow_check",
     default_args=default_args,
     schedule="0 9 * * *",
-    catchup=False,
+    catchup=True,          # a laptop asleep at 09:00 UTC still gets each missed day checked on wake
     max_active_runs=1,
     tags=["data_detector", "monitoring"],
     doc_md=__doc__,

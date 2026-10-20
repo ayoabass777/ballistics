@@ -23,9 +23,6 @@ Updated 2026-10-20 (after the betting workflow removal, D149).
 
 ## Pipeline (DLQ, D147/D148)
 
-- [ ] A replay that first discovers bad rows creates the entry at 1 attempt,
-  not 0, so it dies one retry early (`park_*_rows` with `source="replay"`).
-  A fix (`and not created`) is in the working tree, uncommitted and untested. Low.
 - [ ] A clean fixture load resolves the S3 entry and sets the status to `ok`
   before the caller commits; if that commit then fails the entry is lost
   (`etl/src/fixtures_dlq.py`, `load_league_fixtures`). Low.
