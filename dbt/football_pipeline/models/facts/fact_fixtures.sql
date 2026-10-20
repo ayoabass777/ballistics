@@ -10,10 +10,13 @@
 --
 -- LEFT joins on purpose: a fixture whose league season or team is not yet in
 -- the dimensions still appears (with NULL ids) instead of silently vanishing.
--- Team names are the provider's names from staging (dim names are initcap'd).
+-- Team names come from stg_dim_teams, the one source every model uses, so the
+-- same team is spelled the same everywhere (the per-fixture raw names drop
+-- accents and prefixes: "FC Heidenheim" for "1. FC Heidenheim"). The raw name
+-- is the fallback while a team is not yet in the dimension.
 
 with teams as (
-    select api_team_id, team_id, logo_file_id
+    select api_team_id, team_id, team_name, logo_file_id
     from {{ ref('stg_dim_teams') }}
 ),
 
@@ -68,8 +71,8 @@ select
     -- Crest image ids (S3 crests/teams/<id>); the API turns them into URLs.
     ht.logo_file_id                 as home_logo_file_id,
     at.logo_file_id                 as away_logo_file_id,
-    rf.home_team_name,
-    rf.away_team_name,
+    coalesce(ht.team_name, rf.home_team_name) as home_team_name,
+    coalesce(at.team_name, rf.away_team_name) as away_team_name,
     rf.home_team_halftime_goal,
     rf.away_team_halftime_goal,
     rf.home_team_fulltime_goal,

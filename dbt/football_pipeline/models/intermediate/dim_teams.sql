@@ -4,7 +4,7 @@ with teams as (
     select 
         team_id,
         api_team_id,
-        initcap(team_name) as team_name,
+        team_name,                 -- as the provider spells it (no initcap: "FC", "KV", accents)
         logo_file_id
     from {{ ref('stg_dim_teams') }}
 ),
