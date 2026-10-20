@@ -175,24 +175,40 @@ def set_status(league: Dict[str, Any], bad: List[Dict[str, Any]],
 @dlq.dead_letter(validate=fixture_row_problem, park=park_fixture_rows)
 def load_league_fixtures(rows: List[Dict[str, Any]], *, league: Dict[str, Any], ds: str,
                          conn, source: str = "bootstrap", quarantined=(), parked=None) -> dlq.LoadResult:
-    """Replace a league season's fixtures with the good rows (COPY), in the
-    caller's transaction. With rows parked only the good rows' own fixtures
-    are replaced, so a parked fixture keeps its last good row."""
-    from etl.src.s3_landing import COPY_SQL, RAW_TABLE, _records_to_buffer
+    """Load a league season's good rows in the caller's transaction: COPY into
+    a staging table, then upsert on api_fixture_id, so a fixture already in
+    the table keeps its fixture_id (forecasts, card versions, the consensus
+    pool and the facts key on it). A clean load also removes the league
+    season's rows the API no longer sends; with rows parked nothing is
+    removed, so a parked fixture keeps its last good row."""
+    from etl.src.s3_landing import RAW_COLUMNS, RAW_TABLE, _records_to_buffer
+    cols = ", ".join(RAW_COLUMNS)
+    updates = ", ".join(f"{c} = l.{c}" for c in RAW_COLUMNS if c != "api_fixture_id")
     cur = conn.cursor()
     try:
-        if quarantined:
-            cur.execute(
-                f"DELETE FROM {RAW_TABLE} WHERE api_league_id = %s AND season = %s "
-                "AND api_fixture_id = ANY(%s)",
-                (league["api_league_id"], league["season"], [r["api_fixture_id"] for r in rows]))
-        else:
-            cur.execute(f"DELETE FROM {RAW_TABLE} WHERE api_league_id = %s AND season = %s",
-                        (league["api_league_id"], league["season"]))
+        cur.execute(f"CREATE TEMP TABLE fixtures_load ON COMMIT DROP AS SELECT {cols} FROM {RAW_TABLE} WITH NO DATA")
         count = 0
         if rows:
             buffer, count = _records_to_buffer(rows)
-            cur.copy_expert(COPY_SQL, buffer)
+            cur.copy_expert(f"COPY fixtures_load ({cols}) FROM STDIN WITH CSV NULL ''", buffer)
+        # Update, then insert only new ids: an INSERT ... ON CONFLICT DO UPDATE
+        # would draw a fixture_id from the sequence for every existing row.
+        cur.execute("DELETE FROM fixtures_load a USING fixtures_load b "
+                    "WHERE a.api_fixture_id = b.api_fixture_id AND a.ctid < b.ctid")   # API repeats: last wins
+        cur.execute(
+            f"""UPDATE {RAW_TABLE} r SET {updates}, updated_at = now()
+                FROM fixtures_load l WHERE r.api_fixture_id = l.api_fixture_id""")
+        cur.execute(
+            f"""INSERT INTO {RAW_TABLE} ({cols})
+                SELECT {cols} FROM fixtures_load l
+                WHERE NOT EXISTS (SELECT 1 FROM {RAW_TABLE} r WHERE r.api_fixture_id = l.api_fixture_id)""")
+        if not quarantined:
+            cur.execute(
+                f"""DELETE FROM {RAW_TABLE} r
+                    WHERE r.api_league_id = %s AND r.season = %s
+                      AND NOT EXISTS (SELECT 1 FROM fixtures_load l WHERE l.api_fixture_id = r.api_fixture_id)""",
+                (league["api_league_id"], league["season"]))
+        cur.execute("DROP TABLE fixtures_load")
     finally:
         cur.close()
     resolved = False

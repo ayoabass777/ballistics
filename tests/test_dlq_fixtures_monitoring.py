@@ -75,10 +75,10 @@ class FixtureLoadTests(unittest.TestCase):
     def test_bad_row_parked_good_rows_replace_only_themselves(self):
         result, log = self.load([fx(1), fx(2, home=None), fx(3)])
         self.assertEqual((result.loaded, len(result.parked)), (2, 1))
-        delete = log[0]
-        self.assertIn("api_fixture_id = ANY", delete[1])           # fixture 2 keeps its last good row
-        self.assertEqual(delete[2][2], [1, 3])
-        self.assertEqual(log[1], ("copy", 2))
+        self.assertIn(("copy", 2), log)
+        self.assertTrue(any(e[1].startswith("UPDATE raw.raw_fixtures") for e in log if e[0] == "execute"))
+        self.assertFalse(any(e[1].startswith("DELETE FROM raw.raw_fixtures") for e in log
+                             if e[0] == "execute"))                 # fixture 2 keeps its last good row
         entry = self.s3.objects[KEY]
         self.assertEqual((entry["reasons"], entry["fixtures"]), (["null_team_id"], ["H2 v A2 (2)"]))
         self.assertTrue(result.new_entry)
@@ -89,7 +89,8 @@ class FixtureLoadTests(unittest.TestCase):
         conn = FakeConn()
         result = fd.load_league_fixtures([fx(1), fx(2)], league=LEAGUE, ds="2026-10-19",
                                          conn=conn, source="replay")
-        self.assertNotIn("ANY", conn.log[0][1])                     # full league replace
+        self.assertTrue(any(e[1].startswith("DELETE FROM raw.raw_fixtures") and "NOT EXISTS" in e[1]
+                            for e in conn.log if e[0] == "execute"))
         self.assertTrue(result.resolved)
         self.assertEqual(self.statuses[-1], (0, None))
         self.assertIn(KEY, self.s3.objects)                         # not before the caller commits
@@ -330,11 +331,12 @@ class PostgresFixtureTests(unittest.TestCase):
             DROP TABLE IF EXISTS raw.raw_fixtures, raw.raw_fixtures_status;
             CREATE TABLE raw.raw_fixtures (fixture_id BIGSERIAL PRIMARY KEY, api_fixture_id BIGINT NOT NULL UNIQUE,
               api_league_id INT NOT NULL, season INT NOT NULL, kickoff_utc TIMESTAMPTZ NOT NULL,
-              fixture_status TEXT NOT NULL, home_team_id INT, away_team_id INT, {cols});
+              fixture_status TEXT NOT NULL, home_team_id INT, away_team_id INT, {cols},
+              updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
             INSERT INTO raw.raw_fixtures (api_fixture_id, api_league_id, season, kickoff_utc, fixture_status,
-              home_team_id, away_team_id, home_team_name)
-            VALUES (1, 262, 2026, '2026-10-18', 'FT', 10, 11, 'old'),
-                   (2, 262, 2026, '2026-10-18', 'FT', 12, 13, 'last good');""")
+              home_team_id, away_team_id, home_team_name, updated_at)
+            VALUES (1, 262, 2026, '2026-10-18', 'FT', 10, 11, 'old', '2026-10-01'),
+                   (2, 262, 2026, '2026-10-18', 'FT', 12, 13, 'last good', '2026-10-01');""")
         self.conn.commit()
         self.s3 = FakeS3()
         self.s3.install(self)
@@ -356,6 +358,43 @@ class PostgresFixtureTests(unittest.TestCase):
                                     league=LEAGUE, ds="2026-10-19", conn=self.conn)
         self.conn.commit()
         self.assertEqual(self.rows(), [(1, "new"), (2, "last good"), (3, "H3")])
+
+    def ids(self):
+        cur = self.conn.cursor()
+        cur.execute("SELECT api_fixture_id, fixture_id FROM raw.raw_fixtures ORDER BY 1")
+        return dict(cur.fetchall())
+
+    def load(self, rows):
+        with patch.object(fd, "set_status", lambda *a, **k: None):
+            fd.load_league_fixtures(rows, league=LEAGUE, ds="2026-10-19", conn=self.conn, source="replay")
+        self.conn.commit()
+
+    def test_clean_reload_keeps_fixture_ids(self):
+        before = self.ids()
+        self.load([dict(fx(1), home_team_name="new"), fx(2), fx(3)])
+        after = self.ids()
+        self.assertEqual((after[1], after[2]), (before[1], before[2]))   # downstream keys still valid
+        self.assertEqual(self.rows(), [(1, "new"), (2, "H2"), (3, "H3")])
+        cur = self.conn.cursor()
+        cur.execute("SELECT bool_and(updated_at > '2026-10-02') FROM raw.raw_fixtures")
+        self.assertTrue(cur.fetchone()[0])                          # dbt's incremental staging sees them
+
+    def test_clean_reload_drops_fixtures_the_api_dropped(self):
+        self.load([fx(1)])
+        self.assertEqual([r[0] for r in self.rows()], [1])
+
+    def test_repeated_reloads_keep_ids_and_sequence(self):
+        self.load([fx(1), fx(2), fx(3)])
+        first = self.ids()
+        for _ in range(3):
+            self.load([fx(1), fx(2), fx(3)])
+        self.assertEqual(self.ids(), first)
+        self.load([fx(1), fx(2), fx(3), fx(4)])
+        self.assertEqual(self.ids()[4], max(first.values()) + 1)    # no sequence burnt by reloads
+
+    def test_repeated_id_in_one_response_loads_once_last_wins(self):
+        self.load([dict(fx(3), home_team_name="first"), fx(1), fx(2), dict(fx(3), home_team_name="second")])
+        self.assertEqual(self.rows(), [(1, "H1"), (2, "H2"), (3, "second")])
 
     def test_status_row_and_daily_check(self):
         from etl.src.data_detector import daily_flow as flow

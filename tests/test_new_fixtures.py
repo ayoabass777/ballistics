@@ -146,7 +146,7 @@ class PostgresNewFixturesTests(Patched):
         self.assertEqual(len(self.rows()), 2)
 
     def test_only_current_seasons_are_pulled(self):
-        self.api[(244, 2026)] = []
+        self.api[(244, 2026)] = [fx(1)]
         summary = nf.insert_new_fixtures(self.conn)                 # (244, 2025) would KeyError
         self.assertEqual(summary["league_seasons"], 1)
 
