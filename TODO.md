@@ -2,14 +2,15 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-10-20.
+Updated 2026-10-20 (after the betting workflow removal, D149).
 
 ## Now
 
-- [ ] **Merge the 2026-10-20 branches into `main`** (merge commits, per
-  [docs/git-branches.md](docs/git-branches.md)): `feat/dlq-hourly-retry`,
-  `feat/model-result-reuse`, `chore/calibration-refresh-2026-10-18`,
-  `docs/product-log-2026-10-20`. They touch separate files and merge in any order.
+- [ ] **Merge `feat/remove-betting-workflow` into `main`** (D149). The four
+  2026-10-20 branches (DLQ, model reuse, calibration refresh, docs) are merged.
+- [ ] **Check tonight's engine run** (first with model reuse and card versions):
+  `raw.model_processing_state` should fill, the run should start cold, and
+  `raw.card_versions` should gain rows beyond the 5,265 backfilled on 2026-10-20.
 - [ ] **Run the database-backed tests** (16 skipped without `FLOW_TEST_DSN`):
   create a throwaway database in `ballistics_postgres`, run
   `tests/test_dlq.py`, `tests/test_dlq_fixtures_monitoring.py`,
@@ -23,8 +24,8 @@ Updated 2026-10-20.
 ## Pipeline (DLQ, D147/D148)
 
 - [ ] A replay that first discovers bad rows creates the entry at 1 attempt,
-  not 0, so it dies one retry early (`etl/src/fixtures_dlq.py` and
-  `etl/src/standings_dlq.py`, `park_*_rows` with `source="replay"`). Low.
+  not 0, so it dies one retry early (`park_*_rows` with `source="replay"`).
+  A fix (`and not created`) is in the working tree, uncommitted and untested. Low.
 - [ ] A clean fixture load resolves the S3 entry and sets the status to `ok`
   before the caller commits; if that commit then fails the entry is lost
   (`etl/src/fixtures_dlq.py`, `load_league_fixtures`). Low.
@@ -35,8 +36,13 @@ Updated 2026-10-20.
 
 ## Engine
 
+- [ ] Decide whether to drop the dead betting data: `raw.sportybet_odds` and the
+  `est_odds/real_odds/odds/ev/has_odds` columns of `raw.consensus_pool` (kept, D149).
+- [ ] Rename `sportybet_market` / `sportybet_selection` to neutral market names
+  (pool rows, `raw.consensus_pool`, grading, dashboard, tests). Deferred in D149.
+
 - [ ] Learned stacker to replace tier voting (logistic regression per market
-  family on the four models' probabilities + league base rate); also fixes the
+  family on the models' probabilities + league base rate); also fixes the
   double-counted Bayesian signals in `avg_conf`.
 - [ ] Gate Bayesian picks on edge over the league base rate, not an absolute 0.65.
 - [ ] Align backtest and live Bayesian base rates (current season vs all
@@ -45,9 +51,9 @@ Updated 2026-10-20.
   missing goals in calibration scripts; empty `IN ()` SQL edge cases.
 - [ ] Recheck Poisson bias at each calibration refresh.
 
-Done since July: Dixon-Coles feeds consensus; real SportyBet odds and EV in
-slips; engine Airflow DAGs (`engine_predict`, `engine_calibration`);
-dependency-aware model result reuse (2026-10-19).
+Done since July: Dixon-Coles feeds consensus; engine Airflow DAGs
+(`engine_predict`, `engine_calibration`); dependency-aware model result reuse
+(2026-10-19). SportyBet odds, EV and slips were built and then removed (D149).
 
 ## Product and frontend
 

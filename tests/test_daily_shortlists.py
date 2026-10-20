@@ -16,8 +16,7 @@ class DailyShortlistValidationTests(unittest.TestCase):
     def payload(self):
         generated = "2026-09-03T17:30:00Z"
         sections = {
-            "bounds_1_4_shortlist": [],
-            "over_1_5_shortlist": [{"fixture_id": 1}],
+            "bounds_1_4_shortlist": [{"fixture_id": 1}],
             "elo_gap_shortlist": [],
         }
         return {
@@ -66,9 +65,7 @@ class DailyShortlistValidationTests(unittest.TestCase):
             "pool": [],
             "near_threshold": [],
             "bounds_1_4_shortlist": [],
-            "over_1_5_shortlist": [],
             "elo_gap_shortlist": [],
-            "slips": [],
             "fixture_analysis": [],
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -83,13 +80,15 @@ class DailyShortlistValidationTests(unittest.TestCase):
         self.assertEqual(payload["run_ds"], "2026-09-03")
         for key in (
             "bounds_1_4_shortlist",
-            "over_1_5_shortlist",
             "elo_gap_shortlist",
         ):
             self.assertEqual(
                 payload["shortlist_refresh"]["sections"][key]["count"],
                 0,
             )
+        # Betting outputs removed 2026-10-20.
+        self.assertNotIn("slips", payload)
+        self.assertNotIn("over_1_5_shortlist", payload)
 
 
 if __name__ == "__main__":

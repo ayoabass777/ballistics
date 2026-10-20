@@ -114,8 +114,7 @@ def build_results(days: int = 5, current_rule_only: bool = True) -> dict:
         entry["picks"].append({
             "selection": p["sportybet_selection"], "market": p["sportybet_market"],
             "confidence": p["avg_confidence"], "n_models": p["n_models"],
-            "models": p["models"], "odds": p.get("odds"), "ev": p.get("ev"),
-            "hit": bool(res),
+            "models": p["models"], "hit": bool(res),
         })
 
     results = sorted(fixtures.values(), key=lambda x: x["kickoff"], reverse=True)

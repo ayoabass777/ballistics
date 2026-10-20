@@ -77,8 +77,8 @@ class ForecastRulesTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from engine.eval.consensus_slips import save_slips
-        result = dict(pool=[], near_threshold=[], slips=[], fixture_analysis=[],
-                      bounds_1_4_shortlist=[], over_1_5_shortlist=[], elo_gap_shortlist=[])
+        result = dict(pool=[], near_threshold=[], fixture_analysis=[],
+                      bounds_1_4_shortlist=[], elo_gap_shortlist=[])
         with tempfile.TemporaryDirectory() as td:
             target = Path(td) / "consensus_slips_2026-10-02.json"
             with patch.object(fh, "init_schema"), patch.object(fh, "capture", side_effect=RuntimeError("archive failed")):

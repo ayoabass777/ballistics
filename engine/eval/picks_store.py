@@ -75,11 +75,9 @@ CREATE TABLE IF NOT EXISTS raw.consensus_pool (
     avg_confidence      numeric,
     max_confidence      numeric,
     consensus_score     numeric,
-    est_odds            numeric,
-    real_odds           numeric,
-    odds                numeric,
-    ev                  numeric,
-    has_odds            boolean,
+    -- est_odds, real_odds, odds, ev, has_odds: dropped from new tables on
+    -- 2026-10-20 (betting workflow removed); existing tables keep the columns,
+    -- left NULL from then on.
     market_tier         text,
     strength_rank       jsonb,     -- full strength profile (home/away splits)
     league              text,
@@ -296,8 +294,7 @@ def write_consensus_pool(run_ds: str, ranked: list[dict], conn=None) -> int:
                  p.get("sportybet_market"), p.get("sportybet_selection"), p.get("line"),
                  p.get("n_models"), p.get("models"),
                  p.get("avg_confidence"), p.get("max_confidence"),
-                 p.get("consensus_score"), p.get("est_odds"), p.get("real_odds"),
-                 p.get("odds"), p.get("ev"), p.get("has_odds"),
+                 p.get("consensus_score"),
                  p.get("market_tier"), Json(p.get("strength_rank")),
                  p.get("league"), p.get("country"), p.get("kickoff"))
                 for p in ranked
@@ -308,8 +305,8 @@ def write_consensus_pool(run_ds: str, ranked: list[dict], conn=None) -> int:
                     """INSERT INTO raw.consensus_pool
                        (run_ds, fixture_id, unified_market, sportybet_market,
                         sportybet_selection, line, n_models, models,
-                        avg_confidence, max_confidence, consensus_score, est_odds,
-                        real_odds, odds, ev, has_odds, market_tier, strength_rank,
+                        avg_confidence, max_confidence, consensus_score,
+                        market_tier, strength_rank,
                         league, country, kickoff)
                        VALUES %s""",
                     rows,
