@@ -1852,7 +1852,12 @@ def _warehouse_ids(row) -> dict:
 
 
 def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
-    """{fid: {fixture_id, home, away, league, kickoff, country}} for given fixtures."""
+    """{fid: {fixture_id, home, away, league, kickoff, country}} for given fixtures.
+
+    Not-started fixtures only: a model that lets a postponed, cancelled or live
+    fixture through (Bayesian did until 2026-10-20) must not reach the pool,
+    match pages or Discover. Fixtures without metadata are skipped downstream.
+    """
     own = conn is None
     conn = conn or get_conn()
     try:
@@ -1863,9 +1868,14 @@ def fixture_meta_from_db(fixture_ids, conn=None) -> dict:
         df = pd.read_sql("""
             SELECT fixture_id, home_team_name AS home, away_team_name AS away,
                    kickoff_utc AS kickoff, api_league_id,
-                   home_team_id, away_team_id, league_id
+                   home_team_id, away_team_id, league_id, fixture_status
             FROM raw.fact_fixtures WHERE fixture_id = ANY(%(ids)s)
         """, conn, params={"ids": ids})
+        not_started = df["fixture_status"] == "NS"
+        if (~not_started).any():
+            print(f"  dropped {int((~not_started).sum())} fixtures that are not "
+                  f"'NS' ({', '.join(sorted(df.loc[~not_started, 'fixture_status'].astype(str).unique()))})")
+        df = df[not_started]
         meta = {}
         for _, r in df.iterrows():
             fid = int(r["fixture_id"])
@@ -2134,9 +2144,13 @@ def run_consensus(days: int = 10,
     # (fixtures already in meta came from Poisson/Mismatch/Dixon-Coles).
     meta_ids = [int(f) for f in fixture_meta]
     all_ff = pd.read_sql("""
-        SELECT fixture_id, api_league_id, home_team_id, away_team_id, league_id
+        SELECT fixture_id, api_league_id, home_team_id, away_team_id, league_id,
+               fixture_status
         FROM raw.fact_fixtures WHERE fixture_id = ANY(%(ids)s)
     """, conn, params={"ids": meta_ids})
+    # Not-started fixtures only (see fixture_meta_from_db).
+    for fid in all_ff.loc[all_ff["fixture_status"] != "NS", "fixture_id"].astype(int):
+        fixture_meta.pop(fid, None)
     ff_by_fid = {int(r["fixture_id"]): r for _, r in all_ff.iterrows()}
     for fid, meta in fixture_meta.items():
         r = ff_by_fid.get(fid)
