@@ -20,6 +20,7 @@ class FakeConn:
             def __enter__(self): return self
             def __exit__(self, *a): return False
             def execute(self, sql, params=None): conn.sql.append((sql, params))
+            def fetchone(self): return None
             mogrify = None
         return C()
     def close(self):

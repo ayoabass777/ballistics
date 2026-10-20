@@ -43,10 +43,15 @@ def _home_away_map(fixture_ids) -> dict:
         conn.close()
 
 
+def _ordered(signals):
+    from engine.eval.model_cache import digest
+    return sorted(signals, key=lambda row: (int(row['fixture_id']), row['unified_market'], digest(row)))
+
+
 def _run_mismatch(days: int) -> list[dict]:
     from engine.eval.predict_mismatch import predict_mismatch
     picks, _strength = predict_mismatch(days=days)
-    return mismatch_signals(picks)
+    return _ordered(mismatch_signals(picks))
 
 
 def _run_bayesian(days: int, include_analysis: bool = False):
@@ -60,14 +65,14 @@ def _run_bayesian(days: int, include_analysis: bool = False):
         conn.close()
     home_away = _home_away_map(beliefs.keys())
     if not include_analysis:
-        return bayesian_signals(beliefs, home_away)
+        return _ordered(bayesian_signals(beliefs, home_away))
     analysis = annotate_bayesian_analysis(beliefs, home_away)
-    return bayesian_signals(analysis, home_away), analysis
+    return _ordered(bayesian_signals(analysis, home_away)), analysis
 
 
 def _run_dixon(days: int) -> list[dict]:
     from engine.eval.predict_dixon_coles import predict_dixon_coles
-    return dixon_signals(predict_dixon_coles(days=days))
+    return _ordered(dixon_signals(predict_dixon_coles(days=days)))
 
 
 RUNNERS = {
@@ -77,16 +82,32 @@ RUNNERS = {
 }
 
 
-def run_and_store(model: str, run_ds: str, days: int) -> int:
-    """Run one model and persist its picks + readiness marker. Returns pick count."""
-    if model == "bayesian":
-        signals, analysis = _run_bayesian(days, include_analysis=True)
-        ps.write_model_analysis(run_ds, model, analysis)
-    else:
-        signals = RUNNERS[model](days)
-    n = ps.write_model_picks(run_ds, model, signals)
-    ps.write_model_run(run_ds, model, "ok" if n else "empty", n)
-    return n
+def run_and_store(model: str, run_ds: str, days: int, force: bool = False) -> int:
+    """Publish a complete daily result, reusing only dependency-identical computations."""
+    from engine.eval.model_cache import ModelCache, active_cache
+    conn = get_conn()
+    try:
+        # One task per model can publish/update processing state at a time.
+        with conn.cursor() as cur:
+            cur.execute('SELECT pg_advisory_lock(%s)', (734120270 + list(RUNNERS).index(model),))
+        conn.commit()
+        cache = ModelCache(conn, force=force)
+        with active_cache(cache):
+            if model == "bayesian":
+                signals, analysis = _run_bayesian(days, include_analysis=True)
+                ps.write_model_analysis(run_ds, model, analysis)
+            else:
+                signals = RUNNERS[model](days)
+        n = ps.write_model_picks(run_ds, model, signals)
+        conn.commit()
+        ps.write_model_run(run_ds, model, "ok" if n else "empty", n)
+        print(f"{model}: reused={cache.hits}, computed={cache.misses}, new_versions={cache.new_versions}")
+        return n
+    except BaseException:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()  # Releases model session lock even after failure.
 
 
 def main() -> None:
@@ -95,10 +116,11 @@ def main() -> None:
     ap.add_argument("--run-ds", default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
                     help="prediction run date (YYYY-MM-DD)")
     ap.add_argument("--days", type=int, default=7, help="days ahead to scan")
+    ap.add_argument("--full-recompute", action="store_true", help="Bypass reuse while preserving output version checks")
     args = ap.parse_args()
 
     try:
-        n = run_and_store(args.model, args.run_ds, args.days)
+        n = run_and_store(args.model, args.run_ds, args.days, force=args.full_recompute)
         print(f"{args.model}: wrote {n} picks for run_ds={args.run_ds}")
     except Exception:
         # Mark the run errored so the quorum sensor sees it finished (not counted

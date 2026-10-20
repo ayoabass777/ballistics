@@ -24,7 +24,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -33,6 +33,8 @@ import pandas as pd
 import psycopg2
 
 from etl.src.logger import get_logger
+
+from engine.eval.model_cache import cached, digest
 
 logger = get_logger(__name__)
 
@@ -333,6 +335,81 @@ def _index_latest_by_event(beliefs: list[BayesianBelief]) -> dict[int, dict[str,
     return idx
 
 
+def _cached_beliefs(event_df, base_rates, prior_strength, context):
+    result = []
+    base_rates = base_rates.sort_values(['league', 'event_name']).reset_index(drop=True)
+    league_hashes = {league: digest(rows) for league, rows in base_rates.groupby('league')}
+    for team_id, history in event_df.groupby('team_id', sort=True):
+        rates = base_rates[base_rates['league'].isin(history['league'].unique())]
+        result.extend(cached('bayesian.team.' + context, int(team_id),
+            {'history': history, 'base_rates': {league: league_hashes.get(league) for league in history['league'].unique()}, 'prior_strength': prior_strength},
+            lambda: compute_beliefs(history, rates, prior_strength, context=context),
+            encode=lambda values: [asdict(b) for b in values],
+            decode=lambda values: [BayesianBelief(**b) for b in values]))
+    return result
+
+
+def _fixture_beliefs(fix, idx_by_ctx, include_below_threshold):
+    fid = int(fix["fixture_id"])
+    entry = {"home": [], "away": []}
+
+    for side in ("home", "away"):
+        team_col = "team_id" if side == "home" else "opponent_id"
+        if pd.isna(fix[team_col]):
+            continue
+        h2h_tid = int(fix[team_col])
+
+        venue = idx_by_ctx[side].get(h2h_tid, {})
+        overall = idx_by_ctx["all"].get(h2h_tid, {})
+
+        # Per event: the venue-context belief is primary when its sample
+        # is mature (n >= VENUE_PREFER_MIN), else the overall belief is.
+        # Selection depends only on data volume, never on the probability
+        # itself, so it avoids the optimism of picking the max posterior.
+        # When a venue belief is primary, the overall belief is kept too
+        # (primary=False) so the all-context streak stays visible —
+        # consumers that feed consensus should use primary entries only.
+        for event_name in set(venue) | set(overall):
+            venue_b = venue.get(event_name)
+            overall_b = overall.get(event_name)
+            if venue_b is not None and venue_b.n_matches >= VENUE_PREFER_MIN:
+                chosen = [(venue_b, True)]
+                if overall_b is not None:
+                    chosen.append((overall_b, False))
+            else:
+                chosen = [(overall_b or venue_b, True)]
+            for b, primary in chosen:
+                calibrated = calibrate_posterior(b.posterior)
+                boosted = apply_streak_boost(calibrated, b.recent_streak)
+                display_eligible = boosted >= MIN_POSTERIOR_INTERESTING
+                if not display_eligible and not include_below_threshold:
+                    continue
+                entry[side].append({
+                    "event": b.event_name,
+                    "posterior": boosted,
+                    "posterior_raw": b.posterior,
+                    "posterior_calibrated": calibrated,
+                    "boost": round(boosted - calibrated, 4) if boosted > calibrated else 0,
+                    "base_rate": b.league_base_rate,
+                    "alpha": b.alpha,
+                    "beta": b.beta,
+                    "n": b.n_matches,
+                    "k": b.k_matches,
+                    "league": b.league,
+                    "context": b.context,
+                    "primary": primary,
+                    "display_eligible": display_eligible,
+                    "display_threshold": MIN_POSTERIOR_INTERESTING,
+                    "streak": b.recent_streak,
+                    "trend": b.trend,
+                    "team": b.team_name,
+                })
+
+        entry[side].sort(key=lambda d: d["posterior"], reverse=True)
+
+    return entry
+
+
 def get_fixture_beliefs(
     conn, days: int = 7,
     prior_strength: float = PRIOR_STRENGTH,
@@ -388,76 +465,26 @@ def get_fixture_beliefs(
 
     idx_by_ctx: dict[str, dict[int, dict[str, BayesianBelief]]] = {}
     base_rates_all = compute_league_base_rates(conn, context="all")
-    idx_by_ctx["all"] = _index_latest_by_event(compute_beliefs(
+    idx_by_ctx["all"] = _index_latest_by_event(_cached_beliefs(
         all_event_df, base_rates_all, prior_strength, context="all"))
 
     for ctx in ("home", "away"):
         event_df = load_event_history(conn, context=ctx)
         event_df = event_df[event_df["team_id"].isin(h2h_team_ids)]
         base_rates = compute_league_base_rates(conn, context=ctx)
-        idx_by_ctx[ctx] = _index_latest_by_event(compute_beliefs(
+        idx_by_ctx[ctx] = _index_latest_by_event(_cached_beliefs(
             event_df, base_rates, prior_strength, context=ctx))
 
     result = {}
     for _, fix in fixtures.iterrows():
-        fid = int(fix["fixture_id"])
-        entry = {"home": [], "away": []}
-
-        for side in ("home", "away"):
-            team_col = "team_id" if side == "home" else "opponent_id"
-            if pd.isna(fix[team_col]):
-                continue
-            h2h_tid = int(fix[team_col])
-
-            venue = idx_by_ctx[side].get(h2h_tid, {})
-            overall = idx_by_ctx["all"].get(h2h_tid, {})
-
-            # Per event: the venue-context belief is primary when its sample
-            # is mature (n >= VENUE_PREFER_MIN), else the overall belief is.
-            # Selection depends only on data volume, never on the probability
-            # itself, so it avoids the optimism of picking the max posterior.
-            # When a venue belief is primary, the overall belief is kept too
-            # (primary=False) so the all-context streak stays visible —
-            # consumers that feed consensus should use primary entries only.
-            for event_name in set(venue) | set(overall):
-                venue_b = venue.get(event_name)
-                overall_b = overall.get(event_name)
-                if venue_b is not None and venue_b.n_matches >= VENUE_PREFER_MIN:
-                    chosen = [(venue_b, True)]
-                    if overall_b is not None:
-                        chosen.append((overall_b, False))
-                else:
-                    chosen = [(overall_b or venue_b, True)]
-                for b, primary in chosen:
-                    calibrated = calibrate_posterior(b.posterior)
-                    boosted = apply_streak_boost(calibrated, b.recent_streak)
-                    display_eligible = boosted >= MIN_POSTERIOR_INTERESTING
-                    if not display_eligible and not include_below_threshold:
-                        continue
-                    entry[side].append({
-                        "event": b.event_name,
-                        "posterior": boosted,
-                        "posterior_raw": b.posterior,
-                        "posterior_calibrated": calibrated,
-                        "boost": round(boosted - calibrated, 4) if boosted > calibrated else 0,
-                        "base_rate": b.league_base_rate,
-                        "alpha": b.alpha,
-                        "beta": b.beta,
-                        "n": b.n_matches,
-                        "k": b.k_matches,
-                        "league": b.league,
-                        "context": b.context,
-                        "primary": primary,
-                        "display_eligible": display_eligible,
-                        "display_threshold": MIN_POSTERIOR_INTERESTING,
-                        "streak": b.recent_streak,
-                        "trend": b.trend,
-                        "team": b.team_name,
-                    })
-
-            entry[side].sort(key=lambda d: d["posterior"], reverse=True)
-
-        if entry["home"] or entry["away"]:
+        fid = int(fix['fixture_id'])
+        relevant = {ctx: {int(t): {e: asdict(b) for e,b in teams.get(int(t),{}).items()}
+                         for t in (fix['team_id'], fix['opponent_id']) if pd.notna(t)}
+                    for ctx,teams in idx_by_ctx.items()}
+        entry = cached('bayesian.fixture', fid,
+            {'fixture': fix, 'beliefs': relevant, 'include_below_threshold': include_below_threshold},
+            lambda: _fixture_beliefs(fix, idx_by_ctx, include_below_threshold))
+        if entry['home'] or entry['away']:
             result[fid] = entry
 
     return result
