@@ -103,14 +103,17 @@ class ApiResponseError(Exception):
 def _rate_limited_get(
     endpoint: str,
     params: Dict[str, Any],
-    max_retries: int = 5
+    max_retries: int = 5,
+    *,
+    raise_on_failure: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Perform an HTTP GET with automatic rate-limit handling:
     - Honors daily and per-minute limit headers.
     - Retries on HTTP 429 with Retry-After header.
     - Uses exponential backoff on transient errors.
-    Returns list of JSON 'response' elements or empty list on failure.
+    Returns response elements. With raise_on_failure, transport/JSON failures
+    raise ApiResponseError; a successful empty response still returns [].
     """
     backoff = 1
     for attempt in range(1, max_retries + 1):
@@ -148,7 +151,9 @@ def _rate_limited_get(
             
             try:
                 payload = response.json()
-            except ValueError:
+            except ValueError as exc:
+                if raise_on_failure:
+                    raise ApiResponseError(f"Invalid JSON for {endpoint} with params {params}") from exc
                 logger.error(f"Failed to parse JSON response on attempt {attempt}/{max_retries}")
                 return []
 
@@ -172,18 +177,20 @@ def _rate_limited_get(
             logger.error(f"Non-retryable request error: {e}")
             break
     logger.error(f"Failed to fetch {endpoint} after {max_retries} attempts with params: {params}")
+    if raise_on_failure:
+        raise ApiResponseError(f"Failed to fetch {endpoint} with params {params}")
     return []
 
 # endpoint params => Listof fixture
 # endpoint is fixtures
 #params is league_id and season
 
-def fetch_fixtures(endpoint, params):
+def fetch_fixtures(endpoint, params, *, raise_on_failure=False):
     """
     Fetch fixtures from the API with rate limiting and error handling.  
-    Returns a list of fixtures or an empty list on failure.
+    Returns fixtures; optionally raises on request/JSON failure.
     """
-    return _rate_limited_get(endpoint, params)
+    return _rate_limited_get(endpoint, params, raise_on_failure=raise_on_failure)
 
 #fixtures is a list of fixtures each fixture contains a lot of information that
 #should be documented but i will only extract the ones i consider important
@@ -210,20 +217,17 @@ def extract_fixtures_field(
         return "draw", "draw"
 
     for i, fixture in enumerate(fixtures):
-        missing, fixture_data, teams_data, score_data, league_data = _validate_fixture(fixture)
-        fid = fixture_data.get("id", "unknown")
-        league_id = league_data.get("id", "unknown")
-        season = league_data.get("season", "unknown")
-        home_team = teams_data.get("home", {}) or {}
-        away_team = teams_data.get("away", {}) or {}
-        home_name = home_team.get("name")
-        away_name = away_team.get("name")
-        if missing:
-            logger.warning(f"Skipping fixture id={fid} ({home_name} vs {away_name}): missing {missing}")
-            skip_count += 1
-            continue
-        # All required data present; build record
         try:
+            missing, fixture_data, teams_data, score_data, league_data = _validate_fixture(fixture)
+            fid = fixture_data.get("id", "unknown")
+            league_id = league_data.get("id", "unknown")
+            season = league_data.get("season", "unknown")
+            home_team = teams_data.get("home", {}) or {}
+            away_team = teams_data.get("away", {}) or {}
+            home_name = home_team.get("name")
+            away_name = away_team.get("name")
+            if missing:
+                raise ValueError(f"missing sections: {', '.join(missing)}")
             status_data = fixture_data.get("status") or {}
             halftime = score_data.get("halftime") or {}
             fulltime = score_data.get("fulltime") or {}
@@ -253,12 +257,20 @@ def extract_fixtures_field(
                 "home_halftime_result": home_halftime_result,
                 "away_halftime_result": away_halftime_result
             })
-        except (KeyError, TypeError, ValueError) as e:
-            logger.warning(f"Skipping bad fixture record id={fid} at index {i}: {e}")
+        except (KeyError, TypeError, ValueError, AttributeError) as e:
+            # Keep rejected input in the landing payload so the loader can
+            # quarantine it and cannot mistake this for a complete season.
+            raw = fixture if isinstance(fixture, dict) else {}
+            identity = raw.get("fixture")
+            identity = identity if isinstance(identity, dict) else {}
+            extracted.append({"api_fixture_id": identity.get("id"),
+                              "_dlq_reason": f"extraction_error: {e}",
+                              "_raw_payload": fixture})
+            logger.warning(f"Quarantining bad fixture record at index {i}: {e}")
             skip_count += 1
             continue
     if skip_count:
-        logger.info(f"Skipped {skip_count} fixtures due to missing data or errors ")
+        logger.info(f"Retained {skip_count} rejected fixtures for quarantine ")
     return extracted
 
 def save_fixture_data(

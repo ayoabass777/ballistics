@@ -72,6 +72,18 @@ class FixtureLoadTests(unittest.TestCase):
         result = fd.load_league_fixtures(rows, league=LEAGUE, ds="2026-10-19", conn=conn, source=source)
         return result, conn.log
 
+    def test_extraction_rejects_are_parked_and_disable_pruning(self):
+        from etl.src.extract_fixtures import extract_fixtures_field
+        payload = [{"fixture": {"id": 2}}, {"fixture": ["invalid"]}, None]
+        rejected = extract_fixtures_field(payload)
+        self.assertEqual(len(rejected), 3)
+        self.assertEqual([r["_raw_payload"] for r in rejected], payload)
+        result, log = self.load([fx(1), *rejected])
+        self.assertEqual((result.loaded, len(result.parked)), (1, 3))
+        self.assertEqual(self.s3.objects[KEY]["rows"][0]["_raw_payload"], payload[0])
+        self.assertFalse(any(e[1].startswith("DELETE FROM raw.raw_fixtures")
+                             for e in log if e[0] == "execute"))
+
     def test_bad_row_parked_good_rows_replace_only_themselves(self):
         result, log = self.load([fx(1), fx(2, home=None), fx(3)])
         self.assertEqual((result.loaded, len(result.parked)), (2, 1))

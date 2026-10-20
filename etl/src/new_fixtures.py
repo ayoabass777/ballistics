@@ -11,8 +11,7 @@ Once a day, for every current league season: pull the season's fixtures (one
 API call), and insert the ones whose api_fixture_id isn't in the table. Rows
 already there are never touched: their fixture_id is referenced downstream
 (forecasts, card versions), and the update-by-ids step owns their contents.
-A fixture the API sends incomplete is skipped and logged; the next day's run
-looks again, so no DLQ is needed.
+Incomplete fixtures are quarantined in the fixture-row DLQ for replay.
 """
 from __future__ import annotations
 
@@ -23,7 +22,8 @@ import psycopg2.extras
 from etl.src.config import UPDATE_FIXTURES_LOG
 from etl.src.extract_fixtures import FIXTURES_ENDPOINT, extract_fixtures_field, fetch_fixtures
 from etl.src.extract_metadata import get_db_connection
-from etl.src.fixtures_dlq import fixture_row_problem
+from etl.src import dlq
+from etl.src.fixtures_dlq import fixture_row_problem, park_fixture_rows, set_status
 from etl.src.logger import get_logger
 from etl.src.s3_landing import RAW_COLUMNS, RAW_TABLE
 
@@ -94,7 +94,10 @@ def insert_new_fixtures(conn=None) -> Dict[str, Any]:
         last_error: Optional[Exception] = None
         for api_league_id, season in league_seasons:
             try:
-                payload = fetch_fixtures(FIXTURES_ENDPOINT, {"league": api_league_id, "season": season})
+                payload = fetch_fixtures(
+                    FIXTURES_ENDPOINT, {"league": api_league_id, "season": season},
+                    raise_on_failure=True,
+                )
             except Exception as exc:
                 last_error = exc
                 summary["failed"].append(f"{api_league_id}/{season}")
@@ -104,10 +107,21 @@ def insert_new_fixtures(conn=None) -> Dict[str, Any]:
             records = extract_fixtures_field(payload)
             summary["api_fixtures"] += len(records)
             try:
-                new = missing_fixtures(conn, records)
-                good = [r for r in new if fixture_row_problem(r) is None]
-                skipped = len(new) - len(good)
-                inserted = insert_fixtures(conn, good)
+                # Validate before filtering existing IDs: malformed records may
+                # have no usable ID, or refer to an existing fixture.
+                valid, bad = dlq.split_rows(records, fixture_row_problem)
+                league = {"api_league_id": api_league_id, "season": season}
+                if bad:
+                    parked = park_fixture_rows(
+                        bad, league=league, ds=dlq.now_utc().date().isoformat(),
+                        source="discovery",
+                    )
+                    set_status(league, bad, parked, conn=conn)
+                # Only full replay should clear an existing quarantine: this
+                # insert-only path does not repair existing fixture contents.
+                new = missing_fixtures(conn, valid)
+                skipped = len(bad)
+                inserted = insert_fixtures(conn, new)
                 conn.commit()
             except Exception as exc:
                 conn.rollback()
@@ -116,7 +130,7 @@ def insert_new_fixtures(conn=None) -> Dict[str, Any]:
                 logger.error("new fixtures: insert failed for league %s season %s: %s",
                              api_league_id, season, exc, exc_info=True)
                 continue
-            summary["new"] += len(new)
+            summary["new"] += len(new) + skipped
             summary["inserted"] += inserted
             summary["skipped_invalid"] += skipped
             if inserted:

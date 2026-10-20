@@ -19,6 +19,10 @@ class Patched(unittest.TestCase):
 
     def setUp(self):
         self.api = {}
+        for name in ("park_fixture_rows", "set_status"):
+            stub = patch.object(nf, name)
+            setattr(self, name, stub.start())
+            self.addCleanup(stub.stop)
         for target, fn in (
             ("etl.src.new_fixtures.fetch_fixtures", self.fetch),
             ("etl.src.new_fixtures.extract_fixtures_field", lambda payload: payload),
@@ -27,7 +31,7 @@ class Patched(unittest.TestCase):
             p.start()
             self.addCleanup(p.stop)
 
-    def fetch(self, endpoint, params):
+    def fetch(self, endpoint, params, **kwargs):
         result = self.api[(params["league"], params["season"])]
         if isinstance(result, Exception):
             raise result
@@ -61,6 +65,15 @@ class InsertNewFixturesTests(Patched):
         self.assertEqual(summary["failed"], ["98/2027"])
         self.assertEqual(summary["inserted"], 1)
 
+    def test_invalid_records_without_id_and_existing_ids_are_parked(self):
+        self.api[(244, 2026)] = [fx(None), fx(1, home=None), fx(2)]
+        summary, inserted, _ = self.run_with([(244, 2026)], have={1})
+        self.assertEqual([r["api_fixture_id"] for r in inserted], [2])
+        self.assertEqual(summary["skipped_invalid"], 2)
+        bad = self.park_fixture_rows.call_args.args[0]
+        self.assertEqual([r["api_fixture_id"] for r in bad], [None, 1])
+        self.set_status.assert_called_once()
+
     def test_every_league_failing_raises(self):
         self.api[(98, 2027)] = OSError("plan lapsed")
         self.api[(244, 2026)] = OSError("plan lapsed")
@@ -93,6 +106,35 @@ class InsertNewFixturesTests(Patched):
         self.assertEqual((summary["failed"], summary["inserted"]), (["98/2027"], 1))
         conn.rollback.assert_called_once()
         conn.commit.assert_called_once()
+
+
+class FetchFailureTests(unittest.TestCase):
+    def test_transport_failure_is_reported_and_next_league_continues(self):
+        from requests.exceptions import Timeout
+        from etl.src import extract_fixtures as ef
+
+        response = MagicMock(status_code=200, headers={})
+        response.json.return_value = {"response": [fx(5)]}
+        with patch.object(ef.requests, "get", side_effect=[Timeout("offline")] * 5 + [response]), \
+                patch.object(ef.time, "sleep"), \
+                patch.object(nf, "current_league_seasons", return_value=[(98, 2027), (244, 2026)]), \
+                patch.object(nf, "extract_fixtures_field", side_effect=lambda payload: payload), \
+                patch.object(nf, "missing_fixtures", side_effect=lambda conn, records: records), \
+                patch.object(nf, "insert_fixtures", return_value=1):
+            summary = nf.insert_new_fixtures(MagicMock())
+        self.assertEqual(summary["failed"], ["98/2027"])
+        self.assertEqual(summary["inserted"], 1)
+
+    def test_strict_fetch_distinguishes_empty_success_from_invalid_json(self):
+        from etl.src import extract_fixtures as ef
+
+        response = MagicMock(status_code=200, headers={})
+        response.json.return_value = {"response": []}
+        with patch.object(ef.requests, "get", return_value=response):
+            self.assertEqual(ef.fetch_fixtures("fixtures", {}, raise_on_failure=True), [])
+            response.json.side_effect = ValueError("invalid JSON")
+            with self.assertRaises(ef.ApiResponseError):
+                ef.fetch_fixtures("fixtures", {}, raise_on_failure=True)
 
 
 @unittest.skipUnless(os.getenv("FLOW_TEST_DSN"), "requires FLOW_TEST_DSN (throwaway database)")

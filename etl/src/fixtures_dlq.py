@@ -59,6 +59,8 @@ def dlq_key(api_league_id: int, season: int) -> str:
 
 def fixture_row_problem(row: Dict[str, Any]) -> Optional[str]:
     """Why a fixture row can't be loaded, or None when it can."""
+    if row.get(dlq.DLQ_REASON):
+        return str(row[dlq.DLQ_REASON])
     if row.get("api_fixture_id") is None:
         return "null_fixture_id"         # the key (unique index)
     if not row.get("kickoff_utc"):
