@@ -20,7 +20,7 @@ models:
           - unique
 
       - name: team_name
-        description: "Standardized team name (initcap)."
+        description: "Team name as the provider spells it (stg_dim_teams); the one name source for every model."
         tests:
           - not_null
 
