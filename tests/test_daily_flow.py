@@ -229,7 +229,8 @@ class PostgresFlowTests(unittest.TestCase):
     def full_etl(self):
         self.movement("api_to_s3", "success")
         self.movement("s3_to_raw", "success")
-        for t in ("fixture_corrections", "extract_xg_task", "update_standings_task", "run_dbt"):
+        for t in ("fixture_corrections", "insert_new_fixtures_task", "extract_xg_task",
+                  "update_standings_task", "run_dbt"):
             self.pipeline("fixture_update_dag", t, "success")
 
     def engine(self, models=3):
@@ -306,7 +307,8 @@ class PostgresFlowTests(unittest.TestCase):
     def test_dbt_failure_blocks_engine_and_alerts(self):
         self.movement("api_to_s3", "success")
         self.movement("s3_to_raw", "success")
-        for t in ("fixture_corrections", "extract_xg_task", "update_standings_task"):
+        for t in ("fixture_corrections", "insert_new_fixtures_task", "extract_xg_task",
+                  "update_standings_task"):
             self.pipeline("fixture_update_dag", t, "success")
         self.pipeline("fixture_update_dag", "run_dbt", "failed")
         summary, alert = self.run_check()

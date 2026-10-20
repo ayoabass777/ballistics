@@ -3,20 +3,22 @@ Fixture Update DAG — daily incremental updates for played fixtures.
 
 Fetches fixtures that have been played since last run (null fulltime goals,
 past kickoff), writes raw updates to S3 landing zone, then applies to Postgres.
-Also corrects rescheduled kickoff times and updates league standings.
+Also corrects rescheduled kickoff times, inserts fixtures the table doesn't
+have yet (new phases, unloaded seasons) and updates league standings.
 
 Task graph:
 
-  extract_updates ──► load_updates ──► fixture_corrections ──► extract_xg
-      ──► update_standings ──► data_quality_checks ──► fixtures_loaded
-      ──► dbt_seed ──► dbt_run
+  extract_updates ──► load_updates ──► fixture_corrections
+      ──► insert_new_fixtures ──► extract_xg ──► update_standings
+      ──► data_quality_checks ──► fixtures_loaded ──► dbt_seed ──► dbt_run
 
 The steps after load_updates still run in order (one at a time against the
 API), but each runs even if the one before it failed, and dbt runs as long
-as the fixtures loaded: a failed correction, xG pull or standings refresh is
-reported on its own task instead of stopping dbt and the day's forecasts
-(standings failures on Oct 15 and 17 2026 cost both days). fixtures_loaded
-fails, and so stops dbt, only when extract_updates or load_updates failed.
+as the fixtures loaded: a failed correction, new-fixture insert, xG pull or
+standings refresh is reported on its own task instead of stopping dbt and the
+day's forecasts (standings failures on Oct 15 and 17 2026 cost both days).
+fixtures_loaded fails, and so stops dbt, only when extract_updates or
+load_updates failed.
 """
 
 import os
@@ -319,9 +321,36 @@ def fixture_update_dag():
         check_raw_fixture_stale_from_context(context)
 
     @task(trigger_rule=TriggerRule.ALL_DONE)
+    def insert_new_fixtures_task(**context):
+        """Insert fixtures the API has but raw.raw_fixtures doesn't (new
+        phases, unloaded seasons); one API call per current league season."""
+        from etl.src.new_fixtures import insert_new_fixtures
+        from etl.src.logger import get_logger
+        from etl.src.config import UPDATE_FIXTURES_LOG
+        from etl.src.data_detector import record_data_movement_from_context
+
+        logger = get_logger(__name__, log_path=UPDATE_FIXTURES_LOG)
+        summary = insert_new_fixtures()
+        record_data_movement_from_context(
+            context,
+            movement_type="api_to_raw",
+            source_system="api_sports",
+            source_name="new_fixtures",
+            target_schema="raw",
+            target_table="raw_fixtures",
+            row_count=summary["new"],
+            inserted_count=summary["inserted"],
+            failed_count=summary["skipped_invalid"],
+            status="partial" if summary["failed"] or summary["skipped_invalid"] else "success",
+            details=summary,
+        )
+        logger.info("New fixtures inserted: %d", summary["inserted"])
+        return summary["inserted"]
+
+    @task(trigger_rule=TriggerRule.ALL_DONE)
     def fixtures_loaded(**context):
         """Gate for dbt: pass when the fixture load succeeded, whatever happened
-        to the side steps (corrections, xG, standings, quality checks)."""
+        to the side steps (corrections, new fixtures, xG, standings, quality checks)."""
         dag_run = context["dag_run"]
         bad = [task_id for task_id in ("extract_updates", "load_updates")
                if dag_run.get_task_instance(task_id).state != "success"]
@@ -351,12 +380,13 @@ def fixture_update_dag():
     s3_key = extract_updates()
     loaded = load_updates(s3_key)
     corrections = fixture_corrections()
+    new_fixtures = insert_new_fixtures_task()
     xg = extract_xg_task()
     standings = update_standings_task()
     quality_checks = run_data_quality_checks()
     gate = fixtures_loaded()
 
-    loaded >> corrections >> xg >> standings >> quality_checks >> gate >> dbt_seed >> dbt_run
+    loaded >> corrections >> new_fixtures >> xg >> standings >> quality_checks >> gate >> dbt_seed >> dbt_run
 
 
 fixture_update_dag()

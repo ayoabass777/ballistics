@@ -51,6 +51,13 @@ datasets:
     upstream: [raw.raw_fixtures]
     check: {type: pipeline_task, dag: fixture_update_dag, task: fixture_corrections}
 
+  - id: raw.raw_fixtures.new
+    layer: raw
+    description: Fixtures the API has that raw fixtures didn't (new phases, unloaded seasons)
+    producer: {dag: fixture_update_dag, task: insert_new_fixtures_task}
+    upstream: [raw.raw_fixtures]
+    check: {type: pipeline_task, dag: fixture_update_dag, task: insert_new_fixtures_task}
+
   - id: raw.fixture_xg
     layer: raw
     description: Expected goals for played fixtures
