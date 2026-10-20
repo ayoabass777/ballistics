@@ -1097,6 +1097,21 @@ def _normalise_market(model: str, raw_market: str, side: str = "",
     return None
 
 
+def _market_team(unified: str, home: str, away: str) -> str | None:
+    """Which team a team market ("<team> Over 0.5") is about.
+
+    Full names first, longest match winning ("Inter Miami Over 0.5" is not
+    about "Inter"). A first-word match is a last resort and only when it
+    singles out one team: "VfL Wolfsburg" must not match "VfL Bochum".
+    """
+    text = unified.lower()
+    named = [t for t in (home, away) if t and t.lower() in text]
+    if named:
+        return max(named, key=len)
+    first = [t for t in (home, away) if t and unified.startswith(t.split()[0])]
+    return first[0] if len(first) == 1 else None
+
+
 def _sportify_market(unified: str, home: str, away: str) -> dict:
     """Convert a unified market key into SportyBet-bookable description."""
     if unified == "Match Goals 1-4":
@@ -1112,27 +1127,23 @@ def _sportify_market(unified: str, home: str, away: str) -> dict:
             return {"market": "Home Team Over/Under", "selection": f"{home} Over 0.5", "line": 0.5}
         if unified.startswith("OPP_away"):
             return {"market": "Away Team Over/Under", "selection": f"{away} Over 0.5", "line": 0.5}
-        for team_name in (home, away):
-            if team_name.lower() in unified.lower() or unified.startswith(team_name.split()[0]):
-                is_home = team_name == home
-                mkt = "Home Team Over/Under" if is_home else "Away Team Over/Under"
-                return {"market": mkt, "selection": f"{team_name} Over 0.5", "line": 0.5}
+        team_name = _market_team(unified, home, away)
+        if team_name:
+            mkt = "Home Team Over/Under" if team_name == home else "Away Team Over/Under"
+            return {"market": mkt, "selection": f"{team_name} Over 0.5", "line": 0.5}
         return {"market": "Team Over/Under", "selection": unified, "line": 0.5}
     if "Over 1.5" in unified and not unified.startswith("Match"):
-        for team_name in (home, away):
-            if team_name.lower() in unified.lower():
-                is_home = team_name == home
-                mkt = "Home Team Over/Under" if is_home else "Away Team Over/Under"
-                return {"market": mkt, "selection": f"{team_name} Over 1.5", "line": 1.5}
+        team_name = _market_team(unified, home, away)
+        if team_name:
+            mkt = "Home Team Over/Under" if team_name == home else "Away Team Over/Under"
+            return {"market": mkt, "selection": f"{team_name} Over 1.5", "line": 1.5}
     if "Win" in unified:
         return {"market": "1X2", "selection": unified, "line": None}
     if "Double Chance" in unified:
-        for team_name in (home, away):
-            if team_name.lower() in unified.lower():
-                if team_name == home:
-                    return {"market": "Double Chance", "selection": "1X", "line": None}
-                else:
-                    return {"market": "Double Chance", "selection": "X2", "line": None}
+        team_name = _market_team(unified, home, away)
+        if team_name:
+            return {"market": "Double Chance",
+                    "selection": "1X" if team_name == home else "X2", "line": None}
         return {"market": "Double Chance", "selection": unified, "line": None}
     if "BTTS" in unified:
         return {"market": "Both Teams to Score", "selection": "Yes", "line": None}
