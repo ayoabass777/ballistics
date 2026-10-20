@@ -8,6 +8,7 @@ from unittest.mock import patch
 from etl.src.data_detector import datasets as dsets
 from etl.src.data_detector import daily_flow as flow
 from etl.src.data_detector import notify
+from tests.test_dlq import FakeS3
 
 DS = date(2026, 10, 13)
 ROOT = Path(__file__).resolve().parents[1]
@@ -204,6 +205,7 @@ class PostgresFlowTests(unittest.TestCase):
         dlq_list = patch("etl.src.s3_landing.list_dlq_entries", return_value=[])   # no S3 in tests
         self.dlq_list = dlq_list.start()
         self.addCleanup(dlq_list.stop)
+        FakeS3().install(self)                     # row-level DLQ checks list S3 too
 
     def tearDown(self):
         self.conn.close()
