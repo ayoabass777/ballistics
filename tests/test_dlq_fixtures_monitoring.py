@@ -99,10 +99,17 @@ class FixtureLoadTests(unittest.TestCase):
         self.assertEqual(self.s3.objects[KEY]["attempts"], 0)       # nightly/bootstrap don't count
 
     def test_replay_still_bad_counts_and_load_is_monitored(self):
+        self.load([fx(1, kickoff=None)])                              # entry opened at 0
         self.load([fx(1, kickoff=None)], source="replay")
         self.assertEqual(self.s3.objects[KEY]["attempts"], 1)
         dataset, table, league, result = self.records[-1][0]
         self.assertEqual((dataset, table, self.records[-1][1]["source"]), ("fixtures", "raw.raw_fixtures", "replay"))
+
+
+    def test_entry_first_seen_by_replay_starts_at_zero(self):
+        parked = fd.park_fixture_rows([{**fx(1, kickoff=None), dlq.DLQ_REASON: "null_kickoff"}],
+                                      league=LEAGUE, ds="2026-10-20", source="replay")
+        self.assertEqual(parked[1]["attempts"], 0)
 
 
 class FixtureReplayTests(unittest.TestCase):

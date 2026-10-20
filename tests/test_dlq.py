@@ -149,6 +149,12 @@ class StandingsDlqTests(unittest.TestCase):
         self.assertEqual(summary["still_bad"], 1)
         self.assertEqual(self.s3.objects[KEY]["attempts"], 1)
 
+    def test_entry_first_seen_by_replay_starts_at_zero(self):
+        parked = sd.park_standings_rows([{"api_team_id": None, "team_name": "Club Leon",
+                                          dlq.DLQ_REASON: "null_team_id"}],
+                                        league=LEAGUE, ds="2026-10-20", source="replay")
+        self.assertEqual(parked[1]["attempts"], 0)                    # 24 retries left, not 23
+
     def test_replay_not_due_is_skipped(self):
         self.nightly()
         with patch("etl.src.update_standings.fetch_standings") as fetch:

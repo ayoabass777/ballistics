@@ -22,9 +22,6 @@ Updated 2026-10-20.
 
 ## Pipeline (DLQ, D147/D148)
 
-- [ ] A replay that first discovers bad rows creates the entry at 1 attempt,
-  not 0, so it dies one retry early (`etl/src/fixtures_dlq.py` and
-  `etl/src/standings_dlq.py`, `park_*_rows` with `source="replay"`). Low.
 - [ ] A clean fixture load resolves the S3 entry and sets the status to `ok`
   before the caller commits; if that commit then fails the entry is lost
   (`etl/src/fixtures_dlq.py`, `load_league_fixtures`). Low.

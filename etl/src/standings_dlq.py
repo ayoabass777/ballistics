@@ -84,7 +84,7 @@ def park_standings_rows(bad: List[Dict[str, Any]], *, league: Dict[str, Any], ds
         entry["last_seen"] = dlq._iso(dlq.now_utc())
         entry["ds_seen"] = sorted(set(entry.get("ds_seen") or []) | {str(ds)})
         became_dead = False
-        if source == "replay":
+        if source == "replay" and not created:   # a new entry starts at 0 attempts
             entry, became_dead = dlq.record_failed_attempt(entry, f"still unprocessable: {', '.join(reasons)}")
         dlq.write_json(key, entry)
     except Exception as exc:          # S3 down must not fail the standings task
