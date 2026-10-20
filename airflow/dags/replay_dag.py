@@ -64,6 +64,7 @@ def replay_dag():
         zone, load to Postgres, move the entry to dlq/resolved/ on success.
         A failure counts an attempt (next try in an hour; dead after 24).
         """
+        from etl.src import dlq
         from etl.src.extract_fixtures import mark_fixtures_bootstrap_done
         from etl.src.extract_metadata import get_db_connection
         from etl.src.replay_dlq import due_fixture_entries, fixture_attempt_failed, replay_from_dlq
@@ -103,6 +104,7 @@ def replay_dag():
                         if row:
                             mark_fixtures_bootstrap_done(cur, row[0])
                         conn.commit()
+                        dlq.run_after_commit(conn)
                         cur.close()
                         replayed += 1
                     else:
@@ -110,6 +112,7 @@ def replay_dag():
                         failed += 1
                 except Exception as exc:
                     conn.rollback()
+                    dlq.discard_after_commit(conn)
                     logger.error(
                         "Replay failed for league %s season %s: %s",
                         entry["api_league_id"], entry["season_year"], exc, exc_info=True,

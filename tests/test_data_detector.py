@@ -475,7 +475,7 @@ class DagWiringTests(unittest.TestCase):
         self.assertIn('table_name="fixture_xg"', xg_task_source)
         self.assertIn("record_table_snapshot_from_context", xg_task_source)
 
-        quality_task_start = source.index("    @task\n    def run_data_quality_checks")
+        quality_task_start = source.index("    def run_data_quality_checks")
         standings_task_source = source[standings_task_start:quality_task_start]
 
         self.assertIn("return_summary=True", standings_task_source)

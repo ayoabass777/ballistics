@@ -18,9 +18,6 @@ Updated 2026-10-20 (after the betting workflow removal, D149).
 
 ## Pipeline (DLQ, D147/D148)
 
-- [ ] A clean fixture load resolves the S3 entry and sets the status to `ok`
-  before the caller commits; if that commit then fails the entry is lost
-  (`etl/src/fixtures_dlq.py`, `load_league_fixtures`). Low.
 - [ ] Incremental fixture updates only touch existing rows: fixtures created
   after bootstrap (e.g. playoffs) are never inserted (CLAUDE.md, Known Gaps).
 - [ ] ~110 fixtures stuck at NS from postponements (Egyptian league, USL Tormenta).

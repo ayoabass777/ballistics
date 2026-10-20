@@ -293,6 +293,7 @@ def bootstrap_dag():
         Read extracted fixtures from S3 and COPY into raw.raw_fixtures.
         Marks league-seasons as bootstrapped after successful load.
         """
+        from etl.src import dlq
         from etl.src.extract_fixtures import mark_fixtures_bootstrap_done
         from etl.src.extract_metadata import get_db_connection
         from etl.src.schema_checks import ensure_raw_fixtures_bootstrap_ready
@@ -354,6 +355,7 @@ def bootstrap_dag():
                         mark_fixtures_bootstrap_done(cur, row[0])
 
                     conn.commit()
+                    dlq.run_after_commit(conn)
                     total_loaded += count
                     record_data_movement_from_context(
                         context,
@@ -398,6 +400,7 @@ def bootstrap_dag():
 
                 except Exception as exc:
                     conn.rollback()
+                    dlq.discard_after_commit(conn)
                     logger.error("Failed loading from %s: %s", s3_key, exc, exc_info=True)
                     record_data_movement_from_context(
                         context,

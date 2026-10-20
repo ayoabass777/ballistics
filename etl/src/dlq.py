@@ -33,6 +33,7 @@ from __future__ import annotations
 import functools
 import inspect
 import json
+import weakref
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
@@ -190,6 +191,39 @@ def resolve_entry(key: str, entry: Dict[str, Any], how: str, bucket: Optional[st
     dest = write_json(archive_key(key, now, group), done, bucket)
     delete_key(key, bucket)
     return dest
+
+
+# ---------------------------------------------------------------------------
+# After-commit cleanup: resolve entries only once the load is durable
+# ---------------------------------------------------------------------------
+# A loader that runs in its caller's transaction must not resolve a DLQ entry
+# itself: if the caller's commit then fails, the data is rolled back but the
+# entry is already gone. It registers the resolution here instead, and the
+# caller runs it after commit (or drops it after rollback). A caller that
+# forgets leaves the entry open, and the next clean run resolves it.
+
+_after_commit: "weakref.WeakKeyDictionary[Any, List[Callable[[], Any]]]" = weakref.WeakKeyDictionary()
+
+
+def after_commit(conn, fn: Callable[[], Any]) -> None:
+    """Run fn once the caller commits conn (see run_after_commit)."""
+    _after_commit.setdefault(conn, []).append(fn)
+
+
+def run_after_commit(conn) -> None:
+    """Call right after conn.commit(). A failing step is logged, not raised:
+    the data is committed, and the entry stays open for the next run."""
+    for fn in _after_commit.pop(conn, []):
+        try:
+            fn()
+        except Exception as exc:
+            from etl.src.logger import get_logger
+            get_logger(__name__).error("DLQ after-commit step failed: %s", exc, exc_info=True)
+
+
+def discard_after_commit(conn) -> None:
+    """Call after conn.rollback(): nothing was loaded, so nothing resolves."""
+    _after_commit.pop(conn, None)
 
 
 # ---------------------------------------------------------------------------
