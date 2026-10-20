@@ -99,33 +99,13 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
 .mt-other { background: var(--bg3); color: var(--text2); }
 .mt-win { background: var(--purple-bg); color: var(--purple); }
 
-/* Slip builder */
-.slip-panel { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 24px; }
-.slip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.slip-title { font-size: 16px; font-weight: 600; }
-.slip-odds { font-size: 24px; font-weight: 700; color: var(--green); }
-.slip-actions { display: flex; gap: 8px; }
 .btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text); transition: all 0.15s; }
 .btn:hover { background: var(--bg4); }
 .btn-primary { background: var(--accent2); border-color: var(--accent2); color: #fff; }
 .btn-primary:hover { background: #388bfd; }
 .btn-danger { color: var(--red); }
 .btn-danger:hover { background: var(--red-bg); }
-.slip-legs { display: flex; flex-direction: column; gap: 4px; max-height: 400px; overflow-y: auto; }
-.slip-leg { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--bg); border-radius: 6px; font-size: 12px; }
-.slip-leg .match-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.slip-leg .sel-name { color: var(--accent); font-weight: 500; min-width: 120px; }
-.slip-leg .odds-val { color: var(--green); font-weight: 600; min-width: 40px; text-align: right; }
-.slip-leg .remove-btn { color: var(--text3); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 4px; }
-.slip-leg .remove-btn:hover { color: var(--red); background: var(--red-bg); }
 .slip-empty { color: var(--text3); font-size: 13px; text-align: center; padding: 24px; }
-.role-badge { display:inline-block; min-width:48px; padding:2px 7px; border-radius:9px; font-size:9px; font-weight:800; text-align:center; text-transform:uppercase; letter-spacing:.03em; }
-.role-badge.core { background:var(--green-bg); color:var(--green); }
-.role-badge.support { background:var(--purple-bg); color:var(--purple); }
-.role-badge.filler { background:var(--bg3); color:var(--text3); }
-.add-btn { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; font-size: 14px; cursor: pointer; border: 1px solid var(--border); background: var(--bg3); color: var(--text2); transition: all 0.1s; }
-.add-btn:hover { background: var(--accent2); color: #fff; border-color: var(--accent2); }
-.add-btn.in-slip { background: var(--green); color: #fff; border-color: var(--green); }
 .watch-note { margin: 8px 0 14px; padding: 10px 14px; border: 1px solid var(--amber); border-radius: 8px; background: var(--amber-bg); color: var(--text2); font-size: 13px; }
 .watch-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; background: var(--amber-bg); color: var(--amber); font-size: 10px; font-weight: 700; letter-spacing: .04em; }
 .scope-chip.league { background: var(--green-bg); color: var(--green); }
@@ -150,9 +130,7 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
 .fixture-card-header:hover { background: var(--bg3); }
 .fixture-match { font-size: 15px; font-weight: 600; }
 .fixture-meta { font-size: 12px; color: var(--text2); display: flex; gap: 16px; align-items: center; }
-.book-chip { font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 600; letter-spacing: .02em; }
-.book-chip.ok { background: var(--green-bg); color: var(--green); }
-.book-chip.nb { background: var(--red-bg); color: var(--red); }
+
 .res-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; }
 .res-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .res-score { font-weight: 700; font-size: 16px; white-space: nowrap; }
@@ -265,11 +243,8 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
     <div class="tab active" data-tab="picks">All picks</div>
     <div class="tab" data-tab="watch">Near threshold <span id="watchTabCount"></span></div>
     <div class="tab" data-tab="bounds">Top 1–4 <span id="boundsTabCount"></span></div>
-    <div class="tab" data-tab="over15">Top O1.5 <span id="over15TabCount"></span></div>
     <div class="tab" data-tab="elogaps">Elo gaps <span id="eloGapsTabCount"></span></div>
-    <div class="tab" data-tab="builder">Slip builder</div>
     <div class="tab" data-tab="analysis">Fixture analysis</div>
-    <div class="tab" data-tab="prebuilt">Pre-built slips</div>
     <div class="tab" data-tab="results">Results</div>
   </div>
 
@@ -345,7 +320,6 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
       <table>
         <thead>
           <tr>
-            <th style="width:36px"></th>
             <th data-sort="conf">Conf <span class="sort-arrow">▼</span></th>
             <th data-sort="score">Score <span class="sort-arrow"></span></th>
             <th data-sort="tier">Tier <span class="sort-arrow"></span></th>
@@ -354,7 +328,6 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
             <th>Match</th>
             <th>Selection</th>
             <th>Strength</th>
-            <th data-sort="odds">Odds <span class="sort-arrow"></span></th>
             <th data-sort="league">League <span class="sort-arrow"></span></th>
             <th data-sort="country">Country <span class="sort-arrow"></span></th>
           </tr>
@@ -368,7 +341,7 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
   <div class="section" id="sec-watch">
     <div class="stats-bar" id="watchStats"></div>
     <div class="watch-note">
-      Watch only — searchable Goal Bounds 1-4 candidates from 70% up to the 78% solo gate. They are deliberately excluded from the pool and cannot be added to a slip.
+      Watch only — searchable Goal Bounds 1-4 candidates from 70% up to the 78% solo gate. They are deliberately excluded from the pool.
     </div>
     <div class="filters">
       <div class="filter-group">
@@ -380,7 +353,7 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
       <table>
         <thead><tr>
           <th>Status</th><th>Conf</th><th>Kickoff</th><th>Match</th>
-          <th>Selection</th><th>Calibration</th><th>Odds</th><th>League</th><th>Country</th><th>Why watch</th>
+          <th>Selection</th><th>Calibration</th><th>League</th><th>Country</th><th>Why watch</th>
         </tr></thead>
         <tbody id="watchBody"></tbody>
       </table>
@@ -391,32 +364,15 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
   <div class="section" id="sec-bounds">
     <div class="stats-bar" id="boundsStats"></div>
     <div class="watch-note">
-      Up to 40 Goal Bounds 1–4 analysis events, capped at 7 per league. Any available live price must be at least 1.17. Every league has at least 50 completed matches and an 80%+ historical 1–4 hit rate; unpriced events remain visible as Awaiting odds and stay out of bettable slips. <strong id="boundsWindow"></strong>
+      Up to 40 Goal Bounds 1–4 analysis events, capped at 7 per league. Every league has at least 50 completed matches and an 80%+ historical 1–4 hit rate. <strong id="boundsWindow"></strong>
     </div>
     <div class="table-wrap">
       <table>
         <thead><tr>
           <th>Rank</th><th>Belief</th><th>Kickoff</th><th>Match</th>
-          <th>Pick</th><th>League</th><th>League 1–4 rate</th><th>History</th><th>Odds</th>
+          <th>Pick</th><th>League</th><th>League 1–4 rate</th><th>History</th>
         </tr></thead>
         <tbody id="boundsBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- TOP OVER 1.5 TAB -->
-  <div class="section" id="sec-over15">
-    <div class="stats-bar" id="over15Stats"></div>
-    <div class="watch-note">
-      Up to 40 priced Over 1.5 events, capped at 7 per league. Minimum belief: 75%. Minimum live odds: 1.17. Every league has at least 50 completed matches and an 80%+ historical Over 1.5 hit rate; unpriced and shorter-priced events are excluded. <strong id="over15Window"></strong>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr>
-          <th>Rank</th><th>Belief</th><th>Kickoff</th><th>Match</th>
-          <th>Pick</th><th>League</th><th>League O1.5 rate</th><th>History</th><th>Odds</th>
-        </tr></thead>
-        <tbody id="over15Body"></tbody>
       </table>
     </div>
   </div>
@@ -436,28 +392,6 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
         </tr></thead>
         <tbody id="eloGapsBody"></tbody>
       </table>
-    </div>
-  </div>
-
-  <!-- SLIP BUILDER TAB -->
-  <div class="section" id="sec-builder">
-    <div class="stats-bar">
-      <div class="stat-card"><div class="stat-label">Selections</div><div class="stat-value accent" id="slipCount">0</div></div>
-      <div class="stat-card"><div class="stat-label">Total odds</div><div class="stat-value green" id="slipOdds">1.00x</div></div>
-      <div class="stat-card"><div class="stat-label">Potential return</div><div class="stat-value amber" id="slipReturn">₦0</div></div>
-    </div>
-    <div class="slip-panel">
-      <div class="slip-header">
-        <div class="slip-title">Your slip</div>
-        <div class="slip-actions">
-          <input type="text" id="stakeInput" placeholder="Stake (₦)" style="width:100px;text-align:right">
-          <button class="btn" id="copySlip">Copy list</button>
-          <button class="btn btn-danger" id="clearSlip">Clear all</button>
-        </div>
-      </div>
-      <div class="slip-legs" id="slipLegs">
-        <div class="slip-empty">Click + on any pick to add it here</div>
-      </div>
     </div>
   </div>
 
@@ -494,11 +428,6 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
     <div id="analysisContainer"></div>
   </div>
 
-  <!-- PRE-BUILT SLIPS TAB -->
-  <div class="section" id="sec-prebuilt">
-    <div id="prebuiltContainer"></div>
-  </div>
-
   <!-- RESULTS TAB -->
   <div class="section" id="sec-results">
     <div class="stats-bar" id="resultsSummary"></div>
@@ -510,7 +439,6 @@ tbody td { padding: 8px 12px; white-space: nowrap; }
 
 <script>
 let DATA = null;
-let slip = [];
 let sortCol = 'conf';
 let sortDir = 1;
 let analysisFixtureId = null;
@@ -698,24 +626,6 @@ function shortlistWindowLabel(endDate) {
   return `Showing fixtures through ${label}.`;
 }
 
-function isInSlip(p) {
-  return slip.some(s => s.fixture_id === p.fixture_id && s.sportybet_selection === p.sportybet_selection);
-}
-
-function toggleSlip(p) {
-  const idx = slip.findIndex(s => s.fixture_id === p.fixture_id && s.sportybet_selection === p.sportybet_selection);
-  if (idx >= 0) slip.splice(idx, 1);
-  else slip.push(p);
-  renderPicks();
-  renderSlip();
-}
-
-function removeFromSlip(i) {
-  slip.splice(i, 1);
-  renderPicks();
-  renderSlip();
-}
-
 function getFilteredPool() {
   const search = document.getElementById('fSearch').value.toLowerCase();
   const leagueKey = document.getElementById('fLeague').value;
@@ -755,7 +665,6 @@ function sortPool(pool) {
     let va, vb;
     if (key === 'conf') { va = a.avg_confidence; vb = b.avg_confidence; }
     else if (key === 'score') { va = a.consensus_score || 0; vb = b.consensus_score || 0; }
-    else if (key === 'odds') { va = bookOdds(a); vb = bookOdds(b); }
     else if (key === 'kickoff') { va = a.kickoff; vb = b.kickoff; }
     else if (key === 'league') { va = a.league; vb = b.league; }
     else if (key === 'country') { va = getCountry(a.league, a); vb = getCountry(b.league, b); }
@@ -778,18 +687,7 @@ function renderStats(filtered) {
     <div class="stat-card"><div class="stat-label">2+ model consensus</div><div class="stat-value purple">${duo}</div></div>
     <div class="stat-card"><div class="stat-label">Avg confidence</div><div class="stat-value green">${avgConf}%</div></div>
     <div class="stat-card"><div class="stat-label">Leagues</div><div class="stat-value amber">${leagues}</div></div>
-    <div class="stat-card"><div class="stat-label">In slip</div><div class="stat-value accent">${slip.length}</div></div>
   `;
-}
-
-// Real SportyBet odds when available, else the fabricated estimate.
-function bookOdds(p) { return (p.odds != null ? p.odds : p.est_odds); }
-function oddsCell(p) {
-  const o = bookOdds(p).toFixed(2);
-  if (!p.has_odds) return `<span style="font-weight:600;color:var(--text3)" title="estimated — no live SportyBet odds yet">${o}<span style="font-size:9px"> est</span></span>`;
-  const color = p.ev != null && p.ev >= 1 ? 'var(--green)' : 'var(--red)';
-  const ev = p.ev != null ? ` <span style="font-size:10px;color:var(--text3)">EV ${p.ev.toFixed(2)}</span>` : '';
-  return `<span style="font-weight:600;color:${color}" title="live SportyBet odds">${o}</span>${ev}`;
 }
 
 function consensusScoreCell(p) {
@@ -814,9 +712,7 @@ function renderPicks() {
   const tbody = document.getElementById('picksBody');
   tbody.innerHTML = filtered.map(p => {
     const mt = marketType(p);
-    const inSlip = isInSlip(p);
-    return `<tr class="${inSlip ? 'selected' : ''}">
-      <td><span class="add-btn ${inSlip ? 'in-slip' : ''}" data-fid="${p.fixture_id}" data-sel="${p.sportybet_selection}">${inSlip ? '✓' : '+'}</span></td>
+    return `<tr>
       <td>${confBar(p.avg_confidence)}</td>
       <td>${consensusScoreCell(p)}</td>
       <td>${marketTierBadge(p)}</td>
@@ -825,20 +721,10 @@ function renderPicks() {
       <td><a class="fixture-analysis-link" href="#fixture-${p.fixture_id}" data-fixture-id="${p.fixture_id}" title="Open fixture analysis">${p.match}</a></td>
       <td><span class="market-tag ${marketTag(mt)}">${p.sportybet_selection}</span></td>
       <td>${strengthRankChip(p)}</td>
-      <td>${oddsCell(p)}</td>
       <td style="font-size:12px;color:var(--text2)">${p.league}</td>
       <td style="font-size:12px;color:var(--text2)">${getCountry(p.league, p)}</td>
     </tr>`;
   }).join('');
-
-  tbody.querySelectorAll('.add-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const fid = parseInt(btn.dataset.fid);
-      const sel = btn.dataset.sel;
-      const pick = DATA.pool.find(p => p.fixture_id === fid && p.sportybet_selection === sel);
-      if (pick) toggleSlip(pick);
-    });
-  });
 
   tbody.querySelectorAll('.fixture-analysis-link').forEach(link => {
     link.addEventListener('click', event => {
@@ -863,13 +749,12 @@ function renderWatchlist() {
     <div class="stat-card"><div class="stat-label">Showing</div><div class="stat-value amber">${watch.length}</div></div>
     <div class="stat-card"><div class="stat-label">Watch candidates</div><div class="stat-value">${allWatch.length}</div></div>
     <div class="stat-card"><div class="stat-label">League-adjusted</div><div class="stat-value green">${watch.length - globalOnly}</div></div>
-    <div class="stat-card"><div class="stat-label">Slip eligible</div><div class="stat-value">0</div></div>
   `;
   if (!watch.length) {
     const message = search
       ? 'No 1–4 watch candidates match this search.'
       : 'No candidates currently sit between 70% and 78%.';
-    body.innerHTML = `<tr><td colspan="10" class="slip-empty">${message}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="9" class="slip-empty">${message}</td></tr>`;
     return;
   }
   body.innerHTML = watch.map(p => {
@@ -883,7 +768,6 @@ function renderWatchlist() {
       <td style="font-weight:500">${p.match}</td>
       <td><span class="market-tag other">${p.sportybet_selection}</span></td>
       <td><span class="scope-chip ${scope === 'League-aware' ? 'league' : ''}">${scope}</span>${global}</td>
-      <td>${oddsCell(p)}</td>
       <td style="font-size:12px;color:var(--text2)">${p.league}</td>
       <td style="font-size:12px;color:var(--text2)">${getCountry(p.league, p)}</td>
       <td style="font-size:12px;color:var(--text3)">${p.gate_reason || 'Below the 78% solo gate'}</td>
@@ -893,18 +777,16 @@ function renderWatchlist() {
 
 function renderBoundsShortlist() {
   const picks = DATA.bounds_1_4_shortlist || [];
-  const priced = picks.filter(p => p.has_odds).length;
   const leagues = new Set(picks.map(p => `${p.league}|${p.country || ''}`)).size;
   const topRate = picks.length ? Math.max(...picks.map(p => p.league_hit_rate || 0)) : 0;
   document.getElementById('boundsStats').innerHTML = `
     <div class="stat-card"><div class="stat-label">Selected events</div><div class="stat-value accent">${picks.length}</div></div>
     <div class="stat-card"><div class="stat-label">Top leagues</div><div class="stat-value purple">${leagues}</div></div>
     <div class="stat-card"><div class="stat-label">Best league rate</div><div class="stat-value green">${(topRate * 100).toFixed(1)}%</div></div>
-    <div class="stat-card"><div class="stat-label">Live odds available</div><div class="stat-value ${priced ? 'green' : 'amber'}">${priced}</div></div>
   `;
   const body = document.getElementById('boundsBody');
   if (!picks.length) {
-    body.innerHTML = '<tr><td colspan="9" class="slip-empty">No top-league 1–4 analysis events qualify in this fixture window.</td></tr>';
+    body.innerHTML = '<tr><td colspan="8" class="slip-empty">No top-league 1–4 analysis events qualify in this fixture window.</td></tr>';
     return;
   }
   body.innerHTML = picks.map(p => `<tr>
@@ -916,37 +798,6 @@ function renderBoundsShortlist() {
     <td style="font-size:12px;color:var(--text2)">${p.league}${p.country ? ' · ' + p.country : ''}</td>
     <td style="font-weight:700;color:var(--green)">${(p.league_hit_rate * 100).toFixed(1)}%</td>
     <td style="color:var(--text2)">${p.league_matches.toLocaleString()} matches</td>
-    <td>${p.has_odds
-      ? `<span style="font-weight:700;color:var(--green)">${Number(p.real_odds).toFixed(2)}</span>`
-      : '<span class="watch-chip" title="Goal Bounds price has not been mapped from SportyBet">Awaiting odds</span>'}</td>
-  </tr>`).join('');
-}
-
-function renderOver15Shortlist() {
-  const picks = DATA.over_1_5_shortlist || [];
-  const leagues = new Set(picks.map(p => `${p.league}|${p.country || ''}`)).size;
-  const topRate = picks.length ? Math.max(...picks.map(p => p.league_hit_rate || 0)) : 0;
-  document.getElementById('over15Stats').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Selected events</div><div class="stat-value accent">${picks.length}</div></div>
-    <div class="stat-card"><div class="stat-label">Top leagues</div><div class="stat-value purple">${leagues}</div></div>
-    <div class="stat-card"><div class="stat-label">Best league rate</div><div class="stat-value green">${(topRate * 100).toFixed(1)}%</div></div>
-    <div class="stat-card"><div class="stat-label">Minimum live odds</div><div class="stat-value amber">1.17</div></div>
-  `;
-  const body = document.getElementById('over15Body');
-  if (!picks.length) {
-    body.innerHTML = '<tr><td colspan="9" class="slip-empty">No priced top-league Over 1.5 events at odds of 1.17 or higher qualify in this fixture window.</td></tr>';
-    return;
-  }
-  body.innerHTML = picks.map(p => `<tr>
-    <td style="font-weight:700;color:var(--accent)">#${p.over_1_5_rank}</td>
-    <td style="font-weight:700;color:${confColor(p.avg_confidence)}">${(p.avg_confidence * 100).toFixed(1)}%</td>
-    <td style="font-size:12px;color:var(--text2)">${formatKickoff(p.kickoff)}</td>
-    <td style="font-weight:500">${p.match}</td>
-    <td><span class="market-tag mt-over">Over 1.5</span></td>
-    <td style="font-size:12px;color:var(--text2)">${p.league}${p.country ? ' · ' + p.country : ''}</td>
-    <td style="font-weight:700;color:var(--green)">${(p.league_hit_rate * 100).toFixed(1)}%</td>
-    <td style="color:var(--text2)">${p.league_matches.toLocaleString()} matches</td>
-    <td><span style="font-weight:700;color:var(--green)">${Number(p.real_odds).toFixed(2)}</span></td>
   </tr>`).join('');
 }
 
@@ -978,81 +829,6 @@ function renderEloGapShortlist() {
     <td style="font-weight:700;color:var(--green)">${(p.league_upset_rate * 100).toFixed(1)}%</td>
     <td style="color:var(--text2)">${p.league_matches.toLocaleString()} matches</td>
   </tr>`).join('');
-}
-
-function renderSlip() {
-  document.getElementById('slipCount').textContent = slip.length;
-  const totalOdds = slip.reduce((acc, p) => acc * bookOdds(p), 1);
-  document.getElementById('slipOdds').textContent = totalOdds.toFixed(2) + 'x';
-  const stake = parseFloat(document.getElementById('stakeInput').value) || 0;
-  document.getElementById('slipReturn').textContent = '₦' + Math.round(stake * totalOdds).toLocaleString();
-
-  const container = document.getElementById('slipLegs');
-  if (slip.length === 0) {
-    container.innerHTML = '<div class="slip-empty">Click + on any pick to add it here</div>';
-    return;
-  }
-  container.innerHTML = slip.map((p, i) => `
-    <div class="slip-leg">
-      <span class="remove-btn" data-i="${i}">✕</span>
-      <span class="match-name">${p.match}</span>
-      ${marketTierBadge(p)}
-      ${strengthRankChip(p)}
-      <span class="sel-name">${p.sportybet_selection}</span>
-      <span class="odds-val">${bookOdds(p).toFixed(2)}</span>
-    </div>
-  `).join('');
-
-  container.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => removeFromSlip(parseInt(btn.dataset.i)));
-  });
-}
-
-function renderPrebuilt() {
-  const container = document.getElementById('prebuiltContainer');
-  container.innerHTML = DATA.slips.map((slip, si) => `
-    <div class="slip-panel" style="margin-top:16px">
-      <div class="slip-header">
-        <div><div class="slip-title">${slip.name}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:3px">${slip.role_counts ? `${slip.role_counts.core || 0} core · ${slip.role_counts.support || 0} support · ${slip.role_counts.filler || 0} filler` : ''}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <span style="font-size:14px;color:var(--text2)">${slip.legs} legs</span>
-          <div class="slip-odds">${slip.est_total_odds.toFixed(1)}x</div>
-          <button class="btn btn-primary copy-prebuilt" data-idx="${si}">Copy</button>
-        </div>
-      </div>
-      <div class="slip-legs">
-        ${slip.selections.map((s, i) => `
-          <div class="slip-leg">
-            <span style="color:var(--text3);min-width:24px;text-align:center">${i+1}</span>
-            ${s.slip_role ? `<span class="role-badge ${s.slip_role}" title="${s.slip_role === 'core' ? 'High-weight pick, allowed across multiple slips' : s.slip_role === 'support' ? 'Strong supporting pick' : 'One-use pick added to complete the slip'}">${s.slip_role}${s.slip_repeat_count > 1 ? ' ×' + s.slip_repeat_count : ''}</span>` : ''}
-            ${modelsBadge(s.models)}
-            ${s.league_prior_boost ? `<span style="font-size:9px;color:var(--green);font-weight:700" title="1–4 league ranking boost">+${s.league_prior_boost.toFixed(3)} 1–4</span>` : ''}
-            ${marketTierBadge(s)}
-            ${strengthRankChip(s)}
-            <span style="min-width:36px;text-align:center">${Math.round(s.avg_confidence * 100)}%</span>
-            <span style="font-size:11px;color:var(--text3);min-width:100px">${formatKickoff(s.kickoff)}</span>
-            <span class="match-name">${s.match}</span>
-            <span class="sel-name">${s.sportybet_selection}</span>
-            <span class="odds-val">${bookOdds(s).toFixed(2)}</span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
-
-  container.querySelectorAll('.copy-prebuilt').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = parseInt(btn.dataset.idx);
-      const s = DATA.slips[idx];
-      const text = s.selections.map((sel, i) =>
-        `${i+1}. ${sel.match} — ${sel.sportybet_selection}${sel.market_tier ? ' [Tier ' + sel.market_tier + ']' : ''}${strengthRankText(sel) ? ' [' + strengthRankText(sel) + ']' : ''} @${bookOdds(sel).toFixed(2)} (${sel.league})`
-      ).join('\n');
-      const header = `${s.name}\n${s.legs} legs | ${s.est_total_odds.toFixed(1)}x\n${'─'.repeat(50)}\n`;
-      navigator.clipboard.writeText(header + text).then(() => showToast('Slip copied!'));
-    });
-  });
 }
 
 function confColor(c) {
@@ -1370,9 +1146,6 @@ function renderAnalysis() {
             <span>${formatKickoff(f.kickoff)}</span>
             <span>${f.league}</span>
             <span>${getCountry(f.league, f)}</span>
-            ${f.bookable === undefined ? '' : (f.bookable
-              ? '<span class="book-chip ok" title="Offered on SportyBet">SportyBet ✓</span>'
-              : '<span class="book-chip nb" title="Not offered on SportyBet — model tracking only">Not on SportyBet</span>')}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:12px">
@@ -1501,25 +1274,19 @@ function init(data) {
   document.getElementById('genTime').textContent = 'Generated: ' + data.generated;
   const watchCount = (data.near_threshold || []).length;
   const boundsCount = (data.bounds_1_4_shortlist || []).length;
-  const over15Count = (data.over_1_5_shortlist || []).length;
   const eloGapsCount = (data.elo_gap_shortlist || []).length;
   document.getElementById('poolCount').textContent = data.pool_size + ' qualified · ' + watchCount + ' watch';
   document.getElementById('watchTabCount').textContent = watchCount ? `(${watchCount})` : '';
   document.getElementById('boundsTabCount').textContent = boundsCount ? `(${boundsCount})` : '';
-  document.getElementById('over15TabCount').textContent = over15Count ? `(${over15Count})` : '';
   document.getElementById('eloGapsTabCount').textContent = eloGapsCount ? `(${eloGapsCount})` : '';
   const shortlistWindow = shortlistWindowLabel(data.shortlist_end_date);
   document.getElementById('boundsWindow').textContent = shortlistWindow;
-  document.getElementById('over15Window').textContent = shortlistWindow;
   document.getElementById('eloGapsWindow').textContent = shortlistWindow;
   populateFilters();
   renderPicks();
   renderWatchlist();
   renderBoundsShortlist();
-  renderOver15Shortlist();
   renderEloGapShortlist();
-  renderSlip();
-  renderPrebuilt();
   renderAnalysis();
 
   document.querySelectorAll('.tab').forEach(tab => {
@@ -1563,24 +1330,6 @@ function init(data) {
       renderPicks();
     });
   });
-
-  document.getElementById('copySlip').addEventListener('click', () => {
-    if (!slip.length) return;
-    const totalOdds = slip.reduce((a, p) => a * bookOdds(p), 1);
-    const text = slip.map((p, i) =>
-      `${i+1}. ${p.match} — ${p.sportybet_selection}${p.market_tier ? ' [Tier ' + p.market_tier + ']' : ''}${strengthRankText(p) ? ' [' + strengthRankText(p) + ']' : ''} @${bookOdds(p).toFixed(2)} (${p.league})`
-    ).join('\n');
-    const header = `Custom Slip\n${slip.length} legs | ${totalOdds.toFixed(1)}x\n${'─'.repeat(50)}\n`;
-    navigator.clipboard.writeText(header + text).then(() => showToast('Slip copied to clipboard!'));
-  });
-
-  document.getElementById('clearSlip').addEventListener('click', () => {
-    slip = [];
-    renderPicks();
-    renderSlip();
-  });
-
-  document.getElementById('stakeInput').addEventListener('input', renderSlip);
 
   window.addEventListener('scroll', () => {
     clearTimeout(scrollSaveTimer);
@@ -1629,7 +1378,7 @@ async function loadData() {
            <pre style="display:inline-block;text-align:left;margin-top:8px;padding:12px 16px;background:var(--bg2);border-radius:8px;font-size:13px">python3 -m http.server 8787 --directory engine/eval</pre>
            <p style="margin-top:8px">then open <code>http://localhost:8787/consensus_app.html</code></p>`
         : `<p>No <code>consensus_slips_YYYY-MM-DD.json</code> found in the last 21 days.</p>
-           <p style="margin-top:8px">Generate one: <code>python -m engine.eval.consensus_slips --bankroll 300000</code></p>`}
+           <p style="margin-top:8px">Generate one: <code>python -m engine.eval.consensus_slips</code></p>`}
       <p style="margin-top:12px;font-size:13px;color:var(--text3)">${lastErr ? lastErr.message : ''}</p>
     </div>`;
 }
@@ -1669,7 +1418,7 @@ function renderResults() {
       <div class="res-pick">
         <span class="res-badge ${p.hit?'hit':'miss'}">${p.hit?'HIT':'MISS'}</span>
         <span style="flex:1">${p.selection}</span>
-        <span style="color:var(--text3);font-size:12px">${modelsBadge(p.models)} ${(p.confidence*100).toFixed(0)}%${p.ev!=null?' · EV '+p.ev.toFixed(2):''}</span>
+        <span style="color:var(--text3);font-size:12px">${modelsBadge(p.models)} ${(p.confidence*100).toFixed(0)}%</span>
       </div>`).join('');
     return `<div class="res-card">
       <div class="res-head">

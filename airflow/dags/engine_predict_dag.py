@@ -7,7 +7,7 @@ Bayesian additionally persists its full fixture-analysis audit to
 raw.model_analysis; consensus picks remain filtered in raw.model_picks.
 A reschedule-mode quorum sensor gates consensus: it fires when >= QUORUM models
 are ready, OR all four have finished, OR a grace window has passed since the first
-finished — so a slow/failed model never blocks the slip. Consensus then builds
+finished — so a slow/failed model never blocks the feed. Consensus then builds
 from raw.model_picks (--from-picks) and writes raw.consensus_pool + the JSON feed.
 
 Task graph:
@@ -42,7 +42,6 @@ MODELS = ("mismatch", "bayesian", "dixon_coles")
 QUORUM = 2                          # proceed once this many models are ready
 GRACE = timedelta(minutes=30)       # ...or this long after the first finishes
 DAYS_AHEAD = int(os.getenv("ENGINE_PREDICT_DAYS", "10"))
-BANKROLL = os.getenv("ENGINE_BANKROLL", "300000")
 
 PROJECT_ROOT = os.getenv("PROJECT_ROOT")
 if not PROJECT_ROOT:
@@ -147,7 +146,7 @@ def engine_predict_dag():
     consensus = DockerOperator(
         task_id="consensus",
         command=["python", "-m", "engine.eval.consensus_slips",
-                 "--from-picks", "--run-ds", "{{ ds }}", "--bankroll", str(BANKROLL)],
+                 "--from-picks", "--run-ds", "{{ ds }}"],
         **ENGINE_OPERATOR_KWARGS,
     )
 

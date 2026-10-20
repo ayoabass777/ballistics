@@ -14,7 +14,6 @@ from engine.eval.calibration_wf import (
 )
 from engine.eval.consensus_slips import (
     _build_bounds_1_4_shortlist,
-    _build_over_1_5_shortlist,
     _bounds_1_4_league_prior,
     _score_pool,
     _sportify_market,
@@ -121,7 +120,7 @@ class GoalBoundsTests(unittest.TestCase):
                   "country": "Testland", "kickoff": "2026-08-11T18:00:00Z"}
         }
         pool, gates, watch = _score_pool(
-            consensus, fixture_meta, {}, {}, frozenset())
+            consensus, fixture_meta, {}, frozenset())
         self.assertEqual(pool, [])
         self.assertEqual(len(watch), 1)
         self.assertEqual(watch[0]["decision_status"], "watch")
@@ -145,11 +144,36 @@ class GoalBoundsTests(unittest.TestCase):
         }
 
         pool, gates, watch = _score_pool(
-            consensus, fixture_meta, {}, {}, frozenset())
+            consensus, fixture_meta, {}, frozenset())
 
         self.assertEqual(len(pool), 1)
         self.assertTrue(gates[key]["in_pool"])
         self.assertEqual(watch, [])
+
+    def test_very_confident_pick_stays_in_pool_without_odds_fields(self):
+        # 2026-10-20: the betting-era "est odds too short" rule dropped picks at
+        # 85%+; with slips and odds removed they stay, and rows carry no odds.
+        key = (126, DC_BOUNDS_1_4_MARKET)
+        consensus = {
+            key: {
+                "fixture_id": 126,
+                "unified_market": DC_BOUNDS_1_4_MARKET,
+                "models": ["dixon_coles"],
+                "confidences": [0.92],
+                "details": [{}],
+            }
+        }
+        fixture_meta = {
+            126: {"home": "Home", "away": "Away", "league": "1. Division",
+                  "country": "Belarus", "kickoff": "2026-08-11T18:00:00Z"}
+        }
+
+        pool, gates, _watch = _score_pool(
+            consensus, fixture_meta, {}, frozenset())
+
+        self.assertEqual(len(pool), 1)
+        self.assertTrue(gates[key]["in_pool"])
+        self.assertFalse({"odds", "est_odds", "real_odds", "has_odds", "ev"} & set(pool[0]))
 
     def test_bounds_at_70_percent_is_retained_as_searchable_watch_candidate(self):
         key = (125, DC_BOUNDS_1_4_MARKET)
@@ -168,7 +192,7 @@ class GoalBoundsTests(unittest.TestCase):
         }
 
         pool, gates, watch = _score_pool(
-            consensus, fixture_meta, {}, {}, frozenset())
+            consensus, fixture_meta, {}, frozenset())
 
         self.assertEqual(pool, [])
         self.assertFalse(gates[key]["in_pool"])
@@ -208,7 +232,7 @@ class GoalBoundsTests(unittest.TestCase):
         }
 
         pool, _gates, _watch = _score_pool(
-            consensus, fixture_meta, {}, {}, frozenset())
+            consensus, fixture_meta, {}, frozenset())
 
         self.assertEqual([p["fixture_id"] for p in pool], [2, 1])
         self.assertEqual(pool[0]["avg_confidence"], pool[1]["avg_confidence"])
@@ -221,7 +245,7 @@ class GoalBoundsTests(unittest.TestCase):
         )
 
     def test_top_bounds_shortlist_requires_80_percent_and_50_matches(self):
-        def pick(fid, rate, matches, confidence=0.82, odds=1.20):
+        def pick(fid, rate, matches, confidence=0.82):
             return {
                 "fixture_id": fid,
                 "sportybet_market": "Goal Bounds",
@@ -231,8 +255,6 @@ class GoalBoundsTests(unittest.TestCase):
                 "avg_confidence": confidence,
                 "n_models": 1,
                 "kickoff": f"2026-08-{fid + 10:02d}T18:00:00Z",
-                "has_odds": odds is not None,
-                "real_odds": odds,
             }
 
         shortlist = _build_bounds_1_4_shortlist([
@@ -240,16 +262,11 @@ class GoalBoundsTests(unittest.TestCase):
             pick(2, 0.84, 100, 0.79),
             pick(3, 0.79, 900),
             pick(4, 0.90, 49),
-            pick(5, 0.84, 500, odds=1.16),
-            pick(6, 0.84, 500, odds=None),
+            pick(5, 0.84, 500),
         ])
 
-        self.assertEqual([p["fixture_id"] for p in shortlist], [6, 2, 1])
+        self.assertEqual([p["fixture_id"] for p in shortlist], [5, 2, 1])
         self.assertEqual([p["bounds_rank"] for p in shortlist], [1, 2, 3])
-        self.assertEqual(
-            [p["odds_status"] for p in shortlist],
-            ["awaiting_goal_bounds_odds", "priced", "priced"],
-        )
 
     def test_top_bounds_shortlist_caps_each_league_at_seven(self):
         ranked = []
@@ -263,8 +280,6 @@ class GoalBoundsTests(unittest.TestCase):
                 "avg_confidence": 0.82,
                 "n_models": 1,
                 "kickoff": f"2026-08-{fid + 1:02d}T18:00:00Z",
-                "has_odds": True,
-                "real_odds": 1.20,
                 "league": "League A" if fid <= 10 else "League B",
                 "country": "Testland",
             })
@@ -278,46 +293,6 @@ class GoalBoundsTests(unittest.TestCase):
             sum(p["league"] == "League B" for p in shortlist), 7)
         self.assertEqual(
             [p["bounds_rank"] for p in shortlist], list(range(1, 15)))
-
-    def test_top_over_1_5_shortlist_applies_all_caps_and_floors(self):
-        def pick(fid, league, belief=0.78, odds=1.17):
-            return {
-                "fixture_id": fid,
-                "sportybet_market": "Over/Under",
-                "sportybet_selection": "Over 1.5",
-                "avg_confidence": belief,
-                "max_confidence": belief,
-                "n_models": 2,
-                "kickoff": f"2026-09-{fid:02d}T18:00:00Z",
-                "has_odds": odds is not None,
-                "real_odds": odds,
-                "league": league,
-                "country": "Testland",
-            }
-
-        ranked = [pick(fid, "League A") for fid in range(1, 11)]
-        ranked += [pick(fid, "League C") for fid in range(11, 16)]
-        ranked += [
-            pick(16, "League B"),
-            pick(17, "League A", belief=0.74),
-            pick(18, "League A", odds=1.16),
-            pick(19, "League A", odds=None),
-        ]
-        rates = {
-            ("League A", "Testland"): {"rate": 0.85, "matches": 500},
-            ("League B", "Testland"): {"rate": 0.79, "matches": 500},
-            ("League C", "Testland"): {"rate": 0.82, "matches": 100},
-        }
-
-        shortlist = _build_over_1_5_shortlist(ranked, rates)
-
-        self.assertEqual(len(shortlist), 12)
-        self.assertEqual(sum(p["league"] == "League A" for p in shortlist), 7)
-        self.assertEqual(sum(p["league"] == "League C" for p in shortlist), 5)
-        self.assertTrue(all(p["real_odds"] >= 1.17 for p in shortlist))
-        self.assertTrue(all(p["avg_confidence"] >= 0.75 for p in shortlist))
-        self.assertEqual(
-            [p["over_1_5_rank"] for p in shortlist], list(range(1, 13)))
 
 
 if __name__ == "__main__":

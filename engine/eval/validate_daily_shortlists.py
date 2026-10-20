@@ -10,7 +10,6 @@ from pathlib import Path
 
 SHORTLIST_SECTIONS = (
     "bounds_1_4_shortlist",
-    "over_1_5_shortlist",
     "elo_gap_shortlist",
 )
 MAX_REFRESH_AGE = timedelta(hours=6)
@@ -102,7 +101,7 @@ def validate_file(path: Path, run_ds: str) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Verify that today's 1-4, Over 1.5 and Elo lists are fresh"
+        description="Verify that today's 1-4 and Elo lists are fresh"
     )
     parser.add_argument("--run-ds", required=True, help="Airflow logical run date")
     parser.add_argument("--path", type=Path, default=None)

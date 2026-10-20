@@ -1,5 +1,8 @@
 # Engine Orchestration — Design (not yet built)
 
+> **2026-10-20:** the SportyBet odds scraper (`odds_scrape` DAG), EV and betting
+> slips were removed. References to them below are historical.
+
 2026-10-11 — **Poisson GLM retired.** It fed nothing in the product and the slips are retired. `engine_predict` runs mismatch, bayesian and dixon_coles (quorum 2 of 3); `calibration_wf` no longer fits a Poisson map. Consensus goal rules: Match Over 1.5 and Match Under now need Dixon-Coles alone (were DC + Poisson), which feeds the Over 1.5 shortlist. `predict_upcoming.py` stays as a library (shared loaders and `_tier`).
 
 2026-10-08 — `engine_predict` gate moved from `fixture_update_dag.extract_xg_task` to `fixture_update_dag.run_dbt` (task `wait_for_dbt_refresh`). The engine reads dbt facts (`raw.fact_head_to_head*`, `raw.fact_fixture_xg`); Airflow logs for Oct 5–7 showed every model finishing before `run_dbt` started, i.e. training on the previous night's facts. Side effect: if `run_dbt` fails, the engine does not run that night (previously it ran on stale facts).

@@ -8,8 +8,6 @@ from engine.eval.bayesian_streaks import MIN_POSTERIOR_INTERESTING
 from engine.eval.consensus_slips import (
     _build_elo_gap_shortlist,
     _within_shortlist_end_date,
-    _build_slips,
-    _prepare_slip_nodes,
     _analysis_from_signals,
     _passes_goal_model_rules,
     annotate_bayesian_analysis,
@@ -248,96 +246,6 @@ class BayesianFixtureAnalysisTests(unittest.TestCase):
         write_run.assert_called_once_with(
             "2026-08-28", "bayesian", "ok", 1
         )
-
-
-class WeightedSlipGraphTests(unittest.TestCase):
-    @staticmethod
-    def pick(fid, *, home=None, away=None, models=2, confidence=0.80,
-             odds=1.70, selection=None):
-        home = home or f"Home {fid}"
-        away = away or f"Away {fid}"
-        return {
-            "fixture_id": fid,
-            "home": home,
-            "away": away,
-            "match": f"{home} vs {away}",
-            "kickoff": "2026-08-29T12:00:00+00:00",
-            "league": "Test League",
-            "sportybet_market": "Match Result",
-            "sportybet_selection": selection or home,
-            "line": None,
-            "n_models": models,
-            "models": [f"model_{i}" for i in range(models)],
-            "avg_confidence": confidence,
-            "max_confidence": confidence,
-            "consensus_score": models + confidence + 0.05,
-            "has_odds": True,
-            "odds": odds,
-            "real_odds": odds,
-            "est_odds": odds,
-            "ev": 1.05,
-        }
-
-    def test_elite_club_can_be_core_but_still_needs_quality(self):
-        qualified = self.pick(
-            1, home="Real Madrid", models=1, confidence=0.84
-        )
-        weak = self.pick(
-            2, home="FC Barcelona", models=1, confidence=0.78
-        )
-        opponent_pick = self.pick(
-            3, away="PSV Eindhoven", models=2, confidence=0.80,
-            selection="Home 3 Over 0.5",
-        )
-
-        nodes = _prepare_slip_nodes(
-            [qualified, weak, opponent_pick], min_ev=1.0
-        )
-
-        self.assertEqual(nodes[0]["slip_role"], "core")
-        self.assertEqual(nodes[0]["repeat_limit"], 3)
-        self.assertEqual(nodes[0]["core_team"], "real madrid")
-        self.assertEqual(nodes[1]["slip_role"], "filler")
-        self.assertIsNone(nodes[2]["core_team"])
-        self.assertEqual(nodes[2]["slip_role"], "support")
-
-    def test_graph_slips_repeat_core_and_keep_fixture_conflicts_apart(self):
-        core = [self.pick(i, models=3, confidence=0.82) for i in range(1, 5)]
-        support = [
-            self.pick(i, models=2, confidence=0.78)
-            for i in range(5, 23)
-        ]
-        # A second market on fixture 5 creates a hard conflict edge.
-        conflict = self.pick(
-            5, models=2, confidence=0.77, selection="Away 5"
-        )
-
-        slips = _build_slips(
-            core + support + [conflict], target_odds=4.0,
-            max_legs=8, bankroll=0,
-        )
-
-        self.assertGreaterEqual(len(slips), 2)
-        usage = {}
-        for slip in slips:
-            fixture_ids = [pick["fixture_id"] for pick in slip["selections"]]
-            self.assertEqual(len(fixture_ids), len(set(fixture_ids)))
-            self.assertLessEqual(slip["role_counts"]["core"], 2)
-            self.assertGreaterEqual(slip["role_counts"]["core"], 1)
-            for pick in slip["selections"]:
-                key = (pick["fixture_id"], pick["sportybet_selection"])
-                usage[key] = usage.get(key, 0) + 1
-                self.assertLessEqual(usage[key], pick["repeat_limit"])
-
-        core_usage = [
-            count for (fid, _), count in usage.items() if fid in {1, 2, 3, 4}
-        ]
-        self.assertTrue(any(count > 1 for count in core_usage))
-        self.assertTrue(all(count <= 3 for count in core_usage))
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class SlightAndTierTests(unittest.TestCase):
