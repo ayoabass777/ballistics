@@ -42,3 +42,6 @@ docs/product/experiments/**/*.gz
 # Analysis outputs and automatic calibration backups (regenerate locally)
 analysis/
 engine/eval/calibration_backup_*/
+
+# Generated diagnostics output
+engine/eval/diagnostics/out/

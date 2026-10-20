@@ -35,9 +35,14 @@ except ModuleNotFoundError:
     sys.modules["psycopg2.extras"] = extras_stub
     sys.modules["psycopg2.sql"] = sql_stub
 
-extract_metadata_stub = types.ModuleType("etl.src.extract_metadata")
-extract_metadata_stub.get_db_connection = lambda: None
-sys.modules["etl.src.extract_metadata"] = extract_metadata_stub
+try:
+    import etl.src.extract_metadata  # noqa: F401
+except ImportError:
+    # Stub only when the real module can't load: replacing it in sys.modules
+    # breaks every later test that imports from it in the same run.
+    extract_metadata_stub = types.ModuleType("etl.src.extract_metadata")
+    extract_metadata_stub.get_db_connection = lambda: None
+    sys.modules["etl.src.extract_metadata"] = extract_metadata_stub
 
 from etl.src.data_detector import data_movements, pipeline_runs, quality_events, table_snapshots
 from etl.src.data_detector.watermarks import fixture_kickoff_watermark

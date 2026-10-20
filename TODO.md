@@ -6,20 +6,15 @@ Updated 2026-10-20 (after the betting workflow removal, D149).
 
 ## Now
 
-- [ ] **Merge `feat/remove-betting-workflow` into `main`** (D149). The four
-  2026-10-20 branches (DLQ, model reuse, calibration refresh, docs) are merged.
 - [ ] **Check tonight's engine run** (first with model reuse and card versions):
   `raw.model_processing_state` should fill, the run should start cold, and
   `raw.card_versions` should gain rows beyond the 5,265 backfilled on 2026-10-20.
-- [ ] **Run the database-backed tests** (16 skipped without `FLOW_TEST_DSN`):
-  create a throwaway database in `ballistics_postgres`, run
-  `tests/test_dlq.py`, `tests/test_dlq_fixtures_monitoring.py`,
-  `tests/test_daily_flow.py` against it, drop it.
-- [ ] **Fix the two failing tests** (both predate the 2026-10-20 work):
-  - `tests/test_rolling_standouts.py::test_vancouver_stays_on_utc_minus_7_after_november_2026`
-    needs tzdata ≥ 2026c (local Python has 2025.2): upgrade `tzdata`.
-  - `tests/test_extract_metadata_tiers.py` errors at collection in a full-suite
-    run but passes alone: find the import/name clash.
+- [ ] **Local Python has stale tz data** (Anaconda `share/zoneinfo` is 2025b), so
+  `test_vancouver_stays_on_utc_minus_7_after_november_2026` fails and the local
+  API on port 8000 would show BC kickoffs an hour off after 2026-11-01. The
+  engine image (Debian tzdata 2026b) is correct. `conda install tzdata=2026c`
+  fails on an inconsistent base env (`pluggy`); `PYTHONTZPATH=/usr/share/zoneinfo`
+  (macOS data, 2026c) fixes it.
 
 ## Pipeline (DLQ, D147/D148)
 
@@ -29,7 +24,6 @@ Updated 2026-10-20 (after the betting workflow removal, D149).
 - [ ] Incremental fixture updates only touch existing rows: fixtures created
   after bootstrap (e.g. playoffs) are never inserted (CLAUDE.md, Known Gaps).
 - [ ] ~110 fixtures stuck at NS from postponements (Egyptian league, USL Tormenta).
-- [ ] `engine/eval/diagnostics/out/` is generated output: add it to `.gitignore`.
 
 ## Engine
 
