@@ -17,6 +17,10 @@
 #                  ok when bad_count <= max_bad (default 0); independent of ds
 #   crest_urls     `sql` returns (kind, logo_file_id) rows; each public crest
 #                  URL must answer 200 with an image content type
+#   dlq            open S3 dead letter queue entries for `source`
+#                  (standings | fixtures | fixture_rows, D147/D148): none → ok; younger than 24 h
+#                  → warning (the hourly replay is still on them); dead, older
+#                  than 24 h, or the S3 entries and status flags disagree → error
 #   severity       optional on any check: error (default) or warning; sets the
 #                  quality event severity and marks the alert line
 #   derived        no data of its own (e.g. an API view): ok when every
@@ -60,6 +64,27 @@ datasets:
     producer: {dag: fixture_update_dag, task: update_standings_task}
     upstream: [raw.fixture_xg]
     check: {type: pipeline_task, dag: fixture_update_dag, task: update_standings_task}
+
+  - id: dlq.standings
+    layer: raw
+    description: Standings rows the API sent that couldn't be loaded (e.g. no team id), parked in the S3 DLQ and retried hourly by replay_dag
+    producer: {dag: fixture_update_dag, task: update_standings_task}
+    upstream: []                     # a parked row never blocks the chain
+    check: {type: dlq, source: standings}
+
+  - id: dlq.fixture_rows
+    layer: raw
+    description: Single fixture rows the API sent that couldn't be loaded (no fixture id, kickoff, status or team id), parked in the S3 DLQ and retried hourly by replay_dag
+    producer: {dag: bootstrap_dag, task: load_fixtures}
+    upstream: []
+    check: {type: dlq, source: fixture_rows}
+
+  - id: dlq.fixtures
+    layer: source
+    description: Fixture extractions that failed and wait in the S3 DLQ, retried hourly by replay_dag
+    producer: {dag: bootstrap_dag, task: extract_fixtures}
+    upstream: []
+    check: {type: dlq, source: fixtures}
 
   - id: dbt.run
     layer: dbt

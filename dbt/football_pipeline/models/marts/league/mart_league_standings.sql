@@ -16,9 +16,21 @@
 --   split        several groups and some team appears in more than one
 --                (regular season + championship / relegation rounds)
 --   conferences  several groups, each team in exactly one (MLS, USL)
+--
+-- Unprocessable rows (D147): when the API sends a row that can't be loaded
+-- (e.g. no team id), it is parked in the S3 DLQ and the league is flagged in
+-- stg_raw_league_standings_status. For a flagged league the team's last good
+-- row (from an earlier refresh; pruning is off while flagged) is kept in the
+-- table with is_stale_row, and every row carries standings_incomplete, so the
+-- page can say the table may be out of date. Stale rows don't count towards
+-- ranks_repeat: a stale rank colliding with a fresh one must not hide the table.
 
 with standings as (
     select * from {{ ref('stg_raw_league_standings') }}
+),
+
+status as (
+    select * from {{ ref('stg_raw_league_standings_status') }}
 ),
 
 latest as (
@@ -27,12 +39,40 @@ latest as (
     group by league_season_id
 ),
 
-current_rows as (
-    select s.*, l.standings_updated_at
+fresh_rows as (
+    select s.*, l.standings_updated_at, false as is_stale_row
     from standings s
     join latest l
       on l.league_season_id = s.league_season_id
      and s.updated_at = l.standings_updated_at
+),
+
+-- Flagged leagues only: rows the latest refresh didn't rewrite (the parked
+-- team's last good row). Groups the latest refresh doesn't have at all (old
+-- '' rows from before 2026-10-11, relabelled tables) are left out.
+stale_rows as (
+    select s.*, l.standings_updated_at, true as is_stale_row
+    from standings s
+    join latest l on l.league_season_id = s.league_season_id
+    join status st
+      on st.league_season_id = s.league_season_id
+     and st.has_unprocessed_rows
+    where s.updated_at < l.standings_updated_at
+      and exists (
+          select 1 from fresh_rows f
+          where f.league_season_id = s.league_season_id
+            and f.group_name = s.group_name)
+      and not exists (
+          select 1 from fresh_rows f
+          where f.league_season_id = s.league_season_id
+            and f.group_name = s.group_name
+            and f.api_team_id = s.api_team_id)
+),
+
+current_rows as (
+    select * from fresh_rows
+    union all
+    select * from stale_rows
 ),
 
 group_stats as (
@@ -40,7 +80,7 @@ group_stats as (
         league_season_id,
         group_name,
         count(*) <> count(distinct rank) as ranks_repeat
-    from current_rows
+    from fresh_rows
     group by league_season_id, group_name
 ),
 
@@ -70,6 +110,9 @@ with_context as (
         ss.n_groups,
         gs.ranks_repeat,
         t.team_id,
+        coalesce(st.has_unprocessed_rows, false) as standings_incomplete,
+        st.unprocessed_rows,
+        st.unprocessed_since,
         max(c.group_order) over (
             partition by c.league_season_id, c.api_team_id
         ) as team_last_group_order
@@ -81,6 +124,7 @@ with_context as (
     left join {{ ref('int_league_context') }} lc
       on lc.league_season_id = c.league_season_id
     left join teams t on t.api_team_id = c.api_team_id
+    left join status st on st.league_season_id = c.league_season_id
 )
 
 select
@@ -106,6 +150,10 @@ select
     standings_format,
     n_groups,
     ranks_repeat,
+    standings_incomplete,   -- league has rows parked in the DLQ (D147)
+    unprocessed_rows,
+    unprocessed_since,
+    is_stale_row,           -- kept from an earlier refresh: the API's latest row for this team was unprocessable
     -- The table to show for this team: its only group, or in a split season
     -- the latest round it appears in (last table in the API response).
     (group_order = team_last_group_order

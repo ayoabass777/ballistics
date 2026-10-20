@@ -124,6 +124,29 @@ sources:
           - name: created_at
           - name: updated_at
 
+      - name: raw_league_standings_status
+        description: >
+          One row per league season, written by every standings refresh and the
+          hourly DLQ replay (etl/src/standings_dlq.py, D147). status 'unprocessed'
+          or 'dead' means the API sent rows that couldn't be loaded (e.g. no team
+          id); they are parked in s3://<bucket>/dlq/standings/ and the table is
+          incomplete until a refresh comes back clean.
+        columns:
+          - name: league_season_id
+            tests: [not_null, unique]
+          - name: status
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['ok', 'unprocessed', 'dead']
+          - name: unprocessed_rows
+          - name: unprocessed_teams
+          - name: reason
+          - name: unprocessed_since
+          - name: replay_attempts
+          - name: dlq_key
+          - name: updated_at
+
       - name: fixture_xg
         description: >
           Expected goals per fixture, loaded by etl/src/extract_xg.py from API-Football

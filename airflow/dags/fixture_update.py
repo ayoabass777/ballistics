@@ -285,7 +285,7 @@ def fixture_update_dag():
         from etl.src.data_detector import check_standings_stale_from_context, record_table_snapshot_from_context
 
         logger = get_logger(__name__, log_path=UPDATE_FIXTURES_LOG)
-        standings_summary = update_standings(return_summary=True)
+        standings_summary = update_standings(return_summary=True, ds=context["ds"])
         count_of_standing_rows = standings_summary["total_rows"]
         record_table_snapshot_from_context(
             context,
@@ -295,6 +295,7 @@ def fixture_update_dag():
                 "refresh_rows": count_of_standing_rows,
                 "league_count": standings_summary["league_count"],
                 "leagues_updated": standings_summary["leagues_updated"],
+                "unprocessed": standings_summary.get("unprocessed", []),
             },
         )
         check_standings_stale_from_context(context)

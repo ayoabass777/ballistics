@@ -227,9 +227,118 @@ def check_crest_urls(cur, spec: dict, ds: date) -> dict:
     return {"status": "ok", "details": details}
 
 
+# DLQ entries younger than this are expected (the hourly replay is still on
+# them): warning. Older, or given up on (dead): error. (D147)
+DLQ_WARN_HOURS = 24
+
+
+def _dlq_result(items: list[dict], what: str) -> dict:
+    """items: {label, status, age_hours, attempts, problem?} per open DLQ entry."""
+    if not items:
+        return {"status": "ok", "details": {"open": 0}}
+    dead = [i for i in items if i["status"] == "dead"]
+    stale = [i for i in items if i["status"] != "dead" and i["age_hours"] >= DLQ_WARN_HOURS]
+    broken = [i for i in items if i.get("problem")]
+    oldest = max(i["age_hours"] for i in items)
+    lines = [f"{i['label']}: {i['status']}, {i['age_hours']:.0f}h, {i['attempts']} retries"
+             + (f" ({i['problem']})" if i.get("problem") else "")
+             for i in sorted(items, key=lambda i: -i["age_hours"])[:10]]
+    details = {"open": len(items) - len(dead), "dead": len(dead),
+               "oldest_hours": round(oldest, 1), "entries": lines}
+    if dead or stale or broken:
+        return {"status": "failed", "details": details}
+    return {"status": "failed", "severity": "warning",
+            "details": {**details, "note": f"{what} being retried hourly"}}
+
+
+def _unflagged_s3_entries(prefix: str, flagged: set) -> list[dict]:
+    """Open S3 entries under prefix whose league season isn't flagged in the
+    status table: the rows were parked but the flag write failed, so the page
+    and the DB side of this check can't see them. Mirror of 'flag without
+    dlq_key' (S3 write failed)."""
+    from etl.src import dlq
+    items = []
+    for key in dlq.list_keys(prefix):
+        if not key.endswith("/open.json"):
+            continue
+        lid, season = key.split("/")[-3:-1]          # .../{api_league_id}/{season}/open.json
+        if not (lid.isdigit() and season.isdigit()) or (int(lid), int(season)) in flagged:
+            continue
+        entry = dlq.with_state(dlq.read_json(key) or {})
+        items.append({"label": f"league {lid}/{season} ({key})",
+                      "status": entry.get("status", "open"), "age_hours": dlq.age_hours(entry),
+                      "attempts": int(entry.get("attempts") or 0),
+                      "problem": "not flagged in the DB: status write failed"})
+    return items
+
+
+def _row_dlq_check(cur, table: str, names_col: str, prefix: str, what: str, names) -> dict:
+    """Row-level DLQ (standings, fixture rows): flagged leagues from the status
+    table, cross-checked against the open entries on S3 in both directions."""
+    items = []
+    cur.execute("SELECT to_regclass(%s)", (table,))
+    if cur.fetchone()[0] is not None:            # missing table = nothing flagged yet
+        cur.execute(
+            f"""SELECT api_league_id, season, status, {names_col},
+                       EXTRACT(EPOCH FROM now() - unprocessed_since) / 3600, replay_attempts, dlq_key
+                FROM {table} WHERE status <> 'ok'""")
+        items = [{"label": f"league {lid}/{season} ({names(listed)})",
+                  "status": "dead" if st == "dead" else "open", "age_hours": float(age or 0),
+                  "attempts": attempts or 0, "league": (lid, season),
+                  "problem": None if key else "not in the S3 DLQ: write failed"}
+                 for lid, season, st, listed, age, attempts, key in cur.fetchall()]
+    try:
+        items += _unflagged_s3_entries(prefix, {i["league"] for i in items})
+    except Exception as exc:                      # S3 unreachable: report the DB side only
+        logger.warning("dlq check: S3 cross-check for %s skipped: %s", prefix, exc)
+        result = _dlq_result(items, what)
+        result["details"]["s3_cross_check"] = f"skipped: {type(exc).__name__}"[:200]
+        return result
+    return _dlq_result(items, what)
+
+
+def check_dlq(cur, spec: dict, ds: date) -> dict:
+    """Open DLQ entries for `source` (standings | fixtures).
+
+    standings  raw.raw_league_standings_status (written with each parked row,
+               so it is readable without S3); a flagged league without a
+               dlq_key means the S3 write failed, and an open S3 entry
+               without a flag means the status write failed: both errors.
+    fixture_rows  raw.raw_fixtures_status, the same for single fixture rows (D148).
+    fixtures   the error.json entries under s3://<bucket>/dlq/.
+    """
+    from etl.src import dlq
+    source = spec.get("source")
+    if source == "standings":
+        from etl.src.standings_dlq import PREFIX, STATUS_TABLE
+        return _row_dlq_check(cur, STATUS_TABLE, "unprocessed_teams", PREFIX, "standings rows",
+                              lambda names: ", ".join(names or []))
+    if source == "fixture_rows":
+        from etl.src.fixtures_dlq import PREFIX, STATUS_TABLE
+        return _row_dlq_check(cur, STATUS_TABLE, "unprocessed_fixtures", PREFIX, "fixture rows",
+                              lambda names: ", ".join((names or [])[:3]))
+    if source == "fixtures":
+        from etl.src.s3_landing import list_dlq_entries
+        try:
+            entries = list_dlq_entries()
+            bodies = [dlq.with_state(dlq.read_json(e["error_key"]) or {}) for e in entries]
+        except Exception as exc:
+            if "connect" in type(exc).__name__.lower() or isinstance(exc, OSError):
+                return {"status": "failed", "severity": "warning",
+                        "details": {"reason": "network down: DLQ not checked",
+                                    "error": f"{type(exc).__name__}: {exc}"[:200]}}
+            raise
+        items = [{"label": f"league {e['api_league_id']}/{e['season_year']} ({e['ds']})",
+                  "status": b.get("status", "open"), "age_hours": dlq.age_hours(b),
+                  "attempts": int(b.get("attempts") or 0)}
+                 for e, b in zip(entries, bodies)]
+        return _dlq_result(items, "fixture extractions")
+    raise ValueError(f"dlq check: unknown source {source!r}")
+
+
 CHECKS = {"pipeline_task": check_pipeline_task, "movement": check_movement,
           "run_ds_rows": check_run_ds_rows, "sql_assert": check_sql_assert,
-          "crest_urls": check_crest_urls}
+          "crest_urls": check_crest_urls, "dlq": check_dlq}
 
 
 def evaluate(cur, registry: Registry, ds: date, task_state=None) -> dict[str, dict]:
@@ -283,7 +392,9 @@ def save_results(cur, ds: date, results: dict[str, dict]) -> None:
                    layer = EXCLUDED.layer, status = EXCLUDED.status,
                    blocked_by = EXCLUDED.blocked_by, details = EXCLUDED.details,
                    checked_at = now()""",
-            (ds, dataset_id, r["layer"], r["status"], r["blocked_by"], json.dumps(r["details"], default=str)),
+            (ds, dataset_id, r["layer"], r["status"], r["blocked_by"],
+             json.dumps({**r["details"], **({"severity": r["severity"]} if r.get("severity") else {})},
+                        default=str)),
         )
 
 
@@ -396,7 +507,8 @@ def collect_history(cur, ds: date, days: int = 7) -> list[dict]:
     cur.execute(
         """SELECT c.check_date,
                   CASE WHEN bool_or(c.status IN ('failed', 'missing')
-                                    AND coalesce(d.check_spec->>'severity', 'error') <> 'warning') THEN 'failed'
+                                    AND coalesce(c.details->>'severity', d.check_spec->>'severity', 'error')
+                                        <> 'warning') THEN 'failed'
                        WHEN bool_or(c.status IN ('failed', 'missing')) THEN 'warning'
                        WHEN bool_or(c.status = 'blocked') THEN 'blocked'
                        ELSE 'ok' END

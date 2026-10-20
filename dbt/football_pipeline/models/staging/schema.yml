@@ -83,6 +83,17 @@ models:
       - name: country_name
         tests: [not_null]
 
+  # ── stg_raw_league_standings_status ─────────────────────────────────
+  - name: stg_raw_league_standings_status
+    description: >
+      Per league season: did the last standings refresh park rows in the S3 DLQ
+      (D147). has_unprocessed_rows = the table is incomplete until a clean refresh.
+    columns:
+      - name: league_season_id
+        tests: [not_null, unique]
+      - name: has_unprocessed_rows
+        tests: [not_null]
+
   # ── stg_raw_league_standings ────────────────────────────────────────
   - name: stg_raw_league_standings
     description: "Staged league standings with team rank, form, and goal stats."

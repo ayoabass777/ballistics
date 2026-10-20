@@ -28,7 +28,8 @@ STANDINGS_SQL = """
 SELECT team_id, team_name, group_name, group_order, rank, games_played, wins,
        draws, losses, goals_for, goals_against, goal_diff, points, form,
        description, standings_updated_at, standings_format, n_groups,
-       ranks_repeat, is_team_current_group
+       ranks_repeat, is_team_current_group, standings_incomplete, unprocessed_rows,
+       is_stale_row
 FROM raw_mart.mart_league_standings
 WHERE league_season_id = %(league_season_id)s
 ORDER BY group_order, rank, team_name
@@ -65,6 +66,7 @@ def team_position(rows, team_id):
         "draws": r["draws"], "losses": r["losses"], "goal_diff": r["goal_diff"],
         "form": r["form"], "description": r["description"],
         "ranks_repeat": bool(r["ranks_repeat"]),
+        "stale": bool(r.get("is_stale_row")),   # last good row; the API's latest was unprocessable (D147)
     }
 
 
@@ -138,6 +140,10 @@ def build_context(cur, fixture_id):
                      "points_gap": abs(home_pos["points"] - away_pos["points"]) if same_group and home_pos["points"] is not None and away_pos["points"] is not None else None},
         "table": {"available": any(r["group_name"] not in hidden for r in rows),
                   "standings_format": rows[0]["standings_format"] if rows else None,
+                  # D147: the API sent rows we couldn't load; they wait in the DLQ
+                  # and the table may be out of date until a clean refresh.
+                  "incomplete": any(r.get("standings_incomplete") for r in rows),
+                  "unprocessed_rows": max((r.get("unprocessed_rows") or 0 for r in rows), default=0),
                   "groups": _groups([r for r in rows if r["group_name"] not in hidden])},
         "h2h": h2h,
     }
@@ -148,9 +154,18 @@ def _groups(rows):
     for r in rows:
         g = groups.setdefault(r["group_name"], {"group_name": r["group_name"],
                                                 "group_order": r["group_order"], "rows": []})
-        g["rows"].append({k: r[k] for k in ("rank", "team_id", "team_name", "games_played",
-                                            "goal_diff", "points", "description")})
+        g["rows"].append({**{k: r[k] for k in ("rank", "team_id", "team_name", "games_played",
+                                               "goal_diff", "points", "description")},
+                          "stale": bool(r.get("is_stale_row"))})
     return sorted(groups.values(), key=lambda g: g["group_order"] or 0)
+
+
+def build_context_page(cur, fixture_id):
+    """/context payload with its `data_quality` block (D148)."""
+    from engine.api import data_quality as dq
+    page = dq.decorate(dq.Component(lambda c, fixture_id: build_context(c, fixture_id)),
+                       dq.StandingsQuality, dq.Freshness, dq.FixtureRowsQuality)
+    return page.build(cur, fixture_id=fixture_id)
 
 
 def main(argv):

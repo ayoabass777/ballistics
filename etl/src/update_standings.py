@@ -306,11 +306,18 @@ def upsert_standings(rows: List[Dict[str, Any]], prune: bool = True) -> int:
 
 
 def update_standings(
-    return_summary: bool = False, league_season_ids: Optional[List[int]] = None
+    return_summary: bool = False, league_season_ids: Optional[List[int]] = None,
+    ds: Optional[str] = None,
 ) -> Union[int, Dict[str, Any]]:
     """
     Fetch standings for all current league seasons and upsert into DB.
+
+    Rows that can't be loaded (no team id) go to the standings DLQ on S3 and
+    flag the league (etl/src/standings_dlq.py, D147); the rest still load.
     """
+    from datetime import date
+    from etl.src.standings_dlq import refresh_league
+    ds = ds or date.today().isoformat()
     start = time.time()
     total_rows = 0
     leagues_updated: List[Dict[str, Any]] = []
@@ -328,6 +335,7 @@ def update_standings(
                 }
             return 0
 
+        unprocessed: List[Dict[str, Any]] = []
         for league_season_id, api_league_id, season in league_rows:
             start_fetch = time.time()
             payload = fetch_standings(api_league_id, season)
@@ -337,20 +345,11 @@ def update_standings(
                 league_season_id,
                 time.time() - start_fetch,
             )
-            extracted = extract_standings(payload)
-            for row in extracted:
-                row["league_season_id"] = league_season_id
-                row["api_league_id"] = api_league_id
-                row["season"] = season
-            extracted, missing = drop_rows_without_team_id(extracted)
-            if missing:
-                logger.warning(
-                    "league_season_id=%s: skipped %d standings row(s) with no team id (%s); "
-                    "kept existing rows for that league (no prune).",
-                    league_season_id, len(missing),
-                    ", ".join(str(r.get("team_name")) for r in missing),
-                )
-            inserted = upsert_standings(extracted, prune=not missing)
+            league = {"league_season_id": league_season_id,
+                      "api_league_id": api_league_id, "season": season}
+            inserted, parked = refresh_league(league, ds, source="nightly", payload=payload)
+            if parked:
+                unprocessed.append({**league, "teams": [str(r.get("team_name")) for r in parked]})
             total_rows += inserted
             leagues_updated.append(
                 {
@@ -358,6 +357,7 @@ def update_standings(
                     "api_league_id": api_league_id,
                     "season": season,
                     "row_count": inserted,
+                    "unprocessed_rows": len(parked),
                 }
             )
             logger.info(
@@ -369,6 +369,7 @@ def update_standings(
                 "total_rows": total_rows,
                 "league_count": len(leagues_updated),
                 "leagues_updated": leagues_updated,
+                "unprocessed": unprocessed,
             }
         return total_rows
     finally:

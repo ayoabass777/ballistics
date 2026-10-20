@@ -5,6 +5,7 @@ raw.raw_fixtures (API-Football team ids) or rebuild an API -> warehouse
 team-id map from it.
 """
 
+import re
 from pathlib import Path
 from unittest.mock import patch
 
@@ -26,7 +27,8 @@ def _engine_sources():
 
 
 def test_engine_never_reads_raw_fixtures():
-    offenders = [str(p) for p, src in _engine_sources() if "raw.raw_fixtures" in src]
+    # raw.raw_fixtures_status (DLQ flags, D148) is not fixture data
+    offenders = [str(p) for p, src in _engine_sources() if re.search(r"raw\.raw_fixtures\b", src)]
     assert offenders == []
 
 
