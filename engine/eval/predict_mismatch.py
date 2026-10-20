@@ -109,8 +109,8 @@ def _get_conn():
 
 
 def _get_latest_elo(conn, team_ids: list) -> dict:
-    """Latest Elo per warehouse team_id. Teams with no rating are absent; the
-    caller applies the 1500 default."""
+    """Latest Elo per warehouse team_id. Teams with no rating are absent, and
+    the caller skips their fixtures (no 1500 default)."""
     if not team_ids:
         return {}
     df = pd.read_sql(f"""
@@ -589,9 +589,16 @@ def predict_mismatch(
 
         # Pre-compute which fixtures have a gap above threshold
         fixture_info = []
+        unrated = 0
         for _, row in upcoming.iterrows():
-            h_elo = elo_map.get(row["home_team_id"], 1500.0)
-            a_elo = elo_map.get(row["away_team_id"], 1500.0)
+            # No Elo history (a team new to the data, or not in the dimensions
+            # yet): a 1500 default would make up a gap and confident picks.
+            if any(pd.isna(t) or t not in elo_map
+                   for t in (row["home_team_id"], row["away_team_id"])):
+                unrated += 1
+                continue
+            h_elo = elo_map[row["home_team_id"]]
+            a_elo = elo_map[row["away_team_id"]]
             gap = abs(h_elo - a_elo)
             if gap < min_gap:
                 continue
@@ -602,6 +609,9 @@ def predict_mismatch(
             fav_rf = row["home_team_id"] if fav_is_home else row["away_team_id"]
             dog_rf = row["away_team_id"] if fav_is_home else row["home_team_id"]
             fixture_info.append((row, h_elo, a_elo, gap, bin_info, fav_is_home, fav_rf, dog_rf))
+
+        if unrated:
+            print(f"  skipped {unrated} fixtures with an unrated team (no Elo history)")
 
         # Batch-load H2H for all matchups
         matchups = [(fav_rf, dog_rf) for (_, _, _, _, _, _, fav_rf, dog_rf) in fixture_info]
