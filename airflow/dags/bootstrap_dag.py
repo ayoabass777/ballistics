@@ -13,6 +13,10 @@ Task graph:
                                                      ├──► extract_fixtures ──► load_fixtures ──► mark_metadata_processed
   sensor ──► raw_fixtures_schema ───────────────────┘
 
+After extract_metadata, update_crests runs on an independent branch with retries.
+The same metadata-change sensor gates it; fixture ingestion does not wait for images.
+The daily dbt refresh exposes the new logo references in fact_fixtures.
+
 Failed extractions are written to a DLQ prefix in S3 (dlq/{league_id}/{season}/{ds}/).
 A separate replay_dag handles DLQ retry and monitoring independently.
 """
@@ -132,6 +136,12 @@ def bootstrap_dag():
     # ------------------------------------------------------------------
     # Branch 2: Raw fixtures schema
     # ------------------------------------------------------------------
+
+    @task(retries=2, retry_delay=timedelta(minutes=5))
+    def update_crests():
+        """Independent metadata branch: missing assets only, safe to retry."""
+        from etl.src.extract_metadata import _download_logos_after_metadata
+        _download_logos_after_metadata()
 
     @task
     def bootstrap_raw_fixtures_schema():
@@ -475,6 +485,7 @@ def bootstrap_dag():
 
     metadata_schema = bootstrap_metadata_schema()
     metadata_extract = extract_metadata()
+    crests_updated = update_crests()
     raw_schema = bootstrap_raw_fixtures_schema()
     fixtures_extracted = extract_fixtures()
     fixtures_loaded = load_fixtures(fixtures_extracted)
@@ -486,6 +497,7 @@ def bootstrap_dag():
 
     wait_for_metadata_change >> metadata_schema >> metadata_extract >> fixtures_extracted
     wait_for_metadata_change >> raw_schema >> fixtures_extracted
+    metadata_extract >> crests_updated
     fixtures_loaded >> metadata_processed
 
 
