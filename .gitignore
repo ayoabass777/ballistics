@@ -10,7 +10,8 @@ venv/
 .coverage
 htmlcov/
 airflow/logs/
-/data/
+/data/*
+!/data/metadata.yaml
 *.db
 docker-compose.override.yml
 dbt/football_pipeline/target*/
@@ -53,3 +54,4 @@ engine/eval/*-backup-*.json
 # Staging deploy secrets and certificates (deploy/staging.env.example is the template)
 deploy/.env.staging
 deploy/certs/
+deploy/RELEASES

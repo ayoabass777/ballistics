@@ -206,18 +206,22 @@ services:
       - ../engine/eval:/srv/eval:ro
     networks: [ballistics]
 
-  # Build-only: the DAGs run these images through DockerOperator.
+  # Build-only: the DAGs run these images through DockerOperator as
+  # :latest, which deploy_staging.sh tags once the release has passed dbt
+  # build. The deploy also runs `dbt build` through the dbt service.
   engine:
-    image: ballistics-engine:latest
+    image: ballistics-engine:${RELEASE:-latest}
     build:
       context: ..
       dockerfile: engine/Dockerfile
     profiles: [build]
+    networks: [ballistics]
   dbt:
-    image: ballistics-dbt:latest
+    image: ballistics-dbt:${RELEASE:-latest}
     build:
       context: ../dbt
     profiles: [build]
+    networks: [ballistics]
   airflow-image:
     image: ballistics-airflow:${RELEASE:-latest}
     build:

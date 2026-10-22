@@ -291,14 +291,26 @@ the DAGs run and check the next day's data is fresh.
 
 ## Deploy, rollback and backups
 
-- **Deploy script** (`deploy/deploy_staging.sh`, run from the laptop over SSH):
-  check out a pushed commit or tag of both repos on the server, build images
-  tagged with the git SHA, run migrations, run `dbt build`, then
-  `docker compose up -d`. It records the deployed SHAs in `deploy/RELEASES`.
-  CI can come after beta.
-- **Rollback:** redeploy the previous SHAs from `RELEASES`. Migrations are
-  forward-only, so a migration that must be undone is undone by a new
-  migration; a bad data change is undone from the backup.
+- **Deploy script** (`deploy/deploy_staging.sh`, written 2026-10-22, run
+  from the laptop): refuses refs that are not on an origin branch, pushes the
+  two commits over SSH into `/srv/ballistics` and `/srv/football_stats_project`
+  (the server holds no GitHub credentials), then runs the script as committed
+  at that SHA on the server: stop Airflow (it bind-mounts code from the
+  checkout) → check out → render `.dbt/profiles.yml` → build every image
+  tagged `b<sha>-a<sha>` → Postgres → `migrate.py up` → account bootstrap →
+  `dbt build` → `grants.sql` → tag engine/dbt `:latest` (what the DAGs start)
+  → `docker compose up -d --wait` → append to `deploy/RELEASES` → prune
+  release images outside the last two, dangling images and week-old build
+  cache. A failed step names itself and leaves Airflow stopped and nothing
+  recorded. `--status` prints `RELEASES`; `--checkout-only` is for the first
+  deploy (above). Pre-flight: `.env.staging` must be `chmod 600` with
+  matching paths, and `deploy/certs/origin.{pem,key}` must exist (a symlink
+  to `/etc/ballistics/certs` works). CI can come after beta.
+- **Rollback:** `deploy_staging.sh --rollback` redeploys the line before the
+  last in `RELEASES` (images are rebuilt, mostly from cache). It appends a
+  line too, so a second rollback goes back to the release that was rolled
+  back. Migrations are forward-only, so a migration that must be undone is
+  undone by a new migration; a bad data change is undone from the backup.
 - **Backups:** nightly `pg_dump -Fc` to the backups bucket, 14 days kept, plus
   weekly Hetzner snapshots. A restore into a scratch database is part of the
   smoke test; an untested backup does not count.
@@ -351,16 +363,41 @@ then remove its containers and volumes.
   no `ARG` lines, so `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and the other
   `NEXT_PUBLIC_*` values the compose file passes at build time are ignored.
   Next.js inlines these during `next build`; add matching `ARG`/`ENV` lines in
-  the builder stage.
+  the builder stage. **Blocks the first deploy:** the 2026-10-22 deploy test
+  showed a clean checkout fails `next build` ("Missing publishableKey"; local
+  builds only passed because of the working tree's `.env`). Four `ARG` lines
+  plus one `ENV` before `pnpm run build` fixed it in the test.
 - **Logo URLs (frontend repo).** `lib/logo-asset-url.ts` builds browser image
   URLs from `BACKEND_API_BASE_URL`, which on the server is the internal
   `http://account-api:8000`. The Caddyfile routes `/assets/logos/*` to the
   account API as a stopgap; the lasting fix is a separate public base URL
   (or a relative path) for logos.
-- **Deploy script.** Still to write (`deploy/deploy_staging.sh`): check out
-  pushed commits of both repos, render `.dbt/profiles.yml` from
-  `deploy/dbt-profiles.yml.tmpl`, build images, then run the deploy order
-  above and `docker compose up -d`.
+- ✅ **Deploy script** (2026-10-22): `deploy/deploy_staging.sh`, described
+  under "Deploy, rollback and backups". Tested on the Mac against a scratch
+  "server" folder, a scratch origin and an SSH shim, as a separate compose
+  project (`ballistics-deploytest`, own network and ports): the guards
+  refused an unpushed ref, a bad ref, a rollback with no releases and an env
+  file that was not `chmod 600`; a full run built all images, applied 0001,
+  ran the account bootstrap, `dbt build` passed on the empty schema, grants
+  applied (`research_reader` reads `raw_mart`), and the stack came up behind
+  Caddy (`/` 200 over TLS, research API answering). A failure in the start
+  step reported itself and recorded no release. `--checkout-only`, `--status`,
+  the rollback target and the prune filter (only `b<sha>-a<sha>` tags outside
+  the last two releases) were checked. Not covered locally: one uninterrupted
+  run ending in `RELEASES`, a real prune, and a rollback through to the end.
+  Docker Desktop's registry proxy on the Mac hung partway through, blocking
+  pulls and builds, so the start step was run by hand from the built images.
+  Run these on the server's first deploy.
+- **League config not in git (fixed 2026-10-22, uncommitted).** `/data/` was
+  gitignored, so a clean checkout had no `data/metadata.yaml` (read by the
+  bootstrap DAG and `extract_metadata`), and the engine image's
+  `COPY data/` failed. `.gitignore` now keeps `data/` ignored except
+  `metadata.yaml`, and the deploy creates `data/` and stops if the config is
+  missing.
+- **Airflow admin password on the command line.** `airflow-init` passes
+  `--password ${AIRFLOW_ADMIN_PASSWORD}` in its command, so it shows in
+  `docker top` and `ps` on the server while the container runs. The first
+  start's `airflow users create` took about 20 minutes on the Mac.
 - **Airflow executor.** The compose file keeps Airflow's default executor,
   as locally, so tasks run one at a time; the measured peaks assume no more
   than that.

@@ -1,0 +1,209 @@
+countries:
+  - country: Argentina
+    leagues:
+      - name: Liga Profesional Argentina
+        tier: 1
+  - country: Austria
+    leagues:
+      - name: Bundesliga
+        tier: 1
+      - name: 2. Liga
+        tier: 2
+  - country: Belarus
+    leagues:
+      - name: Premier League
+        tier: 1
+      - name: 1. Division
+        tier: 2
+  - country: Belgium
+    leagues:
+      - name: Jupiler Pro League
+        tier: 1
+      - name: Challenger Pro League
+        tier: 2
+  - country: Brazil
+    leagues:
+      - name: Serie A
+        tier: 1
+      - name: Serie B
+        tier: 2
+  - country: Bulgaria
+    leagues:
+      - name: First League
+        tier: 1
+  - country: Croatia
+    leagues:
+      - name: HNL
+        tier: 1
+  - country: Czech-Republic
+    leagues:
+      - name: Czech Liga
+        tier: 1
+  - country: Denmark
+    leagues:
+      - name: Superliga
+        tier: 1
+      - name: 1. Division
+        tier: 2
+  - country: Egypt
+    leagues:
+      - name: Premier League
+        tier: 1
+  - country: England
+    leagues:
+      - name: Premier League
+        tier: 1
+      - name: Championship
+        tier: 2
+      - name: League One
+        tier: 3
+      - name: League Two
+        tier: 4
+  - country: Finland
+    leagues:
+      - name: Veikkausliiga
+        tier: 1
+  - country: France
+    leagues:
+      - name: Ligue 1
+        tier: 1
+      - name: Ligue 2
+        tier: 2
+  - country: Germany
+    leagues:
+      - name: Bundesliga
+        tier: 1
+      - name: 2. Bundesliga
+        tier: 2
+  - country: Greece
+    leagues:
+      - name: Super League 1
+        tier: 1
+      - name: Super League 2
+        tier: 2
+  - country: Hungary
+    leagues:
+      - name: NB I
+        tier: 1
+  - country: Ireland
+    leagues:
+      - name: Premier Division
+        tier: 1
+  - country: Italy
+    leagues:
+      - name: Serie A
+        tier: 1
+      - name: Serie B
+        tier: 2
+  - country: Japan
+    leagues:
+      - name: J1 League
+        tier: 1
+      - name: J2 League
+        tier: 2
+  - country: Kazakhstan
+    leagues:
+      - name: Premier League
+        tier: 1
+  - country: Mexico
+    leagues:
+      - name: Liga MX
+        tier: 1
+      - name: Liga de Expansión MX
+        tier: 2
+  - country: Netherlands
+    leagues:
+      - name: Eredivisie
+        tier: 1
+      - name: Eerste Divisie
+        tier: 2
+  - country: Norway
+    leagues:
+      - name: Eliteserien
+        tier: 1
+      - name: 1. Division
+        tier: 2
+  - country: Poland
+    leagues:
+      - name: Ekstraklasa
+        tier: 1
+      - name: I Liga
+        tier: 2
+  - country: Portugal
+    leagues:
+      - name: Primeira Liga
+        tier: 1
+      - name: Segunda Liga
+        tier: 2
+  - country: Romania
+    leagues:
+      - name: Liga I
+        tier: 1
+  - country: Russia
+    leagues:
+      - name: Premier League
+        tier: 1
+  - country: Scotland
+    leagues:
+      - name: Premiership
+        tier: 1
+      - name: Championship
+        tier: 2
+  - country: Serbia
+    leagues:
+      - name: Super Liga
+        tier: 1
+  - country: Slovakia
+    leagues:
+      - name: Super Liga
+        tier: 1
+  - country: Slovenia
+    leagues:
+      - name: 1. SNL
+        tier: 1
+  - country: South-Korea
+    leagues:
+      - name: K League 1
+        tier: 1
+      - name: K League 2
+        tier: 2
+      - name: K League 3
+        tier: 3
+  - country: Spain
+    leagues:
+      - name: La Liga
+        tier: 1
+      - name: Segunda Division
+        tier: 2
+  - country: Sweden
+    leagues:
+      - name: Allsvenskan
+        tier: 1
+      - name: Superettan
+        tier: 2
+  - country: Switzerland
+    leagues:
+      - name: Super League
+        tier: 1
+      - name: Challenge League
+        tier: 2
+  - country: Turkey
+    leagues:
+      - name: Süper Lig
+        tier: 1
+      - name: 1. Lig
+        tier: 2
+  - country: Ukraine
+    leagues:
+      - name: Premier League
+        tier: 1
+  - country: USA
+    leagues:
+      - name: Major League Soccer
+        tier: 1
+      - name: USL Championship
+        tier: 2
+  - country: Wales
+    leagues:
+      - name: Premier League
+        tier: 1
