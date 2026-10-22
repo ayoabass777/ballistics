@@ -188,6 +188,15 @@ Postgres.
   login worked and root/password logins were refused. At rest after reboot:
   411 MiB RAM, 6.3 GB disk used. Docker bypasses UFW for published ports, so
   only Caddy may publish ports; everything else binds inside the server.
+- **Cloudflare done 2026-10-22:** proxied A records `staging` and `beta` →
+  2.29.118.240 (existing `api` → v1 DNS-only and the root/`www` v1 Worker
+  untouched). Origin certificate (Cloudflare Origin CA, `*.ballistics.football`
+  and apex, valid to 2041-10-18) issued from a CSR made on the server, so the
+  private key never left it: `/etc/ballistics/certs/origin.key` (root:sage,
+  640) and `origin.pem`; certificate and key verified to match. Copy or mount
+  them as `deploy/certs/` at deploy. Zone SSL mode switched from Full to
+  **Full (strict)** by the owner on 2026-10-22 (verified in the dashboard); it
+  only affects proxied hosts with an origin, i.e. staging and beta.
 - **ARM check (2026-10-22): passed.** The Mac is Apple Silicon, so the local
   Airflow, engine and dbt images were already arm64 and run nightly. Fresh
   `--platform linux/arm64 --pull --no-cache` builds of all six images
@@ -288,6 +297,22 @@ forecast history that would take days to rebuild). Exclude Airflow metadata
 keep the schema). The restored `raw.match_analysis` serves Match details
 until the first staging engine run; no export files need copying. Then let
 the DAGs run and check the next day's data is fresh.
+
+Scripts (2026-10-22): `deploy/seed_from_local.sh` streams `pg_dump -Fc`
+from the local container over SSH to `ballistics-v2:/var/lib/ballistics-seed/`
+(nothing written to the laptop, whose disk is nearly full), excluding
+`public.*` tables, the legacy `public_*` schemas and `app` rows.
+`deploy/seed_restore.sh <dump>` runs on the server: starts only Postgres,
+refuses if `raw` already has tables, restores as the owner, then baselines
+0001. **First-deploy order:** check out the repos
+(`deploy_staging.sh --checkout-only`) and fill `deploy/.env.staging` and
+`deploy/certs/` → `seed_restore.sh` → the full deploy (which then applies
+0002+). Tested locally by streaming into a throwaway PostgreSQL 17:
+345 MB dump, 5 min 17 s end to end, no restore errors; row counts matched
+the source for every pipeline table checked (150,536 fixtures, 274,958 Elo
+rows, 69,289 forecast entries, 6,298 match analyses); `app` tables empty;
+no `public` tables; the forecast append-only trigger still fires; `migrate.py
+baseline 0001` then `up` applied 0002.
 
 ## Deploy, rollback and backups
 
