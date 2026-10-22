@@ -68,5 +68,44 @@ class ConsensusStatusBackstopTests(unittest.TestCase):
         self.assertEqual(set(meta), {1})
 
 
+class InProcessConsensusTests(unittest.TestCase):
+    def test_full_runner_excludes_non_started_from_pool_and_analysis(self):
+        from contextlib import ExitStack
+        statuses = ['NS', 'PST', 'CANC', 'ORPHAN', '1H', 'FT']
+        picks = pd.DataFrame([
+            dict(fixture_id=i, home=f'H{i}', away=f'A{i}', league='Test League',
+                 kickoff='2026-10-25T15:00:00Z', market='Over 1.5', probability=.99,
+                 raw_probability=.99, lambda_home=2., lambda_away=2.)
+            for i in range(1, 7)])
+        facts = pd.DataFrame([dict(fixture_id=i, api_league_id=1, home_team_id=1,
+                                  away_team_id=2, league_id=1, fixture_status=status)
+                              for i, status in enumerate(statuses, 1)])
+        def read(sql, *args, **kwargs):
+            if 'raw.engine_fixtures' in sql:
+                return pd.DataFrame(columns=['fixture_id', 'api_league_id'])
+            if 'raw.fact_fixtures' in sql:
+                return facts
+            raise AssertionError(sql)
+        with ExitStack() as stack:
+            stack.enter_context(patch('engine.eval.bayesian_streaks._get_conn', return_value=MagicMock()))
+            mocks = {
+                'predict_mismatch': ([], {}), 'get_fixture_beliefs': {},
+                'predict_dixon_coles': picks,
+                '_league_id_country_map': ({1: 'Test League'}, {1: 'Testland'}),
+                '_load_fixture_strength_profiles': {}, '_load_bounds_1_4_league_priors': {},
+                '_load_league_elo_volatility': {}, '_load_comparison_context': ({}, None),
+                '_load_team_tiers': {}, '_high_scoring_fixture_ids': set(),
+            }
+            for name, result in mocks.items():
+                stack.enter_context(patch.object(cs, name, return_value=result))
+            for name in ('attach_league_comparisons', 'attach_team_patterns',
+                         'attach_team_tiers', 'attach_discover_picks'):
+                stack.enter_context(patch.object(cs, name))
+            stack.enter_context(patch.object(cs.pd, 'read_sql', side_effect=read))
+            result = cs.run_consensus(days=7)
+        self.assertEqual({p['fixture_id'] for p in result['pool']}, {1})
+        self.assertEqual({p['fixture_id'] for p in result['fixture_analysis']}, {1})
+
+
 if __name__ == "__main__":
     unittest.main()

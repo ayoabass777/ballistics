@@ -56,10 +56,21 @@ def latest_export_path(directory: Path | None = None) -> Path | None:
 def index_export(raw: dict) -> dict:
     """Keep only what the match page needs, keyed for lookup."""
     group = raw.get("elo_gap_group") or {}
+    big_dog = {int(x["fixture_id"]): x for x in raw.get("elo_gap_shortlist") or []}
+    # Discover uses the full qualifying pool; the published shortlist is capped.
+    # Preserve its visible Big dog labels on the corresponding Match pages.
+    for fixture in raw.get("fixture_analysis") or []:
+        pick = (fixture.get("discover_sections") or {}).get("strength") or {}
+        favourite = pick.get("big_dog")
+        if favourite in (fixture.get("home"), fixture.get("away")):
+            big_dog[int(fixture["fixture_id"])] = {
+                "favourite": favourite,
+                "underdog": fixture["away"] if favourite == fixture["home"] else fixture["home"],
+            }
     return {
         "run_ds": raw.get("run_ds"),
         "fixtures": {int(f["fixture_id"]): f for f in raw.get("fixture_analysis") or []},
-        "big_dog": {int(x["fixture_id"]): x for x in raw.get("elo_gap_shortlist") or []},
+        "big_dog": big_dog,
         "big_dog_leagues": {(r.get("league"), r.get("country")): r
                             for r in group.get("big_dog_leagues") or []},
         "gap_min": group.get("gap_min", 250),
@@ -160,6 +171,8 @@ def _strength_state(f: dict, export: dict) -> dict | None:
         why = "not_enough_matches"
     else:
         why = "unpredictable"
+    if favourite is not None:
+        return {**_slight(favourite, f, gap, export), "reason": why}
     return {"state": "no_label", "reason": why}
 
 

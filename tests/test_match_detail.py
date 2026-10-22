@@ -92,6 +92,29 @@ class SectionTests(unittest.TestCase):
             s = md.strength_section(dict(f, mismatch=wide, league=league, country=country), self.export)
             self.assertEqual(s, {"state": "no_label", "reason": why})
 
+    def test_wide_gap_without_big_dog_permission_is_favourite(self):
+        for league, country, reason in (("Liga 2", "X", "top_flight_only"),
+                                        ("Small", "Y", "not_enough_matches"),
+                                        ("Wild", "Z", "unpredictable")):
+            for favourite, underdog in (("Zlin", "Pardubice"), ("Pardubice", "Zlin")):
+                f = dict(FIXTURE, league=league, country=country,
+                         mismatch=[{"market": favourite + " Win", "gap": 400}],
+                         tiers={"home": "Top", "away": "Bottom"})
+                result = md.strength_section(f, dict(self.export, home_edge=65))
+                self.assertEqual(result["state"], "slight_favourite")
+                self.assertEqual(result["level"], "favourite")
+                self.assertEqual(result["favourite"], favourite)
+                self.assertEqual(result["underdog"], underdog)
+                self.assertEqual(result["reason"], reason)
+                self.assertIn("tiers", result)
+
+    def test_discover_big_dog_outside_capped_shortlist_matches_detail(self):
+        fixture = dict(FIXTURE, mismatch=[{"market": "Zlin Win", "gap": 350}],
+                       discover_sections={"strength": {"big_dog": "Zlin"}})
+        export = md.index_export(dict(EXPORT_RAW, fixture_analysis=[fixture]))
+        self.assertEqual(md.strength_section(fixture, export),
+                         {"state": "big_dog", "favourite": "Zlin", "underdog": "Pardubice"})
+
     def test_slight_favourite_boundaries_and_missing_gap(self):
         for gap, state in [(100, "close"), (101, "slight_favourite"), (250, "slight_favourite")]:
             f = dict(FIXTURE, mismatch=[{"market": "Zlin Over 0.5", "gap": gap}])
@@ -107,7 +130,7 @@ class SectionTests(unittest.TestCase):
         export = dict(self.export, home_edge=65)
         f = dict(FIXTURE, mismatch=[{"market": "Zlin Over 0.5", "gap": 265}])
         self.assertEqual(md.strength_section(f, export)["state"], "slight_favourite")
-        self.assertEqual(md.strength_section(f, self.export)["state"], "no_label")   # old export: no edge
+        self.assertEqual(md.strength_section(f, self.export)["level"], "favourite")   # wide gap without league permission
 
     def test_slight_levels_and_tiers(self):
         export = dict(self.export, home_edge=65)
