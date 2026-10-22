@@ -74,11 +74,17 @@ models:
         description: "stage = 'knockout'. Single games / ties where extra time and penalties can decide."
       - name: is_playoff
         description: "Post-season: knockout games plus phases named play-offs (round-robin play-off groups)."
+      - name: is_post_split
+        description: >
+          Phase played after the table splits or the regular season ends: championship /
+          relegation / promotion rounds and groups, lower-table rounds, Conference League and
+          play-off groups, "2nd Phase" outside Argentina. Macro fixture_post_split. Not engine input.
 
   - name: engine_fixtures
     description: >
-      Engine fixture input: fact_fixtures minus knockout games (is_knockout). Training data and
-      prediction targets for the engine; lookups by fixture_id use fact_fixtures.
+      Engine fixture input: fact_fixtures minus knockout games (is_knockout) and post-split
+      phases (is_post_split). Training data and prediction targets for the engine; lookups by
+      fixture_id use fact_fixtures.
     columns:
       - name: fixture_id
         tests: [not_null, unique]
@@ -87,9 +93,14 @@ models:
           - accepted_values:
               arguments:
                 values: [false]
+      - name: is_post_split
+        tests:
+          - accepted_values:
+              arguments:
+                values: [false]
 
   - name: engine_head_to_head
-    description: "Engine team-match history: fact_head_to_head minus knockout games."
+    description: "Engine team-match history: fact_head_to_head minus knockout games and post-split phases."
 
   - name: engine_head_to_head_events
-    description: "Engine event flags: fact_head_to_head_events minus knockout games."
+    description: "Engine event flags: fact_head_to_head_events minus knockout games and post-split phases."

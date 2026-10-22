@@ -1,4 +1,5 @@
-"""The engine models league play: knockout games are excluded (2026-10-12).
+"""The engine models league play: knockout games are excluded (2026-10-12),
+and so are post-split phases (2026-10-21).
 
 Modelling code reads the engine_* views (fact tables minus is_knockout games).
 Only the match API reads the full head-to-head table; fixture lookups by id
@@ -46,3 +47,11 @@ def test_engine_views_drop_knockouts():
     for name in ("engine_fixtures", "engine_head_to_head", "engine_head_to_head_events"):
         sql = (VIEWS / f"{name}.sql").read_text()
         assert "is_knockout is not true" in sql, name
+
+
+def test_engine_views_drop_post_split_phases():
+    # Championship / relegation groups and play-off groups: a different energy
+    # (owner, 2026-10-21).
+    for name in ("engine_fixtures", "engine_head_to_head", "engine_head_to_head_events"):
+        sql = (VIEWS / f"{name}.sql").read_text()
+        assert "is_post_split is not true" in sql, name
