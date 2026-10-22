@@ -1,0 +1,16 @@
+# Rendered on the server to $PROJECT_ROOT/.dbt/profiles.yml (gitignored,
+# chmod 600) by: envsubst < deploy/dbt-profiles.yml.tmpl > .dbt/profiles.yml
+# fixture_update_dag bind-mounts that file into the dbt container, which gets
+# no database environment of its own.
+ballistics:
+  target: prod
+  outputs:
+    prod:
+      type: postgres
+      host: ballistics_postgres
+      port: 5432
+      user: ${DB_USER}
+      password: ${DB_PASSWORD}
+      dbname: ballistics
+      schema: raw
+      threads: 2

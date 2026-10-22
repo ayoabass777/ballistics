@@ -49,3 +49,7 @@ engine/eval/diagnostics/out/
 # dbt anonymous user id and one-off engine label backups
 .dbt/.user.yml
 engine/eval/*-backup-*.json
+
+# Staging deploy secrets and certificates (deploy/staging.env.example is the template)
+deploy/.env.staging
+deploy/certs/

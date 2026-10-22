@@ -1,0 +1,235 @@
+# Ballistics v2 staging/beta stack (docs/staging-deployment-plan.md).
+#
+# Server layout (paths relative to this file):
+#   /srv/ballistics             this repo        (PROJECT_ROOT)
+#   /srv/football_stats_project account API + frontend (ACCOUNT_REPO)
+#
+#   docker compose -f deploy/compose.staging.yml --env-file deploy/.env.staging up -d
+#
+# Only Caddy publishes public ports. Docker bypasses UFW for published ports,
+# so everything else is internal or bound to 127.0.0.1 (reach the Airflow UI
+# and the consensus dashboard with an SSH tunnel).
+#
+# The DAGs start dbt and engine containers through the Docker socket on the
+# network "ballistics_network" and reach Postgres as "ballistics_postgres"
+# (an alias below), with bind mounts under PROJECT_ROOT, so PROJECT_ROOT must
+# be the repo's real path on the host.
+
+name: ballistics
+
+x-airflow: &airflow
+  image: ballistics-airflow:${RELEASE:-latest}
+  restart: unless-stopped
+  environment: &airflow-env
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD}@postgres:5432/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+    AIRFLOW__LOGGING__DELETE_LOCAL_LOGS: "true"
+    PROJECT_ROOT: ${PROJECT_ROOT}
+    ACCOUNT_PROJECT_ROOT: /opt/account
+    DB_NAME: ballistics
+    DB_USER: ${DB_USER}
+    DB_PASSWORD: ${DB_PASSWORD}
+    DB_HOST: ballistics_postgres
+    DB_PORT: "5432"
+    ENGINE_DB_HOST: ballistics_postgres
+    API_KEY: ${API_FOOTBALL_KEY}
+    API_URL: https://v3.football.api-sports.io/
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ca-central-1}
+    S3_BUCKET: ${S3_BUCKET}
+    ASSETS_BUCKET: ${ASSETS_BUCKET}
+    FORECAST_ARCHIVE_BUCKET: ${FORECAST_ARCHIVE_BUCKET}
+    MIN_SEASON_TRACKER: "2020"
+    ALERT_EMAIL_TO: ${ALERT_EMAIL_TO}
+    ALERT_EMAIL_FROM: ${ALERT_EMAIL_FROM}
+    SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+    SMTP_PORT: ${SMTP_PORT:-587}
+    SMTP_USER: ${SMTP_USER}
+    SMTP_PASSWORD: ${SMTP_PASSWORD}
+    ALERT_DAILY_REPORT: "true"
+  volumes:
+    - ../airflow/dags:/opt/airflow/dags:ro
+    - ../etl:/opt/airflow/etl
+    - ../engine:/opt/airflow/engine
+    - ../data:/opt/airflow/data
+    - airflow-logs:/opt/airflow/logs
+    - ${ACCOUNT_REPO:-../../football_stats_project}:/opt/account:ro
+    - /var/run/docker.sock:/var/run/docker.sock
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:17   # must stay >= the local major (17) to restore its dumps
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ballistics
+      AIRFLOW_DB_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      ACCOUNT_DB_PASSWORD: ${ACCOUNT_DB_PASSWORD}
+      RESEARCH_DB_PASSWORD: ${RESEARCH_DB_PASSWORD}
+    command: >
+      postgres
+      -c shared_buffers=1GB
+      -c effective_cache_size=4GB
+      -c work_mem=16MB
+      -c maintenance_work_mem=256MB
+      -c max_connections=100
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ballistics"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      ballistics:
+        aliases: [ballistics_postgres]
+
+  airflow-init:
+    <<: *airflow
+    restart: "no"
+    command: >
+      bash -c "airflow db migrate &&
+      airflow users create --username admin --firstname Admin --lastname User
+      --role Admin --email ${ALERT_EMAIL_TO} --password ${AIRFLOW_ADMIN_PASSWORD} || true"
+    networks: [ballistics]
+
+  airflow-webserver:
+    <<: *airflow
+    command: airflow webserver
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    networks: [ballistics]
+
+  airflow-scheduler:
+    <<: *airflow
+    command: airflow scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    networks: [ballistics]
+
+  research-api:
+    image: ballistics-research-api:${RELEASE:-latest}
+    build:
+      context: ..
+      dockerfile: engine/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      FORECAST_API_DSN: dbname=ballistics user=research_reader password=${RESEARCH_DB_PASSWORD} host=postgres options='-c default_transaction_read_only=on'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [ballistics]
+
+  account-api:
+    image: ballistics-account-api:${RELEASE:-latest}
+    build:
+      context: ${ACCOUNT_REPO:-../../football_stats_project}
+      dockerfile: API/Dockerfile
+    restart: unless-stopped
+    environment:
+      ACCOUNT_DB_HOST: postgres
+      ACCOUNT_DB_PORT: "5432"
+      ACCOUNT_DB_NAME: ballistics
+      ACCOUNT_DB_USER: account_api
+      ACCOUNT_DB_PASSWORD: ${ACCOUNT_DB_PASSWORD}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      CLERK_JWKS_URL: ${CLERK_JWKS_URL}
+      CLERK_ISSUER: ${CLERK_ISSUER}
+      BETA_INVITE_API_KEY: ${BETA_INVITE_API_KEY}
+      BETA_INVITE_PEPPER: ${BETA_INVITE_PEPPER}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ca-central-1}
+      SAVED_ARCHIVE_BUCKET: ${SAVED_ARCHIVE_BUCKET}
+      CREST_BASE_URL: ${CREST_BASE_URL}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [ballistics]
+
+  frontend:
+    image: ballistics-frontend:${RELEASE:-latest}
+    build:
+      context: ${ACCOUNT_REPO:-../../football_stats_project}/frontend_dev
+      # NEXT_PUBLIC_* values are inlined at build time; frontend_dev/Dockerfile
+      # needs matching ARG lines before these take effect.
+      args:
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+        NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
+        NEXT_PUBLIC_USE_MOCK_DATA: "false"
+    restart: unless-stopped
+    environment:
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+      BACKEND_API_BASE_URL: http://account-api:8000
+      ACCOUNT_API_BASE_URL: http://account-api:8000
+      BALLISTICS_API_BASE_URL: http://research-api:8001
+      FORECAST_API_BASE_URL: http://research-api:8001
+      BETA_INVITE_API_KEY: ${BETA_INVITE_API_KEY}
+    depends_on: [account-api, research-api]
+    networks: [ballistics]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/etc/caddy/certs:ro
+      - caddy-data:/data
+    depends_on: [frontend]
+    networks: [ballistics]
+
+  # Internal consensus dashboard (engine/eval/consensus_app.html), reached
+  # with: ssh -L 8787:127.0.0.1:8787 ballistics-v2
+  dashboard:
+    image: python:3.11-slim
+    restart: unless-stopped
+    command: python -m http.server 8787 --directory /srv/eval
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ../engine/eval:/srv/eval:ro
+    networks: [ballistics]
+
+  # Build-only: the DAGs run these images through DockerOperator.
+  engine:
+    image: ballistics-engine:latest
+    build:
+      context: ..
+      dockerfile: engine/Dockerfile
+    profiles: [build]
+  dbt:
+    image: ballistics-dbt:latest
+    build:
+      context: ../dbt
+    profiles: [build]
+  airflow-image:
+    image: ballistics-airflow:${RELEASE:-latest}
+    build:
+      context: ..
+      dockerfile: airflow/Dockerfile
+    profiles: [build]
+
+volumes:
+  pg-data:
+  airflow-logs:
+  caddy-data:
+
+networks:
+  ballistics:
+    name: ballistics_network

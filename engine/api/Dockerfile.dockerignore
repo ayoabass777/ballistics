@@ -1,0 +1,11 @@
+# Build context is the repo root; send only engine code.
+*
+!engine/
+engine/**/__pycache__
+engine/**/*.pyc
+engine/eval/*.json
+engine/eval/*.yaml
+engine/eval/*.html
+engine/eval/calibration_backup_*/
+engine/eval/diagnostics/out/
+engine/tests/
