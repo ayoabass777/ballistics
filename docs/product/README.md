@@ -1,5 +1,7 @@
 # Ballistics product memory
 
+2026-10-22 — The account API source and Saved maintenance scripts have moved into this repository alongside the frontend and research API. The old checkout is retained for rollback while local service and staging deployment checks complete. See [implementation status](implementation-status.md) and the [staging plan](../staging-deployment-plan.md).
+
 2026-10-22 — Ballistics 2.0 frontend source is moving into this repository at [`frontend_dev`](../../frontend_dev). The account API remains in the sibling `football_stats_project` repository. See [implementation status](implementation-status.md) for verification and deployment state.
 
 2026-10-21 — D147 code-first invite-only beta entry is implemented locally. A real invitation was accepted by Clerk; the invited account signed in and reached Discover. The local profile-sync trigger has been added and awaits live backfill verification; Google is still offered on sign-in. See [decision log](decisions.md) and [implementation status](implementation-status.md).

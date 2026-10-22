@@ -5,6 +5,11 @@ Recorded 2026-10-21 for beta blocker 3 ([TODO](../TODO.md)) and
 of anything deployed. Owner decisions were made on 2026-10-21 (D153, listed
 at the end); the plan below follows them.
 
+2026-10-22 source update: the frontend and account API now live in this
+repository at `frontend_dev/` and `API/`. The original checkout remains
+available for rollback. The initial two-repository inspection below is
+historical; staging now builds from one Ballistics commit.
+
 ## Goal
 
 A production-like environment where an invited tester can complete the D152
@@ -20,12 +25,12 @@ second time.
   through Cloudflare (Workers, `frontend_dev/wrangler.jsonc`), and
   `api.ballistics.football` points at a Hetzner server (`5.78.177.28`) whose
   API still returns current streak data. Staging must not touch either.
-- **Two repos, five services.** `ballistics`: Postgres, Airflow (webserver,
-  scheduler; dbt and engine run as DockerOperator containers), research API
-  (`engine/api/app.py`, port 8001, read-only DSN) and the frontend
-  (`frontend_dev`, Next.js with Clerk). `football_stats_project` contains the
-  account API (`API/app.py`, port 8000, Clerk, invites, Saved, preferences).
-  The original frontend checkout remains intact during migration.
+- **One deployment repo, five services.** `ballistics`: Postgres, Airflow
+  (webserver, scheduler; dbt and engine run as DockerOperator containers),
+  research API (`engine/api/app.py`, port 8001, read-only DSN), account API
+  (`API/app.py`, port 8000, Clerk, invites, Saved, preferences), and the
+  frontend (`frontend_dev`, Next.js with Clerk). The original checkout remains
+  intact during migration.
 - **One database.** Account tables (`app`) live in the same `ballistics`
   database as pipeline data (`ACCOUNT_DB_NAME=ballistics`). It is 6.2 GB,
   mostly `raw.fact_head_to_head_streaks` (2.8 GB) and `_events` (2.1 GB).
@@ -219,7 +224,7 @@ Postgres.
 | caddy | new `deploy/Caddyfile` | `caddy:2` | 80/443 | origin cert |
 | consensus dashboard | `engine/eval/consensus_app.html` | `python3 -m http.server` | `127.0.0.1` only (SSH tunnel) | engine output folder, read-only |
 | frontend | `ballistics/frontend_dev` | build from Dockerfile | via caddy | Clerk keys, API base URLs |
-| account-api | `football_stats_project/API` | build from `Dockerfile` | internal | account DB user, Clerk secret, invite key and pepper, Saved archive bucket |
+| account-api | `ballistics/API` | build from `Dockerfile` | internal | account DB user, Clerk secret, invite key and pepper, Saved archive bucket |
 | research-api | `ballistics/engine/api` | new small Dockerfile (FastAPI + psycopg2) | internal | read-only DSN |
 | postgres | | `postgres:17` (the local major; dumps don't restore into older majors) | internal | data volume |
 | airflow-scheduler / webserver | `ballistics/airflow` | build from `airflow/Dockerfile` | SSH tunnel | Docker socket, `PROJECT_ROOT`, API key, AWS, SMTP |
@@ -267,7 +272,7 @@ refused; an advisory lock blocks concurrent runs). Rules are in
   contains everything the dated `migrations_*.sql`, `apply_*.sh` scripts and
   lazily created tables produced.
 - **Changed from the original plan:** the `app` schema is *not* in the
-  baseline. It stays owned by `football_stats_project/API/sql/bootstrap_accounts.sql`,
+  baseline. It stays owned by `ballistics/API/sql/bootstrap_accounts.sql`,
   where onboarding work is changing it now; the deploy runs it after the
   migrations. dbt models (including the nine in `raw`) are left to dbt.
 - Verified on a throwaway PostgreSQL 17.4: `up` applies cleanly and a second
@@ -319,11 +324,11 @@ baseline 0001` then `up` applied 0002.
 
 - **Deploy script** (`deploy/deploy_staging.sh`, written 2026-10-22, run
   from the laptop): refuses refs that are not on an origin branch, pushes the
-  two commits over SSH into `/srv/ballistics` and `/srv/football_stats_project`
-  (the server holds no GitHub credentials), then runs the script as committed
-  at that SHA on the server: stop Airflow (it bind-mounts code from the
+  Ballistics commit over SSH into `/srv/ballistics` (the server holds no
+  GitHub credentials), then runs the script as committed at that SHA on the
+  server: stop Airflow (it bind-mounts code from the
   checkout) → check out → render `.dbt/profiles.yml` → build every image
-  tagged `b<sha>-a<sha>` → Postgres → `migrate.py up` → account bootstrap →
+  tagged `b<sha>` → Postgres → `migrate.py up` → account bootstrap →
   `dbt build` → `grants.sql` → tag engine/dbt `:latest` (what the DAGs start)
   → `docker compose up -d --wait` → append to `deploy/RELEASES` → prune
   release images outside the last two, dangling images and week-old build
@@ -368,7 +373,7 @@ In order; estimates are focused days for one developer.
 
 | # | Task | Days |
 | --- | --- | --- |
-| 1 | Frontend source moved into `ballistics/frontend_dev`; commit and push the migrated tree before staging deploy. The account API still deploys from `football_stats_project`. | 0.5 |
+| 1 | Frontend and account API source moved into Ballistics; commit and push the consolidated tree before staging deploy. | 0.5 |
 | 2 | ✅ 2026-10-22: migration runner and baseline (`scripts/migrate.py`, `db/migrations/`), verified on a throwaway database | 1–1.5 |
 | 3 | ✅ 2026-10-22: `engine/api/Dockerfile`; `deploy/compose.staging.yml`, `Caddyfile`, `postgres-init/01-roles.sh`, `grants.sql`, `dbt-profiles.yml.tmpl`, `staging.env.example`. Validated: compose renders, only Caddy publishes public ports, Caddyfile valid, research API served real data read-only, roles/grants and both APIs checked on a fresh database. Not yet run: Airflow and the frontend from the compose file | 1–1.5 |
 | 4 | Order the CAX21; Caddy, DNS, firewall, origin cert; staging buckets and IAM user; Clerk production instance; secrets filled in | 1 |
@@ -405,8 +410,10 @@ then remove its containers and volumes.
   applied (`research_reader` reads `raw_mart`), and the stack came up behind
   Caddy (`/` 200 over TLS, research API answering). A failure in the start
   step reported itself and recorded no release. `--checkout-only`, `--status`,
-  the rollback target and the prune filter (only `b<sha>-a<sha>` tags outside
-  the last two releases) were checked. Not covered locally: one uninterrupted
+  the rollback target and the pre-consolidation prune filter (only
+  `b<sha>-a<sha>` tags outside the last two releases) were checked. The new
+  single-commit release format needs a fresh deployment rehearsal. Not
+  covered locally: one uninterrupted
   run ending in `RELEASES`, a real prune, and a rollback through to the end.
   Docker Desktop's registry proxy on the Mac hung partway through, blocking
   pulls and builds, so the start step was run by hand from the built images.

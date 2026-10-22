@@ -2,21 +2,21 @@
 # Deploy the v2 staging stack (docs/staging-deployment-plan.md, "Deploy,
 # rollback and backups"). Run from the laptop:
 #
-#   deploy/deploy_staging.sh                         # origin/main + the account default
-#   deploy/deploy_staging.sh --ballistics-ref v0.3 --account-ref origin/main
+#   deploy/deploy_staging.sh                         # origin/main
+#   deploy/deploy_staging.sh --ballistics-ref v0.3
 #   deploy/deploy_staging.sh --rollback              # redeploy the previous release
 #   deploy/deploy_staging.sh --status                # show deploy/RELEASES on the server
 #   deploy/deploy_staging.sh --checkout-only         # first deploy: check out only, so
 #                                                    # .env.staging and seed_restore.sh
 #                                                    # can run before the full deploy
 #
-# Laptop side: resolves both refs to commits that are already on origin, then
-# pushes those commits over SSH into the server checkouts (the server holds no
-# GitHub credentials) and runs this same script there in "remote" mode.
+# Laptop side: resolves a commit already on origin, pushes it over SSH into
+# the server checkout (the server holds no GitHub credentials), and runs this
+# same script there in "remote" mode.
 #
 # Server side, in order; a failed step stops the deploy before the services
 # restart:
-#   stop Airflow → check out both commits → render .dbt/profiles.yml →
+#   stop Airflow → check out the commit → render .dbt/profiles.yml →
 #   build images tagged with the release → start Postgres → migrate.py up →
 #   account bootstrap → dbt build → grants.sql → tag engine/dbt :latest →
 #   docker compose up -d → record deploy/RELEASES → prune old images.
@@ -27,10 +27,7 @@ set -Eeuo pipefail
 
 HOST="${DEPLOY_HOST:-ballistics-v2}"
 BALLISTICS_REF="origin/main"
-# Until checkpoint step 1 picks the branch staging deploys from.
-ACCOUNT_REF="origin/codex/frontend-redesign"
 SERVER_ROOT="${DEPLOY_SERVER_ROOT:-/srv/ballistics}"
-SERVER_ACCOUNT="${DEPLOY_SERVER_ACCOUNT:-/srv/football_stats_project}"
 KEEP_RELEASES=2
 
 log() { printf '\n==> %s\n' "$*"; }
@@ -69,7 +66,6 @@ local_main() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --ballistics-ref) BALLISTICS_REF="$2"; shift 2 ;;
-      --account-ref) ACCOUNT_REF="$2"; shift 2 ;;
       --host) HOST="$2"; shift 2 ;;
       --rollback) rollback=1; shift ;;
       --status) status=1; shift ;;
@@ -80,9 +76,8 @@ local_main() {
     esac
   done
 
-  local here account b_sha a_sha
+  local here b_sha
   here="$(cd "$(dirname "$0")/.." && pwd)"
-  account="$(cd "$here/../football_stats_project" && pwd)"
 
   if (( status )); then
     ssh "$HOST" "cat '$SERVER_ROOT/deploy/RELEASES' 2>/dev/null || echo 'no releases yet'"
@@ -95,49 +90,48 @@ local_main() {
     local lines
     lines="$(ssh "$HOST" "tail -n 2 '$SERVER_ROOT/deploy/RELEASES' 2>/dev/null" || true)"
     [[ "$(wc -l <<<"$lines")" -eq 2 ]] || die "no previous release to roll back to"
-    # RELEASES line: <utc time> <release> <ballistics sha> <account sha>
-    read -r _ _ b_sha a_sha <<<"$(head -n 1 <<<"$lines")"
-    log "Rolling back to ballistics $b_sha, account $a_sha"
+    # RELEASES line: <utc time> <release> <ballistics sha>
+    read -r _ _ b_sha _ <<<"$(head -n 1 <<<"$lines")"
+    log "Rolling back to ballistics $b_sha"
   else
     b_sha="$(resolve_pushed "$here" "$BALLISTICS_REF")"
-    a_sha="$(resolve_pushed "$account" "$ACCOUNT_REF")"
-    log "$([[ $mode == checkout ]] && echo "Checking out" || echo "Deploying") ballistics $BALLISTICS_REF ($b_sha), account $ACCOUNT_REF ($a_sha) on $HOST"
+    log "$([[ $mode == checkout ]] && echo "Checking out" || echo "Deploying") ballistics $BALLISTICS_REF ($b_sha) on $HOST"
   fi
 
   push_commit "$here" "$SERVER_ROOT" "$b_sha"
-  push_commit "$account" "$SERVER_ACCOUNT" "$a_sha"
 
   # Run the script as committed at $b_sha, not the laptop's working copy. It
   # runs from a file, not stdin, so commands inside can't swallow the script.
   # shellcheck disable=SC2029  # expanded locally on purpose
   ssh "$HOST" "set -e; f=\$(mktemp); trap 'rm -f \$f' EXIT
     git -C '$SERVER_ROOT' show '$b_sha:deploy/deploy_staging.sh' > \$f
-    bash \$f remote $mode $b_sha $a_sha '$SERVER_ROOT' '$SERVER_ACCOUNT' $prune"
+    bash \$f remote $mode $b_sha '$SERVER_ROOT' $prune"
 }
 
 # ---------------------------------------------------------------------------
 # Server side
 # ---------------------------------------------------------------------------
 
-# checkout_commits ROOT ACCOUNT B_SHA A_SHA
-checkout_commits() {
-  git -C "$1" checkout --quiet --force --detach "$3"
-  git -C "$2" checkout --quiet --force --detach "$4"
+# checkout_commit ROOT SHA
+checkout_commit() {
+  git -C "$1" checkout --quiet --force --detach "$2"
   # data/ is gitignored except the league config; the engine image copies
   # the folder and the bootstrap DAG reads the config.
   mkdir -p "$1/data"
-  [[ -f "$1/data/metadata.yaml" ]] || die "data/metadata.yaml is not in $3"
+  [[ -f "$1/data/metadata.yaml" ]] || die "data/metadata.yaml is not in $2"
+  [[ -f "$1/frontend_dev/Dockerfile" ]] || die "frontend_dev/ is not in $2"
+  [[ -f "$1/API/Dockerfile" ]] || die "API/ is not in $2"
 }
 
 remote_main() {
-  local mode="$1" b_sha="$2" a_sha="$3" root="$4" account="$5" prune="$6"
+  local mode="$1" b_sha="$2" root="$3" prune="$4"
   if [[ "$mode" == checkout ]]; then
     log "check out commits"
-    checkout_commits "$root" "$account" "$b_sha" "$a_sha"
+    checkout_commit "$root" "$b_sha"
     log "Checked out; nothing built or started. Next: deploy/.env.staging, deploy/certs, seed_restore.sh, then a full deploy"
     return
   fi
-  local release="b${b_sha:0:10}-a${a_sha:0:10}"
+  local release="b${b_sha:0:10}"
   local env_file="$root/deploy/.env.staging"
   local compose=(docker compose -f "$root/deploy/compose.staging.yml" --env-file "$env_file")
 
@@ -149,7 +143,6 @@ remote_main() {
   . "$env_file"
   set +a
   [[ "$PROJECT_ROOT" == "$root" ]] || die "PROJECT_ROOT in $env_file is $PROJECT_ROOT, expected $root"
-  [[ "$ACCOUNT_REPO" == "$account" ]] || die "ACCOUNT_REPO in $env_file is $ACCOUNT_REPO, expected $account"
   # Caddy mounts deploy/certs; on the server it can be a symlink to
   # /etc/ballistics/certs, where the origin certificate was issued.
   [[ -r "$root/deploy/certs/origin.pem" && -r "$root/deploy/certs/origin.key" ]] \
@@ -169,7 +162,7 @@ remote_main() {
   fi
 
   step="check out commits"; log "$step"
-  checkout_commits "$root" "$account" "$b_sha" "$a_sha"
+  checkout_commit "$root" "$b_sha"
 
   step="render .dbt/profiles.yml"; log "$step"
   mkdir -p "$root/.dbt" "$root/dbt/football_pipeline/logs"
@@ -196,7 +189,7 @@ remote_main() {
     airflow-scheduler python /opt/airflow/scripts/migrate.py up
 
   step="account bootstrap"; log "$step"
-  psql_owner "$account/API/sql" -v ON_ERROR_STOP=1 -q -f /sql/bootstrap_accounts.sql
+  psql_owner "$root/API/sql" -v ON_ERROR_STOP=1 -q -f /sql/bootstrap_accounts.sql
 
   step="dbt build"; log "$step"
   "${compose[@]}" --profile build run --rm --no-deps -T \
@@ -216,7 +209,7 @@ remote_main() {
   "${compose[@]}" up -d --wait --remove-orphans
 
   step="record release"
-  printf '%s %s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$release" "$b_sha" "$a_sha" \
+  printf '%s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$release" "$b_sha" \
     >> "$root/deploy/RELEASES"
   trap - ERR
 
@@ -240,14 +233,14 @@ psql_owner() {
     postgres psql -h postgres -U "$DB_USER" -d ballistics "$@"
 }
 
-# Removes ballistics-* images tagged with a release (b<sha>-a<sha>) that is
+# Removes ballistics-* images tagged with a release (b<sha>) that is
 # not among the last KEEP_RELEASES, then dangling images and week-old build
 # cache. Never touches :latest or other tags.
 prune_images() {
   local keep
   keep="$(tail -n "$KEEP_RELEASES" "$1" | awk '{print $2}')"
   docker image ls --format '{{.Repository}}:{{.Tag}}' \
-    | grep -E '^ballistics-[a-z-]+:b[0-9a-f]{10}-a[0-9a-f]{10}$' \
+    | grep -E '^ballistics-[a-z-]+:b[0-9a-f]{10}$' \
     | while read -r image; do
         grep -qxF "${image#*:}" <<<"$keep" || docker image rm "$image" >/dev/null
       done

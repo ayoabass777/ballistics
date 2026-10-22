@@ -2,7 +2,7 @@
 #
 # Server layout (paths relative to this file):
 #   /srv/ballistics             this repo        (PROJECT_ROOT)
-#   /srv/football_stats_project account API (ACCOUNT_REPO)
+#   /srv/ballistics/API          account API
 #   /srv/ballistics/frontend_dev frontend
 #
 #   docker compose -f deploy/compose.staging.yml --env-file deploy/.env.staging up -d
@@ -56,7 +56,7 @@ x-airflow: &airflow
     - ../engine:/opt/airflow/engine
     - ../data:/opt/airflow/data
     - airflow-logs:/opt/airflow/logs
-    - ${ACCOUNT_REPO:-../../football_stats_project}:/opt/account:ro
+    - ..:/opt/account:ro
     - /var/run/docker.sock:/var/run/docker.sock
   depends_on:
     postgres:
@@ -135,8 +135,8 @@ services:
   account-api:
     image: ballistics-account-api:${RELEASE:-latest}
     build:
-      context: ${ACCOUNT_REPO:-../../football_stats_project}
-      dockerfile: API/Dockerfile
+      context: ../API
+      dockerfile: Dockerfile
     restart: unless-stopped
     environment:
       ACCOUNT_DB_HOST: postgres

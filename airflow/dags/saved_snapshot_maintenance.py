@@ -1,6 +1,6 @@
 """Shared Saved payload maintenance. Paused on creation; retention is opt-in.
 
-Mount the account repository and its environment in the worker, then configure
+Mount the Ballistics repository in the worker and configure
 ACCOUNT_PROJECT_ROOT. No fallback to the public crest bucket is permitted.
 """
 import os
