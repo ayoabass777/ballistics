@@ -2,7 +2,7 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-10-21 (beta blockers added).
+Updated 2026-10-21 (beta blockers added; beta scope frozen, D152).
 
 ## Beta blockers (critical path)
 
@@ -13,23 +13,37 @@ path: each item gates the ones below it, except where marked parallel.
 1. [x] **Commit the open working tree.** Done 2026-10-21 (`974e83d`, `f138422`). DLQ, fixture extraction, standings and
    match-detail changes plus their tests are uncommitted; a deploy needs a
    known commit to build from.
-2. [ ] **Freeze beta scope (checkpoint 1).** Cohort is decided (BC, UK, Nigeria,
-   D148); tester count and included pages are not. Decide whether Saved ships
-   (it was left out of the 2026-10-18 frontend release) and whether D146
-   evidence depth is in or deferred.
+2. [x] **Freeze beta scope (checkpoint 1).** Reached 2026-10-21: cohort
+   (D148), 10–15 testers in two waves (D150), Google and email sign-in (D151),
+   pages = Welcome, Discover, Matches, Match details, Saved, Settings (D152).
+   Deferred: D146 evidence depth, forecast record, forecast retention.
 3. [ ] **Stand up staging (checkpoint 3, longest item).** Frontend (merge or
    deploy `codex/frontend-redesign`), account API, research API, Postgres,
    Clerk, Airflow jobs, secrets and S3. Includes a repeatable schema migration
    step: on 2026-10-20 a mart missing new standings columns made Match details
-   return 503 until a manual refresh.
+   return 503 until a manual refresh. Plan (2026-10-21, decisions in D153, revised
+   2026-10-22: new Hetzner CAX21 (ARM, 8 GB, Helsinki; CX43 out of stock), frontend on it, Clerk production instance,
+   beta at `beta.ballistics.football`): [docs/staging-deployment-plan.md](docs/staging-deployment-plan.md).
+   v1 server inspected 2026-10-21 (too small to share). ARM build check passed
+   2026-10-22. Server `ballistics-v2` created
+   2026-10-22 (CAX21, Helsinki, 2.29.118.240, Ubuntu 24.04; SSH as root with
+   `~/.ssh/ballistics_v2_ed25519`, alias `ballistics-v2`, user `sage`). Base
+   setup done 2026-10-22 (swap, Docker, SSH hardening, UFW, fail2ban). Migration runner,
+   baseline and deploy files (compose, Caddyfile, roles, grants) done and
+   checked 2026-10-22. Next: plan step 1 (frontend repo, plus its Dockerfile
+   ARGs and logo URL), the deploy script, then step 4.
 4. [ ] **Member journey gaps (checkpoint 2, parallel with 3).**
-   - Enforce email-only Clerk sign-in (D133); Google is still offered and caused
-     the 2026-10-21 account-switch confusion.
+   - Tester instructions for Google sign-in (D151): use the Google account the
+     invitation went to; the 2026-10-21 "Last used" button signed in as another
+     account.
    - Observe browser-triggered profile sync for a new account.
    - Check Settings and Saved under the invited account.
-   - First-run onboarding (choose leagues), still in the design backlog.
-5. [ ] **Keep forecasts on match pages after kickoff (parallel with 3).** See
-   "Now" below; testers hit this every matchday.
+   - Minimal first-run onboarding (D152): in progress separately.
+5. [ ] **Match details build items (D152, parallel with 3).**
+   - After kickoff, show the last pre-kickoff forecast, labelled as made
+     before kickoff (today `/api/match` reads only the latest run, which covers
+     not-started fixtures, so these pages go empty).
+   - Small `data_quality` badge from the API block (second D148).
 6. [ ] **Daily data reliability on staging.** Several clean daily
    `fixture_update` + engine cycles with no lost days (Oct 15 and 17 were lost
    to a standings failure), an alert that fires on failure, and the ~110
@@ -49,7 +63,7 @@ path: each item gates the ones below it, except where marked parallel.
 - [ ] **Match pages lose their forecast once a match starts.** `/api/match` reads
   only the latest engine run, and runs cover not-started fixtures, so a match
   page shows no Strength/Goals/Patterns after kickoff (and for finished matches).
-  Product question: should the page keep the last pre-kickoff forecast?
+  Decided (D152): keep the last pre-kickoff forecast; tracked in beta blocker 5.
 
 Local tz data fixed 2026-10-20: Anaconda's stale `share/zoneinfo` (2025b) now
 links to macOS `/usr/share/zoneinfo` (2026c); the old folder is kept at
@@ -92,11 +106,12 @@ throwaway databases (438 + DB suites).
 
 Details: [docs/product/implementation-status.md](docs/product/implementation-status.md).
 
-- [ ] Saved forecasts: Saved-account and sidebar work is local only, excluded
-  from the 2026-10-18 frontend release.
-- [ ] Figma: Settings (timezone, followed leagues) not yet designed.
-- [ ] Show the API's new `data_quality` block (D148) on the match page.
-- [ ] D146 evidence-depth bar (Focused / More context / Full view): owner review.
+- [ ] Figma: Settings (timezone, followed leagues) not yet designed. Skipped
+  for beta (D152); Settings ships as implemented.
+- [ ] Fuller `data_quality` treatment on the match page beyond the beta badge
+  (deferred, D152).
+- [ ] D146 evidence-depth bar (Focused / More context / Full view): deferred
+  past beta (D152).
 - [ ] Deployment: nothing is deployed; frontend is on `codex/frontend-redesign`.
 - [ ] Desktop Match details: production implementation; sidebar and H2H
   prototype navigation regression
