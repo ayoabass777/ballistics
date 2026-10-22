@@ -86,6 +86,9 @@ select
     -- Post-season: any knockout game, or a phase named as play-offs
     -- (e.g. Belgium's Conference League play-off group).
     (rf.stage = 'knockout' or rf.phase ~* 'play-?offs?') as is_playoff,
+    -- After the split / end of the regular season: championship, relegation
+    -- and promotion groups, play-off groups. Not engine input (owner, 2026-10-21).
+    coalesce({{ fixture_post_split('rf.phase', 'rf.api_league_id') }}, false) as is_post_split,
     rf.updated_at
 from fixtures as rf
 left join {{ ref('int_league_context') }} as lc
