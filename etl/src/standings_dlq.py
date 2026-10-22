@@ -57,6 +57,19 @@ def dlq_key(api_league_id: int, season: int) -> str:
 
 def standings_row_problem(row: Dict[str, Any]) -> Optional[str]:
     """Why a standings row can't be loaded, or None when it can."""
+    if row.get(dlq.DLQ_REASON):
+        return str(row[dlq.DLQ_REASON])
+    for field in ("api_team_id", "rank", "points", "games_played", "wins",
+                  "draws", "losses", "goals_for", "goals_against", "goal_diff", "group_order"):
+        value = row.get(field)
+        if value is not None:
+            try:
+                if isinstance(value, bool) or str(int(value)) != str(value).strip():
+                    return f"invalid_integer:{field}"
+                if not -(2**31) <= int(value) < 2**31:
+                    return f"integer_out_of_range:{field}"
+            except (ValueError, TypeError, OverflowError):
+                return f"invalid_integer:{field}"
     if row.get("api_team_id") is None:
         return "null_team_id"          # part of the primary key
     return None
@@ -215,14 +228,19 @@ def refresh_league(league: Dict[str, Any], ds: str, source: str = "nightly",
 # ---------------------------------------------------------------------------
 
 def _failed_attempt(key: str, entry: Dict[str, Any], error: str) -> None:
-    entry, became_dead = dlq.record_failed_attempt(entry, error)
-    dlq.write_json(key, entry)
-    league = {k: entry[k] for k in ("league_season_id", "api_league_id", "season")}
-    set_status(league, entry.get("rows") or [{"team_name": t, dlq.DLQ_REASON: "unknown"}
-                                             for t in entry.get("teams") or []], (key, entry))
-    if became_dead:
-        dlq.alert_dead("standings", key, entry,
-                       f"Standings for league {entry['api_league_id']} season {entry['season']}")
+    try:
+        entry, became_dead = dlq.record_failed_attempt(entry, error)
+        dlq.write_json(key, entry)
+        league = {k: entry[k] for k in ("league_season_id", "api_league_id", "season")}
+        set_status(league, entry.get("rows") or [{"team_name": t, dlq.DLQ_REASON: "unknown"}
+                                                 for t in entry.get("teams") or []], (key, entry))
+        if became_dead:
+            dlq.alert_dead("standings", key, entry,
+                           f"Standings for league {entry['api_league_id']} season {entry['season']}")
+    except Exception:
+        # Keep the open entry for a later run if storage/status recording is
+        # unavailable; one entry must not prevent the remaining retries.
+        logger.exception("Could not record DLQ replay failure for %s: %s", key, error)
 
 
 def replay_standings_dlq(ds: Optional[str] = None) -> Dict[str, int]:
@@ -243,11 +261,14 @@ def replay_standings_dlq(ds: Optional[str] = None) -> Dict[str, int]:
             _failed_attempt(key, entry, f"fetch failed: {type(exc).__name__}: {exc}")
             summary["still_bad"] += 1
             continue
-        if not extract_standings(payload):
-            _failed_attempt(key, entry, "empty standings response")
+        try:
+            if not extract_standings(payload):
+                raise ValueError("empty standings response")
+            _, bad = refresh_league(league, ds, source="replay", payload=payload)
+        except Exception as exc:
+            _failed_attempt(key, entry, f"load failed: {type(exc).__name__}: {exc}")
             summary["still_bad"] += 1
             continue
-        _, bad = refresh_league(league, ds, source="replay", payload=payload)
         summary["still_bad" if bad else "resolved"] += 1
     logger.info("standings DLQ replay: %s", summary)
     return summary

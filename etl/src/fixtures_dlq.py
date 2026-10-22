@@ -61,6 +61,24 @@ def fixture_row_problem(row: Dict[str, Any]) -> Optional[str]:
     """Why a fixture row can't be loaded, or None when it can."""
     if row.get(dlq.DLQ_REASON):
         return str(row[dlq.DLQ_REASON])
+    for field in ("api_fixture_id", "api_league_id", "season", "home_team_id", "away_team_id",
+                  "home_team_halftime_goal", "away_team_halftime_goal",
+                  "home_team_fulltime_goal", "away_team_fulltime_goal"):
+        value = row.get(field)
+        if value is not None:
+            try:
+                if isinstance(value, bool) or str(int(value)) != str(value).strip():
+                    return f"invalid_integer:{field}"
+                if not -(2**31) <= int(value) < 2**31:
+                    return f"integer_out_of_range:{field}"
+            except (ValueError, TypeError, OverflowError):
+                return f"invalid_integer:{field}"
+    if row.get("kickoff_utc"):
+        from datetime import datetime
+        try:
+            datetime.fromisoformat(str(row["kickoff_utc"]).replace("Z", "+00:00"))
+        except ValueError:
+            return "invalid_kickoff"
     if row.get("api_fixture_id") is None:
         return "null_fixture_id"         # the key (unique index)
     if not row.get("kickoff_utc"):
@@ -236,13 +254,18 @@ def load_league_fixtures(rows: List[Dict[str, Any]], *, league: Dict[str, Any], 
 
 
 def _failed_attempt(key: str, entry: Dict[str, Any], error: str) -> None:
-    entry, became_dead = dlq.record_failed_attempt(entry, error)
-    dlq.write_json(key, entry)
-    league = {"api_league_id": entry["api_league_id"], "season": entry["season"]}
-    set_status(league, entry.get("rows") or [], (key, entry))
-    if became_dead:
-        dlq.alert_dead("fixture rows", key, entry,
-                       f"Fixtures for league {entry['api_league_id']} season {entry['season']}", clears=CLEARS)
+    try:
+        entry, became_dead = dlq.record_failed_attempt(entry, error)
+        dlq.write_json(key, entry)
+        league = {"api_league_id": entry["api_league_id"], "season": entry["season"]}
+        set_status(league, entry.get("rows") or [], (key, entry))
+        if became_dead:
+            dlq.alert_dead("fixture rows", key, entry,
+                           f"Fixtures for league {entry['api_league_id']} season {entry['season']}", clears=CLEARS)
+    except Exception:
+        # Keep the open entry for a later run if storage/status recording is
+        # unavailable; one entry must not prevent the remaining retries.
+        logger.exception("Could not record DLQ replay failure for %s: %s", key, error)
 
 
 def replay_fixture_rows_dlq(ds: Optional[str] = None) -> Dict[str, int]:
@@ -277,18 +300,23 @@ def replay_fixture_rows_dlq(ds: Optional[str] = None) -> Dict[str, int]:
             _failed_attempt(key, entry, "empty fixtures response")
             summary["still_bad"] += 1
             continue
-        landing = write_fixtures_to_s3(fixtures, lid, season, ds)
-        conn = get_db_connection()
+        conn = None
         try:
+            landing = write_fixtures_to_s3(fixtures, lid, season, ds)
+            conn = get_db_connection()
             _, bad = load_fixtures_from_s3(landing, conn, source="replay", detailed=True)
             conn.commit()
             dlq.run_after_commit(conn)
-        except Exception:
-            conn.rollback()
-            dlq.discard_after_commit(conn)
-            raise
+        except Exception as exc:
+            if conn is not None:
+                conn.rollback()
+                dlq.discard_after_commit(conn)
+            _failed_attempt(key, entry, f"load failed: {type(exc).__name__}: {exc}")
+            summary["still_bad"] += 1
+            continue
         finally:
-            conn.close()
+            if conn is not None:
+                conn.close()
         summary["still_bad" if bad else "resolved"] += 1
     logger.info("fixture row DLQ replay: %s", summary)
     return summary

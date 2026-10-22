@@ -263,7 +263,10 @@ def extract_fixtures_field(
             raw = fixture if isinstance(fixture, dict) else {}
             identity = raw.get("fixture")
             identity = identity if isinstance(identity, dict) else {}
+            league = raw.get("league")
+            league = league if isinstance(league, dict) else {}
             extracted.append({"api_fixture_id": identity.get("id"),
+                              "api_league_id": league.get("id"), "season": league.get("season"),
                               "_dlq_reason": f"extraction_error: {e}",
                               "_raw_payload": fixture})
             logger.warning(f"Quarantining bad fixture record at index {i}: {e}")

@@ -68,8 +68,11 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     # Response structure: list with one element containing "league"->"standings"-> list of tables
     try:
         tables = payload[0].get("league", {}).get("standings", [])
-    except (IndexError, AttributeError):
-        return flattened
+    except (IndexError, AttributeError, TypeError) as exc:
+        return [{"_dlq_reason": f"invalid_standings_payload: {exc}", "_raw_payload": payload}]
+    if not isinstance(tables, list):
+        return [{"_dlq_reason": "invalid_standings_tables", "_raw_payload": payload}]
+    tables = [table if isinstance(table, list) else [table] for table in tables]
 
     labels = [_table_label(table, i) for i, table in enumerate(tables)]
     repeated = {lab for lab in labels if labels.count(lab) > 1}
@@ -81,27 +84,31 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             # Championship conferences both say "USL Championship").
             label = f"{label} - Table {group_order + 1}"
         for row in table:
-            team = row.get("team", {}) or {}
-            stats = row.get("all", {}) or {}
-            flattened.append(
-                {
-                    "api_team_id": team.get("id"),
-                    "team_name": team.get("name"),
-                    "rank": row.get("rank"),
-                    "points": row.get("points"),
-                    "games_played": stats.get("played"),
-                    "wins": stats.get("win"),
-                    "draws": stats.get("draw"),
-                    "losses": stats.get("lose"),
-                    "goals_for": stats.get("goals", {}).get("for"),
-                    "goals_against": stats.get("goals", {}).get("against"),
-                    "goal_diff": row.get("goalsDiff"),
-                    "form": row.get("form"),
-                    "group_name": label,
-                    "group_order": group_order,
-                    "description": row.get("description"),
-                }
-            )
+            try:
+                team = row.get("team", {}) or {}
+                stats = row.get("all", {}) or {}
+                flattened.append(
+                    {
+                        "api_team_id": team.get("id"),
+                        "team_name": team.get("name"),
+                        "rank": row.get("rank"),
+                        "points": row.get("points"),
+                        "games_played": stats.get("played"),
+                        "wins": stats.get("win"),
+                        "draws": stats.get("draw"),
+                        "losses": stats.get("lose"),
+                        "goals_for": stats.get("goals", {}).get("for"),
+                        "goals_against": stats.get("goals", {}).get("against"),
+                        "goal_diff": row.get("goalsDiff"),
+                        "form": row.get("form"),
+                        "group_name": label,
+                        "group_order": group_order,
+                        "description": row.get("description"),
+                    }
+                )
+            except (AttributeError, TypeError, ValueError) as exc:
+                flattened.append({"_dlq_reason": f"extraction_error: {exc}",
+                                  "_raw_payload": row})
     return flattened
 
 
@@ -123,7 +130,7 @@ def _table_label(table: List[Dict[str, Any]], group_order: int) -> str:
     /standings rows; tables without one are named by position so parallel
     tables still get distinct keys instead of overwriting each other."""
     for row in table:
-        if row.get("group"):
+        if isinstance(row, dict) and row.get("group"):
             return row["group"]
     return f"Table {group_order + 1}"
 

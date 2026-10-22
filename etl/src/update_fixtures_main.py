@@ -181,6 +181,52 @@ def _normalize_updates(updates: List[Dict[str, Any]]) -> List[List[Any]]:
     return rows
 
 
+def quarantine_update_rows(updates):
+    """Capture rejected updates before deduplication; partial updates never
+    resolve a league's existing quarantine. Unidentifiable input is retained
+    separately for manual inspection rather than retried against a guessed league.
+    """
+    from etl.src import dlq
+    from etl.src.fixtures_dlq import fixture_row_problem, park_fixture_rows, set_status, dlq_key
+    from uuid import uuid4
+
+    good, bad = dlq.split_rows(updates, fixture_row_problem)
+    if not bad:
+        return good
+    groups = {}
+    with get_db_connection() as conn, conn.cursor() as cur:
+        for row in bad:
+            lid, season = row.get("api_league_id"), row.get("season")
+            if lid is None or season is None:
+                api_id = _safe_int(row.get("api_fixture_id"))
+                if api_id is not None:
+                    cur.execute("SELECT api_league_id, season FROM raw.raw_fixtures WHERE api_fixture_id = %s", (api_id,))
+                    found = cur.fetchone()
+                    if found:
+                        lid, season = found
+            if lid is None or season is None:
+                dlq.write_json(f"dlq/fixtures/unassigned/{uuid4().hex}.json",
+                               {**dlq.new_state(), "kind": "unassigned_fixture_update",
+                                "rows": [row], "requires_manual_review": True})
+                logger.error("Quarantined fixture update with no league/season; manual review required")
+                continue
+            groups.setdefault((lid, season), []).append(row)
+        for (lid, season), rows in groups.items():
+            league = {"api_league_id": lid, "season": season}
+            existing = dlq.read_json(dlq_key(lid, season))
+            # This payload covers only some fixtures. Keep other open rejects.
+            combined = {}
+            for row in (existing or {}).get("rows", []) + rows:
+                import json
+                combined[json.dumps(row, sort_keys=True, default=str)] = row
+            rows = list(combined.values())
+            parked = park_fixture_rows(rows, league=league,
+                                       ds=dlq.now_utc().date().isoformat(), source="updates")
+            set_status(league, rows, parked, conn=conn)
+        conn.commit()
+    return good
+
+
 def apply_updates_to_db(updates: List[Dict[str, Any]], chunk_size: int = 1000) -> int:
     """
     Stream fixture updates into raw.raw_fixtures using COPY + UPDATE (and insert missing).
@@ -190,7 +236,7 @@ def apply_updates_to_db(updates: List[Dict[str, Any]], chunk_size: int = 1000) -
         logger.info("No updates to apply; exiting.")
         return 0
 
-    prepared_updates = _dedupe_updates_by_api_fixture_id(updates)
+    prepared_updates = _dedupe_updates_by_api_fixture_id(quarantine_update_rows(updates))
     if not prepared_updates:
         logger.info("Updates payload is empty; nothing to apply.")
         return 0
