@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "app/discover/**/*.tsx",
+    "app/welcome/**/*.tsx",
+    "app/onboarding/**/*.tsx",
+    "app/matches/**/*.tsx",
+    "app/standouts/**/*.tsx",
+    "app/saved/**/*.tsx",
+    "app/match/**/*.tsx",
+    "app/api/research/**/*.ts",
+    "app/api/beta/**/*.ts",
+    "components/research/**/*.tsx",
+    "lib/research.ts",
+    "lib/server/research-proxy.ts",
+    "app/settings/**/*.tsx",
+    "app/api/preferences/**/*.ts",
+    "app/api/account/**/*.ts",
+    "lib/preferences.ts",
+    "lib/account.ts",
+    "lib/server/account-proxy.ts",
+    "app/layout.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "open-next.config.ts"
+  ]
+}

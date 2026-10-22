@@ -1,5 +1,7 @@
 # Ballistics product memory
 
+2026-10-22 — Ballistics 2.0 frontend source is moving into this repository at [`frontend_dev`](../../frontend_dev). The account API remains in the sibling `football_stats_project` repository. See [implementation status](implementation-status.md) for verification and deployment state.
+
 2026-10-21 — D147 code-first invite-only beta entry is implemented locally. A real invitation was accepted by Clerk; the invited account signed in and reached Discover. The local profile-sync trigger has been added and awaits live backfill verification; Google is still offered on sign-in. See [decision log](decisions.md) and [implementation status](implementation-status.md).
 
 2026-10-20 — Owner chose an invite-only beta with free Clerk account access and no card, billing or seven-day trial clock. The proposed seven-day trial and $9.99/$19.99 monthly price will be revisited at the end of product development. [Ship checkpoints](ship-checkpoints.md) now keep billing off the beta critical path; [decision log](decisions.md) records the agreed and pending parts separately.

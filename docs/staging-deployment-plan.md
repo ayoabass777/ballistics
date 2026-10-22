@@ -22,9 +22,10 @@ second time.
   API still returns current streak data. Staging must not touch either.
 - **Two repos, five services.** `ballistics`: Postgres, Airflow (webserver,
   scheduler; dbt and engine run as DockerOperator containers), research API
-  (`engine/api/app.py`, port 8001, read-only DSN). `football_stats_project`:
-  account API (`API/app.py`, port 8000, Clerk, invites, Saved, preferences)
-  and the frontend (`frontend_dev`, Next.js with Clerk).
+  (`engine/api/app.py`, port 8001, read-only DSN) and the frontend
+  (`frontend_dev`, Next.js with Clerk). `football_stats_project` contains the
+  account API (`API/app.py`, port 8000, Clerk, invites, Saved, preferences).
+  The original frontend checkout remains intact during migration.
 - **One database.** Account tables (`app`) live in the same `ballistics`
   database as pipeline data (`ACCOUNT_DB_NAME=ballistics`). It is 6.2 GB,
   mostly `raw.fact_head_to_head_streaks` (2.8 GB) and `_events` (2.1 GB).
@@ -217,7 +218,7 @@ Postgres.
 | --- | --- | --- | --- | --- |
 | caddy | new `deploy/Caddyfile` | `caddy:2` | 80/443 | origin cert |
 | consensus dashboard | `engine/eval/consensus_app.html` | `python3 -m http.server` | `127.0.0.1` only (SSH tunnel) | engine output folder, read-only |
-| frontend | `football_stats_project/frontend_dev` | build from Dockerfile | via caddy | Clerk keys, API base URLs |
+| frontend | `ballistics/frontend_dev` | build from Dockerfile | via caddy | Clerk keys, API base URLs |
 | account-api | `football_stats_project/API` | build from `Dockerfile` | internal | account DB user, Clerk secret, invite key and pepper, Saved archive bucket |
 | research-api | `ballistics/engine/api` | new small Dockerfile (FastAPI + psycopg2) | internal | read-only DSN |
 | postgres | | `postgres:17` (the local major; dumps don't restore into older majors) | internal | data volume |
@@ -367,7 +368,7 @@ In order; estimates are focused days for one developer.
 
 | # | Task | Days |
 | --- | --- | --- |
-| 1 | Frontend repo ready: commit the 20 files, push, merge `codex/frontend-redesign` into the branch staging deploys from | 0.5 |
+| 1 | Frontend source moved into `ballistics/frontend_dev`; commit and push the migrated tree before staging deploy. The account API still deploys from `football_stats_project`. | 0.5 |
 | 2 | ✅ 2026-10-22: migration runner and baseline (`scripts/migrate.py`, `db/migrations/`), verified on a throwaway database | 1–1.5 |
 | 3 | ✅ 2026-10-22: `engine/api/Dockerfile`; `deploy/compose.staging.yml`, `Caddyfile`, `postgres-init/01-roles.sh`, `grants.sql`, `dbt-profiles.yml.tmpl`, `staging.env.example`. Validated: compose renders, only Caddy publishes public ports, Caddyfile valid, research API served real data read-only, roles/grants and both APIs checked on a fresh database. Not yet run: Airflow and the frontend from the compose file | 1–1.5 |
 | 4 | Order the CAX21; Caddy, DNS, firewall, origin cert; staging buckets and IAM user; Clerk production instance; secrets filled in | 1 |
@@ -384,14 +385,11 @@ then remove its containers and volumes.
 
 ### Open items found while writing the deploy files (2026-10-22)
 
-- **Frontend build arguments (frontend repo).** `frontend_dev/Dockerfile` has
-  no `ARG` lines, so `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and the other
-  `NEXT_PUBLIC_*` values the compose file passes at build time are ignored.
-  Next.js inlines these during `next build`; add matching `ARG`/`ENV` lines in
-  the builder stage. **Blocks the first deploy:** the 2026-10-22 deploy test
-  showed a clean checkout fails `next build` ("Missing publishableKey"; local
-  builds only passed because of the working tree's `.env`). Four `ARG` lines
-  plus one `ENV` before `pnpm run build` fixed it in the test.
+- **Frontend build arguments (resolved locally 2026-10-22).** The migrated
+  `frontend_dev/Dockerfile` has the `ARG`/`ENV` lines needed for Clerk's
+  `NEXT_PUBLIC_*` build values. An ARM64 image built successfully before the
+  move; the relocated source passed `next build` locally. The full staging
+  Compose build and deployment remain untested.
 - **Logo URLs (frontend repo).** `lib/logo-asset-url.ts` builds browser image
   URLs from `BACKEND_API_BASE_URL`, which on the server is the internal
   `http://account-api:8000`. The Caddyfile routes `/assets/logos/*` to the

@@ -1,0 +1,26 @@
+.page { min-height:100vh; background:#f5f6f2; color:#142c23; }
+.main { max-width:1040px; margin:auto; padding:64px 32px 40px; }
+.eyebrow { margin:0 0 20px; font-size:12px; letter-spacing:.1em; color:#52685d; font-weight:600; }
+.main h1 { font-size:clamp(36px,5vw,60px); line-height:1.08; font-weight:700; letter-spacing:-.03em; margin:0 0 24px; }
+.intro { max-width:580px; font-size:18px; line-height:1.6; color:#52685d; }
+.actions { display:flex; margin:28px 0 16px; }
+.primary { display:inline-flex; align-items:center; min-height:48px; padding:12px 24px; border-radius:8px; background:#196346; color:#fff; font-weight:600; text-decoration:none; }
+.caption { color:#607068; font-size:13px; line-height:1.6; }
+.features { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px; margin:56px 0 32px; padding-top:24px; border-top:1px solid #dce3dc; }
+.features h2 { font-size:18px; font-weight:600; margin:0 0 10px; }
+.features p { font-size:14px; line-height:1.6; color:#52685d; }
+.notice { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 12px 8px 20px; margin-bottom:32px; border:1px solid #c1d6c4; border-radius:8px; background:#eaf2e8; }
+.notice button { width:44px; height:44px; background:transparent; border:0; font-size:24px; cursor:pointer; }
+.invite { max-width:500px; margin:32px 0; padding:24px; border:1px solid #dce3dc; border-radius:12px; background:white; }
+.invite h2 { margin:0 0 12px; font-size:22px; }
+.invite p { margin:0 0 16px; color:#52685d; line-height:1.5; }
+.invite .returning { padding:12px 14px; border-radius:8px; background:#eaf2e8; color:#142c23; }
+.returning a { color:#196346; font-weight:700; }
+.invite form { display:grid; gap:10px; }
+.invite label { font-size:14px; font-weight:600; }
+.invite input { width:100%; min-height:44px; padding:10px 12px; border:1px solid #aebdb2; border-radius:7px; font:inherit; }
+.invite button { margin-top:8px; border:0; cursor:pointer; font:inherit; }
+.invite button:disabled { opacity:.65; cursor:wait; }
+.invite .error { color:#9f2929; margin:0; }
+.page :is(a,button):focus-visible { outline:3px solid #285aa4; outline-offset:3px; }
+@media(max-width:700px) { .main { padding:40px 20px; } .features { grid-template-columns:1fr; gap:24px; margin-top:40px; } }

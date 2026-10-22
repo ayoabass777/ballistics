@@ -1,0 +1,30 @@
+.page { min-height:100vh; background:#f5f6f2; color:#142c23; }
+.main { max-width:960px; margin:auto; padding:48px 28px 72px; }
+.eyebrow { color:#196346; font-size:12px; font-weight:700; letter-spacing:.12em; }
+.main h1 { max-width:700px; font-size:clamp(34px,5vw,56px); line-height:1.1; margin:16px 0; }
+.lead { max-width:650px; color:#52685d; font-size:18px; line-height:1.55; }
+.cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:32px 0 24px; }
+.cards section { background:white; border:1px solid #dce3dc; border-radius:12px; padding:24px; }
+.cards span { color:#196346; font-size:12px; font-weight:700; letter-spacing:.08em; }
+.cards h2 { font-size:20px; margin:12px 0 8px; }
+.cards p { color:#52685d; line-height:1.55; margin:0; }
+.caution { padding:16px 20px; border-left:4px solid #196346; background:#eaf2e8; max-width:650px; }
+.actions { display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-top:28px; }
+.actions button { min-height:48px; cursor:pointer; font:inherit; }
+.actions button:disabled { opacity:.55; cursor:not-allowed; }
+.primary { border:0; background:#196346; color:white; padding:12px 22px; border-radius:8px; font-weight:700!important; }
+.actions a.primary { display:inline-flex; align-items:center; min-height:48px; text-decoration:none; }
+.textButton { border:0; background:transparent; color:#196346; font-weight:700!important; padding:8px; }
+.searchLabel { display:block; font-weight:700; margin:28px 0 8px; }
+.search { width:100%; max-width:500px; min-height:46px; border:1px solid #aebdb2; border-radius:8px; padding:10px 12px; font:inherit; background:white; }
+.directory { max-width:680px; max-height:360px; overflow:auto; margin-top:16px; border:1px solid #dce3dc; border-radius:10px; background:white; }
+.directory details + details { border-top:1px solid #e5eae5; }
+.directory summary { padding:14px 18px; cursor:pointer; font-weight:700; }
+.options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px 16px; padding:0 18px 16px; }
+.options label { display:flex; align-items:center; gap:10px; min-height:44px; cursor:pointer; }
+.options input { width:18px; height:18px; accent-color:#196346; }
+.count,.footer { color:#607068; font-size:14px; }
+.error { color:#9f2929; margin-top:20px; }
+.footer { margin-top:40px; }
+.page :is(a,button,input,summary):focus-visible { outline:3px solid #285aa4; outline-offset:3px; }
+@media(max-width:700px) { .main { padding:32px 20px 56px; } .cards,.options { grid-template-columns:1fr; } }

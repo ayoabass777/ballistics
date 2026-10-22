@@ -2,7 +2,8 @@
 #
 # Server layout (paths relative to this file):
 #   /srv/ballistics             this repo        (PROJECT_ROOT)
-#   /srv/football_stats_project account API + frontend (ACCOUNT_REPO)
+#   /srv/football_stats_project account API (ACCOUNT_REPO)
+#   /srv/ballistics/frontend_dev frontend
 #
 #   docker compose -f deploy/compose.staging.yml --env-file deploy/.env.staging up -d
 #
@@ -161,9 +162,8 @@ services:
   frontend:
     image: ballistics-frontend:${RELEASE:-latest}
     build:
-      context: ${ACCOUNT_REPO:-../../football_stats_project}/frontend_dev
-      # NEXT_PUBLIC_* values are inlined at build time; frontend_dev/Dockerfile
-      # needs matching ARG lines before these take effect.
+      context: ../frontend_dev
+      # NEXT_PUBLIC_* values are inlined at build time by frontend_dev/Dockerfile.
       args:
         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
         NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in

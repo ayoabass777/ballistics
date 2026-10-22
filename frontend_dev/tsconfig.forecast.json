@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": [
+    "next-env.d.ts",
+    "app/layout.tsx",
+    "app/forecast-record/**/*.tsx",
+    "app/api/forecast-record/**/*.ts",
+    "components/forecast/**/*.tsx",
+    "lib/forecast-record.ts",
+    "lib/server/forecast-proxy.ts"
+  ],
+  "exclude": ["node_modules", ".next", "open-next.config.ts"]
+}
