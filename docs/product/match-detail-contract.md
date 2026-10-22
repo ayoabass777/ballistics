@@ -1,5 +1,7 @@
 # Match detail — data contract (v2)
 
+2026-10-22: Strength, Patterns and Goals now come from the fixture's most recent complete run, so a match keeps its last pre-kickoff forecast after kickoff (D152). New field `fixture.forecast_from_latest_run` (false for such a kept forecast; the frontend should label it "made before kickoff"). `engine_stale` is not raised for it once kickoff has passed. Migration `0002` adds the index this lookup uses.
+
 2026-10-12 latest owner correction: extra probability-above-league gate rejected. Use the Bayes display-eligible pool and separate Results / Attack-defence categories as described in data-contract.md. Earlier Beta exceedance thresholds and no-pairs rules below are superseded history, not active selection requirements.
 
 Status: **proposal for the frontend build** (2026-10-07; sources and IDs updated 2026-10-11). Design: Figma section "Match detail v2 · fixes 1–6" (668:57671) and "Match detail v2 · weak states" (698:57342); decisions D102–D104. Nothing here is deployed. Field names below are the real engine/database names unless marked **NEW**.
@@ -28,6 +30,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
                 "league": "Czech Liga", "country": "Czech-Republic", "kickoff_utc": "2026-10-17T13:00:00+00:00",
                 "run_ds": "2026-10-13",                       // engine run behind Strength/Patterns/Goals; null if not in run
                 "run_finished_at": "2026-10-14T03:07:00Z",    // when that run was written (run_ds is the Airflow interval start)
+                "forecast_from_latest_run": true,             // false: an earlier run's forecast (after kickoff: the last pre-kickoff one, D152); null if no forecast
                 "standings_updated_at": "2026-10-12T00:00:00Z" },   // DB snapshot behind Context (D69)
   "context":  { "position": {...}, "table": {...}, "h2h": {...},      // as /context (§3.2)
                 "form": { "home_team": {"overall": {...}, "home": {...}, "away": {...}}, "away_team": {...} } },
@@ -41,7 +44,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 }
 ```
 
-- Context comes from the live database snapshot. Strength, Patterns, Goals, `context.form` and `discover` come from `raw.match_analysis` (page-ready jsonb per `run_ds`, `fixture_id`), read only from the latest run marked `complete` in `raw.engine_runs` (`engine/eval/match_store.py`). The consensus task writes both in one transaction before publishing the JSON file, so the page shows a whole run or the previous one, never a partial. `run_ds` is Airflow `{{ ds }}` (an @daily run firing on 14 Oct carries 2026-10-13), hence `run_finished_at`. Backfill old runs: `scripts/apply_match_store.sh`. The JSON export stays as a debug copy; the API no longer reads it.
+- Context comes from the live database snapshot. Strength, Patterns, Goals, `context.form` and `discover` come from `raw.match_analysis` (page-ready jsonb per `run_ds`, `fixture_id`), read from the fixture's most recent run marked `complete` in `raw.engine_runs` (`engine/eval/match_store.py`; before 2026-10-22, only the latest run, which left started and finished matches empty because runs cover not-started fixtures). After kickoff that is the last pre-kickoff forecast (D152): `fixture.forecast_from_latest_run` is false, and the page should label the sections as made before kickoff on `run_ds`. Its age then does not raise `engine_stale`. The consensus task writes both in one transaction before publishing the JSON file, so the page shows a whole run or the previous one, never a partial. `run_ds` is Airflow `{{ ds }}` (an @daily run firing on 14 Oct carries 2026-10-13), hence `run_finished_at`. Backfill old runs: `scripts/apply_match_store.sh`. The JSON export stays as a debug copy; the API no longer reads it.
 - A fixture not in the latest complete run returns Context with the engine sections null (no fallback to an older run). Before the tables exist, the engine sections are null rather than an error.
 - Not in the payload (D61, D115): rating gaps, posteriors, calibration values, shrunk/percentile rates, Big dog counts, Discover scores. `entry` (where the user came from) and `user` (saved, followed, venue preference) are frontend/account state, not served here.
 

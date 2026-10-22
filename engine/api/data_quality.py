@@ -180,7 +180,12 @@ class Freshness(DataDecorator):
             issues.append({"code": "standings_stale", "section": "context", "since": standings_at,
                            "message": f"League table last updated {standings_at:%d %b}."})
         run_ds = fixture.get("run_ds")
-        if run_ds:
+        # After kickoff the page deliberately keeps the last pre-kickoff
+        # forecast (D152); its age is not staleness.
+        kickoff = _parse(fixture.get("kickoff_utc"))
+        kept_pre_kickoff = (fixture.get("forecast_from_latest_run") is False
+                            and kickoff is not None and kickoff <= now)
+        if run_ds and not kept_pre_kickoff:
             run_day = datetime.fromisoformat(str(run_ds)).date()
             if (now.date() - run_day).days > ENGINE_STALE_DAYS:
                 issues.append({"code": "engine_stale", "section": "engine", "since": run_ds,

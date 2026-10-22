@@ -310,6 +310,15 @@ class DataDecoratorTests(unittest.TestCase):
         p = self.build(old, None, lambda inner: dq.Freshness(inner, NOW))
         self.assertEqual([i["code"] for i in p["data_quality"]["issues"]], ["standings_stale", "engine_stale"])
 
+    def test_kept_pre_kickoff_forecast_is_not_stale(self):
+        fresh = lambda inner: dq.Freshness(inner, NOW)
+        codes = lambda fx: [i["code"] for i in self.build(page(fixture=fx), None, fresh)["data_quality"]["issues"]]
+        kept = {"run_ds": "2026-10-10", "forecast_from_latest_run": False,
+                "kickoff_utc": (NOW() - timedelta(days=5)).isoformat()}
+        self.assertEqual(codes(kept), [])
+        # Not in the latest run but not started either: genuinely stale.
+        self.assertEqual(codes(dict(kept, kickoff_utc=(NOW() + timedelta(days=1)).isoformat())), ["engine_stale"])
+
     def test_broken_decorator_never_breaks_the_page(self):
         class Boom(dq.DataDecorator):
             def annotate(self, payload, cur, **kw):

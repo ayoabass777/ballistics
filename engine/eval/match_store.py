@@ -42,6 +42,10 @@ CREATE TABLE IF NOT EXISTS raw.match_analysis (
     written_at  timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (run_ds, fixture_id)
 );
+-- Match details reads a fixture's most recent run (its last pre-kickoff
+-- forecast once the match starts). Also in db/migrations/0002.
+CREATE INDEX IF NOT EXISTS match_analysis_fixture_idx
+    ON raw.match_analysis (fixture_id, run_ds DESC);
 """
 
 

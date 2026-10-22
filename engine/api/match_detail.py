@@ -230,26 +230,41 @@ def engine_sections(f: dict, export: dict) -> dict:
     }
 
 
-LATEST_SQL = """
-SELECT r.run_ds, r.finished_at, m.payload
-FROM (SELECT run_ds, COALESCE(generated_at, finished_at) AS finished_at  -- engine build time
-      FROM raw.engine_runs
-      WHERE status = 'complete' ORDER BY run_ds DESC LIMIT 1) r
-LEFT JOIN raw.match_analysis m
-  ON m.run_ds = r.run_ds AND m.fixture_id = %(fixture_id)s
+# The fixture's most recent complete run, not just the latest run: runs cover
+# not-started fixtures only, so once a match kicks off the page keeps its last
+# pre-kickoff forecast (D152). Without any run for the fixture, the latest run
+# is still returned (payload NULL) so the page knows the store exists.
+SECTIONS_SQL = """
+WITH latest AS (
+    SELECT run_ds FROM raw.engine_runs
+    WHERE status = 'complete' ORDER BY run_ds DESC LIMIT 1),
+hit AS (
+    SELECT m.run_ds, m.payload
+    FROM raw.match_analysis m
+    JOIN raw.engine_runs r ON r.run_ds = m.run_ds AND r.status = 'complete'
+    WHERE m.fixture_id = %(fixture_id)s
+    ORDER BY m.run_ds DESC LIMIT 1)
+SELECT r.run_ds,
+       COALESCE(r.generated_at, r.finished_at) AS finished_at,  -- engine build time
+       h.payload,
+       h.run_ds = l.run_ds AS from_latest_run
+FROM latest l
+LEFT JOIN hit h ON true
+JOIN raw.engine_runs r ON r.run_ds = COALESCE(h.run_ds, l.run_ds)
 """
 
 
 def read_engine_sections(cur, fixture_id: int) -> tuple[dict | None, dict | None]:
-    """(run info, sections) from the latest complete run; Nones if absent."""
+    """(run info, sections) from the fixture's most recent complete run; Nones if absent."""
     cur.execute("SELECT to_regclass('raw.engine_runs') IS NOT NULL AS ready")
     if not cur.fetchone()["ready"]:
         return None, None                       # store not created yet
-    cur.execute(LATEST_SQL, {"fixture_id": fixture_id})
+    cur.execute(SECTIONS_SQL, {"fixture_id": fixture_id})
     row = cur.fetchone()
     if row is None:
         return None, None                       # no complete run yet
-    run = {"run_ds": row["run_ds"], "finished_at": row["finished_at"]}
+    run = {"run_ds": row["run_ds"], "finished_at": row["finished_at"],
+           "from_latest_run": row.get("from_latest_run")}
     return run, row["payload"]
 
 
@@ -263,6 +278,8 @@ def build_match_core(cur, fixture_id: int) -> dict | None:
     fixture = dict(ctx["fixture"])
     fixture["run_ds"] = match_context._iso(run["run_ds"]) if run and sec else None
     fixture["run_finished_at"] = match_context._iso(run["finished_at"]) if run and sec else None
+    # False: an earlier run's forecast (normally the last one before kickoff).
+    fixture["forecast_from_latest_run"] = bool(run.get("from_latest_run")) if run and sec else None
     fixture["standings_updated_at"] = ctx["standings_updated_at"]
     context = {k: v for k, v in ctx.items() if k not in ("fixture", "standings_updated_at")}
     context["form"] = sec.get("form")

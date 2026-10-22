@@ -240,10 +240,27 @@ class BuildTests(unittest.TestCase):
             self.assertIsNone(p["goals"])
             self.assertIsNone(p["fixture"]["run_ds"])
 
-    def test_only_latest_complete_run_is_read(self):
-        sql = md.LATEST_SQL
-        self.assertIn("status = 'complete'", sql)
-        self.assertIn("ORDER BY run_ds DESC LIMIT 1", sql)
+    def test_reads_fixtures_most_recent_complete_run(self):
+        sql = md.SECTIONS_SQL
+        self.assertEqual(sql.count("status = 'complete'"), 2)
+        self.assertIn("WHERE m.fixture_id = %(fixture_id)s", sql)
+        self.assertIn("ORDER BY m.run_ds DESC LIMIT 1", sql)
+
+    def test_latest_run_forecast_is_flagged_latest(self):
+        p = self.build(FakeCursor(row=dict(stored_row(), from_latest_run=True)))
+        self.assertIs(p["fixture"]["forecast_from_latest_run"], True)
+
+    def test_after_kickoff_keeps_earlier_runs_forecast(self):
+        p = self.build(FakeCursor(row=dict(stored_row(), from_latest_run=False)))
+        self.assertIs(p["fixture"]["forecast_from_latest_run"], False)
+        self.assertEqual(p["fixture"]["run_ds"], "2026-10-13")
+        self.assertEqual(p["strength"]["state"], "slight_favourite")
+        codes = [i["code"] for i in p["data_quality"]["issues"]]
+        self.assertNotIn("engine_stale", codes)      # kickoff passed: old on purpose
+
+    def test_no_forecast_has_no_forecast_flag(self):
+        p = self.build(FakeCursor(row=dict(stored_row(), payload=None, from_latest_run=None)), fid=1)
+        self.assertIsNone(p["fixture"]["forecast_from_latest_run"])
 
     def test_unknown_fixture(self):
         with patch.object(md.match_context, "build_context", return_value=None):

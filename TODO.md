@@ -40,9 +40,11 @@ path: each item gates the ones below it, except where marked parallel.
    - Check Settings and Saved under the invited account.
    - Minimal first-run onboarding (D152): in progress separately.
 5. [ ] **Match details build items (D152, parallel with 3).**
-   - After kickoff, show the last pre-kickoff forecast, labelled as made
-     before kickoff (today `/api/match` reads only the latest run, which covers
-     not-started fixtures, so these pages go empty).
+   - After kickoff, show the last pre-kickoff forecast. API side done
+     2026-10-22: `/api/match` reads the fixture's most recent complete run and
+     sets `fixture.forecast_from_latest_run` (migration 0002 adds the index;
+     `engine_stale` skipped once kickoff passed). Frontend still to label the
+     sections "made before kickoff" (frontend repo).
    - Small `data_quality` badge from the API block (second D148).
 6. [ ] **Daily data reliability on staging.** Several clean daily
    `fixture_update` + engine cycles with no lost days (Oct 15 and 17 were lost
