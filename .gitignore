@@ -45,3 +45,7 @@ engine/eval/calibration_backup_*/
 
 # Generated diagnostics output
 engine/eval/diagnostics/out/
+
+# dbt anonymous user id and one-off engine label backups
+.dbt/.user.yml
+engine/eval/*-backup-*.json

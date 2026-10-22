@@ -278,3 +278,9 @@ H2H now has separate win/draw totals, aligned home/score/away rows and UTC calen
 
 
 2026-10-18 — Followed leagues: app.user_followed_leagues(user_id TEXT FK app.app_users ON DELETE CASCADE, league_id BIGINT FK dim.dim_leagues ON DELETE RESTRICT, created_at TIMESTAMPTZ DEFAULT NOW(), PK user_id+league_id). GET /account/leagues returns data.league_ids; PUT accepts a unique positive safe-integer list (max 200), including [] to clear. Identity from Clerk sub only. Unknown IDs rejected before changes; per-account row lock serializes replacements; retained follows preserve created_at. GET /account/leagues/directory uses the full metadata catalog and existing public league crests, independent of current engine fixture coverage. Next.js account proxies use existing authenticated account origin. Bootstrap requires metadata dim.dim_leagues before the follow table.
+
+
+2026-10-21 — Match strength fallback: state=slight_favourite, level=favourite also covers adjusted gaps >250 without Big dog league eligibility; frontend renders Favourite / Underdog. reason retains the league restriction for provenance, not a claim that no favourite exists. level=slight_edge renders Slight edge; missing level retains legacy Slight favourite wording. No new Discover candidates or score changes.
+
+
+2026-10-21 — Frontend preserves optional strength.tiers={home,away}, each Top/Middle/Bottom. Team identity maps to fixture.home/away, independent of favourite direction. Missing/null tiers hide cluster context. Quiet rows renders for close and slight_favourite states; Big dog and no_label omit the row.

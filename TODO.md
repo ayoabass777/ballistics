@@ -2,7 +2,41 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-10-20 (end of day: engine review fixes merged and pushed).
+Updated 2026-10-21 (beta blockers added).
+
+## Beta blockers (critical path)
+
+What stands between today and the invite-only beta (target 10–24 Nov 2026,
+[ship checkpoints](docs/product/ship-checkpoints.md)). Ordered by critical
+path: each item gates the ones below it, except where marked parallel.
+
+1. [x] **Commit the open working tree.** Done 2026-10-21 (`974e83d`, `f138422`). DLQ, fixture extraction, standings and
+   match-detail changes plus their tests are uncommitted; a deploy needs a
+   known commit to build from.
+2. [ ] **Freeze beta scope (checkpoint 1).** Cohort is decided (BC, UK, Nigeria,
+   D148); tester count and included pages are not. Decide whether Saved ships
+   (it was left out of the 2026-10-18 frontend release) and whether D146
+   evidence depth is in or deferred.
+3. [ ] **Stand up staging (checkpoint 3, longest item).** Frontend (merge or
+   deploy `codex/frontend-redesign`), account API, research API, Postgres,
+   Clerk, Airflow jobs, secrets and S3. Includes a repeatable schema migration
+   step: on 2026-10-20 a mart missing new standings columns made Match details
+   return 503 until a manual refresh.
+4. [ ] **Member journey gaps (checkpoint 2, parallel with 3).**
+   - Enforce email-only Clerk sign-in (D133); Google is still offered and caused
+     the 2026-10-21 account-switch confusion.
+   - Observe browser-triggered profile sync for a new account.
+   - Check Settings and Saved under the invited account.
+   - First-run onboarding (choose leagues), still in the design backlog.
+5. [ ] **Keep forecasts on match pages after kickoff (parallel with 3).** See
+   "Now" below; testers hit this every matchday.
+6. [ ] **Daily data reliability on staging.** Several clean daily
+   `fixture_update` + engine cycles with no lost days (Oct 15 and 17 were lost
+   to a standings failure), an alert that fires on failure, and the ~110
+   stuck-NS fixtures resolved or hidden.
+7. [ ] **Staging smoke test.** Fresh invited account end to end on desktop and
+   mobile, data freshness, failure alert and rollback, all exercised on
+   staging. Then send the first invites.
 
 ## Now
 
