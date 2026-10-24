@@ -26,6 +26,47 @@ def meet(day, is_home, gf, ga):
 
 
 class PositionTests(unittest.TestCase):
+    def test_venue_rank_falls_back_when_provider_split_is_missing(self):
+        rows = [row(1, 1, 20), row(2, 2, 10), row(3, 3, 5)]
+        fixtures = [
+            {"home_team_id": 1, "away_team_id": 2, "home_team_fulltime_goal": 2, "away_team_fulltime_goal": 0},
+            {"home_team_id": 3, "away_team_id": 1, "home_team_fulltime_goal": 1, "away_team_fulltime_goal": 2},
+        ]
+        positions = mc.calculated_venue_positions(rows, fixtures, 1, 2)
+        self.assertEqual((positions["home"]["rank"], positions["home"]["points"]), (1, 3))
+        self.assertEqual((positions["away"]["rank"], positions["away"]["points"]), (3, 0))
+        self.assertEqual(positions["home"]["source"], "calculated")
+
+    def test_calculated_overall_position_for_missing_provider_team(self):
+        rows = [row(1, 1, 10), row(2, 2, 7)]
+        fixtures = [
+            {"home_team_id": 3, "away_team_id": 1, "home_team_fulltime_goal": 2, "away_team_fulltime_goal": 0},
+            {"home_team_id": 2, "away_team_id": 3, "home_team_fulltime_goal": 0, "away_team_fulltime_goal": 1},
+        ]
+        result = mc.calculated_overall_positions(rows, fixtures, 3, 2)
+        self.assertEqual((result["home"]["rank"], result["home"]["points"], result["home"]["group_size"]),
+                         (1, 6, 3))
+        self.assertEqual(result["home"]["source"], "calculated")
+        rows[0]["standings_format"] = "split"
+        self.assertIsNone(mc.calculated_overall_positions(rows, fixtures, 3, 2)["home"])
+
+    def test_venue_rank_uses_provider_splits(self):
+        rows = [row(1, 1, 30), row(2, 2, 20), row(3, 3, 10)]
+        home = [(0, 0, 1, 0, 2), (1, 1, 0, 3, 1), (1, 0, 0, 2, 0)]
+        away = [(1, 1, 0, 4, 0), (1, 1, 0, 2, 0), (1, 0, 1, 1, 1)]
+        for r, h, a in zip(rows, home, away):
+            r["home_record"] = {"played": h[0] + h[1] + h[2], "win": h[0],
+                                "draw": h[1], "lose": h[2],
+                                "goals": {"for": h[3], "against": h[4]}}
+            r["away_record"] = {"played": a[0] + a[1] + a[2], "win": a[0],
+                                "draw": a[1], "lose": a[2],
+                                "goals": {"for": a[3], "against": a[4]}}
+        positions = mc.venue_positions(rows, 1, 2)
+        self.assertEqual((positions["home"]["rank"], positions["home"]["points"]), (3, 0))
+        self.assertEqual((positions["away"]["rank"], positions["away"]["points"]), (2, 4))
+        rows[2]["away_record"] = None
+        self.assertIsNone(mc.venue_positions(rows, 1, 2)["away"])
+
     def test_team_in_table(self):
         p = mc.team_position([row(1, 16, 1), row(2, 1, 23)], 1)
         self.assertEqual((p["rank"], p["points"], p["group_size"]), (16, 1, 2))
@@ -88,7 +129,7 @@ class BuildTests(unittest.TestCase):
           "home_logo_file_id": "u1", "away_logo_file_id": None}
 
     def test_payload(self):
-        cur = FakeCursor([self.FX, [row(1, 16, 1), row(2, 1, 23)], H2HTests.GAMES])
+        cur = FakeCursor([self.FX, [row(1, 16, 1), row(2, 1, 23)], H2HTests.GAMES, []])
         p = mc.build_context(cur, 90863)
         self.assertEqual(p["position"]["points_gap"], 22)
         self.assertEqual(p["h2h"]["meetings"], 5)
@@ -98,9 +139,29 @@ class BuildTests(unittest.TestCase):
         self.assertIsNone(p["fixture"]["away_crest_url"])
 
     def test_missing_points_does_not_break_context(self):
-        p = mc.build_context(FakeCursor([self.FX, [row(1, 1, None), row(2, 2, 10)], []]), 90863)
+        p = mc.build_context(FakeCursor([self.FX, [row(1, 1, None), row(2, 2, 10)], [], []]), 90863)
         self.assertIsNone(p["position"]["points_gap"])
         self.assertTrue(p["table"]["available"])
+
+    def test_missing_provider_row_uses_calculated_position(self):
+        fx = dict(self.FX, home_team_id=3)
+        fixtures = [
+            {"home_team_id": 3, "away_team_id": 1, "home_team_fulltime_goal": 2, "away_team_fulltime_goal": 0},
+            {"home_team_id": 2, "away_team_id": 3, "home_team_fulltime_goal": 0, "away_team_fulltime_goal": 1},
+        ]
+        p = mc.build_context(FakeCursor([fx, [row(1, 1, 10), row(2, 2, 7)], [], fixtures]), 90863)
+        self.assertEqual(p["position"]["home"]["rank"], 1)
+        self.assertEqual(p["position"]["home"]["source"], "calculated")
+        self.assertEqual(p["position"]["away"]["source"], "official")
+
+    def test_stale_provider_row_uses_calculated_position(self):
+        stale = row(1, 1, 10)
+        stale["is_stale_row"] = True
+        fixtures = [{"home_team_id": 1, "away_team_id": 2,
+                     "home_team_fulltime_goal": 0, "away_team_fulltime_goal": 2}]
+        p = mc.build_context(FakeCursor([self.FX, [stale, row(2, 2, 7)], [], fixtures]), 90863)
+        self.assertEqual(p["position"]["home"]["source"], "calculated")
+        self.assertEqual(p["position"]["home"]["rank"], 2)
 
     def test_ambiguous_groups_are_not_exposed(self):
         rows = [row(1, 1, 10, repeat=True), row(2, 1, 10, repeat=True)]
@@ -113,11 +174,11 @@ class BuildTests(unittest.TestCase):
 
     def test_unmapped_team_skips_h2h_query(self):
         fx = dict(self.FX, away_team_id=None)
-        cur = FakeCursor([fx, [row(1, 16, 1)]])
+        cur = FakeCursor([fx, [row(1, 16, 1)], []])
         p = mc.build_context(cur, 90863)
         self.assertIsNone(p["position"]["away"])
         self.assertEqual(p["h2h"]["meetings"], 0)
-        self.assertEqual(len(cur.calls), 2)
+        self.assertEqual(len(cur.calls), 3)
 
 
 class HTTPTests(unittest.TestCase):

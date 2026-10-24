@@ -12,7 +12,7 @@ import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import psycopg2
-from psycopg2.extras import execute_values
+from psycopg2.extras import Json, execute_values
 
 import etl.src.config as config
 from etl.src.extract_metadata import get_db_connection
@@ -42,6 +42,8 @@ COLUMNS = [
     "goals_against",
     "goal_diff",
     "form",
+    "home_record",
+    "away_record",
     "group_name",
     "group_order",
     "description",
@@ -87,6 +89,8 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             try:
                 team = row.get("team", {}) or {}
                 stats = row.get("all", {}) or {}
+                home = row.get("home")
+                away = row.get("away")
                 flattened.append(
                     {
                         "api_team_id": team.get("id"),
@@ -101,6 +105,8 @@ def extract_standings(payload: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                         "goals_against": stats.get("goals", {}).get("against"),
                         "goal_diff": row.get("goalsDiff"),
                         "form": row.get("form"),
+                        "home_record": home if isinstance(home, dict) else None,
+                        "away_record": away if isinstance(away, dict) else None,
                         "group_name": label,
                         "group_order": group_order,
                         "description": row.get("description"),
@@ -173,6 +179,8 @@ def ensure_table(cur: psycopg2.extensions.cursor) -> None:
             goals_against INT,
             goal_diff INT,
             form TEXT,
+            home_record JSONB,
+            away_record JSONB,
             group_name TEXT NOT NULL DEFAULT '',
             group_order INT,
             description TEXT,
@@ -195,6 +203,8 @@ def migrate_groups(cur: psycopg2.extensions.cursor) -> None:
         ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS group_name TEXT NOT NULL DEFAULT '';
         ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS group_order INT;
         ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS description TEXT;
+        ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS home_record JSONB;
+        ALTER TABLE {RAW_TABLE} ADD COLUMN IF NOT EXISTS away_record JSONB;
         ALTER TABLE {RAW_TABLE}
             DROP CONSTRAINT IF EXISTS raw_league_standings_league_season_id_api_team_id_key;
         CREATE UNIQUE INDEX IF NOT EXISTS raw_league_standings_season_group_team_uidx
@@ -277,6 +287,8 @@ def upsert_standings(rows: List[Dict[str, Any]], prune: bool = True) -> int:
                 row.get("goals_against"),
                 row.get("goal_diff"),
                 row.get("form"),
+                Json(row["home_record"]) if row.get("home_record") is not None else None,
+                Json(row["away_record"]) if row.get("away_record") is not None else None,
                 row.get("group_name") or "",
                 row.get("group_order"),
                 row.get("description"),

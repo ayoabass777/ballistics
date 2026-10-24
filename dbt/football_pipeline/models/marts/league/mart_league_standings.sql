@@ -145,6 +145,8 @@ select
     goal_diff,
     points,
     form,
+    home_record,
+    away_record,
     description,
     standings_updated_at,
     standings_format,

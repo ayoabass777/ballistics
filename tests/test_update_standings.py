@@ -25,6 +25,18 @@ def test_conferences_keep_their_group_and_order():
                                (3, 1, "Western Conference", 1)]
 
 
+def test_provider_venue_records_are_preserved():
+    team = _row(1, 1, "Regular Season")
+    team["home"] = {"played": 3, "win": 2, "draw": 1, "lose": 0,
+                    "goals": {"for": 7, "against": 2}}
+    team["away"] = {"played": 2, "win": 1, "draw": 0, "lose": 1,
+                    "goals": {"for": 3, "against": 5}}
+    record, = us.extract_standings(_payload([team]))
+    assert record["home_record"] == team["home"]
+    assert record["away_record"] == team["away"]
+    assert {"home_record", "away_record"} <= set(us.COLUMNS)
+
+
 def test_split_season_team_is_kept_in_both_tables():
     rows = us.extract_standings(_payload(
         [_row(7, 1, "Regular Season"), _row(8, 2, "Regular Season")],

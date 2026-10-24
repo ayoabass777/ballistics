@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS raw.raw_league_standings (
   goals_against                 INT,
   goal_diff                     INT,
   form                          TEXT,
+  home_record                   JSONB,
+  away_record                   JSONB,
   group_name                    TEXT         NOT NULL DEFAULT '',  -- API table label (conference / split round)
   group_order                   INT,                               -- table position in the API response
   description                   TEXT,                              -- e.g. "Promotion - Champions League"
@@ -70,6 +72,8 @@ CREATE TABLE IF NOT EXISTS raw.raw_league_standings (
 ALTER TABLE raw.raw_league_standings ADD COLUMN IF NOT EXISTS group_name TEXT NOT NULL DEFAULT '';
 ALTER TABLE raw.raw_league_standings ADD COLUMN IF NOT EXISTS group_order INT;
 ALTER TABLE raw.raw_league_standings ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE raw.raw_league_standings ADD COLUMN IF NOT EXISTS home_record JSONB;
+ALTER TABLE raw.raw_league_standings ADD COLUMN IF NOT EXISTS away_record JSONB;
 ALTER TABLE raw.raw_league_standings
   DROP CONSTRAINT IF EXISTS raw_league_standings_league_season_id_api_team_id_key;
 CREATE UNIQUE INDEX IF NOT EXISTS raw_league_standings_season_group_team_uidx
