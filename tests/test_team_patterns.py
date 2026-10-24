@@ -61,7 +61,7 @@ class SelectionTests(unittest.TestCase):
         rec("away", "Over_1_5", 5, 6, 0.70, team="AEK"),
         rec("away", "win", 0, 6, 0.30, team="AEK"),                      # k = 0: never shown
         rec("away", "clean_sheet", 2, 6, 0.30, team="AEK"),             # gap too small to qualify
-        rec("home", "halftime_win", 4, 6, 0.2, team="Atromitos"),        # excluded event
+        rec("home", "halftime_win", 4, 6, 0.2, team="Atromitos"),
     ]
 
     def setUp(self):
@@ -75,7 +75,7 @@ class SelectionTests(unittest.TestCase):
                 for e in self.events(key)]
 
     def test_top_results_one_per_team(self):
-        self.assertEqual(self.events("top_results"), [("home", "winless"), ("away", "unbeaten")])
+        self.assertEqual(self.events("top_results"), [("home", "halftime_win"), ("away", "unbeaten")])
 
     def test_attack_defence_pair(self):
         self.assertEqual(self.events("top_attack_defence"),
@@ -86,7 +86,7 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual(len(evs), len(set(evs)))
         self.assertNotIn(("away", "win"), evs)
         self.assertNotIn(("away", "clean_sheet"), evs)
-        self.assertNotIn(("home", "halftime_win"), evs)
+        self.assertIn(("home", "halftime_win"), evs)
 
     def test_one_rung_per_ladder(self):
         evs = self.all_events()
@@ -105,7 +105,7 @@ class SelectionTests(unittest.TestCase):
         for key in ("alpha", "beta", "posterior", "league_gap", "league_confidence",
                     "display_eligible"):
             self.assertNotIn(key, r)
-        self.assertEqual(r["label"], "Winless")
+        self.assertEqual(r["label"], "Led at half-time")
 
     def test_single_side_attack_defence(self):
         rows = [rec("home", "goalless", 5, 6, 0.25), rec("away", "concede_1", 4, 6, 0.6)]

@@ -197,12 +197,11 @@ def goals_section(f: dict) -> dict | None:
 
 
 def patterns_section(f: dict) -> dict | None:
-    if f.get("patterns") is not None:
-        return f["patterns"]
     rows = f.get("bayesian") or []
     if not rows:
-        return None
-    # Exports written before the selection moved into the engine (D122-D124).
+        return f.get("patterns")
+    # Apply current selection rules to stored engine rows, including snapshots
+    # whose precomputed patterns were written before an event rule changed.
     from engine.eval.team_patterns import select_patterns
     return select_patterns(rows)
 
