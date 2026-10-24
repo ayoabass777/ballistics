@@ -54,4 +54,18 @@ Priority can change when a serious finding appears. Each daily update should say
 - **Verification:** read `.env.example`, Compose, config, and DockerOperator mounts; AST syntax parse passed for `etl/src/config.py` and `airflow/dags/fixture_update.py`. No runtime behavior was changed. Next unit: 1.3 dependency and build setup.
 
 
+### 2026-10-22 — Unit 1.3 reviewed: dependency and build setup
+
+- **Evidence:** `airflow/requirements.txt` (0/2 pinned), `etl/requirements.txt` (0/8 pinned), and `engine/requirements.txt` (0/10 pinned) leave all listed direct packages open to version changes at rebuild. By contrast, `engine/api/requirements.txt` pins 3/3 and `dbt/requirements.txt` pins 1/1. `airflow/Dockerfile:1` pins Airflow/Python, while `engine/Dockerfile:9` and `dbt/Dockerfile:1` use Python minor tags. **Severity: medium.** Follow-up: lock compatible dependency versions per image, including the Docker provider, then verify image builds and focused tests before switching deployment.
+- **Evidence:** `engine/Dockerfile:20-22` copies the entire `data/` tree into the engine image as fallback. This can make builds large and package local data unintentionally. **Severity: low.** Follow-up: check the image's actual runtime file needs and narrow the copy or build ignore rules.
+- **Scope note:** `deploy/compose.staging.yml:66` pins Postgres major version 17. The `postgres:latest` finding from unit 1.2 applies to the local Compose file, not this staging file.
+- **Verification:** reviewed five requirement files and four Dockerfiles; a read-only script counted exact pins. No image build or dependency install was run, and no runtime code changed. Next unit: 2.1 bootstrap metadata.
+
+### 2026-10-23 — Unit 2.1 reviewed: bootstrap metadata
+
+- **Evidence:** `etl/src/extract_metadata.py:467-470` logs an empty YAML document and returns successfully. `airflow/dags/bootstrap_dag.py:281-294,498-501` can then mark that file modification time processed after the downstream no-op fixture path. **Severity: medium.** Follow-up: fail the extraction task on empty/invalid metadata, with a focused test, so the changed file remains retryable.
+- **Evidence:** `etl/src/extract_metadata.py:119-125,501-503` records unresolved league names but only logs them after committing other rows; the DAG can still mark the metadata revision processed. **Severity: medium.** Follow-up: define whether unresolved configured leagues should fail the bootstrap or enter a durable retry queue, then test that behavior.
+- **Evidence:** `airflow/dags/bootstrap_dag.py:58-72` compares file modification times, not contents. A deployment that preserves timestamps can leave changed metadata unseen. **Severity: low.** Follow-up: consider a content hash or explicit bootstrap trigger if deployment copies preserve mtime.
+- **Verification:** `BASE_DATA_DIR=/private/tmp/ballistics-code-audit-2026-10-23 python -m pytest -q tests/test_extract_metadata_tiers.py` passed (3 tests). The first run without a temporary data directory failed at collection because logger import could not write under `data/logs` in this read-only scheduled workspace. No code was changed. Next unit: 2.2 fixture full load.
+
 `Date | Unit | File/line or command | Observed behavior | Severity | Fix/follow-up | Verification`

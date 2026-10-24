@@ -4,7 +4,11 @@
 
 2026-10-22 — Ballistics 2.0 frontend source is moving into this repository at [`frontend_dev`](../../frontend_dev). The account API remains in the sibling `football_stats_project` repository. See [implementation status](implementation-status.md) for verification and deployment state.
 
-2026-10-21 — D147 code-first invite-only beta entry is implemented locally. A real invitation was accepted by Clerk; the invited account signed in and reached Discover. The local profile-sync trigger has been added and awaits live backfill verification; Google is still offered on sign-in. See [decision log](decisions.md) and [implementation status](implementation-status.md).
+2026-10-21 — Minimal beta first-run onboarding is implemented locally: signed-in new members enter a skippable evidence explainer and optional account-backed league choice before Discover. Existing local members were marked complete. Focused tests and TypeScript pass; browser verification remains pending because browser use was disabled. See [implementation status](implementation-status.md) and [data contract](data-contract.md).
+
+2026-10-21 — Beta recruitment and onboarding plan drafted for BC, UK and Nigeria: [recruitment playbook](beta-recruitment.md). The live first-run onboarding sequence is not implemented; the Figma flow remains illustrative. It is now explicit in [ship checkpoint 2](ship-checkpoints.md), before external tester invitations.
+
+2026-10-21 — D156 code-first invite-only beta entry is implemented locally. A real invitation was accepted by Clerk; the invited account signed in and reached Discover. The local profile-sync trigger has been added and awaits live backfill verification; Google is still offered on sign-in. See [decision log](decisions.md) and [implementation status](implementation-status.md).
 
 2026-10-20 — Owner chose an invite-only beta with free Clerk account access and no card, billing or seven-day trial clock. The proposed seven-day trial and $9.99/$19.99 monthly price will be revisited at the end of product development. [Ship checkpoints](ship-checkpoints.md) now keep billing off the beta critical path; [decision log](decisions.md) records the agreed and pending parts separately.
 
@@ -57,8 +61,10 @@ Start here before continuing design or frontend work:
 5. [Prototype links](prototype-links.md): current flows and preserved versions.
 6. [Methodology requirements](methodology-requirements.md): content, calibration provenance, evidence and delivery checklist.
 7. [User stories and onboarding](user-stories-onboarding.md): draft workflow, Saved stories and first-run flow (proposed, being worked out).
-8. [Strength mock data](mock/strength-mock.md): real saved-export strength fixtures ready for Figma.
-9. [Workflow design review](workflow-design-review.md): page map and Discover hierarchy proposal started 2026-10-07; standouts remain pending review.
+8. [Functionality tutorials](functionality-tutorials.md): contextual lessons and local implementation review for Discover, Matches, Match details, Saved, Settings and Forecast record.
+   [First Match details tutorial draft](match-details-tutorial-draft.md) covers Team strength, Goals outlook, Team patterns and the newer Favourite labels; it is proposed copy, not implemented.
+9. [Strength mock data](mock/strength-mock.md): real saved-export strength fixtures ready for Figma.
+10. [Workflow design review](workflow-design-review.md): page map and Discover hierarchy proposal started 2026-10-07; standouts remain pending review.
 
 ## How to maintain this memory
 

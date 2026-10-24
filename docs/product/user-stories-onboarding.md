@@ -1,5 +1,7 @@
 # User stories, Saved workflow and onboarding
 
+2026-10-22 — Match details first-visit tutorial added (proposal, see section below). Extends the D108 first-fixture detail tip into a 3-step walkthrough. Not yet in Figma.
+
 2026-10-18 — D133 update: the current Figma account flow uses email address and password only, with an email reset link. Earlier phone and SMS language below records superseded prototype history.
 
 
@@ -115,3 +117,52 @@ Saved model A + C (D37); account from day one (D38); leagues filter Discover and
 - Onboarding: welcome, three kinds of number, leagues, account (phone or email + code) × 2 viewports, plus skip paths and a settings sheet (leagues, timezone, account).
 - Save-while-signed-out → sign-up → returns with the fixture saved.
 - "Your leagues · All leagues" switch on Discover and Matches.
+
+## Match details first-visit tutorial (proposal, 2026-10-17; updated 2026-10-22)
+
+Status: raw. Figma first, then build. Extends the D108 dismissible first-fixture detail tip.
+
+Goal: on the first visit to Match details, teach how to read the page in about 20 seconds. Each section answers one question.
+
+1. **Team strength** — Who's the favourite?
+2. **Goals outlook** — How many goals should I expect? (a forecast for this match)
+3. **Team patterns** — What's normal for these teams this season? (compared with the league average)
+
+### Rules
+- Coach marks on the first Match details visit: intro, 3 steps, finish. One sentence per step; Skip at every step.
+- Run on the real fixture the user opened, not a dummy screen.
+- "?" on each section replays that step; How it works → "Replay the intro" also offers it.
+- Make the split explicit: Goals outlook = what's expected next; Team patterns = what's already happened.
+- Explain "league average" once, in Team patterns only. Goals outlook does not show the league average.
+- Cover both strength labels: Big dog (leagues that qualify) and Favourite (clear gap in leagues that don't). Underdog pairs with either.
+- No engine or method wording (no ratings, models, gaps, thresholds).
+- Chances as percentages, not "X in 10".
+- End with the responsible-play line (D40).
+
+### Draft copy (v2)
+
+**Intro — How to read a match**
+Every match page has three sections, and each answers one question. This takes about 20 seconds.
+[Start] [Skip]
+
+**Step 1, Team strength — Who's the favourite?**
+In leagues with a settled pecking order, the team that usually comes out on top is the **Big dog**. In other leagues, a clearly stronger side is the **Favourite**. Either way, the other team is the **Underdog**. This is about track record, not just this season.
+
+**Step 2, Goals outlook — How many goals should you expect?**
+This is a forecast for this match. It's based on how well each team attacks and defends, and it's shown as chances, like Over 2.5 at 64%.
+
+**Step 3, Team patterns — What's normal for these teams this season?**
+This shows results and goals that keep repeating this season. Each one is compared with the league average, so you can see what's ordinary and what stands out.
+Tip: Goals outlook is what's expected next. Team patterns is what's already happened.
+
+**Finish — You're set.**
+Tap ? on any section to see this again.
+Ballistics is for research. If you bet, bet responsibly.
+[Got it]
+
+### Still open
+- Step 1 when neither label shows (evenly matched sides, D138 slight-favourite levels): add a line, or leave it to the section itself.
+- Trigger order with first-run onboarding (Pick your leagues → Discover tip → first Match details).
+- Coach-mark placement on mobile vs desktop.
+- Figma: add to the onboarding section on page 16:353.
+

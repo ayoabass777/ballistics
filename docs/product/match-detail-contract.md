@@ -64,7 +64,7 @@ One page = one `fixture_id`. Every value on the page must come from **one engine
 
 | Row | Home/Away view | All venues view |
 |---|---|---|
-| League position | `rank`, `points` from the team's row where `is_team_current_group` | same |
+| League position / venue rank | Calculated home-only rank and points for the home team, away-only for the away team, using the provider's `home` and `away` standings records when available; a clearly labelled completed-fixture fallback applies in single-table leagues while split records are absent. Missing for ambiguous groups or no venue games. | Official `rank`, `points` from the team's row where `is_team_current_group`; if missing/rankless/stale in a single-table league, a clearly labelled fixture-derived fallback is used |
 | Goals scored / match | `strength.home_team.home.attack_rate` · `strength.away_team.away.attack_rate` | `…overall.attack_rate` |
 | Goals conceded / match | `…home.defense_rate` · `…away.defense_rate` | `…overall.defense_rate` |
 | Attack rank | `attack_rank` "of" `league_size` | overall |
@@ -114,7 +114,7 @@ Rules below are current as of 2026-10-14 (D122). Category intent and examples: [
 
 - Never show a record with `k = 0` (e.g. "0 / 6") anywhere (owner, 2026-10-12).
 - **Qualify** (D123, replaces the D122 qualify rule). Always: primary context per view, `n ≥ 6`, `k > 0`. Then by event family — **Results / Attack / Defence**: above the league average (`league_gap > 0`, comparison available) and league-difference confidence ≥ 0.75 (Beta posterior vs league base). The engine score is not used: it is calibrated on betting events only and floors rare events (Lost 9/10 and Drew 1/10 both score 0.62). Below-league team records are not shown (each mirrors an above-league one: Won 2/10 ↔ Winless 8/10). **Match goals** (Over/Under, BTTS): `display_eligible` (calibrated engine score ≥ 0.75), so common lines like Under 4.5 stay available for Also; may be below or typical vs league.
-- **Top Results** — events `win`, `loss`, `draw`, `winless`, `unbeaten`. At most one per team, from qualified records. Pick by largest `|league_gap|`; confidence breaks ties. Winless/Unbeaten count as results; do not hardcode Won/Lost.
+- **Top Results** — events `win`, `loss`, `draw`, `winless`, `unbeaten`, `halftime_win`. At most one per team, from qualified records. Pick by largest `|league_gap|`; confidence breaks ties. Winless/Unbeaten and half-time leads count as results; do not hardcode Won/Lost.
 - **Top Attack/defence** — events `score_1goal`, `score_2goals`, `goalless`, `concede_1`, `concede_2`, `clean_sheet`. Same confidence gate and ranking. Prefer a corresponding pair across the two teams (scored N+ ↔ conceded N+, failed to score ↔ clean sheet) when both pass; if only one side passes, show it alone; never fill with an unqualified counterpart.
 - One rung per ladder per team (scored 1+/2+, conceded 1+/2+, over x, under x). Top slots are picked first (so a corresponding pair survives a higher rung); a ladder used by a top slot is not repeated below; otherwise the larger gap wins.
 - Omit a top category when nothing passes its gate.
@@ -122,9 +122,9 @@ Rules below are current as of 2026-10-14 (D122). Category intent and examples: [
 - Both views (venue and all venues) are selected server-side and sent in the payload; the Home / Away | All venues switch is frontend only and opens on the engine's primary view.
 - Neither gate value is shown to users (D115).
 - **Built 2026-10-14** (`engine/eval/team_patterns.py`, called after `attach_league_comparisons` in the export): each fixture gets `patterns = {default_view: "venue"|"all", venue: {...}|null, all: {...}}`, each view with `top_results`, `top_attack_defence`, `also`, `see_all`. Records carry `side, team, event, label, k, n, rate, league_rate, league_comparison, streak, context` only — no posterior, Beta parameters, gap or confidence. `venue` is null when neither team has a venue sample; `default_view` is `venue` only when both teams' primary rows are venue rows. `bayesian[]` rows also gain `league_confidence` (internal). Check on the 13 Oct run after D123: fixture 111915 reproduces the review example; Zlin (90876) shows Lost 9/10 in Top Results; 592 fixtures, Top Results present in 82%, Top Attack/defence in 87%, median 6 records per fixture.
-- Event labels (user-facing): `goalless` → "Failed to score" (never "Goalless", which reads as 0–0), `score_1goal` → "Scored 1+", `score_2goals` → "Scored 2+", `concede_1` → "Conceded 1+", `concede_2` → "Conceded 2+", `clean_sheet` → "Clean sheet", `BTTS` → "Both teams scored", `Over_x_5` / `Under_x_5` → "Over / Under x.5 goals", `win` → "Won", `loss` → "Lost", `draw` → "Drew", `winless` → "Winless", `unbeaten` → "Unbeaten".
+- Event labels (user-facing): `goalless` → "Failed to score" (never "Goalless", which reads as 0–0), `score_1goal` → "Scored 1+", `score_2goals` → "Scored 2+", `concede_1` → "Conceded 1+", `concede_2` → "Conceded 2+", `clean_sheet` → "Clean sheet", `BTTS` → "Both teams scored", `Over_x_5` / `Under_x_5` → "Over / Under x.5 goals", `win` → "Won", `loss` → "Lost", `draw` → "Drew", `winless` → "Winless", `unbeaten` → "Unbeaten", `halftime_win` → "Led at half-time".
 - Current run: `streak`, shown only when > 0.
-- Exclude `halftime_win` (D80), `Over_4_5` and `Under_1_5` (D124: never qualified on the 13 Oct run). `draw` stays in Results.
+- Exclude `Over_4_5` and `Under_1_5` (D124: never qualified on the 13 Oct run). `halftime_win` is included by the 2026-10-22 owner correction; `draw` stays in Results.
 - Attack/defence stays one category with a corresponding pair across the teams (D124); a single record when only one side qualifies.
 - Empty states: both teams `n < 6` → one card "Too early for patterns" with "{n} of 6 matches played"; one team short → show the other, "Not enough matches · {n} of 6".
 

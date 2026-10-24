@@ -254,6 +254,19 @@ Staging buckets (separate, so DLQ replay on one environment never sees the
 other's entries): raw landing, assets/crests (public read on `crests/*`),
 forecast archive, Saved archive, backups.
 
+Created 2026-10-22 by the owner in `ca-central-1` (same region as the local
+buckets; the S3 traffic is nightly batch work, so the Helsinki–Canada
+latency doesn't matter): `ballistics-stg-raw`, `-assets`, `-forecast-archive`,
+`-saved-archive`, `-backups`. All encrypted (AES-256), ACLs disabled. Settings
+applied with the owner's local credentials: **saved-archive** versioning on +
+`DenyInsecureTransport` policy + full public-access block (the settings
+`configure_saved_archive_bucket.py` applies; that script hard-codes its own
+bucket name, so it was not run); **assets** public read on `crests/*` only,
+public ACLs still blocked (checked anonymously: crests 200, other keys 403,
+listing 403); **backups** expire after 14 days (incomplete uploads after 1).
+IAM policy for the server's user: `deploy/iam-staging-policy.json` (no delete
+on archives or backups, no bucket-level permissions).
+
 ## Database and migrations
 
 **Layout.** Airflow gets its own `airflow` database. The `ballistics`

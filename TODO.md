@@ -14,7 +14,7 @@ path: each item gates the ones below it, except where marked parallel.
    match-detail changes plus their tests are uncommitted; a deploy needs a
    known commit to build from.
 2. [x] **Freeze beta scope (checkpoint 1).** Reached 2026-10-21: cohort
-   (D148), 10–15 testers in two waves (D150), Google and email sign-in (D151),
+   (D157), 10–15 testers in two waves (D150), Google and email sign-in (D151),
    pages = Welcome, Discover, Matches, Match details, Saved, Settings (D152).
    Deferred: D146 evidence depth, forecast record, forecast retention.
 3. [ ] **Stand up staging (checkpoint 3, longest item).** Frontend (merge or
