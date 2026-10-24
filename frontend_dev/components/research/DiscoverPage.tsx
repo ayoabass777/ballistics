@@ -57,7 +57,8 @@ export function DiscoverPage({ all = false, matches = false }: {
     const { data, busy, error, retry } = useResource(zone ? `/api/research/discover?${params}` : null, discoverSchema);
     const positionQuery = new URLSearchParams(query);
     if (!all && !matches) positionQuery.set('category', category);
-    positionQuery.set('zone', zone || 'UTC');
+    // The preference zone arrives asynchronously; it must not change the
+    // return-position key halfway through restoring this list.
     positionQuery.sort();
     const position = useListPosition(`${path}?${positionQuery}`, !!data);
     const saved = useSaved();

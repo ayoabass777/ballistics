@@ -19,6 +19,9 @@ export function useListPosition(url: string, ready: boolean) {
     const [restorationDone, setRestorationDone] = useState(false);
     const count = state.key === key ? state.count : BATCH;
     useEffect(() => {
+        // Next's history restoration can run after the cards render and undo
+        // our saved position on browser Back. Keep list restoration authoritative.
+        window.history.scrollRestoration = 'manual';
         restored.current = false;
         setRestorationDone(false);
         const stored = read(key);
@@ -33,11 +36,15 @@ export function useListPosition(url: string, ready: boolean) {
         let frame = 0;
         if (!restored.current) {
             const y = read(key).y;
-            frame = requestAnimationFrame(() => {
+            let passes = 0;
+            const restore = () => {
                 window.scrollTo({ top: y, behavior: 'instant' });
-                restored.current = true;
-                setRestorationDone(true);
-            });
+                // Browser Back may adjust scroll in a later frame. Keep the
+                // temporary page height until that navigation has settled.
+                if (++passes < 8) frame = requestAnimationFrame(restore);
+                else { restored.current = true; setRestorationDone(true); }
+            };
+            frame = requestAnimationFrame(restore);
         }
         const save = () => {
             if (!restored.current) return;
