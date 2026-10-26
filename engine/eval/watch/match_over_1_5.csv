@@ -7,3 +7,5 @@ logged_at,report_stamp,market,source,n,avg_predicted,hit_rate,overconfidence,bri
 2026-10-12T20:29:25Z,2026-10-12T20:29:25Z,Match Over 1.5,dixon_coles_only,813,0.738,0.7601,-0.0222,0.1801,
 2026-10-18T00:15:57Z,2026-10-18T00:08:42Z,Match Over 1.5,all,3470,0.7777,0.7922,-0.0145,0.1639,
 2026-10-18T00:15:57Z,2026-10-18T00:08:42Z,Match Over 1.5,dixon_coles_only,776,0.7453,0.7925,-0.0473,0.166,overconfidence -4.7 pts
+2026-10-26T18:54:34Z,2026-10-26T18:52:44Z,Match Over 1.5,all,4605,0.7768,0.7904,-0.0136,0.1645,
+2026-10-26T18:54:34Z,2026-10-26T18:52:44Z,Match Over 1.5,dixon_coles_only,857,0.7469,0.776,-0.0291,0.1721,
