@@ -128,6 +128,39 @@ tester ──HTTPS──> Cloudflare (DNS, proxy, TLS)
   domain when v1 is taken down.
 - **Airflow UI** is not exposed; reach it with `ssh -L 8080:localhost:8080`.
 
+## Clerk production instance (2026-10-26)
+
+The Ballistics Clerk app already had a production instance for
+`ballistics.football` (created in the v1 era, status "Incomplete": domain
+records never added). It was reused rather than recreated:
+
+- **DNS** (Cloudflare, all DNS only, verified with public resolvers):
+  `clerk` → `frontend-api.clerk.services`, `accounts` →
+  `accounts.clerk.services`, `clkmail` → `mail.e232z41koaxn.clerk.services`,
+  `clk._domainkey` → `dkim1.e232z41koaxn.clerk.services`, `clk2._domainkey` →
+  `dkim2.e232z41koaxn.clerk.services`. Clerk then marked the domain, Frontend
+  API, account portal and email **Verified** and started issuing its SSL
+  certificates.
+- **Access mode:** Invite-only (already set).
+- **Email:** sign-up and sign-in with email, verified by one-time code.
+- **Google (D151):** own OAuth client created 2026-10-26 in Google Cloud
+  project `Ballistics` (`ballistics-512818`, owner's account): consent screen
+  External, app name Ballistics, support/developer contact the owner,
+  authorised domain `ballistics.football`, Google API Services User Data
+  Policy accepted by the owner; Web client "Clerk production" with redirect
+  URI `https://clerk.ballistics.football/v1/oauth_callback`. **Publishing
+  status: Testing** — publishing needs a home page and privacy policy URL,
+  and there is no privacy page yet (TODO). Until then only listed test users
+  (max 100) can sign in with Google. The owner copied the client ID and
+  secret into Clerk (neither passed through Claude); Clerk's Google connection
+  then showed "Used for sign-in" instead of "Setup required". Test users:
+  `ayoabass777@gmail.com` (1/100).
+- **Still to confirm in the smoke test:** that sessions work on
+  `staging.`/`beta.ballistics.football` (subdomains of the primary domain),
+  and the redirect URLs after sign-in/out.
+- **Keys:** the publishable key is public; the secret key goes from Clerk
+  straight into `deploy/.env.staging` by the owner.
+
 ## Server spec
 
 Estimates from the local stack (2026-10-22) and the v1 server's container
@@ -266,6 +299,13 @@ public ACLs still blocked (checked anonymously: crests 200, other keys 403,
 listing 403); **backups** expire after 14 days (incomplete uploads after 1).
 IAM policy for the server's user: `deploy/iam-staging-policy.json` (no delete
 on archives or backups, no bucket-level permissions).
+IAM user `ballistics-staging` created by the owner 2026-10-26: only that
+managed policy attached (`ballistics-staging-s3`, identical to the file), no
+inline policies, groups or console login, one active access key (kept by
+the owner; goes into `deploy/.env.staging`). IAM policy simulation: put and
+delete allowed on raw, put allowed on backups; delete on backups and the
+forecast archive, bucket-policy changes, any access to the local
+`ballistics-raw` bucket, and IAM actions are all denied.
 
 ## Database and migrations
 

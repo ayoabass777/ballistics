@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ListStagingBuckets",
+      "Effect": "Allow",
+      "Action": ["s3:ListBucket", "s3:GetBucketLocation"],
+      "Resource": [
+        "arn:aws:s3:::ballistics-stg-raw",
+        "arn:aws:s3:::ballistics-stg-assets",
+        "arn:aws:s3:::ballistics-stg-forecast-archive",
+        "arn:aws:s3:::ballistics-stg-saved-archive",
+        "arn:aws:s3:::ballistics-stg-backups"
+      ]
+    },
+    {
+      "Sid": "RawLandingAndDlqReadWriteDelete",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::ballistics-stg-raw/*"
+    },
+    {
+      "Sid": "CrestsReadWrite",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::ballistics-stg-assets/*"
+    },
+    {
+      "Sid": "ArchivesAndBackupsWriteOnceNoDelete",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": [
+        "arn:aws:s3:::ballistics-stg-forecast-archive/*",
+        "arn:aws:s3:::ballistics-stg-saved-archive/*",
+        "arn:aws:s3:::ballistics-stg-backups/*"
+      ]
+    }
+  ]
+}

@@ -39,6 +39,11 @@ path: each item gates the ones below it, except where marked parallel.
    - Observe browser-triggered profile sync for a new account.
    - Check Settings and Saved under the invited account.
    - Minimal first-run onboarding (D152): in progress separately.
+   - Privacy policy page on the frontend (`/privacy`), then add the home page
+     and privacy URLs on the Google consent screen (project
+     `ballistics-512818`, Branding) and **publish** it. Until then Google
+     sign-in is in Testing: add each tester's Google address as a test user
+     (Audience page, max 100).
 5. [ ] **Match details build items (D152, parallel with 3).**
    - After kickoff, show the last pre-kickoff forecast. API side done
      2026-10-22: `/api/match` reads the fixture's most recent complete run and
