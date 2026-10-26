@@ -153,8 +153,8 @@ records never added). It was reused rather than recreated:
   and there is no privacy page yet (TODO). Until then only listed test users
   (max 100) can sign in with Google. The owner copied the client ID and
   secret into Clerk (neither passed through Claude); Clerk's Google connection
-  then showed "Used for sign-in" instead of "Setup required". Test users:
-  `ayoabass777@gmail.com` (1/100).
+  then showed "Used for sign-in" instead of "Setup required". Test users: the
+  owner's Google account (1/100).
 - **Still to confirm in the smoke test:** that sessions work on
   `staging.`/`beta.ballistics.football` (subdomains of the primary domain),
   and the redirect URLs after sign-in/out.
