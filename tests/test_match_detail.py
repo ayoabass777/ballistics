@@ -258,6 +258,30 @@ class BuildTests(unittest.TestCase):
         codes = [i["code"] for i in p["data_quality"]["issues"]]
         self.assertNotIn("engine_stale", codes)      # kickoff passed: old on purpose
 
+    def build_with_status(self, status):
+        context = context_payload(90876)
+        context["fixture"]["fixture_status"] = status
+        with patch.object(md.match_context, "build_context", return_value=context):
+            return md.build_match_core(FakeCursor(row=stored_row()), 90876)
+
+    def test_postponed_fixture_hides_saved_prediction(self):
+        for status in ("PST", "CANC", "ABD", "SUSP", "INT", "AWD", "WO"):
+            with self.subTest(status=status):
+                p = self.build_with_status(status)
+                self.assertEqual(p["fixture"]["fixture_status"], status)
+                self.assertIsNone(p["strength"])
+                self.assertIsNone(p["patterns"])
+                self.assertIsNone(p["goals"])
+                self.assertIsNone(p["fixture"]["run_ds"])
+
+    def test_live_and_finished_fixture_keeps_pre_kickoff_forecast(self):
+        # D152: the last pre-kickoff forecast stays on Match details after kickoff.
+        for status in ("NS", "1H", "HT", "2H", "ET", "BT", "P", "LIVE", "FT", "AET", "PEN"):
+            with self.subTest(status=status):
+                p = self.build_with_status(status)
+                self.assertIsNotNone(p["strength"])
+                self.assertIsNotNone(p["fixture"]["run_ds"])
+
     def test_no_forecast_has_no_forecast_flag(self):
         p = self.build(FakeCursor(row=dict(stored_row(), payload=None, from_latest_run=None)), fid=1)
         self.assertIsNone(p["fixture"]["forecast_from_latest_run"])

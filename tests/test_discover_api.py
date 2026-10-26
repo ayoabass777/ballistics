@@ -1,6 +1,6 @@
 import unittest
-from datetime import datetime, date, timezone
-from engine.api.discover import snapshot, assemble, window
+from datetime import datetime, date, timedelta, timezone
+from engine.api.discover import snapshot, assemble, window, build_discover
 
 NOW = datetime(2026, 10, 14, 12, tzinfo=timezone.utc)
 def row(fid=1, league=1, kickoff='2026-10-15T18:00:00Z', score=.2):
@@ -8,6 +8,25 @@ def row(fid=1, league=1, kickoff='2026-10-15T18:00:00Z', score=.2):
     return {'payload':{'discovery':snapshot(dict(fixture_id=fid, home='Home', away='Away', league_id=league, league='League', country='Country', kickoff=kickoff, discover_pick=pick, discover_sections={'patterns':pick}))}}
 
 class DiscoverTests(unittest.TestCase):
+    def test_live_status_filters_postponed_fixture_from_snapshot(self):
+        kickoff = (datetime.now(timezone.utc).replace(microsecond=0) + timedelta(days=1)).isoformat()
+        active = row(1, kickoff=kickoff)
+        postponed = row(2, kickoff=kickoff)
+        records = [
+            {**active, 'run_ds': date(2026, 10, 24), 'finished_at': datetime.now(timezone.utc), 'live_status': 'NS'},
+            {**postponed, 'run_ds': date(2026, 10, 24), 'finished_at': datetime.now(timezone.utc), 'live_status': 'PST'},
+        ]
+        class Cursor:
+            def execute(self, sql):
+                self.sql = sql
+            def fetchone(self):
+                return {'ready': True}
+            def fetchall(self):
+                return records
+        result = build_discover(Cursor())
+        self.assertEqual([x['fixture_id'] for x in result['matches']], [1])
+        self.assertEqual([x['fixture_id'] for x in result['lists']['standouts']], [1])
+
     def test_rank_and_filter_no_private_fields(self):
         result=assemble([row(1,1,score=.2),row(2,2,score=.5),row(3,1,score=.3)], leagues=(1,),now=NOW)
         self.assertEqual([r['fixture_id'] for r in result['lists']['standouts']],[3,1])

@@ -102,6 +102,30 @@ def update_db_kickoff_utc(fixture_id: int, new_kickoff_utc: str) -> None:
         conn.close()
 
 
+def update_db_fixture_state(fixture_id: int, kickoff_utc: Optional[str], status: str) -> bool:
+    """Persist the provider's current kickoff and status together for an unfinished fixture."""
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            UPDATE raw.raw_fixtures
+            SET kickoff_utc = COALESCE(%s, kickoff_utc),
+                fixture_status = %s, updated_at = NOW()
+            WHERE api_fixture_id = %s AND fixture_status <> 'FT'
+            """,
+            (kickoff_utc, status, fixture_id),
+        )
+        conn.commit()
+        return cur.rowcount > 0
+    except Exception:
+        conn.rollback()
+        logger.exception("Could not update fixture %s state", fixture_id)
+        return False
+    finally:
+        conn.close()
+
+
 def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
     Compare API vs DB kickoff times and update DB where they differ.
@@ -111,6 +135,7 @@ def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     for fixture in fixtures:
         api_fixture_id = fixture.get("fixture", {}).get("id")
         api_kickoff_utc = fixture.get("fixture", {}).get("date")
+        api_status = fixture.get("fixture", {}).get("status", {}).get("short")
         db_kickoff_utc, db_status = get_db_kickoff_utc(api_fixture_id)
 
         api_dt = _normalize_kickoff(api_kickoff_utc)
@@ -120,26 +145,24 @@ def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             logger.debug("Fixture %s not found in DB; skipping.", api_fixture_id)
             continue
 
-        if (db_dt == api_dt) or db_status == "FT":
-            logger.debug(
-                "Fixture %s kickoff time matches or match is finished; no update needed.",
-                api_fixture_id
-            )
+        if db_status == "FT" or not isinstance(api_status, str) or not api_status:
             continue
-
-        update_db_kickoff_utc(api_fixture_id, api_kickoff_utc)
+        if db_dt == api_dt and db_status == api_status:
+            continue
+        if not update_db_fixture_state(api_fixture_id, api_kickoff_utc if api_dt else None, api_status):
+            continue
         updated.append(
             {
                 "fixture_id": api_fixture_id,
                 "old_kickoff_utc": db_kickoff_utc,
                 "new_kickoff_utc": api_kickoff_utc,
+                "old_status": db_status,
+                "new_status": api_status,
             }
         )
         logger.info(
-            "Updated fixture %s kickoff time from %s to %s.",
-            api_fixture_id,
-            db_kickoff_utc,
-            api_kickoff_utc,
+            "Updated fixture %s kickoff/status from %s/%s to %s/%s.",
+            api_fixture_id, db_kickoff_utc, db_status, api_kickoff_utc, api_status,
         )
     return updated
 
@@ -218,6 +241,28 @@ def _db_ns_fixture_ids_in_window(league_id: int, season: int, days: int) -> List
         con.close()
 
 
+def _db_orphan_fixture_ids_in_window(league_id: int, season: int, days: int) -> List[str]:
+    """Previously orphaned fixture IDs still dated inside the reconciliation window."""
+    con = get_db_connection()
+    cur = con.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT api_fixture_id
+            FROM raw.raw_fixtures
+            WHERE api_league_id = %s AND season = %s
+              AND fixture_status = 'ORPHAN'
+              AND kickoff_utc >= NOW()
+              AND kickoff_utc < NOW() + make_interval(days => %s)
+              AND api_fixture_id IS NOT NULL
+            """,
+            (league_id, season, days),
+        )
+        return [str(r[0]) for r in cur.fetchall()]
+    finally:
+        con.close()
+
+
 def mark_fixtures_status(api_fixture_ids: List[str], status: str) -> int:
     """Set fixture_status for the given api_fixture_ids. Returns rows affected."""
     if not api_fixture_ids:
@@ -249,11 +294,11 @@ def reconcile_upcoming_fixtures(days: int = RECONCILE_WINDOW_DAYS) -> List[Dict[
 
     Closes two blind spots the ``next N``/``last N`` correction functions miss:
       * date drift — corrected via _process_fixtures on the API's returned set;
-      * ORPHANS — a DB NS fixture stuck on a stale future date whose id the API no
-        longer lists (a provisional round replaced by new fixture ids). Fetch-by-id
-        returns nothing for these, so per-id checks can't see them; here we diff the
-        DB's NS set against the API's set and mark the leftovers ORPHAN, dropping
-        them from every NS-based query (e.g. the betting pool).
+      * ORPHANS — a DB NS fixture whose id is absent from the league schedule.
+        Confirm each absence with a direct fixture-id lookup before excluding it;
+        a partial schedule response must not remove a valid fixture.
+      * RESTORATION — if a previously orphaned fixture reappears as NS in the
+        league schedule, restore its status so the engine can analyze it again.
 
     Guard: orphan-marking only runs when the API returned ≥1 fixture for the
     league-season, so a transient empty API response never nukes real fixtures.
@@ -274,7 +319,7 @@ def reconcile_upcoming_fixtures(days: int = RECONCILE_WINDOW_DAYS) -> List[Dict[
             logger.error("reconcile: API fetch failed for league %s: %s", league_id, e, exc_info=True)
             continue
 
-        # 1. date corrections on the fixtures the API still lists
+        # 1. date corrections and restoration for fixtures the API still lists
         updated.extend(_process_fixtures(api_fixtures))
 
         api_ids = {str(f.get("fixture", {}).get("id")) for f in api_fixtures
@@ -283,11 +328,31 @@ def reconcile_upcoming_fixtures(days: int = RECONCILE_WINDOW_DAYS) -> List[Dict[
             logger.info("reconcile: league %s returned no API fixtures in window; skipping orphan check.", league_id)
             continue
 
-        # 2. orphans: DB NS fixtures in window the API no longer lists
+        returned_ns_ids = {str(f["fixture"]["id"]) for f in api_fixtures
+                           if f.get("fixture", {}).get("id") is not None
+                           and f.get("fixture", {}).get("status", {}).get("short") == "NS"}
+        restored = set(_db_orphan_fixture_ids_in_window(league_id, season, days)) & returned_ns_ids
+        if restored:
+            n = mark_fixtures_status(sorted(restored), "NS")
+            logger.info("reconcile: league %s — restored %d orphaned fixtures to NS.", league_id, n)
+            updated.extend({"fixture_id": oid, "action": "restored"} for oid in sorted(restored))
+
+        # 2. Confirm each apparent orphan by fixture ID. Only a successful,
+        # empty direct lookup is enough to remove an NS fixture.
         db_ids = set(_db_ns_fixture_ids_in_window(league_id, season, days))
-        orphans = db_ids - api_ids
+        orphans = set()
+        for oid in db_ids - api_ids:
+            try:
+                direct = fetch_fixtures(FIXTURES_ENDPOINT, {"id": int(oid)}, raise_on_failure=True)
+            except Exception as exc:
+                logger.warning("reconcile: could not verify fixture %s by id (%s); retaining NS.", oid, type(exc).__name__)
+                continue
+            if not direct:
+                orphans.add(oid)
+            else:
+                updated.extend(_process_fixtures(direct))
         if orphans:
-            n = mark_fixtures_status(list(orphans), ORPHAN_STATUS)
+            n = mark_fixtures_status(sorted(orphans), ORPHAN_STATUS)
             logger.info("reconcile: league %s — marked %d orphaned fixtures %s.",
                         league_id, n, ORPHAN_STATUS)
             updated.extend({"fixture_id": oid, "action": "orphaned"} for oid in orphans)

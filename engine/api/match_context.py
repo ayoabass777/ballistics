@@ -17,9 +17,11 @@ H2H_LIMIT = 5
 
 FIXTURE_SQL = """
 SELECT f.fixture_id, f.league_season_id, f.league_id, f.league_name, f.country_name,
-       kickoff_utc, home_team_id, away_team_id, home_team_name, away_team_name,
-       home_logo_file_id, away_logo_file_id, l.logo_file_id AS league_logo_file_id
+       f.kickoff_utc, rf.fixture_status, f.home_team_id, f.away_team_id,
+       f.home_team_name, f.away_team_name,
+       f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id
 FROM raw.fact_fixtures f
+LEFT JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
 LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id
 WHERE f.fixture_id = %(fixture_id)s
 """
@@ -267,6 +269,7 @@ def build_context(cur, fixture_id):
         "fixture": {"fixture_id": fx["fixture_id"], "league_id": fx["league_id"],
                     "league": fx["league_name"], "country": fx["country_name"],
                     "kickoff_utc": _iso(fx["kickoff_utc"]),
+                    "fixture_status": fx["fixture_status"],
                     "home": fx["home_team_name"], "away": fx["away_team_name"],
                     "home_team_id": home_id, "away_team_id": away_id,
                     "league_logo_url": crest_url("leagues", fx.get("league_logo_file_id")),

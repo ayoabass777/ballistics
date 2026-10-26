@@ -31,6 +31,11 @@ EXPORT_GLOB = re.compile(r"^consensus_slips_(\d{4}-\d{2}-\d{2})\.json$")
 DEFAULT_EXPORT_DIR = Path(__file__).resolve().parents[1] / "eval"
 GOALS_MAX = 3
 NO_COMPARISON = {"too_few_matches", "unavailable", None}
+# Provider statuses that keep the stored pre-kickoff forecast: not started,
+# in play (D152: the last pre-kickoff forecast stays after kickoff) and finished.
+# Anything else (postponed, cancelled, abandoned, suspended, interrupted,
+# awarded) hides it.
+FORECAST_STATUSES = {"NS", "1H", "HT", "2H", "ET", "BT", "P", "LIVE", "FT", "AET", "PEN"}
 
 _cache: dict = {"key": None, "export": None}
 _lock = threading.Lock()
@@ -275,6 +280,10 @@ def build_match_core(cur, fixture_id: int) -> dict | None:
     run, sec = read_engine_sections(cur, fixture_id)
     sec = sec or {}
     fixture = dict(ctx["fixture"])
+    # A saved pre-match snapshot must not remain an active prediction after
+    # the provider postpones, cancels or otherwise suspends the fixture.
+    if fixture.get("fixture_status") is not None and fixture["fixture_status"] not in FORECAST_STATUSES:
+        sec = {}
     fixture["run_ds"] = match_context._iso(run["run_ds"]) if run and sec else None
     fixture["run_finished_at"] = match_context._iso(run["finished_at"]) if run and sec else None
     # False: an earlier run's forecast (normally the last one before kickoff).

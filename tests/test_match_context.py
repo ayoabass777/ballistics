@@ -125,6 +125,7 @@ class FakeCursor:
 class BuildTests(unittest.TestCase):
     FX = {"fixture_id": 90863, "league_season_id": 7, "league_id": 3, "league_name": "Czech Liga",
           "country_name": "Czech-Republic", "kickoff_utc": datetime(2026, 10, 9, 16, tzinfo=timezone.utc),
+          "fixture_status": "NS",
           "home_team_id": 1, "away_team_id": 2, "home_team_name": "Zlin", "away_team_name": "Slavia",
           "home_logo_file_id": "u1", "away_logo_file_id": None}
 
