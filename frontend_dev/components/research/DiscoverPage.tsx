@@ -9,6 +9,7 @@ import { discoverSchema, labels, headline, reason, matchHref, type Card, type Ki
 import { Button, Crest, FixtureIdentity, Shell, ResourceState, useResource, useSaved, Toast } from './shared';
 import s from './research.module.css';
 import { DiscoverLeagues } from './DiscoverLeagues';
+import { track } from '@/lib/usage-events';
 import { MatchesControls } from './MatchesControls';
 import { useFollowedLeagues } from './useFollowedLeagues';
 import { useListPosition } from './useListPosition';
@@ -63,6 +64,7 @@ export function DiscoverPage({ all = false, matches = false }: {
     const position = useListPosition(`${path}?${positionQuery}`, !!data);
     const saved = useSaved();
     const follows = useFollowedLeagues();
+    useEffect(() => { if (follows.ready) track('discover_viewed', { page: matches ? 'matches' : all ? 'all' : 'discover', followed_league_count: follows.ids.length }); }, [follows.ready, matches, all]);
     const carousel = useRef<HTMLDivElement>(null);
     const [edges, setEdges] = useState({ start: true, end: true });
     const updateEdges = () => { const el = carousel.current; if (el)

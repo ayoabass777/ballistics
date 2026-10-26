@@ -1,0 +1,28 @@
+version: 2
+
+# Account tables used only by the private beta analytics models (D164).
+# Models in this folder build into raw_analytics, which deploy/grants.sql does not
+# grant to the research or account API roles.
+sources:
+  - name: app
+    schema: app
+    description: "Account API tables: members, invitations, followed leagues, saved fixtures, preferences and beta usage events."
+    tables:
+      - name: app_events
+        description: "Allow-listed beta usage events written by POST /account/events."
+        loaded_at_field: received_at
+        columns:
+          - name: event_id
+            tests: [not_null, unique]
+          - name: user_id
+            tests: [not_null]
+          - name: event_name
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['session_started', 'onboarding_finished', 'discover_viewed', 'match_opened', 'fixture_unsaved', 'tutorial_dismissed', 'tutorial_replayed', 'methodology_opened']
+      - name: app_users
+      - name: beta_invite_codes
+      - name: user_followed_leagues
+      - name: saved_fixtures
+      - name: user_preferences

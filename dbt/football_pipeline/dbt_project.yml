@@ -40,6 +40,12 @@ models:
     marts:
       +schema: mart
       +materialized: table
+    # D164 beta analytics: per-member data, kept out of the API-readable schemas.
+    analytics:
+      +schema: analytics
+      +materialized: view
+      beta_funnel:
+        +materialized: table
 
 seeds:
   football_pipeline:

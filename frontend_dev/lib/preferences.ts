@@ -1,6 +1,7 @@
 import { z } from 'zod';
 export const preferencesSchema = z.object({ data: z.object({
     timezone_override: z.string().refine(zone => { try { new Intl.DateTimeFormat('en', {timeZone: zone}); return true; } catch { return false; } }).nullable(),
+    usage_events_enabled: z.boolean().optional(),
     created_at: z.string().nullable(), updated_at: z.string().nullable(),
 }) });
 export function dayInZone(zone: string, offset = 0, now = new Date()) {

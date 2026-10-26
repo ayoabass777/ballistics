@@ -20,4 +20,5 @@ CREATE TABLE IF NOT EXISTS app.app_users (
 \ir user_followed_leagues.sql
 \ir billing.sql
 \ir beta_invite_codes.sql
+\ir app_events.sql
 COMMIT;

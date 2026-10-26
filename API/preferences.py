@@ -24,8 +24,8 @@ class PreferencesUpdate(BaseModel):
 
 
 def read_preferences(db, user_id):
-    row = db.execute(text("SELECT timezone_override, created_at, updated_at FROM app.user_preferences WHERE user_id = :user_id"), {"user_id": user_id}).mappings().first()
-    return dict(row) if row else {"timezone_override": None, "created_at": None, "updated_at": None}
+    row = db.execute(text("SELECT timezone_override, usage_events_enabled, created_at, updated_at FROM app.user_preferences WHERE user_id = :user_id"), {"user_id": user_id}).mappings().first()
+    return dict(row) if row else {"timezone_override": None, "usage_events_enabled": True, "created_at": None, "updated_at": None}
 
 
 def save_preferences(db, user_id, timezone_override):
@@ -35,6 +35,6 @@ def save_preferences(db, user_id, timezone_override):
         ON CONFLICT (user_id) DO UPDATE SET
             timezone_override = EXCLUDED.timezone_override,
             updated_at = NOW()
-        RETURNING timezone_override, created_at, updated_at
+        RETURNING timezone_override, usage_events_enabled, created_at, updated_at
     """), {"user_id": user_id, "timezone_override": timezone_override}).mappings().one()
     return dict(row)

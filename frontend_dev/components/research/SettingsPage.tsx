@@ -8,6 +8,7 @@ import { Shell, Button, Crest, useResource, ResourceState } from './shared';
 import { usePreferences } from './PreferencesProvider';
 import { useFollowedLeagues } from './useFollowedLeagues';
 import { leagueDirectorySchema } from '@/lib/account';
+import { track } from '@/lib/usage-events';
 import s from './research.module.css';
 
 export function SettingsPage() {
@@ -25,6 +26,9 @@ export function SettingsPage() {
     const [leagueSaving, setLeagueSaving] = useState(false);
     const [leagueMessage, setLeagueMessage] = useState('');
     const [leagueFailure, setLeagueFailure] = useState('');
+    const [usageSaving, setUsageSaving] = useState(false);
+    const [usageMessage, setUsageMessage] = useState('');
+    const [usageFailure, setUsageFailure] = useState('');
     const directory = useResource(
         prefs.signedIn ? '/api/account/leagues/directory' : null,
         leagueDirectorySchema,
@@ -44,6 +48,12 @@ export function SettingsPage() {
         catch (error) { setLeagueFailure(error instanceof Error ? error.message : 'Could not save leagues.'); }
         finally { setLeagueSaving(false); }
     }
+    async function toggleUsageEvents(enabled: boolean) {
+        setUsageSaving(true); setUsageMessage(''); setUsageFailure('');
+        try { await prefs.saveUsageEvents(enabled); setUsageMessage(enabled ? 'Usage events are on.' : 'Usage events are off. Nothing more will be recorded.'); }
+        catch (error) { setUsageFailure(error instanceof Error ? error.message : 'Could not save this setting.'); }
+        finally { setUsageSaving(false); }
+    }
     const filtered = directory.data?.data.leagues.filter(league =>
         `${league.league} ${league.country || ''}`.toLocaleLowerCase().includes(leagueSearch.trim().toLocaleLowerCase())
     ).sort((a, b) => (a.country || '').localeCompare(b.country || '') || a.league.localeCompare(b.league)) || [];
@@ -58,7 +68,7 @@ export function SettingsPage() {
                 <h2>Account</h2>
                 <p>{user?.primaryEmailAddress?.emailAddress || 'Your signed-in email address'}</p>
                 <p className={s.caption}>Use the account menu in the header to manage your password and sign out.</p>
-                <p><Link href="/onboarding?replay=1">Replay the introduction →</Link></p>
+                <p><Link href="/onboarding?replay=1" onClick={() => track('tutorial_replayed', { what: 'introduction' })}>Replay the introduction →</Link></p>
                 <p><Button type="button" onClick={() => { if (user?.id) { replayFunctionalityTips(user.id); router.push('/discover'); } }}>Replay feature tips</Button></p>
             </section>
             <section className={s.panel}>
@@ -112,6 +122,18 @@ export function SettingsPage() {
                     </fieldset></form>}
                 {failure && <p role="alert">{failure}</p>}
                 <p role="status">{message}</p>
+            </section>
+            <section className={s.panel}>
+                <h2>Privacy</h2>
+                <p>During the beta, Ballistics records which pages and matches you open and when you skip a tip, so we can find what’s confusing. This is stored with your account, never sold or shared, and deleted within 90 days of the beta ending.</p>
+                {prefs.loading ? <p role="status">Loading preferences…</p> : prefs.usageEvents == null ?
+                    <p className={s.caption}>This setting is temporarily unavailable.</p> :
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 44 }}>
+                        <input type="checkbox" checked={prefs.usageEvents} disabled={usageSaving} onChange={event => toggleUsageEvents(event.target.checked)}/>
+                        <span>Record usage events</span>
+                    </label>}
+                {usageFailure && <p role="alert">{usageFailure}</p>}
+                <p role="status">{usageMessage}</p>
             </section>
         </>}
     </Shell>;

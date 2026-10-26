@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback, useRef, type ComponentProps, type Rea
 import { GlassButton } from '@/components/GlassButton';
 import { savedSchema, type Saved, type Card } from '@/lib/research';
 import { savedResponseSchema, savedIdsSchema } from '@/lib/account';
+import { track } from '@/lib/usage-events';
 import { z } from 'zod';
 import s from './research.module.css';
 import { usePreferences } from './PreferencesProvider';
@@ -147,6 +148,7 @@ export function useSaved() {
         const ids = removing ? (state.ids || []).filter(id => id !== card.fixture_id) : [...new Set([...(state.ids || []), card.fixture_id])];
         setState({ key, items: next, ids, ready: true, error: '' });
         window.dispatchEvent(new CustomEvent('ballistics-saved', { detail: { key, items: next, ids } }));
+        if (removing) track('fixture_unsaved', { fixture_id: card.fixture_id });
         announce(removing ? 'Fixture removed from Saved.' : 'Fixture saved to your account.');
     }
     catch (error) { announce(error instanceof Error ? error.message : 'Could not update Saved.'); }

@@ -2,12 +2,13 @@
 import Link from 'next/link';
 import { usePreferences, useStamp } from './PreferencesProvider';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { matchSchema, type Match, type Pattern, type Card } from '@/lib/research';
 import { Shell, Button, Crest, FixtureIdentity, ResourceState, useResource, useSaved, Toast } from './shared';
 import s from './research.module.css';
 import { matchGuideKey } from './FunctionalityTip';
+import { track } from '@/lib/usage-events';
 const comparisons: Record<string, string> = { well_above: 'Much more often than usual', above: 'More often than usual', typical: 'Typical for this league', below: 'Less often than usual', well_below: 'Much less often than usual' };
 function Segment({ value, onChange, disabled = false }: {
     value: string;
@@ -27,6 +28,13 @@ function Details({ data }: {
     const { user, isLoaded } = useUser();
     const guideSections = (['strength', 'goals', 'patterns'] as const).filter(section => Boolean(data[section]));
     const [guideIndex, setGuideIndex] = useState<number | null>(null);
+    const opened = useRef<number | null>(null);
+    useEffect(() => {
+        // Strict Mode runs effects twice in development; record one open per fixture view.
+        if (opened.current === f.fixture_id) return;
+        opened.current = f.fixture_id;
+        track('match_opened', { fixture_id: f.fixture_id, after_kickoff: Date.now() >= new Date(f.kickoff_utc).getTime() });
+    }, [f.fixture_id]);
     useEffect(() => {
         if (!isLoaded || !user?.id || !guideSections.length) return;
         try { setGuideIndex(localStorage.getItem(matchGuideKey(user.id)) !== '1' ? 0 : null); }
@@ -36,7 +44,8 @@ function Details({ data }: {
         if (guideIndex == null) return;
         document.querySelector('[aria-label^="Match details guide"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, [guideIndex, guideSections.join(',')]);
-    const closeGuide = () => {
+    const closeGuide = (action: 'done' | 'skip') => {
+        track('tutorial_dismissed', { tutorial_id: 'match', action });
         if (user?.id) try { localStorage.setItem(matchGuideKey(user.id), '1'); } catch { /* Dismiss for this visit. */ }
         setGuideIndex(null);
     };
@@ -59,8 +68,8 @@ function Details({ data }: {
             {section === 'strength' ? <><strong>Who has the strength edge?</strong><p>This compares the teams’ strength using ratings and past league results. It shows an expectation for the matchup, not a certain winner.</p><p>{strengthLine}</p>{data.strength?.tiers && (data.strength.state === 'slight_favourite' || data.strength.state === 'close') && <p>Top, Middle and Bottom tiers group team ratings within this league; they are not table positions.</p>}</>
                 : section === 'goals' ? <><strong>What goal outcomes look likely?</strong><p>Each row shows a goal outcome and the model’s estimated chance of it happening in this match. The estimate draws on scoring and conceding evidence, but it is not a promised score or an exact goal range.</p><p>Related goal outcomes can overlap, so several high percentages are not separate confirmations.</p>{data.goals?.nothing_stands_out && <p>The available estimates do not identify a standout goal outcome here.</p>}</>
                 : <><strong>What has each team been doing this season?</strong><p>These are observed results and goal patterns from this season. A count such as 6/8 means that event happened in six of eight relevant matches. The league comparison uses the same event and home/away or all-venue setting.</p><p>Patterns describe what has happened, not the chance of it happening next time. Smaller samples can change quickly.</p></>}
-            <div className={s.row}>{guideIndex > 0 && <Button onClick={() => setGuideIndex(guideIndex - 1)}>Back</Button>}<Button className={s.active} onClick={() => last ? closeGuide() : setGuideIndex(guideIndex + 1)}>{last ? 'Done' : `Look at ${guideSections[guideIndex + 1]}`}</Button><Button onClick={closeGuide}>Skip guide</Button></div>
-            <a className={s.link} href="#methodology" onClick={() => { const details = document.getElementById('methodology') as HTMLDetailsElement | null; if (details) details.open = true; }}>{section === 'goals' ? 'How the model works' : 'Read how the numbers work'} →</a>
+            <div className={s.row}>{guideIndex > 0 && <Button onClick={() => setGuideIndex(guideIndex - 1)}>Back</Button>}<Button className={s.active} onClick={() => last ? closeGuide('done') : setGuideIndex(guideIndex + 1)}>{last ? 'Done' : `Look at ${guideSections[guideIndex + 1]}`}</Button><Button onClick={() => closeGuide('skip')}>Skip guide</Button></div>
+            <a className={s.link} href="#methodology" onClick={() => { track('methodology_opened', { from_section: 'match_guide' }); const details = document.getElementById('methodology') as HTMLDetailsElement | null; if (details) details.open = true; }}>{section === 'goals' ? 'How the model works' : 'Read how the numbers work'} →</a>
         </aside>;
     };
     const search = useSearchParams(), router = useRouter(), saved = useSaved();
@@ -89,7 +98,7 @@ function Details({ data }: {
     return <><div className={s.sticky}><div className={s.row}><Button aria-label="Back to previous page" onClick={() => { if (window.history.length > 1)
         router.back();
     else
-        router.push('/discover'); }}>←</Button><div className={s.stickyTitle}><h1 aria-label={title}><FixtureIdentity card={f}/></h1></div><Button asChild aria-label="How these numbers work"><a href="#methodology">i</a></Button><Button className={s.active} aria-pressed={saved.isSaved(f.fixture_id)} onClick={() => saved.toggle(card, f.run_ds)}>{saved.isSaved(f.fixture_id) ? '✓ Saved' : '+ Save'}</Button></div><div className={s.matchMetadata}><p className={`${s.caption} ${s.competition}`}><Crest name={f.league} url={f.league_logo_url} league/><span>{f.league}{f.country && ` · ${f.country}`}</span></p><p className={s.caption}>{stamp(f.kickoff_utc)}</p></div><nav className={s.chips} aria-label="Match sections">{['context', ...(data.strength ? ['strength'] : []), ...(data.patterns ? ['patterns'] : []), ...(data.goals ? ['goals'] : [])].map(key => <a href={`#${key}`} className={active === key ? s.active : ''} onClick={() => setActive(key)} key={key}>{key[0].toUpperCase() + key.slice(1)}</a>)}</nav></div>
+        router.push('/discover'); }}>←</Button><div className={s.stickyTitle}><h1 aria-label={title}><FixtureIdentity card={f}/></h1></div><Button asChild aria-label="How these numbers work"><a href="#methodology" onClick={() => track('methodology_opened', { from_section: 'match_header' })}>i</a></Button><Button className={s.active} aria-pressed={saved.isSaved(f.fixture_id)} onClick={() => saved.toggle(card, f.run_ds)}>{saved.isSaved(f.fixture_id) ? '✓ Saved' : '+ Save'}</Button></div><div className={s.matchMetadata}><p className={`${s.caption} ${s.competition}`}><Crest name={f.league} url={f.league_logo_url} league/><span>{f.league}{f.country && ` · ${f.country}`}</span></p><p className={s.caption}>{stamp(f.kickoff_utc)}</p></div><nav className={s.chips} aria-label="Match sections">{['context', ...(data.strength ? ['strength'] : []), ...(data.patterns ? ['patterns'] : []), ...(data.goals ? ['goals'] : [])].map(key => <a href={`#${key}`} className={active === key ? s.active : ''} onClick={() => setActive(key)} key={key}>{key[0].toUpperCase() + key.slice(1)}</a>)}</nav></div>
  <div className={s.mobileIdentity}><h2 className={s.team}><Crest name={f.home} url={f.home_crest_url}/>{f.home}</h2><h2 className={s.team}><Crest name={f.away} url={f.away_crest_url}/>{f.away}</h2><p className={`${s.caption} ${s.competition}`}><Crest name={f.league} url={f.league_logo_url} league/><span>{f.league}{f.country && ` · ${f.country}`}</span></p><p className={s.caption}>{stamp(f.kickoff_utc)}</p><p className={s.caption}>{f.run_finished_at ? `Engine updated ${stamp(f.run_finished_at)} · Run ${f.run_ds}` : 'No engine analysis in the latest complete run.'}</p>{entry && <p className={s.caption}>Opened from Discover · {entry === 'strength' ? 'Team strength' : entry === 'patterns' ? 'Team patterns' : 'Goals outlook'}</p>}</div>
  <section id="context" data-match-section className={`${s.panel} ${s.contextPanel}`}><h2>Match context</h2><div className={s.contextCore}><Segment value={contextView} onChange={setContextView}/><table className={s.comparison}><thead><tr><th scope="col"><span aria-label="Comparison metric"/></th><th scope="col">{f.home}<br />{contextView === 'all' ? 'All venues' : 'Home'}</th><th scope="col">{f.away}<br />{contextView === 'all' ? 'All venues' : 'Away'}</th></tr></thead><tbody><tr><td>{contextView === 'venue' ? 'Home / away rank' : 'League position'}</td>{[positions?.home, positions?.away].map((p, i) => <td key={i}>{positionText(p)}{p?.source === 'calculated' && <p className={s.caption}>Calculated from results</p>}{p?.points != null && <><br />{p.points} pts</>}{p?.show_group_name && <p className={s.caption}>{p.group_name}</p>}{!p && <p className={s.caption}>Not in table yet</p>}</td>)}</tr>{compareRows.map(([label, left, right, higher, rank]) => <tr key={label}><td>{label}</td>{[left, right].map((n, i) => <td key={i} className={left != null && right != null && left !== right && ((higher ? left > right : left < right) === (i === 0)) ? s.better : undefined}>{n == null ? '—' : rank ? `#${n}${(i === 0 ? h : a)?.league_size ? ` of ${(i === 0 ? h : a)?.league_size}` : ''}` : n.toFixed(2)}</td>)}</tr>)}</tbody></table><p className={s.caption}>Home / away rank uses the league’s venue records when available. Missing venue or overall ranks can be calculated from completed league results and are labelled. The full standings show the provider table. Other rows follow the venue switch. #1 is best. Shaded = better side. Standings updated {f.standings_updated_at ? stamp(f.standings_updated_at) : 'unavailable'}. Engine {f.run_finished_at ? stamp(f.run_finished_at) : 'unavailable'}.</p></div>
  <div className={s.supportingContext}>

@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_app__events
+    description: "Beta usage events with allow-listed properties as typed columns."
+    columns:
+      - name: event_id
+        tests: [not_null, unique]
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              to: source('app', 'app_users')
+              field: user_id
+  - name: beta_funnel
+    description: "One row per member: invitation, onboarding, first Match, first save and return after kickoff. Private to the database owner."
+    columns:
+      - name: user_id
+        tests: [not_null, unique]
+      - name: onboarding_outcome
+        tests:
+          - accepted_values:
+              values: ['completed', 'skipped']

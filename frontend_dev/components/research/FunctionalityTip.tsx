@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
+import { track } from '@/lib/usage-events';
 import s from './research.module.css';
 
 export const tutorialIds = ['discover', 'filters', 'match', 'saved', 'settings', 'record'] as const;
@@ -11,6 +12,7 @@ export const matchGuideKey = (userId: string) => key(userId, 'match');
 
 export function replayFunctionalityTips(userId: string) {
     for (const id of tutorialIds) localStorage.removeItem(key(userId, id));
+    track('tutorial_replayed', { what: 'tips' });
 }
 
 export function FunctionalityTip({ id, title, children, moreHref, moreLabel = 'How it works', suppressIfOnboardingSaveTip = false }: {
@@ -31,8 +33,8 @@ export function FunctionalityTip({ id, title, children, moreHref, moreLabel = 'H
     if (!visible || !user?.id) return null;
     return <aside className={s.tutorialTip} aria-label={`${title} help`}>
         <strong>{title}</strong><div>{children}</div>
-        <div className={s.row}>{moreHref && <Link className={s.link} href={moreHref}>{moreLabel} →</Link>}
-            <button type="button" onClick={() => { try { localStorage.setItem(key(user.id, id), '1'); } catch { /* Dismiss for this visit. */ } setVisible(false); }}>Got it</button>
+        <div className={s.row}>{moreHref && <Link className={s.link} href={moreHref} onClick={() => { if (id === 'discover' || id === 'record') track('methodology_opened', { from_section: id }); }}>{moreLabel} →</Link>}
+            <button type="button" onClick={() => { track('tutorial_dismissed', { tutorial_id: id, action: 'got_it' }); try { localStorage.setItem(key(user.id, id), '1'); } catch { /* Dismiss for this visit. */ } setVisible(false); }}>Got it</button>
         </div>
     </aside>;
 }

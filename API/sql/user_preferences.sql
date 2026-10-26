@@ -5,3 +5,5 @@ CREATE TABLE IF NOT EXISTS app.user_preferences (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+-- D164: beta usage events are on unless the member turns them off in Settings.
+ALTER TABLE app.user_preferences ADD COLUMN IF NOT EXISTS usage_events_enabled BOOLEAN NOT NULL DEFAULT TRUE;

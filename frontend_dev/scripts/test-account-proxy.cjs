@@ -46,6 +46,20 @@ const request = (method = 'GET', body, origin = 'https://ballistics.test') => ({
   assert.equal(result.status, 503); assert.ok(!(await result.text()).includes('private'));
   upstream = { status: 200, body: { unexpected: true } };
   assert.equal((await accountProxy(request(), 'account/saved', schemas.savedResponseSchema)).status, 502);
+  const events = load('lib/usage-events.ts');
+  const usage = { event_id: '6f1c3c2e-1d1e-4c55-9d7c-2f1d3b4a5c6d', session_id: '0b4e8d6a-7c2f-4e1a-9b3d-5a6c7d8e9f01', event_name: 'match_opened', props: { fixture_id: 7, after_kickoff: false }, occurred_at: '2026-10-26T12:00:00.000Z' };
+  calls = []; upstream = { status: 200, body: { data: { accepted: 1, enabled: true } } };
+  for (const bad of [{ events: [] }, { events: Array(21).fill(usage) }, { events: [{ ...usage, user_id: 'bob' }] }, { events: [{ ...usage, props: { note: { nested: true } } }] }, { events: [usage], user_id: 'bob' }])
+    assert.equal((await accountProxy(request('POST', bad), 'account/events', events.usageEventsResponseSchema, events.usageEventBatchSchema)).status, 422);
+  assert.equal(calls.length, 0);
+  result = await accountProxy(request('POST', { events: [usage] }), 'account/events', events.usageEventsResponseSchema, events.usageEventBatchSchema);
+  assert.equal(result.status, 200);
+  assert.equal(calls.at(-1).url, 'http://localhost:8000/account/events');
+  assert.deepEqual(JSON.parse(calls.at(-1).options.body), { events: [usage] });
+  upstream = { status: 200, body: { data: { usage_events_enabled: false } } };
+  assert.equal((await accountProxy(request('POST', { enabled: 'no' }), 'preferences/usage-events', events.usageEventsSettingResponseSchema, events.usageEventsSettingSchema)).status, 422);
+  result = await accountProxy(request('POST', { enabled: false }), 'preferences/usage-events', events.usageEventsSettingResponseSchema, events.usageEventsSettingSchema);
+  assert.equal(result.status, 200); assert.equal((await result.json()).data.usage_events_enabled, false);
   token = null;
   assert.equal((await accountProxy(request(), 'account/saved', schemas.savedResponseSchema)).status, 401);
   console.log('PASS: account proxy auth, origin, token forwarding, response validation, no-store and sanitized errors');

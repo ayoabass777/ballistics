@@ -16,6 +16,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from API.preferences import PreferencesUpdate, read_preferences, save_preferences
+from API.usage_events import (
+    UsageEventBatch, UsageEventsSetting, insert_events, save_usage_events_setting, usage_events_enabled,
+)
 from API.account_data import (
     FollowedLeaguesUpdate, SavedCreate, SavedImport, delete_saved,
     ensure_account_user, insert_saved, list_followed_leagues, list_saved,
@@ -1525,6 +1528,32 @@ def update_preferences(
     db: Session = Depends(get_db),
 ):
     return _preferences_request(db, claims, body)
+
+
+@app.post("/preferences/usage-events")
+def update_usage_events_setting(
+    body: UsageEventsSetting,
+    claims: Dict[str, Any] = Depends(get_current_user_claims),
+    db: Session = Depends(get_db),
+):
+    def save(uid):
+        return {"usage_events_enabled": save_usage_events_setting(db, uid, body.enabled)}
+    return _account_data_request(db, claims, save, write=True)
+
+
+@app.post("/account/events")
+def record_usage_events(
+    body: UsageEventBatch,
+    claims: Dict[str, Any] = Depends(get_current_user_claims),
+    db: Session = Depends(get_db),
+):
+    def record(uid):
+        # A member who opted out has nothing stored, even if a stale tab still sends.
+        if not usage_events_enabled(db, uid):
+            return {"accepted": 0, "enabled": False}
+        insert_events(db, uid, body.events)
+        return {"accepted": len(body.events), "enabled": True}
+    return _account_data_request(db, claims, record, write=True)
 
 
 def _account_data_request(db, claims, operation, write=False):
