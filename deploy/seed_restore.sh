@@ -37,9 +37,12 @@ docker exec -i "$pg" pg_restore -U "$DB_USER" -d ballistics \
 echo "    restored in $(( $(date +%s) - start ))s"
 
 echo "==> recording migration 0001 as applied"
+# A plain Python image: the seed runs before the first deploy has built any
+# of ours, and migrate.py only needs psycopg2.
 docker run --rm --network ballistics_network -v "$ROOT:/repo:ro" -w /repo \
     -e DATABASE_URL="postgresql://$DB_USER:$DB_PASSWORD@ballistics_postgres:5432/ballistics" \
-    "ballistics-engine:${RELEASE:-latest}" python scripts/migrate.py baseline 0001
+    python:3.11-slim sh -c "pip install -q --root-user-action=ignore psycopg2-binary \
+      && python scripts/migrate.py baseline 0001"
 
 psql -Atc "select 'raw tables: '||count(*) from pg_tables where schemaname='raw'
            union all select 'latest complete run: '||coalesce(max(run_ds)::text,'none') from raw.engine_runs where status='complete'"
