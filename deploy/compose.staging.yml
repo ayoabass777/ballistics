@@ -127,6 +127,11 @@ services:
     restart: unless-stopped
     environment:
       FORECAST_API_DSN: dbname=ballistics user=research_reader password=${RESEARCH_DB_PASSWORD} host=postgres options='-c default_transaction_read_only=on'
+      # Crest links in Match context and Discover (engine/api/crests.py);
+      # without these it falls back to a bucket name that doesn't exist.
+      CREST_BASE_URL: ${CREST_BASE_URL}
+      ASSETS_BUCKET: ${ASSETS_BUCKET}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ca-central-1}
     depends_on:
       postgres:
         condition: service_healthy
