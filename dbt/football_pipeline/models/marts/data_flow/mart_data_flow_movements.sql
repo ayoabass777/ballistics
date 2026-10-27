@@ -1,5 +1,7 @@
 SELECT
-    run_id,
+    -- Loads run outside Airflow (manual backfills) record no run id
+    -- (etl/src/data_detector/monitoring.py).
+    COALESCE(run_id, 'manual') AS run_id,
     dag_id,
     task_id,
     movement_type,
