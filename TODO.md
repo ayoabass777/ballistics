@@ -30,8 +30,14 @@ path: each item gates the ones below it, except where marked parallel.
    `~/.ssh/ballistics_v2_ed25519`, alias `ballistics-v2`, user `sage`). Base
    setup done 2026-10-22 (swap, Docker, SSH hardening, UFW, fail2ban). Migration runner,
    baseline and deploy files (compose, Caddyfile, roles, grants) done and
-   checked 2026-10-22. Next: plan step 1 (frontend repo, plus its Dockerfile
-   ARGs and logo URL), the deploy script, then step 4.
+   checked 2026-10-22. **Deployed 2026-10-27** (release `b5ed5b3f505`): seeded
+   from local, all services up at `beta.ballistics.football`, Clerk production
+   sign-in renders, crests copied to the staging bucket. Local DAGs paused and
+   local Airflow stopped; staging's DAGs unpaused (except
+   `saved_snapshot_maintenance`), first nightly cycle 2026-10-28 00:00 UTC.
+   Nightly backup built and restore-tested 2026-10-27
+   (`deploy/backup_postgres.sh`, 03:30 UTC cron). Still open: Hetzner weekly
+   snapshots (owner, console), missed-run alert, uptime and disk checks.
 4. [ ] **Member journey gaps (checkpoint 2, parallel with 3).**
    - Tester instructions for Google sign-in (D151): use the Google account the
      invitation went to; the 2026-10-21 "Last used" button signed in as another

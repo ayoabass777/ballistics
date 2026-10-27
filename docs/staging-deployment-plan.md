@@ -398,6 +398,19 @@ baseline 0001` then `up` applied 0002.
 - **Backups:** nightly `pg_dump -Fc` to the backups bucket, 14 days kept, plus
   weekly Hetzner snapshots. A restore into a scratch database is part of the
   smoke test; an untested backup does not count.
+  Built 2026-10-27: `deploy/backup_postgres.sh`, run by `sage`'s crontab at
+  03:30 UTC (outside Airflow, so a broken scheduler doesn't stop backups).
+  Dumps `ballistics` and `airflow`, checks each with `pg_restore --list`,
+  uploads to `s3://ballistics-stg-backups/postgres/<day>/` with the
+  `amazon/aws-cli` image, compares uploaded sizes, keeps only the newest dump
+  in `/var/lib/ballistics-backup`, and emails `ALERT_EMAIL_TO` if any step
+  fails (log: `/var/lib/ballistics-backup/backup.log`). First run: 384 MB in
+  1m41s; a forced upload failure sent the alert. `restore-test` restored it
+  into a scratch database in 2m52s with every table count and key row count
+  matching live, then dropped it. Restoring for real on a new server: deploy
+  with `--checkout-only`, fill `.env.staging` (the postgres-init script
+  recreates the roles), download the dump and run `seed_restore.sh` on it.
+  Hetzner weekly snapshots: owner to enable in the console (not done).
 - **Exports and the consensus dashboard:** the beta site does not read the
   per-run JSON, but the internal dashboard `engine/eval/consensus_app.html`
   does: it loads the newest `consensus_slips_<ds>.json` and
