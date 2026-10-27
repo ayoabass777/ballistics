@@ -21,6 +21,12 @@ name: ballistics
 x-airflow: &airflow
   image: ballistics-airflow:${RELEASE:-latest}
   restart: unless-stopped
+  # The image's airflow user (50000) can't write the bind mounts, which the
+  # host user owns (config.py creates data/ subfolders at import), or reach
+  # the Docker socket (root:docker 660). Run as the owner of /srv/ballistics,
+  # with group 0 as the image expects, plus the host's docker group.
+  user: "${AIRFLOW_UID:-1000}:0"
+  group_add: ["${DOCKER_GID:-988}"]
   environment: &airflow-env
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${AIRFLOW_DB_PASSWORD}@postgres:5432/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
