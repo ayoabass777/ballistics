@@ -4,11 +4,16 @@ import unittest
 from unittest.mock import patch
 
 from engine.eval import run_model
+from datetime import datetime, timezone
+
 from engine.eval.bayesian_streaks import MIN_POSTERIOR_INTERESTING
+from engine.eval.predict_mismatch import MismatchPick
 from engine.eval.consensus_slips import (
     _build_elo_gap_shortlist,
     _within_shortlist_end_date,
     _analysis_from_signals,
+    add_mismatch_rows,
+    mismatch_signals,
     _passes_goal_model_rules,
     annotate_bayesian_analysis,
     bayesian_signals,
@@ -79,6 +84,38 @@ class EloGapShortlistTests(unittest.TestCase):
         shortlist = _build_elo_gap_shortlist([f, g], volatility)
         self.assertEqual([p["favourite"] for p in shortlist], ["Favourite 5"])
         self.assertEqual(shortlist[0]["elo_gap"], 255)
+
+
+class MismatchRowParityTests(unittest.TestCase):
+    """run_consensus and --from-picks must write the same Mismatch rows (10-27 outage)."""
+
+    META = {"fixture_id": 7, "home": "Underdogs FC", "away": "Big Club", "league": "Stable",
+            "country": "Testland", "kickoff": "2026-11-01T18:00:00Z"}
+
+    def picks(self):
+        common = dict(fixture_id=7, kickoff=datetime(2026, 11, 1, 18, tzinfo=timezone.utc),
+                      home_team="Underdogs FC", away_team="Big Club", league="Stable",
+                      favourite="Big Club", underdog="Underdogs FC", fav_elo=1900, dog_elo=1560,
+                      gap=340, gap_bin="300+", sample_size=400, fav_is_home=False,
+                      country="Testland", fav_attack_pct=80.0, dog_defense_pct=30.0)
+        return [MismatchPick(market="fav_to_score", confidence=0.91, **common),
+                MismatchPick(market="fav_win", confidence=0.78, **common)]
+
+    def test_in_process_rows_match_fan_in_rows(self):
+        in_process = {7: {**self.META, "mismatch": []}}
+        add_mismatch_rows(in_process, self.picks())
+        fan_in = _analysis_from_signals(mismatch_signals(self.picks()), {7: self.META}, {})
+        self.assertEqual(in_process[7]["mismatch"], fan_in[0]["mismatch"])
+        markets = [row["market"] for row in in_process[7]["mismatch"]]
+        self.assertIn("Big Club Over 0.5", markets)
+        self.assertNotIn("fav_to_score", markets)
+
+    def test_in_process_rows_feed_the_big_dog_shortlist(self):
+        fixtures = {7: {**self.META, "mismatch": []}}
+        add_mismatch_rows(fixtures, self.picks())
+        volatility = {("Stable", "Testland"): {"upset_rate": 0.2, "matches": 500}}
+        shortlist = _build_elo_gap_shortlist(list(fixtures.values()), volatility)
+        self.assertEqual([p["favourite"] for p in shortlist], ["Big Club"])
 
 
 class ConsensusGoalModelRuleTests(unittest.TestCase):

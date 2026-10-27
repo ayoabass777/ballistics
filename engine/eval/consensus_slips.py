@@ -53,7 +53,7 @@ import pandas as pd
 from engine.eval.team_patterns import attach_team_patterns
 from engine.eval.predict_upcoming import _tier
 from engine.eval.goals_league_blend import blend_probability
-from engine.eval.predict_mismatch import predict_mismatch, _market_label
+from engine.eval.predict_mismatch import predict_mismatch
 from engine.eval.predict_dixon_coles import predict_dixon_coles
 from engine.eval.db import get_conn
 from engine.eval.team_strength import load_team_df, compute_team_strength
@@ -1900,6 +1900,25 @@ def _gates_by_fixture(gate_status: dict) -> dict:
     return out
 
 
+def _analysis_row(signal: dict) -> dict:
+    """One fixture_analysis model row from a consensus signal."""
+    return {"market": signal["unified_market"], "probability": signal["probability"],
+            **(signal.get("detail") or {})}
+
+
+def add_mismatch_rows(fixture_analysis: dict, mismatch_picks) -> None:
+    """In-process run: the same Mismatch rows as the --from-picks fan-in.
+
+    raw.model_picks stores exactly mismatch_signals, so both paths carry
+    team-named markets ("<favourite> Over 0.5"), which the Big dog shortlist
+    and the Match page read to find the favourite.
+    """
+    for sig in mismatch_signals(mismatch_picks):
+        entry = fixture_analysis.get(sig["fixture_id"])
+        if entry is not None:
+            entry["mismatch"].append(_analysis_row(sig))
+
+
 def _analysis_from_signals(signals: list[dict], fixture_meta: dict,
                            fixture_strength_all: dict,
                            gate_status: dict | None = None,
@@ -1916,9 +1935,7 @@ def _analysis_from_signals(signals: list[dict], fixture_meta: dict,
         entry = fa.get(s["fixture_id"])
         if not entry or s["model"] not in entry:
             continue
-        entry[s["model"]].append({"market": s["unified_market"],
-                                  "probability": s["probability"],
-                                  **(s.get("detail") or {})})
+        entry[s["model"]].append(_analysis_row(s))
 
     # The scheduled fan-in report is normally reconstructed from model_picks,
     # which intentionally contains only consensus-eligible rows. Replace that
@@ -2233,22 +2250,7 @@ def run_consensus(days: int = 10,
                     "tier": _tier(row["probability"]),
                 })
 
-    for p in mismatch_picks:
-        fid = p.fixture_id
-        if fid in fixture_analysis:
-            entry = {
-                "market": p.market,
-                "label": _market_label(p.market, p.favourite),
-                "confidence": round(p.confidence, 4),
-                "favourite": p.favourite,
-                "gap": p.gap,
-                "gap_bin": p.gap_bin,
-            }
-            if hasattr(p, "fav_attack_pct") and p.fav_attack_pct:
-                entry["fav_atk"] = p.fav_attack_pct
-            if hasattr(p, "dog_defense_pct") and p.dog_defense_pct:
-                entry["dog_def"] = p.dog_defense_pct
-            fixture_analysis[fid]["mismatch"].append(entry)
+    add_mismatch_rows(fixture_analysis, mismatch_picks)
 
     for fid, sides in bayesian_by_fixture.items():
         if fid not in fixture_analysis:
