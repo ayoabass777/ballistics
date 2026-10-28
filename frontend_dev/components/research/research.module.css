@@ -209,3 +209,7 @@
 .followActions { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 18px; }
 .followActions p { margin: 0; }
 @media (max-width: 500px) { .followActions { align-items: stretch; flex-direction: column; } .followActions > div { display: flex; } .followActions button { flex: 1; } }
+.dataQuality { align-self:flex-start; background:#fff8e8; border:1px solid #e6d8b4; border-radius:999px; padding:0 12px; font-size:12px; }
+.dataQuality[open] { border-radius:8px; padding:0 12px 8px; }
+.dataQuality summary { cursor:pointer; padding:6px 0; font-weight:600; }
+.dataQuality ul { margin:0; padding-left:18px; line-height:18px; }

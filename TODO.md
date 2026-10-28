@@ -52,13 +52,16 @@ path: each item gates the ones below it, except where marked parallel.
      `ballistics-512818`, Branding) and **publish** it. Until then Google
      sign-in is in Testing: add each tester's Google address as a test user
      (Audience page, max 100).
-5. [ ] **Match details build items (D152, parallel with 3).**
+5. [x] **Match details build items (D152, parallel with 3).** Done locally
+   2026-10-28, not yet deployed to staging.
    - After kickoff, show the last pre-kickoff forecast. API side done
      2026-10-22: `/api/match` reads the fixture's most recent complete run and
      sets `fixture.forecast_from_latest_run` (migration 0002 adds the index;
-     `engine_stale` skipped once kickoff passed). Frontend still to label the
-     sections "made before kickoff" (frontend repo).
-   - Small `data_quality` badge from the API block (second D148).
+     `engine_stale` skipped once kickoff passed). Frontend 2026-10-28: a "Made
+     before kickoff" notice above Strength, Patterns and Goals once kickoff has
+     passed and the run finished before it.
+   - Small `data_quality` badge from the API block (second D148): "Data check ·
+     N notes" under the match header, opening to the API messages.
 6. [ ] **Daily data reliability on staging.** Several clean daily
    `fixture_update` + engine cycles with no lost days (Oct 15 and 17 were lost
    to a standings failure), an alert that fires on failure, and the ~110
