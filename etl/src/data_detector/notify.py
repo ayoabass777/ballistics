@@ -57,6 +57,24 @@ def _send_email(subject: str, body: str, html: str | None = None) -> None:
 
 SENDERS = {"slack": _send_slack, "email": _send_email}
 
+
+def send_failure_alert(subject: str, body: str) -> list[str]:
+    """Attempt every configured channel once, without delaying a failed Airflow task.
+
+    Returns the channels that succeeded."""
+    sent = []
+    channels = configured_channels()
+    if not channels:
+        logger.warning("No failure alert channel configured. %s\n%s", subject, body)
+        return sent
+    for name in channels:
+        try:
+            SENDERS[name](subject, body)
+            sent.append(name)
+        except Exception as exc:   # one broken channel must not hide the alert elsewhere
+            logger.error("Immediate failure alert via %s failed: %s", name, exc, exc_info=True)
+    return sent
+
 # Waits (seconds) between attempts when a send fails on the network
 # (DNS, connection refused, timeout). Auth or bad-request errors don't retry.
 RETRY_WAITS = (60, 180)

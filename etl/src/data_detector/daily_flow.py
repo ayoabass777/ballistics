@@ -502,6 +502,87 @@ def collect_metrics(cur, ds: date, results: dict[str, dict]) -> dict:
     return metrics
 
 
+ACTIVITY_SQL = {
+    # Per DAG for the day: tasks, outcomes, wall-clock window, slowest task.
+    "runs": """
+        WITH day AS (
+          SELECT dag_id, task_id, status, started_at, finished_at FROM data_detector.pipeline_runs
+          WHERE ((metadata->>'logical_date')::timestamptz AT TIME ZONE 'UTC')::date = %(ds)s)
+        SELECT dag_id, count(*), count(*) FILTER (WHERE status = 'success'),
+               count(*) FILTER (WHERE status IN ('failed', 'upstream_failed')),
+               count(*) FILTER (WHERE status = 'skipped'),
+               min(started_at), max(finished_at),
+               (SELECT d2.task_id FROM day d2 WHERE d2.dag_id = day.dag_id AND d2.finished_at IS NOT NULL
+                ORDER BY d2.finished_at - d2.started_at DESC NULLS LAST LIMIT 1),
+               (SELECT EXTRACT(EPOCH FROM max(d2.finished_at - d2.started_at)) FROM day d2
+                WHERE d2.dag_id = day.dag_id)
+        FROM day GROUP BY dag_id ORDER BY dag_id""",
+    # Rows moved per movement and target for the day, against the median of the 7 days
+    # before (a median, so one bootstrap load does not make every normal day look low).
+    "movements": """
+        WITH m AS (
+          SELECT (r.logical_date::timestamptz AT TIME ZONE 'UTC')::date AS day,
+                 m.movement_type, coalesce(m.target_schema || '.' || m.target_table, m.source_system) AS target,
+                 m.status, m.row_count, m.inserted_count, m.updated_count, m.failed_count
+          FROM data_detector.data_movements m
+          JOIN (SELECT DISTINCT dag_id, run_id, metadata->>'logical_date' AS logical_date
+                FROM data_detector.pipeline_runs) r ON r.dag_id = m.dag_id AND r.run_id = m.run_id
+          WHERE (r.logical_date::timestamptz AT TIME ZONE 'UTC')::date
+                BETWEEN %(ds)s::date - 7 AND %(ds)s),
+        today AS (
+          SELECT movement_type, target, sum(row_count) AS rows, sum(inserted_count) AS ins,
+                 sum(updated_count) AS upd, sum(failed_count) AS failed,
+                 count(*) FILTER (WHERE status <> 'success') AS bad_moves
+          FROM m WHERE day = %(ds)s GROUP BY 1, 2),
+        prior AS (
+          SELECT movement_type, target,
+                 percentile_cont(0.5) WITHIN GROUP (ORDER BY rows) AS median_rows FROM (
+            SELECT day, movement_type, target, sum(row_count) AS rows FROM m
+            WHERE day < %(ds)s GROUP BY 1, 2, 3) x GROUP BY 1, 2)
+        SELECT t.movement_type, t.target, t.rows, t.ins, t.upd, t.failed, t.bad_moves, p.median_rows
+        FROM today t LEFT JOIN prior p USING (movement_type, target)
+        ORDER BY t.movement_type, t.target""",
+    # Incidents still open, oldest first.
+    "incidents": """
+        SELECT coalesce(table_schema || '.' || table_name, check_name), check_name, severity,
+               EXTRACT(EPOCH FROM now() - detected_at) / 3600, error_message
+        FROM data_detector.data_quality_events
+        WHERE status IN ('open', 'failed')
+        ORDER BY detected_at LIMIT 15""",
+}
+
+
+def _num(x):
+    return None if x is None else float(x)
+
+
+def collect_activity(cur, ds: date) -> dict:
+    """What ran and moved on ds, plus open incidents. A failed query leaves its key out."""
+    out: dict = {}
+    for key, sql in ACTIVITY_SQL.items():
+        cur.execute("SAVEPOINT flow_activity")
+        try:
+            cur.execute(sql, {"ds": ds})
+            rows = cur.fetchall()
+            cur.execute("RELEASE SAVEPOINT flow_activity")
+        except Exception as exc:
+            cur.execute("ROLLBACK TO SAVEPOINT flow_activity")
+            logger.warning("daily_flow activity %s unavailable: %s", key, exc)
+            continue
+        if key == "runs":
+            out[key] = [{"dag": r[0], "tasks": r[1], "ok": r[2], "failed": r[3], "skipped": r[4],
+                         "started": r[5], "finished": r[6], "slowest_task": r[7],
+                         "slowest_seconds": _num(r[8])} for r in rows]
+        elif key == "movements":
+            out[key] = [{"movement": r[0], "target": r[1], "rows": r[2], "inserted": r[3],
+                         "updated": r[4], "failed": r[5] or 0, "bad_moves": r[6] or 0,
+                         "median_rows": _num(r[7])} for r in rows]
+        else:
+            out[key] = [{"dataset": r[0], "check": r[1], "severity": r[2],
+                         "age_hours": _num(r[3]) or 0.0, "error": (r[4] or "")[:200]} for r in rows]
+    return out
+
+
 def collect_history(cur, ds: date, days: int = 7) -> list[dict]:
     """Worst status per day for the last `days` days ending at ds (oldest first)."""
     cur.execute(
@@ -555,6 +636,7 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
             history = collect_history(cur, ds)
             from etl.src.data_detector.model_watch import collect as collect_watch
             watch = collect_watch(cur, ds)
+            activity = collect_activity(cur, ds)
         conn.rollback()
     finally:
         if own:
@@ -566,7 +648,8 @@ def run(ds: date, *, conn=None, registry: Registry | None = None, notify: bool =
     # Problems and recoveries always send; a clean day sends only with the daily report on.
     if notify and (bad or events["resolved"] or daily_report_enabled()):
         subject, text, html = render(ds, results, registry, metrics=metrics, history=history,
-                                     resolved=events["resolved"], watch=watch)
+                                     resolved=events["resolved"], watch=watch,
+                                     activity=activity)
         sent = send_alert(subject, text, html=html)
     summary = {"check_date": str(ds), "ok": sum(v["status"] == "ok" for v in results.values()),
                "failed_or_missing": errors,          # fails the Airflow task

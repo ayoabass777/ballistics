@@ -228,8 +228,175 @@ def _watch_html(watch: dict | None) -> str:
             f'</td></tr>')
 
 
+def _section(title: str, body: str, note: str = "") -> str:
+    note_html = (f'<div style="font-size:12px;color:{MUTED};margin-bottom:6px;">{escape(note)}</div>'
+                 if note else "")
+    return (f'<tr><td style="padding:22px 28px 0;"><div style="font-size:13px;font-weight:700;'
+            f'letter-spacing:.04em;text-transform:uppercase;color:{MUTED};margin-bottom:6px;">{escape(title)}</div>'
+            f'{note_html}<table role="presentation" width="100%" cellpadding="0" cellspacing="0">{body}</table>'
+            f'</td></tr>')
+
+
+def _cells(*cells, status: str | None = None) -> str:
+    """One table row; the first cell gets a status dot when status is given."""
+    out = []
+    for i, text in enumerate(cells):
+        dot = (f'<span style="color:{STATUS[status][0]};">&#9679;</span>&nbsp;'
+               if i == 0 and status else "")
+        align = "left" if i == 0 else "right"
+        out.append(f'<td align="{align}" valign="top" style="padding:6px 0 6px {0 if i == 0 else 10}px;'
+                   f'border-bottom:1px solid {LINE};font-size:12px;color:{INK};">{dot}{escape(str(text))}</td>')
+    return f'<tr>{"".join(out)}</tr>'
+
+
+def _head(*cells) -> str:
+    return "<tr>" + "".join(
+        f'<td align="{"left" if i == 0 else "right"}" style="padding:4px 0 4px {0 if i == 0 else 10}px;'
+        f'font-size:11px;color:{MUTED};border-bottom:1px solid {LINE};">{escape(c)}</td>'
+        for i, c in enumerate(cells)) + "</tr>"
+
+
+NOTE_KEYS = ("rows", "open", "bad", "sampled", "note", "reason", "error", "check_error", "finished_at")
+
+
+def dataset_note(r: dict) -> str:
+    """The one detail that best says what happened to a dataset."""
+    d = r.get("details") or {}
+    if r["status"] == "blocked":
+        return "blocked by " + ", ".join(r.get("blocked_by") or []) if r.get("blocked_by") else "blocked"
+    for key in NOTE_KEYS:
+        if d.get(key) not in (None, ""):
+            value = d[key]
+            if key == "finished_at":
+                return "finished " + str(value)[:16]
+            if key in ("rows", "open", "bad", "sampled"):
+                return f"{_fmt(value)} {key}"
+            return str(value)[:80]
+    return ""
+
+
+def _dataset_lines(results: dict, registry) -> list[tuple[str, str, str, str]]:
+    """(layer name, dataset, status, note) for every dataset, pipeline order."""
+    out = []
+    for layer in LAYER_ORDER:
+        for k, v in results.items():
+            if v["layer"] == layer:
+                out.append((LAYER_NAMES[layer], k, _status_of(k, v, registry), dataset_note(v)))
+    return out
+
+
+def _duration(seconds) -> str:
+    if seconds is None:
+        return "—"
+    seconds = int(seconds)
+    if seconds < 60:
+        return f"{seconds}s"
+    if seconds < 3600:
+        return f"{seconds // 60}m {seconds % 60:02d}s"
+    return f"{seconds // 3600}h {seconds % 3600 // 60:02d}m"
+
+
+def _hhmm(ts) -> str:
+    return "—" if ts is None else ts.strftime("%a %H:%M UTC") if hasattr(ts, "strftime") else str(ts)[:16]
+
+
+def _run_window(r: dict) -> str:
+    if r["started"] is None or r["finished"] is None:
+        return "—"
+    return f"{_hhmm(r['started'])} · {_duration((r['finished'] - r['started']).total_seconds())}"
+
+
+def run_status(r: dict) -> str:
+    if r["failed"]:
+        return "failed"
+    return "ok" if r["ok"] + r.get("skipped", 0) == r["tasks"] else "warning"
+
+
+def _task_counts(r: dict) -> str:
+    parts = [f"{r['ok']}/{r['tasks']} ok"]
+    parts += [f"{r[k]} {k}" for k in ("failed", "skipped") if r.get(k)]
+    return ", ".join(parts)
+
+
+# A movement under this share of its 7-day median is flagged.
+LOW_VOLUME_SHARE = 0.5
+
+
+def movement_status(m: dict) -> str:
+    if m["failed"] or m["bad_moves"]:
+        return "failed"
+    if m["median_rows"] and (m["rows"] or 0) < LOW_VOLUME_SHARE * m["median_rows"]:
+        return "warning"
+    return "ok"
+
+
+def _vs_median(m: dict) -> str:
+    if m["median_rows"] is None:
+        return "no history"
+    return f"median {m['median_rows']:,.0f}"
+
+
+def _age(hours: float) -> str:
+    return f"{hours:.0f}h" if hours < 48 else f"{hours / 24:.0f}d"
+
+
+def _activity_html(activity: dict | None) -> str:
+    if not activity:
+        return ""
+    parts = []
+    runs = activity.get("runs")
+    if runs is not None:
+        body = _head("DAG", "tasks", "window", "slowest") + "".join(
+            _cells(r["dag"], _task_counts(r), _run_window(r),
+                   f"{r['slowest_task'] or '—'} {_duration(r['slowest_seconds'])}",
+                   status=run_status(r))
+            for r in runs) if runs else _cells("No task runs recorded for this day", status="none")
+        parts.append(_section("DAG runs", body, "From data_detector.pipeline_runs"))
+    moves = activity.get("movements")
+    if moves is not None:
+        body = _head("Movement → target", "rows", "ins / upd", "7-day") + "".join(
+            _cells(f"{m['movement']} → {m['target']}", _fmt(m["rows"]),
+                   f"{_fmt(m['inserted'])} / {_fmt(m['updated'])}"
+                   + (f" · {m['failed']} failed" if m["failed"] else ""),
+                   _vs_median(m), status=movement_status(m))
+            for m in moves) if moves else _cells("No data movements recorded for this day", status="none")
+        parts.append(_section("Data moved", body,
+                              f"Amber when under {LOW_VOLUME_SHARE:.0%} of the 7-day median"))
+    incidents = activity.get("incidents")
+    if incidents is not None:
+        body = "".join(
+            _cells(f"{i['dataset']} · {i['check']}", f"open {_age(i['age_hours'])}",
+                   status="warning" if i["severity"] == "warning" else "failed")
+            for i in incidents) if incidents else _cells("No open incidents", status="ok")
+        parts.append(_section("Open incidents", body))
+    return "".join(parts)
+
+
+def _activity_lines(activity: dict | None) -> list[str]:
+    if not activity:
+        return []
+    lines = []
+    if "runs" in activity:
+        lines += ["", "DAG runs"]
+        lines += [f"  {r['dag']}: {_task_counts(r)}"
+                  + f", {_run_window(r)}, slowest {r['slowest_task'] or '-'} {_duration(r['slowest_seconds'])}"
+                  for r in activity["runs"]] or ["  none recorded"]
+    if "movements" in activity:
+        lines += ["", "Data moved"]
+        lines += [f"  {'!' if movement_status(m) != 'ok' else ' '} {m['movement']} -> {m['target']}: "
+                  f"{_fmt(m['rows'])} rows (ins {_fmt(m['inserted'])}, upd {_fmt(m['updated'])}, "
+                  f"failed {m['failed']}), {_vs_median(m)}"
+                  for m in activity["movements"]] or ["  none recorded"]
+    if "incidents" in activity:
+        lines += ["", "Open incidents"]
+        lines += [f"  {i['dataset']} ({i['check']}, {i['severity']}): open {_age(i['age_hours'])}"
+                  for i in activity["incidents"]] or ["  none"]
+    return lines
+
+
 def render(ds: date, results: dict, registry, *, metrics: dict, history: list[dict],
-           resolved: list[str], watch: dict | None = None) -> tuple[str, str, str]:
+           resolved: list[str], watch: dict | None = None,
+           activity: dict | None = None) -> tuple[str, str, str]:
     """(subject, plain text, html) for the day's email."""
     state = day_state(results, registry, resolved)
     subject = subject_line(ds, state, results, registry)
@@ -262,6 +429,8 @@ def render(ds: date, results: dict, registry, *, metrics: dict, history: list[di
         _kpi("Picks in pool", _fmt(m.get("pool_rows")), "consensus"),
     ])
     crest = m.get("crest_coverage")
+    datasets_html = _section("Every dataset", "".join(
+        _cells(f"{k}", note, layer, status=st) for layer, k, st, note in _dataset_lines(results, registry)))
     crest_line = (f'{crest[0]:,} of {crest[1]:,} upcoming teams have a crest' if crest else "Crest coverage unavailable")
 
     html = f"""<!doctype html><html><head><meta charset="utf-8">
@@ -290,6 +459,8 @@ def render(ds: date, results: dict, registry, *, metrics: dict, history: list[di
     <div style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:{MUTED};margin-bottom:6px;">Pipeline</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">{_layer_rows(results, registry)}</table>
   </td></tr>
+  {datasets_html}
+  {_activity_html(activity)}
   {_watch_html(watch)}
   <tr><td style="padding:22px 28px 0;">
     <div style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:{MUTED};margin-bottom:10px;">Last 7 days</div>
@@ -318,5 +489,9 @@ def render(ds: date, results: dict, registry, *, metrics: dict, history: list[di
               f"Match pages: {_fmt(m.get('match_pages'))}", f"Picks in pool: {_fmt(m.get('pool_rows'))}",
               crest_line,
               "Last 7 days: " + " ".join(f"{h['label']}:{h['status']}" for h in history)]
+    lines += ["", "Every dataset"]
+    lines += [f"  {st:<8} {k}" + (f" — {note}" if note else "")
+              for _layer, k, st, note in _dataset_lines(results, registry)]
+    lines += _activity_lines(activity)
     lines += _watch_lines(watch)
     return subject, "\n".join(lines), html

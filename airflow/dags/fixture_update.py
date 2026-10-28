@@ -31,11 +31,11 @@ from airflow.utils.trigger_rule import TriggerRule
 from airflow.providers.docker.operators.docker import DockerOperator
 from docker.types import Mount
 from etl.src.data_detector import (
-    pipeline_run_failed,
     pipeline_run_skipped,
     pipeline_run_started,
     pipeline_run_succeeded,
 )
+from etl.src.data_detector.failure_alerts import pipeline_run_failed_with_alert
 
 
 default_args = {
@@ -46,7 +46,7 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
     "on_execute_callback": pipeline_run_started,
     "on_success_callback": pipeline_run_succeeded,
-    "on_failure_callback": pipeline_run_failed,
+    "on_failure_callback": pipeline_run_failed_with_alert,
     "on_skipped_callback": pipeline_run_skipped,
 }
 

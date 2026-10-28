@@ -169,6 +169,53 @@ class EmailTemplateTests(unittest.TestCase):
         self.assertIn("Match pages: —", text)
         self.assertIn("Crest coverage unavailable", html)
 
+    def test_every_dataset_listed_with_its_note(self):
+        r = self.results(raw_b="failed", raw_c="blocked")
+        r["api.a"]["details"] = {"rows": 1234}
+        r["raw.c"]["blocked_by"] = ["raw.b"]
+        _, text, html = self.render(r)
+        self.assertIn("Every dataset", html)
+        self.assertIn("ok       api.a — 1,234 rows", text)
+        self.assertIn("blocked  raw.c — blocked by raw.b", text)
+
+    def test_activity_sections(self):
+        started = datetime(2026, 10, 14, 0, 0, tzinfo=timezone.utc)
+        activity = {
+            "runs": [{"dag": "fixture_update_dag", "tasks": 10, "ok": 9, "failed": 1, "skipped": 0,
+                      "started": started, "finished": started.replace(minute=30),
+                      "slowest_task": "run_dbt", "slowest_seconds": 1560.0},
+                     {"dag": "bootstrap_dag", "tasks": 1, "ok": 0, "failed": 0, "skipped": 1,
+                      "started": started, "finished": started.replace(minute=1),
+                      "slowest_task": "wait", "slowest_seconds": 60.0}],
+            "movements": [{"movement": "s3_to_raw", "target": "raw.raw_fixtures", "rows": 10,
+                           "inserted": None, "updated": 10, "failed": 0, "bad_moves": 0,
+                           "median_rows": 100.0},
+                          {"movement": "row_validation", "target": "raw.raw_league_standings",
+                           "rows": 1300, "inserted": 1300, "updated": None, "failed": 0,
+                           "bad_moves": 0, "median_rows": 1320.0}],
+            "incidents": [{"dataset": "raw.fixture_xg", "check": "daily_flow", "severity": "error",
+                           "age_hours": 50.0, "error": ""}],
+        }
+        _, text, html = self.et.render(DS, self.results(), self.reg, metrics=self.metrics,
+                                       history=self.history, resolved=[], activity=activity)
+        for section in ("DAG runs", "Data moved", "Open incidents"):
+            self.assertIn(section, html)
+        self.assertIn("fixture_update_dag: 9/10 ok, 1 failed, Wed 00:00 UTC · 30m 00s, slowest run_dbt 26m 00s", text)
+        self.assertIn("bootstrap_dag: 0/1 ok, 1 skipped", text)
+        self.assertIn("! s3_to_raw -> raw.raw_fixtures: 10 rows", text)        # under half the median
+        self.assertIn("  row_validation -> raw.raw_league_standings", text)
+        self.assertIn("raw.fixture_xg (daily_flow, error): open 2d", text)
+        self.assertEqual(self.et.run_status(activity["runs"][1]), "ok")         # skipped is not a problem
+        self.assertEqual(self.et.run_status(activity["runs"][0]), "failed")
+
+    def test_activity_empty_and_absent(self):
+        _, text, _ = self.et.render(DS, self.results(), self.reg, metrics=self.metrics,
+                                    history=self.history, resolved=[],
+                                    activity={"runs": [], "movements": [], "incidents": []})
+        self.assertIn("Open incidents\n  none", text)
+        _, text, html = self.render(self.results())                          # older callers
+        self.assertNotIn("DAG runs", html)
+
 
 @unittest.skipUnless(os.getenv("FLOW_TEST_DSN"), "requires FLOW_TEST_DSN (throwaway database)")
 class PostgresFlowTests(unittest.TestCase):
