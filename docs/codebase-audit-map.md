@@ -38,6 +38,14 @@ Priority can change when a serious finding appears. Each daily update should say
 
 ## Progress log
 
+### 2026-10-28 — Fix for issue 1: silent ingestion failures (local code)
+
+- Fixture bootstrap now uses strict API fetch and records a failed league-season in DLQ. An empty season is a failure only while the season is in progress by its `dim_league_seasons` dates; outside them it is logged and skipped (staging had three such seasons). Seasons that extracted still load; `load_fixtures` then fails the run (no task retry when only extraction failed), so the metadata revision is not marked complete and the failure callback fires.
+- Incremental fixture selection now propagates database errors. ID-batch fetches use strict API failure handling; any failed batch or an empty result for requested IDs fails extraction rather than reporting no work.
+- Standings fetch uses strict API failure handling. A league whose fetch fails is logged and skipped so the other leagues still refresh; the task fails at the end naming the failed leagues, instead of an empty standings table.
+- Both ingestion DAGs now attempt an immediate alert through every configured channel (Slack webhook, SMTP email to `ALERT_EMAIL_TO`) when a task reaches failed state after retries. The callback also records the detector failure. A failed channel is logged and does not stop the others. The daily flow report remains in place.
+- **Verification:** focused ingestion tests passed locally (32 passed, 3 database integration tests skipped). No live API, SMTP delivery, container DAG parse, or deployed pipeline run was performed. Deployment and live alert verification remain open.
+
 ### 2026-10-20 — Unit 1.1 complete: repository inventory
 
 - **Evidence:** repository directories include `airflow/dags`, `etl/src`, `dbt/football_pipeline`, `engine/eval`, `engine/elo`, `engine/api`, `tests`, `scripts`, and `docs`. The README points to `scripts/quality_check.sh` for local unit/compile checks and `docker compose run --rm dbt dbt test` for dbt tests. There are focused Python tests under both `tests/` and `engine/tests/`.

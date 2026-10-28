@@ -55,7 +55,7 @@ def fetch_standings(api_league_id: int, season: int) -> List[Dict[str, Any]]:
     Fetch standings for a league/season using the rate-limited GET utility.
     """
     params = {"league": api_league_id, "season": season}
-    payload = _rate_limited_get(STANDINGS_ENDPOINT, params=params)
+    payload = _rate_limited_get(STANDINGS_ENDPOINT, params=params, raise_on_failure=True)
     return payload
 
 
@@ -355,9 +355,17 @@ def update_standings(
             return 0
 
         unprocessed: List[Dict[str, Any]] = []
+        failed: List[str] = []
         for league_season_id, api_league_id, season in league_rows:
             start_fetch = time.time()
-            payload = fetch_standings(api_league_id, season)
+            try:
+                payload = fetch_standings(api_league_id, season)
+            except Exception as exc:
+                # One league's API failure must not cost the others their refresh.
+                logger.error("Standings fetch failed for league %s season %s: %s",
+                             api_league_id, season, exc, exc_info=True)
+                failed.append(f"{api_league_id}/{season}: {exc}")
+                continue
             logger.info(
                 "Fetched standings payload (len=%s) for league_season_id=%s in %.2fs",
                 len(payload),
@@ -383,6 +391,11 @@ def update_standings(
                 "Upserted %d standings rows for league_season_id=%s", inserted, league_season_id
             )
         logger.info("Standings update complete: %d rows in %.2fs", total_rows, time.time() - start)
+        if failed:
+            raise RuntimeError(
+                f"Standings fetch failed for {len(failed)}/{len(league_rows)} leagues: "
+                + "; ".join(failed[:5]) + ("; ..." if len(failed) > 5 else "")
+            )
         if return_summary:
             return {
                 "total_rows": total_rows,

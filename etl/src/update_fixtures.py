@@ -75,7 +75,7 @@ def to_update_fixture_ids() -> List[Tuple[Optional[int], str]]:
         return ids
     except Exception as e:
         logger.error(f"Error querying fixture IDs needing updates: {e}", exc_info=True)
-        return []
+        raise
     finally:
         conn.close()
 
@@ -249,7 +249,8 @@ def update_by_ids(ids: List[Union[str, Tuple[Optional[int], str]]]) -> List[Dict
                 FIXTURES_ENDPOINT,
                 {
                     "ids": batch_ids_str
-                }
+                },
+                raise_on_failure=True,
             )
             fetch_fixtures_elapsed = time.time() - start_req
             logger.info(
@@ -272,18 +273,15 @@ def update_by_ids(ids: List[Union[str, Tuple[Optional[int], str]]]) -> List[Dict
 
     # If every batch failed, the API is broken (bad key, lapsed plan, outage) —
     # fail the task loudly rather than reporting a quiet "no updates" success.
-    if n_batches > 0 and failed_batches == n_batches:
-        raise RuntimeError(
-            f"All {n_batches} fixture-update batches failed; last error: {last_error}"
-        ) from last_error
     if failed_batches:
-        logger.warning("%d/%d fixture-update batches failed", failed_batches, n_batches)
+        raise RuntimeError(
+            f"{failed_batches}/{n_batches} fixture-update batches failed; last error: {last_error}"
+        ) from last_error
 
     try:
         extracted_batch = extract_fixtures_field(fixtures)
         if not extracted_batch:
-            logger.info("No fixture updates extracted for provided IDs; exiting early.")
-            return []
+            raise RuntimeError(f"API returned no fixture updates for {len(api_ids)} requested IDs")
 
         for rec in extracted_batch:
             api_id = rec.get("api_fixture_id")
@@ -295,7 +293,7 @@ def update_by_ids(ids: List[Union[str, Tuple[Optional[int], str]]]) -> List[Dict
         return updated_fixtures
     except Exception as e:
         logger.error("Error extracting fixtures for provided IDs: %s", e, exc_info=True)
-        return []
+        raise
 
 
 def correct_missed_fixtures() -> None:
