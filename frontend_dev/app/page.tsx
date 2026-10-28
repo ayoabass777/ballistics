@@ -1,5 +1,5 @@
-import SportsStreaks from "@/sports-streaks"
+import { redirect } from "next/navigation"
 
 export default function Page() {
-  return <SportsStreaks />
+  redirect("/welcome")
 }

@@ -75,6 +75,7 @@ export default function WelcomePage() {
         <section><h2>Team patterns</h2><p>Understand recent and season records across venues.</p></section>
       </div>
       <p className={s.caption}>Estimates are not guarantees. Historical patterns describe what happened.</p>
+      <footer className={s.caption}><Link href="/privacy">Privacy policy</Link></footer>
     </main>
   </div>;
 }
