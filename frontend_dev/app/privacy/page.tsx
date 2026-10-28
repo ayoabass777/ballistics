@@ -22,7 +22,7 @@ export default function PrivacyPage() {
         <li><strong>Account and invitation information.</strong> Your email address, account identifier, available name and profile image, and invitation status help us manage beta access and identify your account.</li>
         <li><strong>Your choices.</strong> Saved fixtures, followed leagues, timezone, onboarding progress and usage-event preference let us provide and remember your research experience.</li>
         <li><strong>Beta usage events.</strong> When enabled, we record account-linked interactions such as pages and matches opened, saves and tutorial actions, with timestamps and a session identifier. We use these to understand and improve the product. Event properties do not include names, email addresses or free-text input.</li>
-        <li><strong>Technical information.</strong> Hosting and authentication services may process IP addresses, browser information and request logs to deliver the site, diagnose failures and protect access.</li>
+        <li><strong>Technical information.</strong> Hosting and authentication services may process your internet connection’s address (IP address), information about your browser and records of requests to the site to deliver the site, diagnose failures and protect access.</li>
       </ul>
 
       <h2>Google sign-in</h2>

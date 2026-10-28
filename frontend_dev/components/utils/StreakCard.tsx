@@ -154,7 +154,7 @@ function TeamTierTag({ tier }: { tier: number }) {
   return (
     <div className="relative group/team-tier">
       <span
-        title={`Current team is ${cfg.label.toLowerCase()} tier by Elo.`}
+        title={`Current team is ${cfg.label.toLowerCase()} tier based on team strength.`}
         className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-semibold ${cfg.pill} ${cfg.text}`}
       >
         {cfg.label}
@@ -163,7 +163,7 @@ function TeamTierTag({ tier }: { tier: number }) {
         role="tooltip"
         className="pointer-events-none absolute right-0 top-full z-20 mt-1 w-52 rounded-md border border-border/70 bg-popover px-2.5 py-1.5 text-[11px] leading-snug text-popover-foreground shadow-md opacity-0 transition-opacity duration-150 group-hover/team-tier:opacity-100"
       >
-        Current team Elo tier in league context.
+        How this team’s strength compares with others in its league.
       </div>
     </div>
   )

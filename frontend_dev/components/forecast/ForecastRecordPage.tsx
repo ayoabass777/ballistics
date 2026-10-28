@@ -232,7 +232,7 @@ export function ForecastRecordPage() {
         </div>}
         {busy && !visible && <div className={styles.loading} role="status">Loading captured forecasts…</div>}
         {visible && <>
-          <FunctionalityTip id="record" title="Check the published record" moreHref="#record-methodology" moreLabel="Read the methodology"><p>This record includes captured forecasts, including misses. Settled entries have an outcome; pending entries do not yet. It is a published model record, not your personal betting history or a guarantee.</p></FunctionalityTip>
+          <FunctionalityTip id="record" title="Check the published record" moreHref="#record-methodology" moreLabel="Read the methodology"><p>This record includes captured forecasts, including misses. Settled entries have an outcome; pending entries do not yet. It shows how recorded forecasts turned out, not your personal betting history or a guarantee.</p></FunctionalityTip>
           <h2 aria-live="polite">{visible.totals.fixtures.toLocaleString()} fixtures · {visible.totals.forecasts.toLocaleString()} forecasts</h2>
           {counts && <p className={styles.caption}>{counts.hit + counts.miss} settled · {counts.pending} pending · {counts.void + counts.unavailable + counts.excluded} other forecasts in this date/team/league selection</p>}
           <p className={styles.caption}>Showing {visible.fixtures.length} of {visible.totals.fixtures} fixtures · Newest archived kickoff first</p>
@@ -249,7 +249,7 @@ export function ForecastRecordPage() {
           <p>We evaluate the latest eligible forecast captured before kickoff for each match and event. Earlier versions remain stored. Before the capture cutoff, selection is provisional.</p>
           <p>Hit and Miss describe the event outcome—not whether a probability was “correct”. Pending, Void, Unavailable and Excluded are not counted as settled binary outcomes.</p>
           <p>Result corrections are appended to the history without rewriting the captured estimate. The last changed outcome time is not the last result-check time. Schedule changes use a conservative cutoff: a passed captured kickoff does not reopen.</p>
-          <p>Only exported goal forecasts are included, not every possible model output. Captured does not prove a forecast was displayed to a user.</p>
+          <p>This record includes only goal forecasts saved for review, so it may not cover every estimate calculated for a match. A saved forecast was not necessarily shown to a user.</p>
         </details>
       </main>
     </div>

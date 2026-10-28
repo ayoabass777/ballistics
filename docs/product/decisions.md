@@ -1,5 +1,8 @@
 # Decision log
 
+2026-10-28 — **Plain-language public explanations (agreed; owner requested friendlier wording for exposed IP/model details).** Replace named methods in frontend copy, including Match methodology and legacy card tooltips, with explanations of team strength and estimated goal chances. Extend the existing no-model-names principle to public methodology copy. Preserve uncertainty, data limitations and the distinction between forecasts and historical records. Keep technical names in internal code and documentation. The privacy policy still discloses visitor IP-address processing, now with a plain-language explanation; this is personal-data transparency, not a server address.
+
+
 2026-10-28 — **Public entry and privacy page (agreed; owner requested these first for Google consent publishing).** Redirect `/` to `/welcome`; add a public `/privacy` page and link it from Welcome and Settings. Policy reflects Clerk/Google basic identity, account preferences, Saved, browser storage and D164 usage events. Proposed public contact: `privacy@ballistics.football`, forwarded to a monitored inbox; owner has not yet selected or configured the address. Current beta contact wording uses the invitation channel. No deployment or Google publishing is implied.
 
 

@@ -70,7 +70,7 @@ export function Onboarding() {
         <p className={s.lead}>Ballistics helps you inspect the evidence behind a match. It does not tell you what to bet.</p>
         <div className={s.cards}>
           <section><span>01 · RECORD</span><h2>What happened</h2><p>Recent and season results describe past matches.</p></section>
-          <section><span>02 · ESTIMATE</span><h2>What might happen</h2><p>Goal outlooks are model estimates, never guarantees.</p></section>
+          <section><span>02 · ESTIMATE</span><h2>What might happen</h2><p>Goals outlook shows estimated chances based on scoring and conceding records, never guarantees.</p></section>
           <section><span>03 · COMPARISON</span><h2>What stands out</h2><p>Strength and patterns help compare teams and leagues.</p></section>
         </div>
         <p className={s.caution}>If you bet, only risk what you can afford to lose.</p>
