@@ -38,7 +38,9 @@ path: each item gates the ones below it, except where marked parallel.
    Nightly backup built and restore-tested 2026-10-27
    (`deploy/backup_postgres.sh`, 03:30 UTC cron). Hetzner Cloud Firewall
    2026-10-28 (`deploy/hetzner_firewall.sh`): web traffic only through
-   Cloudflare. Still open: Hetzner weekly
+   Cloudflare. Release `ba7fbc77773` deployed 2026-10-28 (privacy page, `/` →
+   `/welcome`). Operating guide: [docs/staging-runbook.md](docs/staging-runbook.md).
+   Still open: Hetzner weekly
    snapshots (owner, console), missed-run alert, uptime and disk checks.
 4. [ ] **Member journey gaps (checkpoint 2, parallel with 3).**
    - Tester instructions for Google sign-in (D151): use the Google account the
@@ -47,11 +49,11 @@ path: each item gates the ones below it, except where marked parallel.
    - Observe browser-triggered profile sync for a new account.
    - Check Settings and Saved under the invited account.
    - Minimal first-run onboarding (D152): in progress separately.
-   - Privacy policy page on the frontend (`/privacy`), then add the home page
-     and privacy URLs on the Google consent screen (project
-     `ballistics-512818`, Branding) and **publish** it. Until then Google
-     sign-in is in Testing: add each tester's Google address as a test user
-     (Audience page, max 100).
+   - [x] Privacy policy page (`/privacy`, contact
+     `privacy@ballistics.football` via Cloudflare Email Routing) deployed
+     2026-10-28; Google consent screen published the same day (home page and
+     privacy URLs set). Still to check: Google sign-in for an account that was
+     never a test user (part of the smoke test).
 5. [x] **Match details build items (D152, parallel with 3).** Done locally
    2026-10-28, not yet deployed to staging.
    - After kickoff, show the last pre-kickoff forecast. API side done

@@ -10,6 +10,10 @@ repository at `frontend_dev/` and `API/`. The original checkout remains
 available for rollback. The initial two-repository inspection below is
 historical; staging now builds from one Ballistics commit.
 
+Staging is deployed (2026-10-27). For day-to-day operation (deploy, alerts,
+backups, invites, secrets) use the [staging runbook](staging-runbook.md);
+this document records how it was built and why.
+
 ## Goal
 
 A production-like environment where an invited tester can complete the D152
@@ -149,13 +153,20 @@ records never added). It was reused rather than recreated:
   External, app name Ballistics, support/developer contact the owner,
   authorised domain `ballistics.football`, Google API Services User Data
   Policy accepted by the owner; Web client "Clerk production" with redirect
-  URI `https://clerk.ballistics.football/v1/oauth_callback`. **Publishing
-  status: Testing** — publishing needs a home page and privacy policy URL,
-  and public deployment of the home/privacy pages remains pending. Local `/privacy` and `/` → `/welcome` were implemented and HTTP-checked on 2026-10-28; confirm a monitored privacy contact before publication. Until then only listed test users
-  (max 100) can sign in with Google. The owner copied the client ID and
-  secret into Clerk (neither passed through Claude); Clerk's Google connection
-  then showed "Used for sign-in" instead of "Setup required". Test users: the
-  owner's Google account (1/100).
+  URI `https://clerk.ballistics.football/v1/oauth_callback`. **Published
+  2026-10-28** (In production) by the owner, after `/privacy` and the `/` →
+  `/welcome` redirect were deployed (release `ba7fbc77773`): home page
+  `https://beta.ballistics.football/welcome`, privacy policy
+  `https://beta.ballistics.football/privacy`, no logo (a logo triggers
+  Google's brand review). Before that only listed test users (max 100) could
+  sign in with Google; the only one was the owner's account. The owner copied
+  the client ID and secret into Clerk (neither passed through Claude); Clerk's
+  Google connection then showed "Used for sign-in" instead of "Setup
+  required".
+- **Privacy contact (2026-10-28):** Cloudflare Email Routing on
+  `ballistics.football` forwards `privacy@ballistics.football` to the owner's
+  Gmail (catch-all: drop). MX, SPF and DKIM records were added by Cloudflare;
+  a test from another account arrived. The privacy page names this address.
 - **Still to confirm in the smoke test:** that sessions work on
   `staging.`/`beta.ballistics.football` (subdomains of the primary domain),
   and the redirect URLs after sign-in/out.
