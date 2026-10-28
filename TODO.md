@@ -36,7 +36,9 @@ path: each item gates the ones below it, except where marked parallel.
    local Airflow stopped; staging's DAGs unpaused (except
    `saved_snapshot_maintenance`), first nightly cycle 2026-10-28 00:00 UTC.
    Nightly backup built and restore-tested 2026-10-27
-   (`deploy/backup_postgres.sh`, 03:30 UTC cron). Still open: Hetzner weekly
+   (`deploy/backup_postgres.sh`, 03:30 UTC cron). Hetzner Cloud Firewall
+   2026-10-28 (`deploy/hetzner_firewall.sh`): web traffic only through
+   Cloudflare. Still open: Hetzner weekly
    snapshots (owner, console), missed-run alert, uptime and disk checks.
 4. [ ] **Member journey gaps (checkpoint 2, parallel with 3).**
    - Tester instructions for Google sign-in (D151): use the Google account the

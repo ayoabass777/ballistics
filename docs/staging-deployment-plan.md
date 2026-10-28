@@ -120,7 +120,8 @@ tester ──HTTPS──> Cloudflare (DNS, proxy, TLS)
   network, so the research API needs no new auth.
 - **Reverse proxy.** Caddy owns 80/443 on the new server; v1 keeps its own
   nginx. TLS uses a Cloudflare origin certificate. A Hetzner firewall allows
-  80/443 (later only from Cloudflare IP ranges) and 22 from the owner's IP.
+  80/443 only from Cloudflare IP ranges (done 2026-10-28) and 22 (open to
+  all in the end; key-only SSH and fail2ban guard it).
 - **Internal tools over SSH tunnels.** The Airflow UI and the consensus
   dashboard listen on `127.0.0.1` only.
 - **Hostnames.** `staging.ballistics.football` for the smoke test, then
@@ -227,6 +228,14 @@ Postgres.
   login worked and root/password logins were refused. At rest after reboot:
   411 MiB RAM, 6.3 GB disk used. Docker bypasses UFW for published ports, so
   only Caddy may publish ports; everything else binds inside the server.
+- **Hetzner Cloud Firewall done 2026-10-28** (`ballistics-web`, attached to
+  `ballistics-v2`, from `deploy/hetzner_firewall.sh` with an hcloud context
+  on the Mac): 80/443 only from Cloudflare's published ranges, fetched each
+  run (rerun when Cloudflare changes them); 22 and ICMP open to all (key-only
+  SSH and fail2ban guard 22); outbound unfiltered. Before it, a request to
+  2.29.118.240 for `beta.ballistics.football` returned 200, going around
+  Cloudflare. After: direct HTTP and HTTPS time out, both hostnames return
+  200 through Cloudflare, SSH works, containers reach the internet.
 - **Cloudflare done 2026-10-22:** proxied A records `staging` and `beta` →
   2.29.118.240 (existing `api` → v1 DNS-only and the root/`www` v1 Worker
   untouched). Origin certificate (Cloudflare Origin CA, `*.ballistics.football`
