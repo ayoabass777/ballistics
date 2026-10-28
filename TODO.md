@@ -66,14 +66,22 @@ path: each item gates the ones below it, except where marked parallel.
      N notes" under the match header, opening to the API messages.
 6. [ ] **Daily data reliability on staging.** Several clean daily
    `fixture_update` + engine cycles with no lost days (Oct 15 and 17 were lost
-   to a standings failure), an alert that fires on failure, and the ~110
-   stuck-NS fixtures resolved or hidden.
+   to a standings failure) and an alert that fires on failure. Stuck NS
+   (checked 2026-10-28): none in current seasons on staging. The ~110 are
+   past-season rows outside every reader; the one current case (Port Vale v
+   Northampton, 1563773) was the provider keeping the 26 Sep date until it
+   moved the match to 24 Nov, which the nightly by-ID update picks up.
 7. [ ] **Staging smoke test.** Fresh invited account end to end on desktop and
    mobile, data freshness, failure alert and rollback, all exercised on
    staging. Then send the first invites.
 
 ## Now
 
+- [ ] **Check Port Vale v Northampton picked up its new date** after the
+  2026-10-29 nightly run (after ~00:10 UTC). On staging, `raw.raw_fixtures`
+  row for api_fixture_id 1563773 (fixture 107511) should read kickoff
+  2026-11-24 19:45 UTC, NS. If it still says 26 Sep, check that night's
+  `extract_updates` payload in `incremental/2026-10-28/fixtures.json`.
 - [ ] **Check tonight's engine run** (run_ds 2026-10-20, ~00:40 UTC), the first
   with everything from today: dbt is no longer blocked by xG/standings; model
   reuse (`raw.model_processing_state` fills, run starts cold); `raw.card_versions`
@@ -91,7 +99,10 @@ links to macOS `/usr/share/zoneinfo` (2026c); the old folder is kept at
 
 ## Pipeline (DLQ, D147/D148)
 
-- [ ] ~110 fixtures stuck at NS from postponements (Egyptian league, USL Tormenta).
+- [ ] ~110 past-season fixtures still NS from postponements (Egyptian league,
+  USL Tormenta). Not shown anywhere (current-season readers only); clean up
+  or mark them if the old seasons are ever reloaded. Current seasons are
+  re-checked nightly by ID (`to_update_fixture_ids`).
 
 ## Engine
 
