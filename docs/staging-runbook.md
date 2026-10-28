@@ -16,7 +16,7 @@ is in [TODO.md](../TODO.md) (beta blockers). Current as of 2026-10-28.
 | Release history | `/srv/ballistics/deploy/RELEASES` (`deploy/deploy_staging.sh --status`) |
 | Current release | `ba7fbc77773` (2026-10-28) |
 | Backups | `s3://ballistics-stg-backups/postgres/<day>/`, nightly 03:30 UTC, 14 days |
-| Alerts | email to `ALERT_EMAIL_TO` via Gmail SMTP (the owner's inbox) |
+| Alerts | Slack `#ballistics-alerts` (Ballistics workspace, webhook in `ALERT_SLACK_WEBHOOK_URL`) and email to `ALERT_EMAIL_TO` via Gmail SMTP (the owner's inbox) |
 
 Request path: tester → Cloudflare (DNS, proxy, TLS) → Hetzner Cloud Firewall
 → Caddy (Cloudflare origin certificate) → `frontend` (Next.js) → `account-api`
