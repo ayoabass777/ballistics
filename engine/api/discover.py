@@ -91,11 +91,10 @@ def build_discover(cur, zone='UTC', scope='week', day=None, end_day=None, league
     cur.execute("""WITH latest AS (SELECT run_ds, finished_at FROM raw.engine_runs
         WHERE status = 'complete' ORDER BY run_ds DESC LIMIT 1)
         SELECT latest.run_ds, latest.finished_at, m.payload,
-               rf.fixture_status AS live_status,
+               f.fixture_status AS live_status,
                f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id
         FROM latest
         LEFT JOIN raw.match_analysis m USING (run_ds)
-        LEFT JOIN raw.raw_fixtures rf ON rf.fixture_id = m.fixture_id
         LEFT JOIN raw.fact_fixtures f ON f.fixture_id = m.fixture_id
         LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id""")
     rows = cur.fetchall()

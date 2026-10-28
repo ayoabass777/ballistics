@@ -17,11 +17,10 @@ H2H_LIMIT = 5
 
 FIXTURE_SQL = """
 SELECT f.fixture_id, f.league_season_id, f.league_id, f.league_name, f.country_name,
-       f.kickoff_utc, rf.fixture_status, f.home_team_id, f.away_team_id,
+       f.kickoff_utc, f.fixture_status, f.home_team_id, f.away_team_id,
        f.home_team_name, f.away_team_name,
        f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id
 FROM raw.fact_fixtures f
-LEFT JOIN raw.raw_fixtures rf ON rf.fixture_id = f.fixture_id
 LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id
 WHERE f.fixture_id = %(fixture_id)s
 """
