@@ -10,6 +10,8 @@ Recorded: 2026-10-20. The date ranges are planning estimates, not deployment aut
 
 The current local product has working Discover, Matches, Match details, Saved and followed leagues, with selected signed-in browser checks. It has not been deployed. The billing schema is tested on a disposable database but has not been applied to the account database; Stripe checkout and webhooks are unbuilt. A seven-day free trial followed by $9.99 or $19.99 per month is an option for the paid product, not a final price or an implemented flow. Decide and document those terms at the end of product development, before paid launch implementation is finalized. See [implementation status](implementation-status.md) and [decisions](decisions.md).
 
+2026-10-26 plan update: the first invite-only beta remains the existing research experience. A match-specific LLM assistant comes after the beta (D165, updated 2026-10-28), not in any beta wave. Set the paid price after the assistant has been tried; $12.99 and $15.99 are candidate monthly prices, not approved terms. If the assistant is included in the paid launch, recalculate the paid ETS when its scope and measured beta work are known. Earlier baseline ranges above have not been recalculated for that possible scope.
+
 ## Checkpoints that trigger a new estimated time to ship (ETS)
 
 | Checkpoint | Reached when | Current state (updated 2026-10-21) | Recalculate |

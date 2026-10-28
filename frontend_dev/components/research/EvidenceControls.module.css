@@ -1,0 +1,15 @@
+.filter { display:flex; gap:8px; flex-wrap:wrap; align-items:center; min-width:0; }
+.control,.option,.group,.sort select { font:inherit; color:var(--ink,#142c23); background:white; border:1px solid var(--line,#dce3dc); border-radius:8px; min-height:44px; padding:10px 14px; cursor:pointer; }
+.control { max-width:100%; text-align:left; overflow-wrap:anywhere; }
+.sort { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.sort select { max-width:100%; }
+.dialog { color:var(--ink,#142c23); background:white; width:min(560px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); overflow-y:auto; margin:auto; padding:24px; border:1px solid var(--line,#dce3dc); border-radius:12px; box-shadow:0 12px 40px #0003; }
+.dialog::backdrop { background:#142c2366; }
+.dialog h2 { margin:0 0 8px; }
+.dialog p { margin:0 0 16px; font-size:13px; }
+.option,.group { display:flex; width:100%; gap:12px; justify-content:space-between; text-align:left; margin-bottom:8px; overflow-wrap:anywhere; }
+.option span,.group span { margin-left:auto; flex-shrink:0; }
+.group { background:#eff4eb; font-weight:600; margin-top:12px; }
+.option[aria-pressed=true] { background:#eff6de; border-color:#8ca66e; }
+.filter :is(button,select):focus-visible,.sort select:focus-visible { outline:3px solid #285aa4; outline-offset:3px; }
+@media(max-width:480px) { .dialog { padding:16px; } .sort { width:100%; } .sort select { flex:1; min-width:0; } }

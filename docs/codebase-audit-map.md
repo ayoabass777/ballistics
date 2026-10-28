@@ -82,6 +82,19 @@ Priority can change when a serious finding appears. Each daily update should say
 - **Evidence:** `etl/src/update_standings.py:215-231,258-317` deduplicates by table group and team before upsert and prunes stale keys for refreshed seasons. Existing tests cover split-season groups and missing team IDs. **Severity: info.** No change needed in this unit.
 - **Verification:** `BASE_DATA_DIR=/private/tmp/ballistics-code-audit-2026-10-26 PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/test_update_standings.py tests/test_extract_xg.py` passed (16 tests). No runtime code changed. Next unit: 2.5 replay and corrections.
 
+### 2026-10-27 — Unit 2.5 reviewed: replay and corrections
+
+- **Evidence:** `etl/src/replay_dlq.py:97-110` records the raw fixture table snapshot before `load_fixtures_from_s3` runs. The snapshot can therefore report pre-replay row counts even when the load succeeds. **Severity: medium.** Follow-up: record the snapshot after the load and commit, and test its ordering.
+- **Evidence:** `etl/src/replay_dlq.py:51-55` uses non-strict fetch, so exhausted API retries become an empty response and count as a failed replay attempt through `airflow/dags/replay_dag.py:110-120`. The DLQ entry remains, but the recorded reason loses the transport error and can consume the 24-attempt budget during an outage. **Severity: medium.** Follow-up: use strict fetch and preserve the underlying error in retry state.
+- **Evidence:** replay cleanup is registered after load (`etl/src/replay_dlq.py:159-160`) and executed only after database commit (`airflow/dags/replay_dag.py:106-107`); rollback discards it (`:113-115`). The fixture reconciliation path also requires a strict direct-ID lookup before marking an apparent orphan (`etl/src/fixture_correction/fixture_correction.py:340-358`). **Severity: info.** These safeguards were reviewed; no change needed in this unit.
+- **Verification:** `BASE_DATA_DIR=/private/tmp/ballistics-code-audit-2026-10-27 PYTHONDONTWRITEBYTECODE=1 python -m pytest -q -p no:cacheprovider tests/test_dlq.py tests/test_fixture_reconciliation.py` passed (30 passed, 3 integration tests skipped). No runtime code changed. Next unit: 3.1 Airflow DAG dependencies.
+
+### 2026-10-28 — Unit 3.1 reviewed: Airflow DAG dependencies
+
+- **Evidence:** `airflow/dags/fixture_update.py:350-358,389` gates dbt only on `extract_updates` and `load_updates`. The new-fixture, xG, standings, correction, and quality tasks are upstream of that gate but use `ALL_DONE` for parts of the chain (`:263,291,316,323`), so dbt can run after one of these side tasks fails. `airflow/dags/engine_predict_dag.py:108-117` waits for `run_dbt` success and can then consume stale side-input data. **Severity: medium.** Follow-up: decide which side-task failures should block dbt/engine and which should be explicitly marked degraded; add DAG dependency tests for those policies.
+- **Evidence:** `engine_predict_dag.py:108-117,172-178` waits on the same-day `fixture_update_dag.run_dbt` before models and forecast history, addressing the prior previous-night facts race. **Severity: info.** This dependency is present in code.
+- **Verification:** AST parsing succeeded for all 8 DAG Python files. A local Airflow 2.10.5 DagBag attempt could not parse DAGs because its installed SQLAlchemy raises `MappedAnnotationError` before project DAG loading; this is a local environment compatibility issue, not evidence that the deployed DAGs fail. No runtime code changed. Next unit: 3.2 data detector.
+
 `Date | Unit | File/line or command | Observed behavior | Severity | Fix/follow-up | Verification`
 
 ### 2026-10-25 — Unit 2.3 reviewed: incremental fixture updates

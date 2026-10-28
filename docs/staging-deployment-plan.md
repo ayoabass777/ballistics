@@ -151,7 +151,7 @@ records never added). It was reused rather than recreated:
   Policy accepted by the owner; Web client "Clerk production" with redirect
   URI `https://clerk.ballistics.football/v1/oauth_callback`. **Publishing
   status: Testing** — publishing needs a home page and privacy policy URL,
-  and there is no privacy page yet (TODO). Until then only listed test users
+  and public deployment of the home/privacy pages remains pending. Local `/privacy` and `/` → `/welcome` were implemented and HTTP-checked on 2026-10-28; confirm a monitored privacy contact before publication. Until then only listed test users
   (max 100) can sign in with Google. The owner copied the client ID and
   secret into Clerk (neither passed through Claude); Clerk's Google connection
   then showed "Used for sign-in" instead of "Setup required". Test users: the
