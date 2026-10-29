@@ -150,7 +150,7 @@ models:
           - not_null
           - accepted_values:
               arguments:
-                values: ['success', 'failed', 'skipped']
+                values: ['success', 'partial', 'failed', 'skipped']
       - name: detected_at
         tests: [not_null]
 
