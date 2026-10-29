@@ -16,7 +16,6 @@ def setup(monkeypatch):
     db = DB()
     store = {}
     api.app.dependency_overrides[api.get_db] = lambda: db
-    monkeypatch.setattr(api, '_ensure_app_auth_tables', lambda db: None)
     monkeypatch.setattr(api, '_upsert_app_user_from_claims', lambda db, claims: None)
     monkeypatch.setattr(api, 'read_preferences', lambda db, uid: {'timezone_override': store.get(uid)})
     def save(db, uid, zone):

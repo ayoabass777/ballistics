@@ -322,28 +322,6 @@ def _fetch_clerk_user_profile(user_id: str) -> Dict[str, Optional[str]]:
         return {}
 
 
-def _ensure_app_auth_tables(db: Session) -> None:
-    db.execute(text("CREATE SCHEMA IF NOT EXISTS app"))
-    db.execute(
-        text(
-            """
-            CREATE TABLE IF NOT EXISTS app.app_users (
-                user_id TEXT PRIMARY KEY,
-                email TEXT,
-                first_name TEXT,
-                last_name TEXT,
-                image_url TEXT,
-                auth_provider TEXT NOT NULL DEFAULT 'clerk',
-                plan TEXT NOT NULL DEFAULT 'free',
-                onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )
-            """
-        )
-    )
-
-
 def _upsert_app_user_from_claims(db: Session, claims: Dict[str, Any]) -> Dict[str, Any]:
     user_id = _claim_text(claims, "sub")
     if not user_id:
@@ -1439,8 +1417,9 @@ def get_me(
     claims: Dict[str, Any] = Depends(get_current_user_claims),
     db: Session = Depends(get_db),
 ):
+    # No DDL here: the account role has none. API/sql/bootstrap_accounts.sql
+    # creates app.app_users, and every deploy runs it as the owner.
     try:
-        _ensure_app_auth_tables(db)
         user_row = _upsert_app_user_from_claims(db, claims)
     except HTTPException:
         db.rollback()
