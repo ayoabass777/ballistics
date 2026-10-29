@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { isSameOrigin } from './same-origin';
 
 const headers = { 'Cache-Control': 'no-store' };
 const fail = (status: number, error: string) => NextResponse.json({ error }, { status, headers });
@@ -14,7 +15,7 @@ export async function accountProxy(
     try {
         const session = await auth();
         if (!session.userId) return fail(401, 'Sign in to manage your account.');
-        if (request.method !== 'GET' && request.headers.get('origin') !== request.nextUrl.origin)
+        if (request.method !== 'GET' && !isSameOrigin(request))
             return fail(403, 'Please make account changes from this site.');
         const origin = process.env.ACCOUNT_API_BASE_URL || process.env.BACKEND_API_BASE_URL;
         if (!origin) return fail(503, 'Account data is temporarily unavailable.');

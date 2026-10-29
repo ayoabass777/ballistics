@@ -1,13 +1,14 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { preferencesSchema } from '@/lib/preferences';
+import { isSameOrigin } from '@/lib/server/same-origin';
 const headers = { 'Cache-Control': 'no-store' };
 async function proxy(request: NextRequest) {
     const fail = (status: number, error: string) => NextResponse.json({ error }, { status, headers });
     try {
         const session = await auth();
         if (!session.userId) return fail(401, 'Sign in to manage preferences.');
-        if (request.method === 'POST' && request.headers.get('origin') !== request.nextUrl.origin)
+        if (request.method === 'POST' && !isSameOrigin(request))
             return fail(403, 'Please save preferences from this site.');
         const origin = process.env.ACCOUNT_API_BASE_URL || process.env.BACKEND_API_BASE_URL;
         if (!origin) return fail(503, 'Account settings are temporarily unavailable.');

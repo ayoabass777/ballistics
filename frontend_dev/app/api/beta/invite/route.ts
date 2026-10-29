@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isSameOrigin } from '@/lib/server/same-origin';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get('origin') !== request.nextUrl.origin) {
+  if (!isSameOrigin(request)) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 403 });
   }
   const key = process.env.BETA_INVITE_API_KEY;
