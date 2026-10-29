@@ -6,6 +6,7 @@
 #   deploy/deploy_staging.sh --ballistics-ref v0.3
 #   deploy/deploy_staging.sh --rollback              # redeploy the previous release
 #   deploy/deploy_staging.sh --status                # show deploy/RELEASES on the server
+#   deploy/deploy_staging.sh --force-dbt             # run dbt build even if no dbt input changed
 #   deploy/deploy_staging.sh --checkout-only         # first deploy: check out only, so
 #                                                    # .env.staging and seed_restore.sh
 #                                                    # can run before the full deploy
@@ -20,6 +21,8 @@
 #   build images tagged with the release → start Postgres → migrate.py up →
 #   account bootstrap → dbt build → grants.sql → tag engine/dbt :latest →
 #   docker compose up -d → record deploy/RELEASES → prune old images.
+#   dbt build (about 3 minutes) is skipped when nothing under DBT_INPUTS
+#   changed since the last recorded release; the nightly DAG runs dbt anyway.
 #
 # Rollback redeploys the previous line of RELEASES. Migrations are
 # forward-only: rolling back code never undoes a migration.
@@ -29,6 +32,9 @@ HOST="${DEPLOY_HOST:-ballistics-v2}"
 BALLISTICS_REF="origin/main"
 SERVER_ROOT="${DEPLOY_SERVER_ROOT:-/srv/ballistics}"
 KEEP_RELEASES=2
+# What dbt build depends on: models and seeds, the schema it builds on, the
+# app tables the analytics models read, and its profile.
+DBT_INPUTS=(dbt db/migrations API/sql deploy/dbt-profiles.yml.tmpl)
 
 log() { printf '\n==> %s\n' "$*"; }
 die() { printf 'deploy: %s\n' "$*" >&2; exit 1; }
@@ -62,7 +68,7 @@ push_commit() {
 }
 
 local_main() {
-  local rollback=0 status=0 prune=1 mode=deploy
+  local rollback=0 status=0 prune=1 mode=deploy force_dbt=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --ballistics-ref) BALLISTICS_REF="$2"; shift 2 ;;
@@ -70,6 +76,7 @@ local_main() {
       --rollback) rollback=1; shift ;;
       --status) status=1; shift ;;
       --no-prune) prune=0; shift ;;
+      --force-dbt) force_dbt=1; shift ;;
       --checkout-only) mode=checkout; shift ;;
       -h|--help) usage 0 ;;
       *) usage 1 ;;
@@ -105,7 +112,7 @@ local_main() {
   # shellcheck disable=SC2029  # expanded locally on purpose
   ssh "$HOST" "set -e; f=\$(mktemp); trap 'rm -f \$f' EXIT
     git -C '$SERVER_ROOT' show '$b_sha:deploy/deploy_staging.sh' > \$f
-    bash \$f remote $mode $b_sha '$SERVER_ROOT' $prune"
+    bash \$f remote $mode $b_sha '$SERVER_ROOT' $prune $force_dbt"
 }
 
 # ---------------------------------------------------------------------------
@@ -123,8 +130,17 @@ checkout_commit() {
   [[ -f "$1/API/Dockerfile" ]] || die "API/ is not in $2"
 }
 
+# dbt_inputs_changed ROOT PREV_SHA NEW_SHA: true unless git can show that
+# nothing under DBT_INPUTS differs (no previous release, or a commit missing
+# from the server checkout, counts as changed).
+dbt_inputs_changed() {
+  [[ -n "$2" ]] || return 0
+  git -C "$1" cat-file -e "$2^{commit}" 2>/dev/null || return 0
+  ! git -C "$1" diff --quiet "$2" "$3" -- "${DBT_INPUTS[@]}"
+}
+
 remote_main() {
-  local mode="$1" b_sha="$2" root="$3" prune="$4"
+  local mode="$1" b_sha="$2" root="$3" prune="$4" force_dbt="${5:-0}"
   if [[ "$mode" == checkout ]]; then
     log "check out commits"
     checkout_commit "$root" "$b_sha"
@@ -161,6 +177,10 @@ remote_main() {
     "${compose[@]}" stop airflow-scheduler airflow-webserver
   fi
 
+  # The last successful release, to decide whether dbt build is needed.
+  local prev_sha=""
+  [[ -f "$root/deploy/RELEASES" ]] && prev_sha="$(awk 'END{print $3}' "$root/deploy/RELEASES")"
+
   step="check out commits"; log "$step"
   checkout_commit "$root" "$b_sha"
 
@@ -191,11 +211,15 @@ remote_main() {
   step="account bootstrap"; log "$step"
   psql_owner "$root/API/sql" -v ON_ERROR_STOP=1 -q -f /sql/bootstrap_accounts.sql
 
-  step="dbt build"; log "$step"
-  "${compose[@]}" --profile build run --rm --no-deps -T \
-    -v "$root/dbt/football_pipeline:/opt/dbt" \
-    -v "$root/.dbt/profiles.yml:/root/.dbt/profiles.yml:ro" \
-    dbt dbt build --profiles-dir /root/.dbt
+  if [[ "$force_dbt" == 1 ]] || dbt_inputs_changed "$root" "$prev_sha" "$b_sha"; then
+    step="dbt build"; log "$step"
+    "${compose[@]}" --profile build run --rm --no-deps -T \
+      -v "$root/dbt/football_pipeline:/opt/dbt" \
+      -v "$root/.dbt/profiles.yml:/root/.dbt/profiles.yml:ro" \
+      dbt dbt build --profiles-dir /root/.dbt
+  else
+    log "dbt build skipped: ${DBT_INPUTS[*]} unchanged since ${prev_sha:0:10} (--force-dbt to run it)"
+  fi
 
   step="grants.sql"; log "$step"
   psql_owner "$root/deploy" -v ON_ERROR_STOP=1 -q -f /sql/grants.sql

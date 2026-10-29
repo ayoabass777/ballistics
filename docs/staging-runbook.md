@@ -80,9 +80,14 @@ origin, so push first.
 deploy/deploy_staging.sh                  # deploy origin/main
 deploy/deploy_staging.sh --status         # list RELEASES
 deploy/deploy_staging.sh --rollback       # redeploy the previous release
+deploy/deploy_staging.sh --force-dbt      # run dbt build even if no dbt input changed
 ```
 
-A deploy takes about 10–15 minutes. Order: stop Airflow → check out → build
+A deploy takes about 5 minutes when images are cached, about 2 minutes when
+`dbt build` is skipped. `dbt build` (about 3 minutes, mostly the
+head-to-head tables) runs only when `dbt/`, `db/migrations/`, `API/sql/` or
+`deploy/dbt-profiles.yml.tmpl` changed since the last recorded release, or
+with `--force-dbt`; the nightly DAG runs dbt either way. Order: stop Airflow → check out → build
 images tagged `b<sha>` → migrations (`scripts/migrate.py up`) → account
 bootstrap → `dbt build` → grants → tag engine/dbt `:latest` → start
 everything → record `RELEASES` → prune old images. If a step fails, it says
