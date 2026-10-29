@@ -1,0 +1,114 @@
+# CI: Python tests and dbt compile on every push and pull request.
+# No deploy here; staging still deploys with deploy/deploy_staging.sh.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PGUSER: ci
+  PGPASSWORD: ci
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      # Throwaway database for the integration tests gated on *_TEST_DSN.
+      # Matches staging (postgres:17).
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      PROJECT_ROOT: ${{ github.workspace }}
+      FLOW_TEST_DSN: postgresql://ci:ci@localhost:5432/flow_test
+      FORECAST_TEST_DSN: postgresql://ci:ci@localhost:5432/forecast_test
+      FORECAST_API_TEST_DSN: postgresql://ci:ci@localhost:5432/forecast_test_api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"   # the engine and API images; Airflow runs 3.10
+          cache: pip
+          cache-dependency-path: |
+            etl/requirements.txt
+            engine/requirements.txt
+            engine/api/requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r etl/requirements.txt -r engine/requirements.txt \
+                      -r engine/api/requirements.txt pytest httpx
+      - name: Create one database per integration suite
+        # The suites drop and recreate schemas, so they don't share a database.
+        run: |
+          for db in flow_test forecast_test forecast_test_api; do
+            psql -h localhost -d ci -c "CREATE DATABASE $db"
+          done
+      - name: Compile DAGs
+        # Airflow isn't installed here, so this checks syntax only.
+        run: python -m py_compile airflow/dags/*.py
+      - name: Run tests
+        run: python -m pytest -q tests engine/tests
+
+  dbt-compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ballistics
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    defaults:
+      run:
+        working-directory: dbt/football_pipeline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"   # the dbt image
+          cache: pip
+          cache-dependency-path: dbt/requirements.txt
+      - name: Install dbt
+        run: pip install -r ../requirements.txt
+      - name: Write a CI profile
+        # Same profile name and schema as deploy/dbt-profiles.yml.tmpl, pointed
+        # at the empty service database: compile needs a connection, not data.
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<'EOF'
+          ballistics:
+            target: ci
+            outputs:
+              ci:
+                type: postgres
+                host: localhost
+                port: 5432
+                user: ci
+                password: ci
+                dbname: ballistics
+                schema: raw
+                threads: 4
+          EOF
+      - name: dbt compile
+        run: dbt compile

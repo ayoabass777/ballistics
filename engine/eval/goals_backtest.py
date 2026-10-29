@@ -6,7 +6,7 @@ over/under probabilities at any line (1.5, 2.5, 3.5) from the fitted
 distribution — one model, no class-imbalance problem.
 
 Feature sets compared:
-  A) elo_rich              — abs_gap, max_elo, min_elo, elo_sum, home_elo_gap
+  A) elo_rich              — abs_gap, max_elo, home_elo_gap
   B) elo_plus_cluster      — elo_rich + scoring-style cluster dummies
   C) elo_plus_league       — elo_rich + per-league dummies
   D) cluster_only          — cluster dummies (baseline)
@@ -49,7 +49,10 @@ MIN_TRAIN_MATCHES: int = 500
 
 LINES: List[float] = [1.5, 2.5, 3.5]
 
-ELO_RICH_COLS = ["abs_gap", "max_elo", "min_elo", "elo_sum", "home_elo_gap"]
+# min_elo = max_elo - abs_gap and elo_sum = 2*max_elo - abs_gap, so either one
+# makes the design singular (NegBin's Newton solve fails on x86). These three
+# span the same information.
+ELO_RICH_COLS = ["abs_gap", "max_elo", "home_elo_gap"]
 
 FEATURE_SETS = [
     "elo_rich",

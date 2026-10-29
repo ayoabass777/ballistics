@@ -99,6 +99,10 @@ class ApiResponseError(Exception):
     success while the pipeline quietly stops updating."""
 
 
+class EmptySeasonError(ApiResponseError):
+    """A healthy API response with no fixtures for a bootstrap season."""
+
+
 # Unified rate-limited GET with retry/backoff and 429 handling
 def _rate_limited_get(
     endpoint: str,
@@ -191,6 +195,46 @@ def fetch_fixtures(endpoint, params, *, raise_on_failure=False):
     Returns fixtures; optionally raises on request/JSON failure.
     """
     return _rate_limited_get(endpoint, params, raise_on_failure=raise_on_failure)
+
+
+def fetch_bootstrap_fixtures(api_league_id: int, season_year: int) -> List[Dict[str, Any]]:
+    """A configured season must produce data or a retryable bootstrap failure."""
+    fixtures = fetch_fixtures(
+        FIXTURES_ENDPOINT,
+        {"league": api_league_id, "season": season_year},
+        raise_on_failure=True,
+    )
+    if not fixtures:
+        raise EmptySeasonError(
+            f"No fixtures returned for league {api_league_id} season {season_year}"
+        )
+    return fixtures
+
+
+def bootstrap_failure_message(failed_seasons: List[str], failed_keys: List[str]) -> Optional[str]:
+    """Why a bootstrap run failed after loading what it could, or None."""
+    parts = []
+    if failed_seasons:
+        parts.append("extraction failed for " + "; ".join(failed_seasons))
+    if failed_keys:
+        parts.append("load failed for S3 keys " + ", ".join(failed_keys))
+    return "Fixture bootstrap " + " and ".join(parts) if parts else None
+
+
+def empty_season_is_expected(cur, league_season_id: int, today=None) -> bool:
+    """An empty answer is expected for a season that hasn't started or has
+    ended (the provider has no fixtures for it); during the season it is a
+    failure. Seasons without dates count as in progress."""
+    today = today or datetime.utcnow().date()
+    cur.execute(
+        "SELECT start_date, end_date FROM dim.dim_league_seasons WHERE league_season_id = %s",
+        (league_season_id,),
+    )
+    row = cur.fetchone()
+    if not row or row[0] is None or row[1] is None:
+        return False
+    start_date, end_date = row
+    return today < start_date or today > end_date
 
 #fixtures is a list of fixtures each fixture contains a lot of information that
 #should be documented but i will only extract the ones i consider important

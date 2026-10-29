@@ -81,6 +81,19 @@ METADATA_PATH = os.getenv(
     os.path.join(os.getcwd(), "data", "metadata.yaml"),
 )
 
+def _raise_for_bootstrap_failures(failed_seasons, failed_keys):
+    """Fail load_fixtures after the good seasons loaded. Extraction-only
+    failures skip the task retry: a reload can't fetch the missing seasons;
+    the next bootstrap run does."""
+    from airflow.exceptions import AirflowFailException
+    from etl.src.extract_fixtures import bootstrap_failure_message
+
+    message = bootstrap_failure_message(failed_seasons, failed_keys)
+    if message is None:
+        return
+    raise (RuntimeError if failed_keys else AirflowFailException)(message)
+
+
 default_args = {
     "owner": "Ayomide Abass",
     "depends_on_past": False,
@@ -162,9 +175,10 @@ def bootstrap_dag():
         Returns list of successful S3 keys via XCom.
         """
         from etl.src.extract_fixtures import (
-            FIXTURES_ENDPOINT,
+            EmptySeasonError,
+            empty_season_is_expected,
+            fetch_bootstrap_fixtures,
             extract_fixtures_field,
-            fetch_fixtures,
             get_season_rows,
         )
         from etl.src.extract_metadata import get_db_connection
@@ -186,6 +200,7 @@ def bootstrap_dag():
         conn = get_db_connection()
         cur = conn.cursor()
         s3_keys = []
+        failed_seasons = []
 
         try:
             ensure_raw_fixtures_bootstrap_ready(cur)
@@ -200,17 +215,24 @@ def bootstrap_dag():
             for country_name, league_name, api_league_id, season_year, league_season_id in season_rows:
                 logger.info("Extracting %s (%s)", league_name, season_year)
                 try:
-                    fixtures = fetch_fixtures(
-                        FIXTURES_ENDPOINT,
-                        params={"league": api_league_id, "season": season_year},
-                    )
+                    try:
+                        fixtures = fetch_bootstrap_fixtures(api_league_id, season_year)
+                    except EmptySeasonError:
+                        if not empty_season_is_expected(cur, league_season_id):
+                            raise
+                        logger.warning(
+                            "No fixtures for %s (%s), outside its season dates; skipped",
+                            league_name, season_year,
+                        )
+                        continue
                     extracted = extract_fixtures_field(fixtures)
                     if fixtures:
                         write_raw_payload_to_s3(fixtures, api_league_id, season_year, ds)
 
                     if not extracted:
-                        logger.warning("No fixtures extracted for %s (%s)", league_name, season_year)
-                        continue
+                        raise ValueError(
+                            f"No fixture rows extracted for league {api_league_id} season {season_year}"
+                        )
 
                     s3_key = write_fixtures_to_s3(extracted, api_league_id, season_year, ds)
                     s3_keys.append(s3_key)
@@ -270,8 +292,12 @@ def bootstrap_dag():
                             "error": str(exc),
                         },
                     )
+                    failed_seasons.append(f"{api_league_id}/{season_year}: {exc}")
                     continue
 
+            # Seasons that did extract still load; load_fixtures fails the run
+            # afterwards so metadata isn't marked processed.
+            context["ti"].xcom_push(key="failed_seasons", value=failed_seasons)
             return s3_keys
 
         finally:
@@ -319,9 +345,13 @@ def bootstrap_dag():
         )
 
         logger = get_logger(__name__, log_path=EXTRACT_FIXTURES_LOG)
+        failed_seasons = context["ti"].xcom_pull(
+            task_ids="extract_fixtures", key="failed_seasons"
+        ) or []
 
         if not s3_keys:
             logger.info("No S3 keys to load. Skipping.")
+            _raise_for_bootstrap_failures(failed_seasons, [])
             return
 
         conn = get_db_connection()
@@ -468,12 +498,8 @@ def bootstrap_dag():
                     failed_keys.append(s3_key)
                     continue
 
-            if failed_keys:
-                raise RuntimeError(
-                    "Failed loading fixtures from S3 keys: " + ", ".join(failed_keys)
-                )
-
             logger.info("Total fixtures loaded: %d from %d S3 keys", total_loaded, len(s3_keys))
+            _raise_for_bootstrap_failures(failed_seasons, failed_keys)
 
         finally:
             cur.close()
