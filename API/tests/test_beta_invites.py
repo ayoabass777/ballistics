@@ -65,4 +65,17 @@ def test_email_bound_single_use_claim_sends_invitation(monkeypatch):
         payload = send.call_args.kwargs["json"]
         assert payload["email_address"] == "member@example.com"
         assert payload["notify"] is True
+        assert "redirect_url" not in payload
     assert db.updated and db.committed
+
+
+def test_claim_sends_the_configured_redirect(monkeypatch):
+    monkeypatch.setenv("BETA_INVITE_PEPPER", "x" * 32)
+    monkeypatch.setenv("CLERK_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("BETA_INVITE_REDIRECT_URL", "https://beta.ballistics.football/sign-up")
+    row = {"email": "member@example.com", "expires_at": datetime.now(timezone.utc) + timedelta(days=1),
+           "claimed_at": None}
+    with patch("API.beta_invites.httpx.post") as send:
+        send.return_value.json.return_value = {"id": "inv_123"}
+        claim_code(FakeDB(row), "ABCDEFGHJKLMNPQRSTUV", "member@example.com")
+    assert send.call_args.kwargs["json"]["redirect_url"] == "https://beta.ballistics.football/sign-up"

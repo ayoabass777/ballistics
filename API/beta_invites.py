@@ -53,11 +53,17 @@ def claim_code(db: Session, code: str, email: str) -> None:
     secret = os.getenv("CLERK_SECRET_KEY", "")
     if not secret:
         raise HTTPException(503, "Invitations are unavailable")
+    invitation_body = {"email_address": normalized_email, "notify": True,
+                       "public_metadata": {"ballistics_beta": True}}
+    # Without it the emailed link goes through Clerk's Account Portal to the
+    # instance home URL, which is still v1 at the apex domain.
+    redirect_url = os.getenv("BETA_INVITE_REDIRECT_URL", "").strip()
+    if redirect_url:
+        invitation_body["redirect_url"] = redirect_url
     try:
         response = httpx.post(
             os.getenv("CLERK_BACKEND_API_BASE", "https://api.clerk.com/v1").rstrip("/") + "/invitations",
-            json={"email_address": normalized_email, "notify": True,
-                  "public_metadata": {"ballistics_beta": True}},
+            json=invitation_body,
             headers={"Authorization": f"Bearer {secret}", "Accept": "application/json"},
             timeout=10,
         )
