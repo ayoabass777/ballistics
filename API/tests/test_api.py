@@ -2361,8 +2361,8 @@ def test_me_returns_synced_user_payload():
     }
 
     def override_get_db():
-        # CREATE SCHEMA, CREATE TABLE, UPSERT RETURNING
-        yield _FakeExecuteSession([[], [], [user_row]])
+        # UPSERT RETURNING
+        yield _FakeExecuteSession([[user_row]])
 
     def override_claims():
         return {
@@ -2389,6 +2389,37 @@ def test_me_returns_synced_user_payload():
     assert payload["data"]["onboardingCompleted"] is False
     assert payload["meta"]["authProvider"] == "clerk"
     assert payload["meta"]["source"] == "app.app_users"
+
+
+def test_me_runs_no_ddl():
+    # The account role has no CREATE rights; any DDL in /me returns 503 on staging.
+    statements = []
+
+    class RecordingSession(_FakeExecuteSession):
+        def execute(self, statement, *args, **kwargs):
+            statements.append(str(statement))
+            return super().execute(statement, *args, **kwargs)
+
+    user_row = {"user_id": "user_789", "email": "ddl@example.com", "first_name": "D", "last_name": "L",
+                "image_url": "https://example.com/d.png", "plan": "free", "onboarding_completed": False}
+
+    def override_get_db():
+        yield RecordingSession([[user_row]])
+
+    def override_claims():
+        return {"sub": "user_789", "email": "ddl@example.com", "first_name": "D", "last_name": "L",
+                "image_url": "https://example.com/d.png"}
+
+    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_current_user_claims] = override_claims
+    try:
+        response = client.get("/me")
+    finally:
+        app.dependency_overrides.pop(get_db, None)
+        app.dependency_overrides.pop(get_current_user_claims, None)
+
+    assert response.status_code == 200
+    assert statements and not any(s.lstrip().upper().startswith(("CREATE", "ALTER", "DROP")) for s in statements)
 
 
 def test_me_returns_503_on_db_error():
@@ -2422,8 +2453,8 @@ def test_me_hydrates_missing_email_from_clerk_profile():
     }
 
     def override_get_db():
-        # CREATE SCHEMA, CREATE TABLE, UPSERT RETURNING
-        yield _FakeExecuteSession([[], [], [user_row]])
+        # UPSERT RETURNING
+        yield _FakeExecuteSession([[user_row]])
 
     def override_claims():
         return {"sub": "user_456"}
