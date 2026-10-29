@@ -88,12 +88,12 @@ sources:
           - name: watermark_max
             description: "Maximum watermark value observed for this movement."
           - name: status
-            description: "Movement status."
+            description: "Movement status. partial = some rows loaded, the rest parked or failed."
             tests:
               - not_null
               - accepted_values:
                   arguments:
-                    values: ['success', 'failed', 'skipped']
+                    values: ['success', 'partial', 'failed', 'skipped']
           - name: details
             description: "Movement-specific detail payload."
           - name: detected_at
