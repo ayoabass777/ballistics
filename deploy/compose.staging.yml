@@ -161,6 +161,9 @@ services:
       CLERK_ISSUER: ${CLERK_ISSUER}
       BETA_INVITE_API_KEY: ${BETA_INVITE_API_KEY}
       BETA_INVITE_PEPPER: ${BETA_INVITE_PEPPER}
+      # The invitation email links here (the beta's own sign-up page, which
+      # then sends members to /discover), not to v1 at the apex domain.
+      BETA_INVITE_REDIRECT_URL: ${BETA_INVITE_REDIRECT_URL:-https://beta.ballistics.football/sign-up}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ca-central-1}
