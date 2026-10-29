@@ -38,6 +38,13 @@ staging.ballistics.football, beta.ballistics.football {
 	}
 }
 
+# Plain-HTTP visitors (Cloudflare passes http:// through on port 80 in Full
+# mode). The catch-all below claims :80, so Caddy adds no automatic redirect
+# for these hosts; without this block they got Cloudflare error 520.
+http://staging.ballistics.football, http://beta.ballistics.football {
+	redir https://{host}{uri} permanent
+}
+
 # Anything else (bare IP, unknown host): refuse.
 :80, :443 {
 	abort
