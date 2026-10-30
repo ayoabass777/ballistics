@@ -1,4 +1,4 @@
-# CI: Python tests and dbt compile on every push and pull request.
+# CI: Python tests, frontend checks and dbt compile on every push and pull request.
 # No deploy here; staging still deploys with deploy/deploy_staging.sh.
 name: CI
 
@@ -136,6 +136,37 @@ jobs:
           ACCOUNT_DB_PORT: "5432"
           ACCOUNT_DB_NAME: ballistics
         run: python -m pytest -q -rs API/tests/test_shared_saved_postgres.py
+
+  frontend-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend_dev
+    steps:
+      - uses: actions/checkout@v4
+      # Same Node and pnpm as frontend_dev/Dockerfile.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: frontend_dev/pnpm-lock.yaml
+      - name: Install dependencies
+        # --no-frozen-lockfile as in the image build, so CI checks what deploys.
+        run: pnpm install --no-frozen-lockfile
+      - name: Typecheck research and forecast pages
+        run: |
+          pnpm run typecheck:research
+          pnpm run typecheck:forecast
+      - name: Contract and proxy tests
+        run: |
+          pnpm run test:research:contracts
+          pnpm run test:research:proxy
+          pnpm run test:forecast:contracts
+          pnpm run test:forecast:proxy
 
   dbt-compile:
     runs-on: ubuntu-latest
