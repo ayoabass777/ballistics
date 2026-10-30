@@ -238,8 +238,8 @@ Issue a single-use, email-bound code on staging (codes made locally won't
 verify here):
 
 ```bash
-dc exec account-api python -m API.issue_beta_invite person@example.com            # valid 14 days
-dc exec account-api python -m API.issue_beta_invite person@example.com --days 30  # 1–30
+dc exec account-api python -m API.issue_beta_invite person@example.com            # valid 30 days
+dc exec account-api python -m API.issue_beta_invite person@example.com --days 7   # 1–30
 ```
 
 The tester claims the code, Clerk sends the sign-up email, and they sign up

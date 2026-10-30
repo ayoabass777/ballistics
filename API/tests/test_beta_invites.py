@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi import HTTPException
@@ -79,3 +79,13 @@ def test_claim_sends_the_configured_redirect(monkeypatch):
         send.return_value.json.return_value = {"id": "inv_123"}
         claim_code(FakeDB(row), "ABCDEFGHJKLMNPQRSTUV", "member@example.com")
     assert send.call_args.kwargs["json"]["redirect_url"] == "https://beta.ballistics.football/sign-up"
+
+
+def test_issue_beta_invite_defaults_to_30_days(monkeypatch, capsys):
+    from API import issue_beta_invite
+    monkeypatch.setattr("sys.argv", ["issue_beta_invite", "member@example.com"])
+    with patch.object(issue_beta_invite, "SessionLocal", MagicMock()), \
+         patch.object(issue_beta_invite, "issue_code", return_value="CODE") as issue:
+        issue_beta_invite.main()
+    assert issue.call_args.args[1:] == ("member@example.com", 30)
+    assert "Expires in: 30 days" in capsys.readouterr().out

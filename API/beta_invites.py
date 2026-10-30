@@ -27,7 +27,7 @@ def code_hash(code: str) -> str:
     return hmac.new(pepper.encode(), code.encode(), hashlib.sha256).hexdigest()
 
 
-def issue_code(db: Session, email: str, days: int = 14) -> str:
+def issue_code(db: Session, email: str, days: int = 30) -> str:
     """Admin-only helper; print and deliver the returned code out of band."""
     code = "".join(secrets.choice("ABCDEFGHJKLMNPQRSTUVWXYZ23456789") for _ in range(20))
     db.execute(text("""INSERT INTO app.beta_invite_codes (code_hash, email, expires_at)

@@ -9,7 +9,7 @@ from API.beta_invites import issue_code
 def main() -> None:
     parser = argparse.ArgumentParser(description="Issue one email-bound Ballistics beta code")
     parser.add_argument("email")
-    parser.add_argument("--days", type=int, default=14)
+    parser.add_argument("--days", type=int, default=30)
     args = parser.parse_args()
     if not 1 <= args.days <= 30:
         parser.error("--days must be between 1 and 30")
