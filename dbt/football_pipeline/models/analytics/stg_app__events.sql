@@ -17,5 +17,17 @@ SELECT
     props->>'what' AS replayed,
     props->>'from_section' AS from_section,
     props->>'entry_route' AS entry_route,
-    props->>'device' AS device
+    props->>'device' AS device,
+    props->>'api' AS api,
+    props->>'method' AS http_method,
+    (props->>'status')::int AS http_status,
+    props->>'reason' AS failure_reason,
+    props->>'route' AS route,
+    props->>'kind' AS error_kind,
+    (props->>'result_count')::int AS result_count,
+    (props->>'query_length')::int AS query_length,
+    props->>'filter' AS filter_name,
+    props->>'metric' AS speed_metric,
+    (props->>'value_ms')::int AS speed_ms,
+    props->>'rating' AS speed_rating
 FROM {{ source('app', 'app_events') }}

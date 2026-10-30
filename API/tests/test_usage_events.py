@@ -67,12 +67,35 @@ def test_records_batch_under_token_identity(setup):
     {**event(), 'occurred_at': '2026-10-26T12:00:00'},
     {**event(), 'occurred_at': (datetime.now(timezone.utc) + timedelta(days=3)).isoformat()},
     {**event(), 'event_id': 'not-a-uuid'},
+    event('request_failed', {'api': '/api/research/discover?q=arsenal', 'method': 'GET', 'status': 503, 'reason': 'http'}),
+    event('request_failed', {'api': 'https://evil.test/api/x', 'method': 'GET', 'status': 503, 'reason': 'http'}),
+    event('request_failed', {'api': '/api/account/leagues', 'method': 'GET', 'status': 700, 'reason': 'http'}),
+    event('client_error', {'route': '/matches', 'kind': 'error', 'message': 'boom'}),
+    event('search_used', {'page': 'matches', 'result_count': 2, 'query_length': 7, 'query': 'arsenal'}),
+    event('filter_changed', {'page': 'matches', 'filter': 'team', 'result_count': 2}),
+    event('page_speed', {'route': '/matches', 'metric': 'cls', 'value_ms': 1, 'rating': 'good'}),
+    event('page_speed', {'route': '/matches', 'metric': 'lcp', 'value_ms': 1.5, 'rating': 'good'}),
 ])
 def test_rejects_events_outside_allow_list(setup, bad):
     client, _, stored, _ = setup
     signin('alice')
     assert client.post('/account/events', json={'events': [bad]}).status_code == 422
     assert not stored
+
+
+@pytest.mark.parametrize('good', [
+    event('request_failed', {'api': '/api/research/match/[id]', 'method': 'GET', 'status': 0, 'reason': 'network'}),
+    event('client_error', {'route': '/match/[id]', 'kind': 'unhandled_rejection'}),
+    event('retry_clicked', {'api': '/api/account/leagues'}),
+    event('search_used', {'page': 'all', 'result_count': 0, 'query_length': 4}),
+    event('filter_changed', {'page': 'discover', 'filter': 'evidence_filter', 'result_count': 12}),
+    event('page_speed', {'route': '/matches', 'metric': 'inp', 'value_ms': 184, 'rating': 'good'}),
+])
+def test_accepts_error_search_and_speed_events(setup, good):
+    client, _, stored, _ = setup
+    signin('alice')
+    assert client.post('/account/events', json={'events': [good]}).status_code == 200
+    assert len(stored) == 1
 
 
 @pytest.mark.parametrize('events', [[], [event() for _ in range(21)]])

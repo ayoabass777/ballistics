@@ -27,6 +27,15 @@ activity AS (
         count(*) FILTER (WHERE event_name = 'tutorial_dismissed' AND tutorial_action = 'skip') AS tutorials_skipped,
         count(*) FILTER (WHERE event_name = 'methodology_opened') AS methodology_opens,
         bool_or(device = 'mobile') AS used_mobile,
+        count(*) FILTER (WHERE event_name = 'request_failed') AS requests_failed,
+        count(*) FILTER (WHERE event_name = 'client_error') AS client_errors,
+        count(*) FILTER (WHERE event_name = 'retry_clicked') AS retries,
+        count(*) FILTER (WHERE event_name = 'search_used') AS searches,
+        count(*) FILTER (WHERE event_name = 'search_used' AND result_count = 0) AS empty_searches,
+        count(*) FILTER (WHERE event_name = 'filter_changed') AS filter_changes,
+        percentile_cont(0.75) WITHIN GROUP (ORDER BY speed_ms) FILTER (WHERE speed_metric = 'lcp') AS lcp_p75_ms,
+        percentile_cont(0.75) WITHIN GROUP (ORDER BY speed_ms) FILTER (WHERE speed_metric = 'inp') AS inp_p75_ms,
+        count(*) FILTER (WHERE event_name = 'page_speed' AND speed_rating = 'poor') AS poor_speed_readings,
         max(occurred_at) AS last_seen_at
     FROM events
     GROUP BY user_id
@@ -78,6 +87,15 @@ SELECT
     coalesce(a.tutorials_skipped, 0) AS tutorials_skipped,
     coalesce(a.methodology_opens, 0) AS methodology_opens,
     coalesce(a.used_mobile, false) AS used_mobile,
+    coalesce(a.requests_failed, 0) AS requests_failed,
+    coalesce(a.client_errors, 0) AS client_errors,
+    coalesce(a.retries, 0) AS retries,
+    coalesce(a.searches, 0) AS searches,
+    coalesce(a.empty_searches, 0) AS empty_searches,
+    coalesce(a.filter_changes, 0) AS filter_changes,
+    a.lcp_p75_ms,
+    a.inp_p75_ms,
+    coalesce(a.poor_speed_readings, 0) AS poor_speed_readings,
     a.last_seen_at,
     coalesce(p.usage_events_enabled, true) AS usage_events_enabled
 FROM {{ source('app', 'app_users') }} u

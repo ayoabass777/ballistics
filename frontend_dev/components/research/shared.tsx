@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useRef, type ComponentProps, type Rea
 import { GlassButton } from '@/components/GlassButton';
 import { savedSchema, type Saved, type Card } from '@/lib/research';
 import { savedResponseSchema, savedIdsSchema } from '@/lib/account';
-import { track } from '@/lib/usage-events';
+import { apiTemplate, track, trackRequestFailure } from '@/lib/usage-events';
 import { z } from 'zod';
 import s from './research.module.css';
 import { usePreferences } from './PreferencesProvider';
@@ -50,11 +50,12 @@ export function useResource<T>(url: string | null, schema: z.ZodType<T>) {
         setState({ url, data: null, error: '', busy: true });
         fetch(url, { cache: 'no-store', signal: abort.signal }).then(async (r) => { const body = await r.json(); if (!r.ok)
             throw new Error(body.error || 'Unable to load match research.'); return schema.parse(body); }).then(data => { if (!abort.signal.aborted)
-            setState({ url, data, error: '', busy: false }); }).catch(e => { if (!abort.signal.aborted)
+            setState({ url, data, error: '', busy: false }); }).catch(e => { if (!abort.signal.aborted && e instanceof z.ZodError)
+            trackRequestFailure(url, 'GET', 200, 'invalid'); if (!abort.signal.aborted)
             setState({ url, data: null, error: e instanceof z.ZodError ? 'The response could not be verified.' : e.message, busy: false }); });
         return () => abort.abort();
     }, [url, schema, revision]);
-    return { ...(state.url === url ? state : { data: null, error: '', busy: true }), retry: () => setRevision(x => x + 1) };
+    return { ...(state.url === url ? state : { data: null, error: '', busy: true }), retry: () => { if (url) track('retry_clicked', { api: apiTemplate(url) }); setRevision(x => x + 1); } };
 }
 export function ResourceState({ busy, error, retry }: {
     busy: boolean;
