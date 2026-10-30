@@ -2,7 +2,7 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-10-21 (beta blockers added; beta scope frozen, D152).
+Updated 2026-10-30 (member journey done, Wave 1 invites sent).
 
 ## Beta blockers (critical path)
 
@@ -40,9 +40,12 @@ path: each item gates the ones below it, except where marked parallel.
    2026-10-28 (`deploy/hetzner_firewall.sh`): web traffic only through
    Cloudflare. Release `ba7fbc77773` deployed 2026-10-28 (privacy page, `/` →
    `/welcome`). Operating guide: [docs/staging-runbook.md](docs/staging-runbook.md).
-   Still open: Hetzner weekly
-   snapshots (owner, console), missed-run alert, uptime and disk checks.
-4. [ ] **Member journey gaps (checkpoint 2, parallel with 3).**
+   Release `b5458bb24c0` deployed 2026-10-30 (pipeline failure alerts,
+   post-deploy smoke check). Missed-run check (`deploy/check_nightly.sh`)
+   installed in cron 2026-10-30. Still open: Hetzner weekly snapshots (owner,
+   console), external uptime check, disk alert at 80%,
+   `saved_snapshot_maintenance` still paused.
+4. [x] **Member journey gaps (checkpoint 2, parallel with 3).** Done by 2026-10-30.
    - Tester instructions for Google sign-in (D151): use the Google account the
      invitation went to; the 2026-10-21 "Last used" button signed in as another
      account.
@@ -54,8 +57,8 @@ path: each item gates the ones below it, except where marked parallel.
      2026-10-28; Google consent screen published the same day (home page and
      privacy URLs set). Still to check: Google sign-in for an account that was
      never a test user (part of the smoke test).
-5. [x] **Match details build items (D152, parallel with 3).** Done locally
-   2026-10-28, not yet deployed to staging.
+5. [x] **Match details build items (D152, parallel with 3).** Done
+   2026-10-28; on staging since release `b5458bb24c0` (2026-10-30).
    - After kickoff, show the last pre-kickoff forecast. API side done
      2026-10-22: `/api/match` reads the fixture's most recent complete run and
      sets `fixture.forecast_from_latest_run` (migration 0002 adds the index;
@@ -70,14 +73,17 @@ path: each item gates the ones below it, except where marked parallel.
    (checked 2026-10-28): none in current seasons on staging. The ~110 are
    past-season rows outside every reader; the one current case (Port Vale v
    Northampton, 1563773) was the provider keeping the 26 Sep date until it
-   moved the match to 24 Nov, which the nightly by-ID update picks up.
-7. [ ] **Staging smoke test.** Fresh invited account end to end on desktop and
+   moved the match to 24 Nov; the nightly by-ID update picked it up
+   (confirmed 2026-10-30). Next bootstrap will fail on J1 League 2026
+   (in progress by its dates, API returns no fixtures): find out why.
+7. [x] **Staging smoke test.** Fresh invited account end to end on desktop and
    mobile, data freshness, failure alert and rollback, all exercised on
-   staging. Then send the first invites.
+   staging. Then send the first invites. Wave 1 invites sent by 2026-10-30.
 
 ## Now
 
-- [ ] **Check Port Vale v Northampton picked up its new date** after the
+- [x] **Check Port Vale v Northampton picked up its new date** (confirmed
+  2026-10-30: kickoff 2026-11-24 19:45 UTC, NS) after the
   2026-10-29 nightly run (after ~00:10 UTC). On staging, `raw.raw_fixtures`
   row for api_fixture_id 1563773 (fixture 107511) should read kickoff
   2026-11-24 19:45 UTC, NS. If it still says 26 Sep, check that night's
@@ -88,7 +94,8 @@ path: each item gates the ones below it, except where marked parallel.
   gains rows beyond the 5,265 backfilled (team-name fix makes ~330 teams' cards
   new versions once); no CANC/PST/ORPHAN fixtures in the feed; Discover shows
   provider team names ("FC Copenhagen", not "Fc Copenhagen").
-- [ ] **Match pages lose their forecast once a match starts.** `/api/match` reads
+- [x] **Match pages lose their forecast once a match starts.** Fixed (beta
+  blocker 5, deployed 2026-10-30). `/api/match` reads
   only the latest engine run, and runs cover not-started fixtures, so a match
   page shows no Strength/Goals/Patterns after kickoff (and for finished matches).
   Decided (D152): keep the last pre-kickoff forecast; tracked in beta blocker 5.
