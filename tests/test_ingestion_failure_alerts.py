@@ -146,3 +146,12 @@ def test_one_league_standings_failure_does_not_stop_the_others():
     assert fetch.call_count == 2
     refresh.assert_called_once()
     assert refresh.call_args.args[0]["api_league_id"] == 140
+
+
+def test_bootstrap_requests_the_provider_season_not_the_start_year():
+    cur = Mock()
+    cur.fetchall.return_value = []
+    extract_fixtures.get_season_rows(cur)
+    sql = cur.execute.call_args.args[0]
+    assert "ls.season AS season_year" in sql
+    assert "start_date" not in sql
