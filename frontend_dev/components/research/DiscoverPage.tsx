@@ -44,6 +44,11 @@ function OnboardingSaveTip() {
     if (!visible) return null;
     return <div className={s.notice} role="status">Tap Save on a fixture to build your matchday shortlist. <Button onClick={() => { sessionStorage.removeItem('ballistics:onboarding:save-tip'); setVisible(false); }}>Got it</Button></div>;
 }
+// URL parameters behind each filter_changed value (the team search q is search_used).
+const FILTER_GROUPS: Record<string, string[]> = {
+    dates: ['scope', 'day', 'end_day'], leagues: ['leagues'], finding: ['finding'], category: ['category'],
+    evidence_filter: ['goals_filter', 'patterns_filter'], sort: ['goals_sort', 'patterns_sort'],
+};
 export function DiscoverPage({ all = false, matches = false }: {
     matches?: boolean;
     all?: boolean;
@@ -107,6 +112,30 @@ export function DiscoverPage({ all = false, matches = false }: {
     const categoryTeams = (data?.lists[category] || []).filter(f => !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
     const categoryCards = categoryResults(categoryTeams, category === 'strength' ? '' : filterKey, category !== 'strength' && sortKey === 'highest');
     const standoutResults = (data?.lists.standouts || []).filter(f => !all || !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
+    const page = matches ? 'matches' : all ? 'all' : 'discover';
+    const resultCount = Math.min(200, matches ? matchResults.length : all ? standoutResults.length : categoryCards.length);
+    // One search_used per settled search, not one per pause in typing, and not again
+    // when a filter refetches the list under the same search. Never the text.
+    const reportedSearch = useRef('');
+    useEffect(() => {
+        if (!teamQuery || !data || teamQuery === reportedSearch.current) return;
+        const timer = setTimeout(() => { reportedSearch.current = teamQuery; track('search_used', { page, result_count: resultCount, query_length: Math.min(200, teamQuery.length) }); }, 1500);
+        return () => clearTimeout(timer);
+    }, [teamQuery, data]); // eslint-disable-line react-hooks/exhaustive-deps
+    // filter_changed waits for the refetched list, so result_count is the new one.
+    const lastFilters = useRef<Record<string, string> | null>(null), pendingFilter = useRef<string | null>(null);
+    useEffect(() => {
+        const current = Object.fromEntries(Object.entries(FILTER_GROUPS).map(([group, keys]) => [group, keys.map(key => search.get(key) || '').join('|')]));
+        const previous = lastFilters.current;
+        lastFilters.current = current;
+        const changed = previous && Object.keys(current).find(group => current[group] !== previous[group]);
+        if (changed) pendingFilter.current = changed;
+    }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        if (!pendingFilter.current || busy) return;
+        if (data) track('filter_changed', { page, filter: pendingFilter.current, result_count: resultCount });
+        pendingFilter.current = null;
+    }, [query, busy, data]); // eslint-disable-line react-hooks/exhaustive-deps
     const shownMatches = matchResults.slice(0, position.count);
     const matchDays = new Map<string, Card[]>();
     const dayFormat = new Intl.DateTimeFormat('en-GB', { timeZone: zone || 'UTC', year: 'numeric', month: '2-digit', day: '2-digit' });
