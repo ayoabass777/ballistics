@@ -33,6 +33,14 @@ function routeTemplate(path: string) {
         .replace(/[^a-z0-9\-/[\]]/g, '').slice(0, 100) || '/';
 }
 
+// Same-origin API path with ids collapsed, so no query string or record id is sent.
+export function apiTemplate(url: string) {
+    let path = url;
+    try { path = new URL(url, window.location.origin).pathname; } catch { /* Keep the raw path. */ }
+    return path.toLowerCase().split('/').map(part => /^\d+$|^[0-9a-f-]{32,36}$/.test(part) ? '[id]' : part).join('/')
+        .replace(/[^a-z0-9\-/[\]]/g, '').slice(0, 94);
+}
+
 function session(now: number) {
     let current = fallbackSession;
     try { const raw = sessionStorage.getItem(SESSION_KEY); if (raw) current = JSON.parse(raw); } catch { /* Keep the in-memory session. */ }
@@ -57,7 +65,8 @@ export function track(name: string, props: Props = {}) {
     }));
     queue.push(make(name, props));
     if (queue.length > 100) queue = queue.slice(-100);
-    if (enabled && queue.length >= 20) flush();
+    // Speed metrics arrive as the tab hides, after the hide-time flush has run.
+    if (enabled && (queue.length >= 20 || document.visibilityState === 'hidden')) flush();
     else if (!timer) timer = setTimeout(flush, 5000);
 }
 
@@ -76,3 +85,37 @@ export function flush() {
 
 if (typeof document !== 'undefined')
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+
+export function trackRequestFailure(url: string, method: string, status: number, reason: 'http' | 'network' | 'invalid') {
+    if (!url.startsWith('/api/') && !url.startsWith(`${window.location.origin}/api/`)) return;
+    const api = apiTemplate(url);
+    if (api === '/api/account/events') return;   // never report the reporter
+    track('request_failed', { api, method: method.toUpperCase(), status, reason });
+}
+
+// Observe every same-origin API call once, rather than at each call site. The
+// response passes through untouched; aborted requests are not failures.
+if (typeof window !== 'undefined' && !(window as { __ballisticsFetch?: boolean }).__ballisticsFetch) {
+    (window as { __ballisticsFetch?: boolean }).__ballisticsFetch = true;
+    const original = window.fetch.bind(window);
+    window.fetch = async (input, init) => {
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+        const method = init?.method || (input instanceof Request ? input.method : 'GET');
+        try {
+            const response = await original(input, init);
+            if (!response.ok) trackRequestFailure(url, method, response.status, 'http');
+            return response;
+        } catch (error) {
+            if (!(error instanceof DOMException && error.name === 'AbortError')) trackRequestFailure(url, method, 0, 'network');
+            throw error;
+        }
+    };
+    window.addEventListener('error', () => track('client_error', { route: routeTemplate(window.location.pathname), kind: 'error' }));
+    window.addEventListener('unhandledrejection', () => track('client_error', { route: routeTemplate(window.location.pathname), kind: 'unhandled_rejection' }));
+}
+
+export function trackSpeed(name: string, value: number, rating: string) {
+    const metric = name.toLowerCase();
+    if (!['lcp', 'inp', 'ttfb', 'fcp'].includes(metric)) return;
+    track('page_speed', { route: routeTemplate(window.location.pathname), metric, value_ms: Math.min(120000, Math.max(0, Math.round(value))), rating });
+}

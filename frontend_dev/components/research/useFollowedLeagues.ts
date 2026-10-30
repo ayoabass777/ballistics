@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { followedResponseSchema } from '@/lib/account';
+import { track } from '@/lib/usage-events';
 
 export function useFollowedLeagues() {
     const { user, isLoaded } = useUser();
@@ -52,6 +53,6 @@ export function useFollowedLeagues() {
         ids: state.userId === userId ? state.ids : [],
         ready: isLoaded && state.userId === userId && state.ready,
         error: state.userId === userId ? state.error : '',
-        signedIn: !!userId, busy, save, reload: () => setRevision(n => n + 1),
+        signedIn: !!userId, busy, save, reload: () => { track('retry_clicked', { api: '/api/account/leagues' }); setRevision(n => n + 1); },
     };
 }

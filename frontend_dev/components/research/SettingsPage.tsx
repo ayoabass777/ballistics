@@ -125,7 +125,7 @@ export function SettingsPage() {
             </section>
             <section className={s.panel}>
                 <h2>Privacy</h2>
-                <p>During the beta, Ballistics records which pages and matches you open and when you skip a tip, so we can find what’s confusing. This is stored with your account, never sold or shared, and deleted within 90 days of the beta ending.</p>
+                <p>During the beta, Ballistics records which pages and matches you open, when you skip a tip, how many results your searches and filters return (never what you type), errors you run into and how fast pages load, so we can find what’s confusing or broken. This is stored with your account, never sold or shared, and deleted within 90 days of the beta ending.</p>
                 {prefs.loading ? <p role="status">Loading preferences…</p> : prefs.usageEvents == null ?
                     <p className={s.caption}>This setting is temporarily unavailable.</p> :
                     <label style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 44 }}>
