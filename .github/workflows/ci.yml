@@ -155,8 +155,10 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend_dev/pnpm-lock.yaml
       - name: Install dependencies
-        # --no-frozen-lockfile as in the image build, so CI checks what deploys.
-        run: pnpm install --no-frozen-lockfile
+        # Exactly the lockfile, as the image build does, so CI checks what deploys.
+        # Fails if pnpm-lock.yaml is out of date with package.json: regenerate it
+        # with `pnpm import` (from package-lock.json) or `pnpm install`.
+        run: pnpm install --frozen-lockfile
       - name: Typecheck research and forecast pages
         run: |
           pnpm run typecheck:research
