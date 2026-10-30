@@ -381,11 +381,12 @@ def _upsert_app_user_from_claims(db: Session, claims: Dict[str, Any]) -> Dict[st
                     :image_url,
                     'clerk'
                 )
+                -- A failed Clerk lookup yields NULLs; keep what is stored.
                 ON CONFLICT (user_id) DO UPDATE SET
-                    email = EXCLUDED.email,
-                    first_name = EXCLUDED.first_name,
-                    last_name = EXCLUDED.last_name,
-                    image_url = EXCLUDED.image_url,
+                    email = COALESCE(EXCLUDED.email, app_users.email),
+                    first_name = COALESCE(EXCLUDED.first_name, app_users.first_name),
+                    last_name = COALESCE(EXCLUDED.last_name, app_users.last_name),
+                    image_url = COALESCE(EXCLUDED.image_url, app_users.image_url),
                     updated_at = NOW()
                 RETURNING
                     user_id,
