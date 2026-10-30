@@ -66,10 +66,29 @@ jobs:
         run: python -m pytest -q tests engine/tests
 
   account-api-tests:
-    # The account API (API/) has its own requirements; its Postgres tests stay
-    # opt-in (they skip without their *_TEST_DATABASE_URL).
+    # The account API (API/) has its own requirements. Its opt-in Postgres
+    # tests run against a database set up the way the staging deploy does it,
+    # connected as the restricted account_api role, so a missing grant or DDL
+    # in the request path fails here instead of on staging.
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ballistics
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ci" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGDATABASE: ballistics
+      # Owner connection, used only for setup and the owner-only test below.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ballistics
+      ACCOUNT_URL: postgresql://account_api:account@localhost:5432/ballistics
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -79,8 +98,44 @@ jobs:
           cache-dependency-path: API/requirements.txt
       - name: Install dependencies
         run: pip install -r API/requirements.txt pytest
-      - name: Run tests
-        run: python -m pytest -q API/tests
+      - name: Set up the database like staging
+        # Same order as deploy/deploy_staging.sh: migrations, account
+        # bootstrap, (dbt build: here a small seed), grants. Roles as in
+        # deploy/postgres-init/01-roles.sh.
+        run: |
+          python scripts/migrate.py up
+          psql -v ON_ERROR_STOP=1 -q -f API/sql/bootstrap_accounts.sql
+          psql -v ON_ERROR_STOP=1 -q <<'SQL'
+          CREATE ROLE account_api LOGIN PASSWORD 'account';
+          CREATE ROLE research_reader LOGIN PASSWORD 'research';
+          ALTER ROLE research_reader SET default_transaction_read_only = on;
+          SQL
+          psql -v ON_ERROR_STOP=1 -q -f API/tests/postgres_seed.sql
+          psql -v ON_ERROR_STOP=1 -q -f deploy/grants.sql
+      - name: Run tests as account_api
+        env:
+          BILLING_TEST_DATABASE_URL: ${{ env.ACCOUNT_URL }}
+          FOLLOWED_LEAGUES_TEST_DATABASE_URL: ${{ env.ACCOUNT_URL }}
+          PREFERENCES_TEST_DATABASE_URL: ${{ env.ACCOUNT_URL }}
+          TEST_ACCOUNT_POSTGRES: "1"
+          ACCOUNT_DB_USER: account_api
+          ACCOUNT_DB_PASSWORD: account
+          ACCOUNT_DB_HOST: localhost
+          ACCOUNT_DB_PORT: "5432"
+          ACCOUNT_DB_NAME: ballistics
+        run: python -m pytest -q -rs API/tests --deselect API/tests/test_shared_saved_postgres.py
+      - name: Run owner-only tests
+        # test_shared_saved_postgres re-applies API/sql/shared_saved_snapshots.sql
+        # and creates a partition to exercise scripts/archive_saved_snapshots.py:
+        # schema maintenance that the deploy and archive job do as the owner.
+        env:
+          TEST_ACCOUNT_POSTGRES: "1"
+          ACCOUNT_DB_USER: ci
+          ACCOUNT_DB_PASSWORD: ci
+          ACCOUNT_DB_HOST: localhost
+          ACCOUNT_DB_PORT: "5432"
+          ACCOUNT_DB_NAME: ballistics
+        run: python -m pytest -q -rs API/tests/test_shared_saved_postgres.py
 
   dbt-compile:
     runs-on: ubuntu-latest
