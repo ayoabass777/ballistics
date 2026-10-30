@@ -15,3 +15,14 @@ for (const saved_at of ['2026-10-19T12:34:56.123456+00:00', '2026-10-19T05:34:56
 for (const saved_at of ['2026-10-19T12:34:56', 'invalid']) {
   assert.equal(c.savedSchema.safeParse([{...saved[0], saved_at}]).success, false);
 }
+
+// Explicit list origins survive authentication without trusting external return URLs.
+for (const origin of ['/discover?category=goals&goals_sort=highest', '/matches?scope=week&q=Arsenal', '/standouts?leagues=39', '/saved']) {
+  const link = new URL(c.matchHref(cards[0], true, origin), 'https://ballistics.invalid');
+  assert.equal(c.matchReturnTo(link.searchParams.get('returnTo')), origin);
+  assert.equal(link.searchParams.get('section'), 'strength');
+}
+for (const unsafe of [null, '', '/sign-in?redirect_url=/match/1', '/match/2', '//example.com', 'https://example.com', '/\\example.com', '/discover/../sign-in']) {
+  assert.equal(c.matchReturnTo(unsafe), '/discover');
+}
+console.log('PASS: explicit list return destinations and safe fallback');
