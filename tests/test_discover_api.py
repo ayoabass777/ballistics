@@ -81,3 +81,76 @@ class DiscoverTests(unittest.TestCase):
         self.assertEqual(assemble([{'payload':{}}],now=NOW)['coverage'],'needs_refresh')
     def test_invalid_zone(self):
         with self.assertRaises(ValueError): window('not-a-zone','week')
+
+
+class DiscoverCacheTests(unittest.TestCase):
+    """discover_json: per-process cache keyed on the latest complete run."""
+
+    def setUp(self):
+        from engine.api import discover as d
+        self.d = d
+        d.clear_cache()
+        self.addCleanup(d.clear_cache)
+        self.run = {'run_ds': date(2026, 10, 29), 'finished_at': datetime(2026, 10, 30, 0, 14, tzinfo=timezone.utc)}
+        kickoff = (datetime.now(timezone.utc).replace(microsecond=0) + timedelta(days=1)).isoformat()
+        self.rows = [{**row(1, kickoff=kickoff), **self.run, 'live_status': 'NS'}]
+        self.row_queries = 0
+        test = self
+
+        class Cursor:
+            def execute(self, sql, params=None):
+                self.sql = sql
+            def fetchone(self):
+                return {'ready': True} if 'to_regclass' in self.sql else test.run
+            def fetchall(self):
+                test.row_queries += 1
+                return test.rows
+        self.cur = Cursor()
+
+    def get(self, **kw):
+        import json
+        return json.loads(self.d.discover_json(self.cur, zone='UTC', **kw))
+
+    def test_repeat_request_is_served_from_cache(self):
+        first = self.get()
+        self.assertEqual(self.get(), first)
+        self.assertEqual(self.row_queries, 1)
+        self.assertEqual([x['fixture_id'] for x in first['lists']['standouts']], [1])
+
+    def test_new_run_is_picked_up_on_the_next_request(self):
+        self.get()
+        self.run = {**self.run, 'run_ds': date(2026, 10, 30)}
+        self.rows = [{**r, **self.run} for r in self.rows]        # the query reads the new run's rows
+        self.assertEqual(self.get()['run_ds'], '2026-10-30')
+        self.assertEqual(self.row_queries, 2)
+
+    def test_parameters_share_the_rows_but_not_the_response(self):
+        week, today = self.get(), self.get(scope='today')
+        self.assertEqual(self.row_queries, 1)
+        self.assertNotEqual(week['window'], today['window'])
+
+    def test_response_expires_but_rows_stay(self):
+        from unittest.mock import patch
+        self.get()
+        later = self.d.clock.monotonic() + self.d.RESPONSE_TTL + 1
+        with patch.object(self.d.clock, 'monotonic', return_value=later):
+            self.get()
+        self.assertEqual(self.row_queries, 1)
+        with patch.object(self.d.clock, 'monotonic', return_value=later + self.d.ROWS_TTL):
+            self.get()
+        self.assertEqual(self.row_queries, 2)
+
+    def test_response_cache_is_bounded(self):
+        from unittest.mock import patch
+        with patch.object(self.d, 'RESPONSE_MAX', 3):
+            for league in range(1, 6):
+                self.get(leagues=(league,))
+            self.assertEqual(len(self.d._responses), 3)
+
+    def test_same_payload_as_build_discover(self):
+        import json
+        cached = self.get()
+        uncached = json.loads(json.dumps(build_discover(self.cur, zone='UTC'), default=str))
+        for doc in (cached, uncached):
+            doc['window'].pop('from')
+        self.assertEqual(cached, uncached)

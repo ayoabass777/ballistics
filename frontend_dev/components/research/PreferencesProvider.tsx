@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { preferencesSchema } from '@/lib/preferences';
 import { stamp as formatStamp } from '@/lib/research';
@@ -7,14 +7,24 @@ import { setUsageEventsEnabled, usageEventsSettingResponseSchema } from '@/lib/u
 const Context = createContext({ zone: null as string | null, browserZone: 'UTC', override: null as string | null, loading: true, error: '', signedIn: false, reload: () => {}, save: async (_zone: string | null): Promise<void> => {}, usageEvents: null as boolean | null, saveUsageEvents: async (_enabled: boolean): Promise<void> => {} });
 export function PreferencesProvider({ children }: { children: ReactNode }) {
     const { user, isLoaded } = useUser();
-    return <AccountPreferences key={user?.id || 'anonymous'} signedIn={!!user} authLoaded={isLoaded}>{children}</AccountPreferences>;
-}
-function AccountPreferences({ children, signedIn, authLoaded }: { children: ReactNode; signedIn: boolean; authLoaded: boolean }) {
+    // The app below remounts when the account changes, so no state carries
+    // from one person to the next. Not when Clerk first finishes loading,
+    // though: the identity it resolves to is the one the page opened with, and
+    // remounting then cancelled and resent every request on the page (Discover
+    // and Saved were fetched twice per load).
+    const identity = user?.id || 'anonymous';
+    const first = useRef<string | null>(null);
+    if (isLoaded && first.current === null) first.current = identity;
+    const key = !isLoaded || identity === first.current ? 'initial' : identity;
+    // Outside the remount, so a later account change keeps the zone steady.
     const [browserZone, setBrowserZone] = useState<string | null>(null);
+    useEffect(() => setBrowserZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'), []);
+    return <AccountPreferences key={key} signedIn={!!user} authLoaded={isLoaded} browserZone={browserZone}>{children}</AccountPreferences>;
+}
+function AccountPreferences({ children, signedIn, authLoaded, browserZone }: { children: ReactNode; signedIn: boolean; authLoaded: boolean; browserZone: string | null }) {
     const [override, setOverride] = useState<string | null>(null);
     const [usageEvents, setUsageEvents] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(true), [error, setError] = useState(''), [revision, setRevision] = useState(0);
-    useEffect(() => setBrowserZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'), []);
     useEffect(() => {
         if (!authLoaded) return;
         if (!signedIn) { setUsageEventsEnabled(null); setLoading(false); return; }
