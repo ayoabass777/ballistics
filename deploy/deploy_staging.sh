@@ -20,7 +20,8 @@
 #   stop Airflow → check out the commit → render .dbt/profiles.yml →
 #   build images tagged with the release → start Postgres → migrate.py up →
 #   account bootstrap → dbt build → grants.sql → tag engine/dbt :latest →
-#   docker compose up -d → record deploy/RELEASES → prune old images.
+#   docker compose up -d → restart Caddy if the Caddyfile changed → record
+#   deploy/RELEASES → prune old images → smoke checks against the public URL.
 #   dbt build (about 3 minutes) is skipped when nothing under DBT_INPUTS
 #   changed since the last recorded release; the nightly DAG runs dbt anyway.
 #
@@ -35,6 +36,8 @@ KEEP_RELEASES=2
 # What dbt build depends on: models and seeds, the schema it builds on, the
 # app tables the analytics models read, and its profile.
 DBT_INPUTS=(dbt db/migrations API/sql deploy/dbt-profiles.yml.tmpl)
+# Where the post-deploy smoke checks look (through Cloudflare, like a tester).
+PUBLIC_URL="${DEPLOY_PUBLIC_URL:-https://beta.ballistics.football}"
 
 log() { printf '\n==> %s\n' "$*"; }
 die() { printf 'deploy: %s\n' "$*" >&2; exit 1; }
@@ -232,6 +235,14 @@ remote_main() {
   step="start services"; log "$step"
   "${compose[@]}" up -d --wait --remove-orphans
 
+  # Caddy reads its config only at start, and up -d doesn't recreate it for a
+  # changed bind-mounted file.
+  if [[ -z "$prev_sha" ]] || ! git -C "$root" diff --quiet "$prev_sha" "$b_sha" -- deploy/Caddyfile 2>/dev/null; then
+    step="restart Caddy (Caddyfile changed)"; log "$step"
+    "${compose[@]}" exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+    "${compose[@]}" restart caddy
+  fi
+
   step="record release"
   printf '%s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$release" "$b_sha" \
     >> "$root/deploy/RELEASES"
@@ -244,6 +255,41 @@ remote_main() {
 
   log "Deployed $release"
   "${compose[@]}" ps --format 'table {{.Service}}\t{{.Status}}'
+
+  log "smoke checks against $PUBLIC_URL"
+  if ! smoke_checks "$PUBLIC_URL"; then
+    die "smoke checks FAILED for $release. It is running and recorded in RELEASES; fix and redeploy, or run deploy_staging.sh --rollback"
+  fi
+}
+
+# smoke_checks BASE_URL: what a tester's browser hits first, through
+# Cloudflare. Each check retries for about 30 s while services warm up.
+smoke_checks() {
+  local base="$1" host="${1#https://}" failed=0
+  check() {  # check NAME EXPECTED_STATUS CURL_ARGS...
+    local name="$1" want="$2" got=""
+    shift 2
+    for _ in 1 2 3 4 5 6; do
+      got="$(curl -sS -o /dev/null -m 15 -w '%{http_code}' "$@" 2>/dev/null || true)"
+      [[ "$got" == "$want" ]] && break
+      sleep 5
+    done
+    if [[ "$got" == "$want" ]]; then
+      printf '  ok    %-44s %s\n' "$name" "$got"
+    else
+      printf '  FAIL  %-44s got %s, want %s\n' "$name" "${got:-no answer}" "$want"
+      failed=1
+    fi
+  }
+  check "welcome page" 200 "$base/welcome"
+  check "http:// redirects to https://" 301 "http://$host/welcome"
+  # A fake code must reach the account API (400), not be refused by the
+  # frontend's same-origin check (403) or fail upstream (503).
+  check "invite claim reaches the account API" 400 -X POST "$base/api/beta/invite" \
+    -H "Origin: $base" -H 'Content-Type: application/json' \
+    --data '{"code":"SMOKETEST","email":"nobody@example.com"}'
+  check "account profile needs a session" 401 "$base/api/account/profile"
+  return "$failed"
 }
 
 # psql_owner DIR ARGS...: psql as the database owner in a throwaway postgres

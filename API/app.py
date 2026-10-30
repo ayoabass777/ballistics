@@ -1,5 +1,6 @@
 import json
 import hmac
+import logging
 import os
 import re
 from datetime import datetime, timezone
@@ -11,6 +12,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.encoders import jsonable_encoder
+from fastapi.exception_handlers import http_exception_handler
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -75,6 +77,26 @@ LOGO_BASE_PATH = Path(os.getenv("LOGO_BASE_PATH", Path(os.getenv("BASE_DATA_DIR"
 FORM_FIXTURE_RELATIONS = ("raw_int.fact_team_fixtures", "raw_int.int_fact_fixtures")
 
 app = FastAPI(title="Football Stats API")
+logger = logging.getLogger("account_api")
+
+
+@app.exception_handler(HTTPException)
+async def log_server_errors(request: Request, exc: HTTPException):
+    """Log why a 5xx happened; the response itself is unchanged.
+
+    Handlers raise HTTPException(503, ...) from the real error, so without
+    this the cause is lost. Only the cause's first line is logged: SQLAlchemy
+    appends the SQL and its parameters, which can hold member data.
+    """
+    if exc.status_code >= 500:
+        cause = exc.__cause__
+        detail = getattr(cause, "orig", None) or cause
+        first_line = str(detail).strip().splitlines()[0][:300] if detail else ""
+        logger.error("%s %s -> %s %s | cause: %s: %s", request.method, request.url.path,
+                     exc.status_code, exc.detail, type(detail).__name__ if detail else "none", first_line)
+    return await http_exception_handler(request, exc)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

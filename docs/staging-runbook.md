@@ -90,7 +90,8 @@ head-to-head tables) runs only when `dbt/`, `db/migrations/`, `API/sql/` or
 with `--force-dbt`; the nightly DAG runs dbt either way. Order: stop Airflow → check out → build
 images tagged `b<sha>` → migrations (`scripts/migrate.py up`) → account
 bootstrap → `dbt build` → grants → tag engine/dbt `:latest` → start
-everything → record `RELEASES` → prune old images. If a step fails, it says
+everything → restart Caddy if `deploy/Caddyfile` changed → record `RELEASES`
+→ prune old images → smoke checks. If a step fails, it says
 which one, Airflow stays stopped and nothing is recorded: fix and deploy
 again, or roll back. A `dbt build` test failure stops the deploy before the
 new images go live.
@@ -100,7 +101,13 @@ new images go live.
 - **Rollback** rebuilds the previous commit's images. Migrations are
   forward-only: undo a schema change with a new migration, and bad data from
   a backup.
-- **After a deploy**, check:
+- **Smoke checks** run at the end of every deploy, through Cloudflare against
+  `https://beta.ballistics.football` (override with `DEPLOY_PUBLIC_URL`):
+  `/welcome` is 200, `http://` is 301, a fake invite claim reaches the account
+  API (400, not 403 or 503), and `/api/account/profile` without a session is
+  401. A failure exits non-zero after the release is recorded: fix and
+  redeploy, or `--rollback`.
+- **Also worth checking by hand** after a deploy:
 
   ```bash
   curl -s -o /dev/null -w '%{http_code}\n' https://beta.ballistics.football/welcome    # 200
@@ -119,6 +126,7 @@ new images go live.
 | 00:00 | `bootstrap_dag` | skips unless `data/metadata.yaml` changed |
 | 00:00 | `fixture_update_dag` | fixtures, new fixtures, corrections, standings, then dbt |
 | 00:00 | `engine_predict` | waits for `fixture_update_dag`, then the models and consensus |
+| 02:30 | missed-run check (cron, not Airflow) | `deploy/check_nightly.sh` |
 | 03:30 | backup (cron, not Airflow) | `deploy/backup_postgres.sh` |
 | 04:15 | `saved_snapshot_maintenance` | paused (left off at cutover) |
 | 05:45 | `forecast_history_archive` | copies forecast history to S3; deletes nothing |
@@ -136,9 +144,14 @@ new images go live.
 | `✗ Ballistics DLQ: <kind> gave up after N retries` | an extraction failed 24 hourly retries | check the API-Football quota/plan and the entry in `s3://ballistics-stg-raw/dlq/` |
 | `! Ballistics <dataset>: N unprocessable row(s) parked` | rows the loader couldn't use were set aside | look at the parked rows; usually an API quirk |
 | `[ballistics staging] backup FAILED: <step>` | the nightly backup stopped at that step | read `/var/lib/ballistics-backup/backup.log`; run the backup by hand once fixed |
+| `[ballistics staging] nightly run missed or Airflow down` (email and Slack) | at 02:30 the scheduler wasn't running, or `fixture_update_dag` / `engine_predict` had no success in 26 h | the alert lists which; a failed deploy leaves Airflow stopped, so redeploy or roll back; otherwise read the DAG's log |
 
-No daily report by about 09:30 UTC means the scheduler, the server or SMTP
-is down: there is no missed-run alert yet (TODO).
+The missed-run check runs from cron outside Airflow, so it still fires when
+the scheduler is stopped. Install or reinstall it with
+`/srv/ballistics/deploy/check_nightly.sh install-cron`; run it by hand with
+`deploy/check_nightly.sh` (`DRY_RUN=1` prints the alert instead of sending).
+It can't fire if the whole server is down; that needs the external uptime
+check below.
 
 ## Airflow and the dashboard
 
@@ -169,7 +182,12 @@ DAGs that are new to Airflow start paused.
 dc logs --tail 200 -f frontend            # or account-api, research-api, caddy, airflow-scheduler
 sudo ls /var/lib/docker/volumes/ballistics_airflow-logs/_data/   # Airflow task logs (also in the UI)
 tail -n 50 /var/lib/ballistics-backup/backup.log                 # backups
+tail -n 20 ~/nightly-check.log                                    # missed-run check
+dc logs account-api | grep ERROR                                  # account API 5xx with their cause
 ```
+
+The account API logs every 5xx with its cause's first line (for example
+`permission denied for schema app`), never the SQL or its parameters.
 
 Container logs are capped at 3 × 20 MB per container.
 
@@ -292,8 +310,8 @@ No disk alert yet (TODO).
 
 ## Open operational items
 
-- Missed-run alert (dead-man's switch) for `fixture_update_dag`,
-  `engine_predict` and the backup.
+- Missed-run check: written (`deploy/check_nightly.sh`); install its cron
+  line on the server. It doesn't cover the backup or a fully down server.
 - External uptime check on `beta.ballistics.football`.
 - Disk alert at 80%.
 - Hetzner weekly snapshots (owner, console).

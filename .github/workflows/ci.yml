@@ -65,6 +65,23 @@ jobs:
       - name: Run tests
         run: python -m pytest -q tests engine/tests
 
+  account-api-tests:
+    # The account API (API/) has its own requirements; its Postgres tests stay
+    # opt-in (they skip without their *_TEST_DATABASE_URL).
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"   # API/Dockerfile
+          cache: pip
+          cache-dependency-path: API/requirements.txt
+      - name: Install dependencies
+        run: pip install -r API/requirements.txt pytest
+      - name: Run tests
+        run: python -m pytest -q API/tests
+
   dbt-compile:
     runs-on: ubuntu-latest
     timeout-minutes: 15
