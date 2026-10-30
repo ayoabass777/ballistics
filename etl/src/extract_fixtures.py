@@ -350,13 +350,15 @@ def get_season_rows(
     """
     Fetch all league-season combinations from the database.
     Returns a list of tuples (country_name, league_name, api_league_id, season_year, league_season_id).
+    season_year is the provider's season, not the start year: J1 2026/27 starts
+    in Aug 2026 but is season 2027 (2026 is the Feb–Jun half-season).
     """
     cur.execute("""
         SELECT
           c.country_name,
           l.league_name,
           l.api_league_id,
-          EXTRACT(YEAR FROM ls.start_date)::int AS season_year,
+          ls.season AS season_year,
           ls.league_season_id
         FROM dim.dim_league_seasons ls
         JOIN dim.dim_leagues l ON ls.league_id = l.league_id

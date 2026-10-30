@@ -74,8 +74,9 @@ path: each item gates the ones below it, except where marked parallel.
    past-season rows outside every reader; the one current case (Port Vale v
    Northampton, 1563773) was the provider keeping the 26 Sep date until it
    moved the match to 24 Nov; the nightly by-ID update picked it up
-   (confirmed 2026-10-30). Next bootstrap will fail on J1 League 2026
-   (in progress by its dates, API returns no fixtures): find out why.
+   (confirmed 2026-10-30). Three seasons never finished bootstrap (J1 2026/27,
+   Super League 2 2020, Capixaba B 2027): bootstrap asked the API for the
+   start year instead of the season; fixed 2026-10-30.
 7. [x] **Staging smoke test.** Fresh invited account end to end on desktop and
    mobile, data freshness, failure alert and rollback, all exercised on
    staging. Then send the first invites. Wave 1 invites sent by 2026-10-30.
