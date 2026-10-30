@@ -1,5 +1,11 @@
 # Decision log
 
+2026-10-30 — **Discover team search (proposal; prototype authorized).** One team/match search below the category tabs, beside existing evidence filter and sort controls, scopes to category results without changing Standouts. Proposed implementation retains query across categories, filters before pagination and offers counts/Clear search. Figma Goals examples demonstrate placement and recovery only; frontend implementation remains pending approval.
+
+
+2026-10-29 — **Match return navigation (agreed; owner reported Back/section/authentication problems and requested a fix).** Match links from Discover, Matches, All standouts and Saved carry an explicit internal list return destination. The in-page Back action replaces the current route with that destination, defaulting to Discover for missing or invalid destinations. Section and methodology jumps replace the fragment without adding browser Back steps. Preserve list filters, expansion and session-local scroll state across detail visits; sign-in must not become the in-page Back destination.
+
+
 2026-10-28 — **Plain-language public explanations (agreed; owner requested friendlier wording for exposed IP/model details).** Replace named methods in frontend copy, including Match methodology and legacy card tooltips, with explanations of team strength and estimated goal chances. Extend the existing no-model-names principle to public methodology copy. Preserve uncertainty, data limitations and the distinction between forecasts and historical records. Keep technical names in internal code and documentation. The privacy policy still discloses visitor IP-address processing, now with a plain-language explanation; this is personal-data transparency, not a server address.
 
 
@@ -548,3 +554,9 @@ When changing direction, add a dated entry and identify which decision it supers
 
 
 2026-10-21 — Owner requested Your leagues layout repair. Settings league picker now uses collapsible country groups, visible selected counts, aligned logo/checkbox rows, search-expanded results and a separate save footer.
+
+
+2026-10-30 — Mobile Discover search proposal now has separate full-page and focused-category Figma previews, preserving original designs. Full-width search sits above a two-column Market/Sort row, with explicit result count and Clear recovery. Goals uses illustrative Brooklyn/Naples fixtures. Three focused 390px states visually checked; no frontend implementation, live typing, or category/filter interaction approval is implied. See prototype links for review entry points and verification limits.
+
+
+2026-10-30 — Owner rejected the outdated mobile Figma base and requested localhost review. Added search to the current Discover frontend for review, preserving existing page/cards/filter design. This supersedes the old mobile composition as the review reference, not the preserved original Figma designs.

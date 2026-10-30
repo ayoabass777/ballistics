@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 // useSearchParams in sync without router.replace's server round trip.
 const PAUSE_MS = 200;
 
-export function TeamSearch({ className }: { className?: string }) {
+export function TeamSearch({ className, label = 'Search teams', placeholder = 'Enter a team name', clearable = false }: { className?: string; label?: string; placeholder?: string; clearable?: boolean }) {
     const urlValue = useSearchParams().get('q') || '';
     const [text, setText] = useState(urlValue);
     const pending = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -24,5 +24,5 @@ export function TeamSearch({ className }: { className?: string }) {
             window.history.replaceState(null, '', `${window.location.pathname}${next.size ? `?${next}` : ''}`);
         }, PAUSE_MS);
     }
-    return <label className={className}>Search teams<input type="search" value={text} onChange={e => change(e.target.value)} placeholder="Enter a team name"/></label>;
+    return <div className={className}><label>{label}<input type="search" value={text} onChange={e => change(e.target.value)} placeholder={placeholder}/></label>{clearable && text && <button type="button" onClick={() => change('')}>Clear search</button>}</div>;
 }

@@ -300,3 +300,6 @@ H2H now has separate win/draw totals, aligned home/score/away rows and UTC calen
 
 
 2026-10-21 — Frontend preserves optional strength.tiers={home,away}, each Top/Middle/Bottom. Team identity maps to fixture.home/away, independent of favourite direction. Missing/null tiers hide cluster context. Quiet rows renders for close and slight_favourite states; Big dog and no_label omit the row.
+
+
+2026-10-30 — Local Discover category search uses q to match home/away names case-insensitively within the returned date/league snapshot, before evidence filtering/sorting and pagination. No API search or ranking change. Query persists across category tabs; home Standouts remains unaffected. Evidence choices/counts use the team-matched category set.
