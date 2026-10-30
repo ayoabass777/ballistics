@@ -83,7 +83,7 @@ def match_view(response: Response, fixture_id: int):
 def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
                   scope: Literal["week", "today", "tomorrow", "date", "range"] = "week",
                   day: date | None = None, end_day: date | None = None, leagues: str = Query("", max_length=2000)):
-    from engine.api.discover import build_discover
+    from engine.api.discover import discover_json
     try:
         ids = tuple(int(x) for x in leagues.split(",") if x)
         if any(x < 1 for x in ids):
@@ -92,4 +92,6 @@ def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
         raise HTTPException(422, "Invalid league IDs") from exc
     if scope == 'range' and (day is None or end_day is None or end_day < day):
         raise HTTPException(422, "Choose a valid date range")
-    return read(build_discover, response, zone=zone, scope=scope, day=day, end_day=end_day, leagues=ids)
+    # Cached, already-encoded JSON: skips re-querying and re-encoding ~1 MB per request.
+    body = read(discover_json, response, zone=zone, scope=scope, day=day, end_day=end_day, leagues=ids)
+    return Response(content=body, media_type="application/json", headers={"Cache-Control": "no-store"})
