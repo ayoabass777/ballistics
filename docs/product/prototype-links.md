@@ -1,5 +1,8 @@
 # Prototype links and versions
 
+2026-10-30 — Discover team/match search review (Figma-only): [start](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=2095-63874&starting-point-node-id=2095%3A63874). Preserved copies of the contextual Goals screen: default `2095:63874`, Reims result `2095:64160`, no-results `2095:64448`. Search field cycles through fixed examples; Clear search returns to default. Existing Market/Sort styling retained; other controls are visual context in these copies. Standouts unaffected. Default and empty screenshots inspected. Free typing, cross-category query persistence, mobile and production implementation are not delivered.
+
+
 2026-10-27 — D163 frontend controls implemented locally on `/discover`, `/matches` and `/match/:fixtureId`. Existing Figma review links remain design references. Local data/type/contract/proxy checks pass; browser visual verification and deployment remain pending.
 
 2026-10-27 — Contextual filter menus now use collapsible groups. The existing 26 Oct entry links are unchanged. All 19 Goals, Patterns and Matches filter menus start collapsed; clicking a group opens only that group, clicking it again collapses it. Selection indicators, result links and Cancel are retained. Expanded pre-change menus are archived separately. Figma SWAP destinations created and Defending-expanded screenshot inspected; browser click-through remains unverified. Example expanded menu: `2090:64288`.
@@ -327,3 +330,15 @@ Final Figma interaction check: selected overlay `1155:62580` swaps to empty draf
 
 
 2026-10-18 — User requested account backend design review. Created [editable account architecture in FigJam](https://www.figma.com/board/S1EHQJsZCsVqPrYPVEaTu2). Source: original project TODO.md phases 1–4 and API/app.py Clerk verification, app.app_users DDL and /me route. Diagram distinguishes source implementation from planned personalization/billing tables and unverified running account persistence; Saved remains browser-local. No schema migrations or backend implementation performed.
+
+
+## 2026-10-30 — Mobile Discover search review
+
+[Focused mobile preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=2100-64030&starting-point-node-id=2100%3A64030) starts at the category controls. States: all teams `2100:64030`, Brooklyn `2100:64295`, no results `2100:64562`. Tap the search field to cycle sample states; Clear returns to all teams. Search is 48px high; Market and Sort occupy a second row with 44px targets. Counts reflect the two illustrative fixtures.
+
+[Full-page mobile preview](https://www.figma.com/proto/dLgWAaafmzxQNcp2Rb9P7u?node-id=2098-63922&starting-point-node-id=2098%3A63922) retains the introduction and Standouts above categories. Original `22:642` is preserved. Focused previews omit those preceding sections solely to make review immediate.
+
+Verification 2026-10-30: inspected 390×844 screenshots of all three focused states; controls, result labels, Clear and empty-state copy fit. Prototype reactions were assigned in Figma, but interactive browser/keyboard testing remains pending. This is a click-through Figma sample, not live typing or frontend search; Market, Sort and category tabs remain visual in this isolated review flow. Other widths and actual keyboard behavior are unverified.
+
+
+2026-10-30 — Current-design review moved to localhost at http://localhost:3102/discover?category=goals#discover-categories following owner feedback that the mobile Figma base was outdated. Local search is functional against the research snapshot; older Figma mobile frames remain preserved historical proposals.

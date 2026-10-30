@@ -213,3 +213,9 @@
 .dataQuality[open] { border-radius:8px; padding:0 12px 8px; }
 .dataQuality summary { cursor:pointer; padding:6px 0; font-weight:600; }
 .dataQuality ul { margin:0; padding-left:18px; line-height:18px; }
+
+/* Discover category search stays with its section, below the category tabs. */
+.leagueSearch > label { display:flex; flex-direction:column; gap:6px; }
+.categorySearch { width:100%; max-width:560px; margin:16px 0; }
+.categorySearch input { width:100%; box-sizing:border-box; font-size:16px; min-height:48px; }
+.categorySearch button { align-self:flex-start; min-height:44px; padding:8px 12px; color:var(--ink); background:white; border:1px solid var(--line); border-radius:8px; cursor:pointer; }
