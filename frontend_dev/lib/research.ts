@@ -36,5 +36,19 @@ export function headline(card: Card) { const p = card.pick; if (!p)
     return `${p.market} · ${Math.round((p.probability ?? 0) * 100)}%`; return `${p.team} · ${eventLabel(p.event || '')} ${p.k}/${p.n}${p.context && p.context !== 'all' ? ` · ${p.context}` : ''}`; }
 export function reason(card: Card) { return card.pick?.list === 'strength' ? `Clear strength advantage for ${card.pick.favourite}.` : headline(card); }
 export function stamp(value: string, timeZone?: string) { return new Intl.DateTimeFormat('en', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short', timeZone }).format(new Date(value)); }
-export function matchHref(card: Card, entry = true) { const p = card.pick; return `/match/${card.fixture_id}${entry && p ? `?${new URLSearchParams({ section: p.list, team: p.team || '', event: p.event || p.market || '', context: p.context || '' })}` : ''}`; }
+/** Only internal research lists can be a match's return destination. */
+export function matchReturnTo(value: string | null | undefined) {
+    if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return '/discover';
+    try {
+        const url = new URL(value, 'https://ballistics.invalid');
+        if (url.origin !== 'https://ballistics.invalid' || !['/discover', '/matches', '/standouts', '/saved'].includes(url.pathname)) return '/discover';
+        return `${url.pathname}${url.search}`;
+    } catch { return '/discover'; }
+}
+export function matchHref(card: Card, entry = true, returnTo?: string) {
+    const p = card.pick;
+    const params = new URLSearchParams(entry && p ? { section: p.list, team: p.team || '', event: p.event || p.market || '', context: p.context || '' } : {});
+    if (returnTo) params.set('returnTo', matchReturnTo(returnTo));
+    return `/match/${card.fixture_id}${params.size ? `?${params}` : ''}`;
+}
 export function toggleSaved(items: Saved, card: Card, run: string | null, now = new Date().toISOString()): Saved { return items.some(x => x.card.fixture_id === card.fixture_id) ? items.filter(x => x.card.fixture_id !== card.fixture_id) : [...items, { card: structuredClone(card), saved_at: now, run_ds: run }]; }

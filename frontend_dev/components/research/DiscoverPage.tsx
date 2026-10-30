@@ -16,8 +16,9 @@ import { MatchesControls } from './MatchesControls';
 import { useFollowedLeagues } from './useFollowedLeagues';
 import { useListPosition } from './useListPosition';
 import { TeamSearch } from './TeamSearch';
-function FixtureCard({ card, featured, matchPreview, matchingFinding, rank, total, saved, onSave }: {
+function FixtureCard({ card, featured, matchPreview, matchingFinding, returnTo, rank, total, saved, onSave }: {
     card: Card;
+    returnTo: string;
     featured?: boolean;
     matchPreview?: boolean;
     matchingFinding?: boolean;
@@ -34,7 +35,7 @@ function FixtureCard({ card, featured, matchPreview, matchingFinding, rank, tota
  {!featured && !matchPreview && card.pick && <div className={s.categoryInsight}><p>{headline(card)}</p></div>}
  {matchPreview && <div className={s.matchInsight}>{card.preview ? <><small>{matchingFinding ? 'MATCHING INSIGHT' : 'LEADING INSIGHT'} · {labels[card.preview.list].toUpperCase()}</small><p>{headline({ ...card, pick: card.preview })}</p></> : <p className={s.caption}>No leading insight in this snapshot.</p>}</div>}
  <div className={`${s.caption} ${featured ? s.metadata : s.small}`}><p className={s.competition}><Crest name={card.league} url={card.league_logo_url} league/><span>{card.league}{card.country && ` · ${card.country}`}</span></p><p>{stamp(card.kickoff)}</p></div>
- <div className={featured ? s.actions : s.compactActions}>{featured ? <Button asChild className={s.active}><Link href={matchHref(card)}>Explore match</Link></Button> : <Link className={s.link} href={matchingFinding && card.preview ? matchHref({ ...card, pick: card.preview }) : matchHref(card, !matchPreview)}>View match →</Link>}<Button aria-pressed={saved} onClick={onSave}>{saved ? '✓ Saved' : '+ Save fixture'}</Button></div>
+ <div className={featured ? s.actions : s.compactActions}>{featured ? <Button asChild className={s.active}><Link href={matchHref(card, true, returnTo)}>Explore match</Link></Button> : <Link className={s.link} href={matchingFinding && card.preview ? matchHref({ ...card, pick: card.preview }, true, returnTo) : matchHref(card, !matchPreview, returnTo)}>View match →</Link>}<Button aria-pressed={saved} onClick={onSave}>{saved ? '✓ Saved' : '+ Save fixture'}</Button></div>
  </article>;
 }
 function OnboardingSaveTip() {
@@ -94,7 +95,7 @@ export function DiscoverPage({ all = false, matches = false }: {
         router.replace(`${path}?${next}`, { scroll: false });
     }
     const scopeText = scope === 'week' ? 'Next 7 days' : scope === 'today' ? 'Today' : scope === 'tomorrow' ? 'Tomorrow' : scope === 'range' ? `${search.get('day') || 'Start'} to ${search.get('end_day') || 'end'}` : search.get('day') || 'Choose a date';
-    const card = (item: Card, i: number, featured = false) => <FixtureCard key={item.fixture_id} card={item} featured={featured} matchPreview={matches} matchingFinding={matches && Boolean(search.get('finding'))} rank={i + 1} total={all ? data?.lists.standouts.length : Math.min(5, data?.lists.standouts.length || 0)} saved={saved.isSaved(item.fixture_id)} onSave={() => saved.toggle(item, data?.run_ds || null)}/>;
+    const card = (item: Card, i: number, featured = false) => <FixtureCard key={item.fixture_id} card={item} returnTo={`${path}?${positionQuery}`} featured={featured} matchPreview={matches} matchingFinding={matches && Boolean(search.get('finding'))} rank={i + 1} total={all ? data?.lists.standouts.length : Math.min(5, data?.lists.standouts.length || 0)} saved={saved.isSaved(item.fixture_id)} onSave={() => saved.toggle(item, data?.run_ds || null)}/>;
     // Deferred so refiltering the cards never blocks the controls.
     const teamQuery = useDeferredValue((search.get('q') || '').trim().toLocaleLowerCase());
     const teamMatches = (data?.matches || []).filter(f => !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
