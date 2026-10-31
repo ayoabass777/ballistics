@@ -24,8 +24,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ClerkProvider afterSignOutUrl="/welcome?signed_out=1">
-          <AccountProfileSync />
-          <Providers><PreferencesProvider>{children}</PreferencesProvider></Providers>
+          <Providers><PreferencesProvider><AccountProfileSync />{children}</PreferencesProvider></Providers>
         </ClerkProvider>
       </body>
     </html>

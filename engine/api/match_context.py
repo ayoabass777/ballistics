@@ -48,6 +48,18 @@ WHERE league_season_id = %(league_season_id)s
   AND home_team_fulltime_goal IS NOT NULL AND away_team_fulltime_goal IS NOT NULL
 """
 
+RECENT_TEAM_SQL = """
+SELECT fixture_id, kickoff_utc, league_name, home_team_id, away_team_id,
+       home_team_name, away_team_name, home_team_fulltime_goal AS home_goals,
+       away_team_fulltime_goal AS away_goals
+FROM raw.fact_fixtures
+WHERE (home_team_id = %(team_id)s OR away_team_id = %(team_id)s)
+  AND is_played AND kickoff_utc < LEAST(%(cutoff)s, CURRENT_TIMESTAMP)
+  AND home_team_fulltime_goal IS NOT NULL AND away_team_fulltime_goal IS NOT NULL
+ORDER BY kickoff_utc DESC, fixture_id DESC
+LIMIT 5
+"""
+
 # One row per meeting, seen from today's home team. Played only (fact filter).
 H2H_SQL = """
 SELECT fixture_id, kickoff_utc, is_home, goals_for, goals_against,
@@ -261,6 +273,22 @@ def build_context(cur, fixture_id):
         if needs_venue:
             venue_fallback = calculated_venue_positions(rows, fixtures, home_id, away_id)
             venue = {side: venue[side] or venue_fallback[side] for side in ("home", "away")}
+    recent = {"home": [], "away": []}
+    for side, team_id in (("home", home_id), ("away", away_id)):
+        if team_id is None:
+            continue
+        cur.execute(RECENT_TEAM_SQL, {"team_id": team_id, "cutoff": fx["kickoff_utc"]})
+        for game in cur.fetchall():
+            is_home = game["home_team_id"] == team_id
+            scored = game["home_goals"] if is_home else game["away_goals"]
+            conceded = game["away_goals"] if is_home else game["home_goals"]
+            recent[side].append({"fixture_id": game["fixture_id"],
+                                 "kickoff_utc": _iso(game["kickoff_utc"]),
+                                 "league": game["league_name"],
+                                 "venue": "home" if is_home else "away",
+                                 "opponent": game["away_team_name"] if is_home else game["home_team_name"],
+                                 "scored": scored, "conceded": conceded,
+                                 "result": "W" if scored > conceded else "L" if scored < conceded else "D"})
     same_group = bool(home_pos and away_pos and home_pos["group_name"] == away_pos["group_name"]
                       and home_pos.get("source") == away_pos.get("source"))
     hidden = {r["group_name"] for r in rows if r["ranks_repeat"]}
@@ -286,6 +314,7 @@ def build_context(cur, fixture_id):
                   "unprocessed_rows": max((r.get("unprocessed_rows") or 0 for r in rows), default=0),
                   "groups": _groups([r for r in rows if r["group_name"] not in hidden])},
         "h2h": h2h,
+        "recent": recent,
     }
 
 
@@ -295,8 +324,35 @@ def _groups(rows):
         g = groups.setdefault(r["group_name"], {"group_name": r["group_name"],
                                                 "group_order": r["group_order"], "rows": []})
         g["rows"].append({**{k: r[k] for k in ("rank", "team_id", "team_name", "games_played",
-                                               "goal_diff", "points", "description")},
+                                               "wins", "draws", "losses", "goals_for", "goals_against", "goal_diff", "points", "form", "description")},
                           "stale": bool(r.get("is_stale_row"))})
+    for g in groups.values():
+        peers = [r for r in rows if r["group_name"] == g["group_name"]]
+        for venue in ("home", "away"):
+            records = {r["team_id"]: r.get(f"{venue}_record") for r in peers}
+            complete = all(isinstance(rec, dict) and all(isinstance(rec.get(k), int)
+                           for k in ("played", "win", "draw"))
+                           and isinstance(rec.get("goals"), dict)
+                           and all(isinstance(rec["goals"].get(k), int) for k in ("for", "against"))
+                           for rec in records.values())
+            g[f"{venue}_available"] = complete
+            if not complete:
+                continue
+            def score(team_id):
+                rec = records[team_id]
+                return (3 * rec["win"] + rec["draw"],
+                        rec["goals"]["for"] - rec["goals"]["against"], rec["goals"]["for"])
+            ranked = sorted(records, key=lambda i: tuple(-x for x in score(i)) + (i,))
+            for row in g["rows"]:
+                rec = records[row["team_id"]]
+                row[venue] = {"rank": ranked.index(row["team_id"]) + 1,
+                              "games_played": rec["played"], "wins": rec["win"],
+                              "draws": rec["draw"],
+                              "losses": rec.get("lose", rec["played"] - rec["win"] - rec["draw"]),
+                              "goals_for": rec["goals"]["for"],
+                              "goals_against": rec["goals"]["against"],
+                              "goal_diff": score(row["team_id"])[1],
+                              "points": score(row["team_id"])[0], "form": rec.get("form")}
     return sorted(groups.values(), key=lambda g: g["group_order"] or 0)
 
 

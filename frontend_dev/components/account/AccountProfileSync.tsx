@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { discardQueued } from '@/lib/usage-events';
+import { usePreferences } from '@/components/research/PreferencesProvider';
 import s from './AccountProfileSync.module.css';
 
 const memberPath = /^\/(dashboard|account|billing|discover|matches|standouts|match|saved|settings)(\/|$)/;
@@ -13,7 +14,10 @@ export function AccountProfileSync() {
   const { isLoaded, userId } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { error: preferencesError, reload: reloadPreferences } = usePreferences();
   const [failed, setFailed] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     if (!isLoaded || !userId || !memberPath.test(pathname)) return;
@@ -37,13 +41,19 @@ export function AccountProfileSync() {
         if (active) setFailed(true);
       });
     return () => { active = false; };
-  }, [isLoaded, userId, pathname, router]);
+  }, [isLoaded, userId, pathname, router, revision]);
 
-  if (!failed) return null;
+  if (!memberPath.test(pathname) || (!failed && !preferencesError) || dismissed) return null;
+  const retry = () => {
+    setFailed(false);
+    setRevision(value => value + 1);
+    reloadPreferences();
+  };
   return (
     <div className={s.notice} role="alert">
-      <p>We couldn&apos;t load your account, so onboarding and some settings may not work right now.</p>
-      <button type="button" onClick={() => window.location.reload()}>Try again</button>
+      <p>{failed ? 'Account unavailable. Setup and settings may be affected.' : 'Account preferences unavailable.'}{preferencesError && ' Times use your browser timezone.'}</p>
+      <button type="button" onClick={retry}>Try again</button>
+      <button className={s.dismiss} type="button" aria-label="Dismiss account notice" onClick={() => setDismissed(true)}>×</button>
     </div>
   );
 }

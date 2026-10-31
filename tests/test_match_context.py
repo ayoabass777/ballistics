@@ -119,7 +119,7 @@ class FakeCursor:
     def fetchone(self):
         return self.results.pop(0)
     def fetchall(self):
-        return self.results.pop(0)
+        return self.results.pop(0) if self.results else []
 
 
 class BuildTests(unittest.TestCase):
@@ -170,6 +170,17 @@ class BuildTests(unittest.TestCase):
         self.assertFalse(p["table"]["available"])
         self.assertEqual(p["table"]["groups"], [])
 
+    def test_recent_results_use_each_team_perspective(self):
+        game = {"fixture_id": 99, "kickoff_utc": datetime(2026, 10, 1, tzinfo=timezone.utc),
+                "league_name": "Czech Liga", "home_team_id": 2, "away_team_id": 1,
+                "home_team_name": "Slavia", "away_team_name": "Zlin",
+                "home_goals": 2, "away_goals": 1}
+        cur = FakeCursor([self.FX, [row(1, 1, 10), row(2, 2, 7)], [], [], [game], [game]])
+        p = mc.build_context(cur, 90863)
+        self.assertEqual((p["recent"]["home"][0]["result"], p["recent"]["home"][0]["venue"]), ("L", "away"))
+        self.assertEqual((p["recent"]["away"][0]["result"], p["recent"]["away"][0]["venue"]), ("W", "home"))
+        self.assertEqual(cur.calls[4]["cutoff"], self.FX["kickoff_utc"])
+
     def test_unknown_fixture(self):
         self.assertIsNone(mc.build_context(FakeCursor([None]), 1))
 
@@ -179,7 +190,7 @@ class BuildTests(unittest.TestCase):
         p = mc.build_context(cur, 90863)
         self.assertIsNone(p["position"]["away"])
         self.assertEqual(p["h2h"]["meetings"], 0)
-        self.assertEqual(len(cur.calls), 3)
+        self.assertEqual(len(cur.calls), 4)
 
 
 class HTTPTests(unittest.TestCase):

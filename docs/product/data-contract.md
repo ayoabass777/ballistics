@@ -306,3 +306,12 @@ H2H now has separate win/draw totals, aligned home/score/away rows and UTC calen
 
 
 2026-10-30 — Local Discover category search uses q to match home/away names case-insensitively within the returned date/league snapshot, before evidence filtering/sorting and pagination. No API search or ranking change. Query persists across category tabs; home Standouts remains unaffected. Evidence choices/counts use the team-matched category set.
+
+
+2026-10-30 — Match context standings rows now project provider W/D/L, goals for, goals against and form alongside played, goal difference and points. These are current provider snapshot fields, not forecast metrics. Missing fields remain unavailable, and the table still excludes ambiguous groups. No change to rank source or API eligibility.
+
+
+2026-10-30 — Expanded Match standings now offers All venues, Home and Away. Split rows use provider home_record/away_record only when every row in the standings group has played, win, draw and goals counts; otherwise the split table is explicitly unavailable. Split rank is calculated within the group from 3/1/0 points, goal difference, goals for, then team ID for deterministic ties, and rows are displayed in that rank order. The overall provider rank remains distinct.
+
+
+2026-10-30 — Match context `recent.home` and `recent.away` return up to five completed raw.fact_fixtures per team, latest first, before the viewed fixture kickoff and current time. Scores and W/D/L are from that team's perspective; venue and competition are included. Results may span competitions, unlike current-season league standings. `h2h` remains previous meetings between the two teams. Missing teams or fixtures yield empty arrays, not inferred form.

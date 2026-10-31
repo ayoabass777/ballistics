@@ -560,3 +560,33 @@ When changing direction, add a dated entry and identify which decision it supers
 
 
 2026-10-30 — Owner rejected the outdated mobile Figma base and requested localhost review. Added search to the current Discover frontend for review, preserving existing page/cards/filter design. This supersedes the old mobile composition as the review reference, not the preserved original Figma designs.
+
+
+2026-10-30 — Owner requested more elaborate standings. Local Match context table now shows the provider's W/D/L, goals for/against and recent form in addition to rank, played, goal difference and points. The table remains a disclosure within context; group separation and source-date rules stay as previously agreed. This is code implemented locally, not a Figma update or staging deployment.
+
+
+2026-10-30 — Owner requested past fixtures alongside head-to-head. Local Match context combines three views under Past results: previous meetings, home team's last five completed games, and away team's last five. Each team's list shows date, opponent, venue, score from that team's perspective, W/D/L and competition. This is local code, pending staging release.
+
+
+2026-10-30 — Owner accepted the UX revision for Past results: recent fixtures for both teams are the default view, shown side by side on desktop and stacked on mobile. Each starts with three rows and has an explicit Show all five control; previous meetings remain a separate secondary view. This supersedes the earlier head-to-head-first local layout without changing its underlying fixture data. Local frontend only, not deployed.
+
+
+2026-10-30 — Owner approved league standings summary and mobile table usability revision. Collapsed label shows both teams' official overall ranks when both belong to the same reliable group; otherwise it retains View full table. Mobile table keeps position and team columns visible during horizontal scrolling. Home/Away full-table controls remain available. Local code only, not committed or deployed.
+
+
+2026-10-30 — Owner asked to promote standings and past results to Match details sections. Local UX now keeps Context as the concise comparison, puts the analytical sections next, then provides dedicated League standings and Past results panels with direct section navigation. The results panel defaults to both teams' recent games; the table retains All venues/Home/Away. Previous embedded disclosures are superseded in the local layout. No Figma update or staging deployment.
+
+
+2026-10-30 — Match details navigation refinement (owner asked to see recommendation locally). Five top-level sections now follow the reading order Overview → Goals → Patterns → Past results → Standings. Overview groups the existing context comparison and strength verdict; the former separate Strength link is superseded, while `#strength` remains a deep-link target for Discover and the first-use guide. Goals and Patterns remain distinct because one presents estimates and the other historical observations. Past results precedes the broader league table. This is a local UX iteration for review, not Figma approval or deployment authorization.
+
+
+2026-10-30 — Match details Overview correction after owner review. The first five-section pass buried Team strength below the comparison and repeated the fixture header on mobile. The local revision leads Overview with a permanently emphasized strength verdict, then the match context table; the tutorial follows the verdict inside its card. The redundant mobile fixture identity block is removed, leaving the sticky fixture header as the single identity. `#strength` remains available for Discover deep links and the guide.
+
+
+2026-10-30 — Match details spacing pass (owner: “apply” after desktop/mobile UX review). Preserve the five-section sequence. Keep the full fixture header at the top, then condense its mobile sticky version during scrolling. Limit desktop Match details to a readable width and Overview cards to a narrower column. Separate top-level panels consistently, shorten the Standings introduction, show the sideways-table cue before the table on mobile, and keep the active section chip fully visible in a narrow nav strip. The account-sync error becomes an inline dismissible notice so it no longer floats over content. Local frontend only; this does not update Figma or authorize deployment.
+
+
+2026-10-30 — Strength emphasis correction after owner clarification. The pale green Overview strength card is reserved for `big_dog`; `slight_favourite` (including Slight edge and Favourite), `close`, and unavailable/no-label states use a neutral card. An entry deep link adds a neutral focus outline rather than green fill. This changes visual emphasis only, not strength eligibility or calculations.
+
+
+2026-10-30 — Match details follow-up after UX review (owner: “fix it and do 2 and 3”). Consolidate account-profile and timezone-preference failures into one inline, dismissible member-page notice with Retry for both requests. In Match context, retain the immediate reading guidance and update times, while moving rank derivation and provider detail into a disclosure. Add match-scoped scroll padding so keyboard focus stays visible between the sticky match header and mobile primary navigation. No data calculation, Figma, or deployment decision changes.

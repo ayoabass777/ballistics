@@ -635,3 +635,36 @@ Verified 2026-10-20: research and forecast TypeScript checks pass; `git diff --c
 
 
 2026-10-30 — Discover category team search added locally for review in the current frontend layout. Reuses debounced URL search with Clear, filters full category results before pagination and evidence filtering, preserves query across categories, and leaves the home Standouts carousel unchanged. Research TypeScript passed. Signed-in localhost browser verified Goals 289→1 for Macva while Standouts remained unchanged. Mobile viewport and return-navigation testing for this addition remain pending. Account/preferences API warnings were present independently of research results. Standard Next dev server used because Turbopack rejected the existing node_modules symlink. Not committed or deployed.
+
+
+2026-10-30 — More detailed Match standings implemented locally: W/D/L, GF/GA, GD, points and recent form in a horizontally scrollable table, with existing match-team highlights and updated abbreviation help. Backend context projection and frontend schema updated; 19 match-context tests, research TypeScript and contract checks passed. Mobile browser visual check and staging deployment pending.
+
+
+2026-10-30 — Added local Home/Away selectors inside expanded league standings after owner feedback. Real Macva–Crvena Zvezda local browser check confirmed Home rows and computed split values; corrected initial overall-order display so split views sort by their own rank. 19 match-context tests passed; local browser recheck confirmed Home ranks appear in ascending order after the sort change. Research TypeScript passed before the sort edit; final typecheck still running. Not committed or deployed.
+
+
+2026-10-30 — Past results extension implemented locally. Real Macva–Crvena Zvezda browser review confirmed previous meetings and five recent fixtures for both sides. Compact desktop layout checked; mobile viewport not yet reviewed. Backend context and frontend schema changed; 20 focused backend tests, research TypeScript, and diff whitespace check passed. No deployment or commit.
+
+
+2026-10-30 — Past results hierarchy revised locally: two-team recent-games overview first, prior meetings second, with per-team expansion. Browser verified the Macva/Crvena Zvezda example at desktop and 390px mobile; research TypeScript passed. Existing account warning in local browser is unrelated. No commit or staging deployment.
+
+
+2026-10-30 — League standings UX revision implemented locally. In Macva–Crvena Zvezda browser review, collapsed summary showed official overall #12/#1. At 390px, position/team remained visible after scrolling to later stats; narrowed fixed team width after first visual check. Research TypeScript and diff whitespace check passed after the final copy/CSS refinement; local browser verified the updated summary and Home selector. No commit or staging deployment.
+
+
+2026-10-30 — Standings and Past results promoted to standalone local Match sections, with six section links. Desktop browser verified direct Results jump and active link. At 390px all six compact links fit; Table jump verified. Research TypeScript and diff whitespace check passed after the active-section adjustment; mobile Results jump and highlighted chip verified. Not committed or deployed.
+
+
+2026-10-30 — Local Match details revised to five in-page links and matching DOM/mobile order: Overview (Context + Strength), Goals, Patterns, Past results, Standings. Previous six-link layout remains documented above as superseded. TypeScript and `git diff --check` passed. Browser checked desktop Overview and 390px mobile navigation; all five links fit, Past results jump lands with the correct active link and visible heading. The account preferences error banner was present in the local browser and is unrelated. Not committed, pushed or mirrored to Figma.
+
+
+2026-10-30 — Follow-up local Match details correction: Strength now leads Overview in a tinted card with larger verdict text; Context follows. Removed the second mobile fixture header. Mobile browser at 390px verified one fixture identity, visible Overview active link, strength card above context, and TypeScript plus diff whitespace checks passed. No deployment or commit.
+
+
+2026-10-30 — Local Match details spacing pass implemented in `MatchPage.tsx`, research CSS, and account-sync notice. Verified with live fixture 124403 in the local browser: 390px Goals section showed compact sticky header and clear panel separation; 320px Standings jump brought its selected chip fully into view and displayed the swipe cue above the table; 1440px Overview showed heading below sticky header and centered narrower cards. At mobile top, the account notice appeared inline and its Dismiss button removed it; the separate preference fallback banner remained visible because that backend request returned 503. Research TypeScript and `git diff --check` passed. Local frontend and read-only research API were restarted for verification. No commit, staging deployment, or Figma change.
+
+
+2026-10-30 — Local strength-card state styling corrected. Fixture 124403 (Farul Constanta · Slight edge) rendered a white card; fixture 126508 (FK Crvena Zvezda · Big dog) retained pale green. Research TypeScript and diff whitespace checks passed. Not committed, deployed, or updated in Figma.
+
+
+2026-10-30 — Local UX follow-up implemented: root account notice now reads preference state via the same provider and replaces the duplicate Shell preference banner; Retry refetches both account and preference requests without a page reload. Match context has a short visible explanation, a rank-calculation disclosure, and visible source timestamps. Match-only scroll padding guards focus at the sticky header and mobile footer. Browser on fixture 124403 verified one notice with both local APIs returning 503, Retry remaining on the match, compact context copy, and keyboard Tab focus visible from section navigation to context controls and from methodology link to mobile primary navigation at 390px. Research TypeScript and `git diff --check` passed. Not committed or deployed; Figma unchanged.
