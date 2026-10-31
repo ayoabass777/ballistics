@@ -105,7 +105,9 @@
 .matchBody > [data-match-section] { margin-top:24px; }
 .matchBody > #methodology { margin-top:24px; }
 .matchBody .panel { gap:12px; }
-.matchBody [data-match-section], .matchBody #strength { scroll-margin-top:210px; }
+/* The page sets scroll-padding for the sticky match header (globals.css); a section
+   margin on top would add to it and land jumps far below the header. */
+.matchBody [id] { scroll-margin-top:0; }
 .matchBody .chips { scrollbar-width:thin; }
 .mobileSwipeCue { display:none; }
 .evidence { display:flex; align-items:center; gap:16px; border:1px solid var(--line); border-radius:8px; padding:12px; }
@@ -156,7 +158,6 @@
 @media(max-width:700px) { .stickyTitle .fixtureIdentity { gap:6px; } .panel { scroll-margin-top:230px; } }
 @media(max-width:700px) {
  .matchBody > [data-match-section] { margin-top:20px; }
- .matchBody [data-match-section], .matchBody #strength { scroll-margin-top:132px; }
  .matchBody .matchStickyCompact { gap:4px; padding-block:6px; }
  .matchStickyCompact .matchMetadata { display:none; }
  .matchStickyCompact .stickyTitle h1 { font-size:12px; line-height:16px; }
