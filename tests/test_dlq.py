@@ -268,7 +268,8 @@ class MatchPageFlagTests(unittest.TestCase):
         from engine.api import match_context as mc
         base = {"group_name": "Apertura", "group_order": 0, "games_played": 11, "goal_diff": 1,
                 "description": None, "n_groups": 1, "ranks_repeat": False, "wins": 5, "draws": 3,
-                "losses": 3, "form": "WDW", "is_team_current_group": True,
+                "losses": 3, "goals_for": 14, "goals_against": 13, "form": "WDW",
+                "is_team_current_group": True,
                 "standings_incomplete": True, "unprocessed_rows": 1}
         rows = [dict(base, team_id=1, team_name="Toluca", rank=1, points=18, is_stale_row=False),
                 dict(base, team_id=2, team_name="Club Leon", rank=5, points=18, is_stale_row=True)]
