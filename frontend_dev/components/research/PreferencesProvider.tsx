@@ -3,10 +3,14 @@ import { createContext, useContext, useEffect, useRef, useState, useCallback, ty
 import { useUser } from '@clerk/nextjs';
 import { preferencesSchema } from '@/lib/preferences';
 import { stamp as formatStamp } from '@/lib/research';
-import { setUsageEventsEnabled, usageEventsSettingResponseSchema } from '@/lib/usage-events';
+import { useReportWebVitals } from 'next/web-vitals';
+import { setUsageEventsEnabled, track, trackSpeed, usageEventsSettingResponseSchema } from '@/lib/usage-events';
 const Context = createContext({ zone: null as string | null, browserZone: 'UTC', override: null as string | null, loading: true, error: '', signedIn: false, reload: () => {}, save: async (_zone: string | null): Promise<void> => {}, usageEvents: null as boolean | null, saveUsageEvents: async (_enabled: boolean): Promise<void> => {} });
+// Module-level so the vitals listener is registered once, not on every render.
+const reportSpeed: Parameters<typeof useReportWebVitals>[0] = metric => trackSpeed(metric.name, metric.value, metric.rating);
 export function PreferencesProvider({ children }: { children: ReactNode }) {
     const { user, isLoaded } = useUser();
+    useReportWebVitals(reportSpeed);
     // The app below remounts when the account changes, so no state carries
     // from one person to the next. Not when Clerk first finishes loading,
     // though: the identity it resolves to is the one the page opened with, and
@@ -52,7 +56,7 @@ function AccountPreferences({ children, signedIn, authLoaded, browserZone }: { c
         const value = usageEventsSettingResponseSchema.parse(body).data.usage_events_enabled;
         setUsageEvents(value); setUsageEventsEnabled(value);
     }, []);
-    return <Context.Provider value={{ zone: browserZone ? override || browserZone : null, browserZone: browserZone || 'UTC', override, loading, error, signedIn, reload: () => setRevision(n => n + 1), save, usageEvents, saveUsageEvents }}>{children}</Context.Provider>;
+    return <Context.Provider value={{ zone: browserZone ? override || browserZone : null, browserZone: browserZone || 'UTC', override, loading, error, signedIn, reload: () => { track('retry_clicked', { api: '/api/preferences' }); setRevision(n => n + 1); }, save, usageEvents, saveUsageEvents }}>{children}</Context.Provider>;
 }
 export const usePreferences = () => useContext(Context);
 export function useStamp() { const { zone } = usePreferences(); return (value: string) => formatStamp(value, zone || 'UTC'); }
