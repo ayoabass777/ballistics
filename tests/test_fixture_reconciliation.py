@@ -74,3 +74,15 @@ def test_reconciliation_marks_orphan_only_after_empty_direct_lookup():
 
     mark.assert_called_once_with(["1"], correction.ORPHAN_STATUS)
     assert changes == [{"fixture_id": "1", "action": "orphaned"}]
+
+
+def test_correction_leaves_full_time_to_the_score_updater():
+    # Marking FT here without goals made fixture 1493226 "played" with NULL
+    # goals and crashed the Elo refresh on 2026-11-01.
+    kickoff = datetime(2026, 10, 31, 22, 15, tzinfo=timezone.utc)
+    provider = {"fixture": {"id": 1493226, "date": kickoff.isoformat(),
+                            "status": {"short": "FT"}}}
+    with patch.object(correction, "get_db_kickoff_utc", return_value=(kickoff, "NS")), \
+         patch.object(correction, "update_db_fixture_state") as update:
+        assert correction._process_fixtures([provider]) == []
+    update.assert_not_called()

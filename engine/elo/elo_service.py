@@ -115,6 +115,9 @@ def fetch_unprocessed_fixtures(cur) -> List[Tuple]:
         FROM {SOURCE_TABLE} f
         WHERE f.is_played
           AND f.is_home
+          -- An FT row can briefly lack its score; rate it once goals land.
+          AND f.goals_for IS NOT NULL
+          AND f.goals_against IS NOT NULL
           AND NOT EXISTS (
               SELECT 1
               FROM {HISTORY_TABLE} h

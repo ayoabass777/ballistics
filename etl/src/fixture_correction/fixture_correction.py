@@ -147,6 +147,10 @@ def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
         if db_status == "FT" or not isinstance(api_status, str) or not api_status:
             continue
+        # FT without its score makes the fixture "played" with NULL goals,
+        # which breaks Elo. The score updater writes FT and goals together.
+        if api_status == "FT":
+            continue
         if db_dt == api_dt and db_status == api_status:
             continue
         if not update_db_fixture_state(api_fixture_id, api_kickoff_utc if api_dt else None, api_status):
