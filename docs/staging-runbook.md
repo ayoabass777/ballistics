@@ -128,7 +128,7 @@ new images go live.
 | 00:00 | `engine_predict` | waits for `fixture_update_dag`, then the models and consensus |
 | 02:30 | missed-run check (cron, not Airflow) | `deploy/check_nightly.sh` |
 | 03:30 | backup (cron, not Airflow) | `deploy/backup_postgres.sh` |
-| 04:15 | `saved_snapshot_maintenance` | paused (left off at cutover) |
+| 04:15 | `saved_snapshot_maintenance` | paused: can't run in the Airflow image (see open items) |
 | 05:45 | `forecast_history_archive` | copies forecast history to S3; deletes nothing |
 | 09:00 | `data_flow_check` | daily report email |
 | weekly | `engine_calibration` | |
@@ -144,14 +144,20 @@ new images go live.
 | `✗ Ballistics DLQ: <kind> gave up after N retries` | an extraction failed 24 hourly retries | check the API-Football quota/plan and the entry in `s3://ballistics-stg-raw/dlq/` |
 | `! Ballistics <dataset>: N unprocessable row(s) parked` | rows the loader couldn't use were set aside | look at the parked rows; usually an API quirk |
 | `[ballistics staging] backup FAILED: <step>` | the nightly backup stopped at that step | read `/var/lib/ballistics-backup/backup.log`; run the backup by hand once fixed |
-| `[ballistics staging] nightly run missed or Airflow down` (email and Slack) | at 02:30 the scheduler wasn't running, or `fixture_update_dag` / `engine_predict` had no success in 26 h | the alert lists which; a failed deploy leaves Airflow stopped, so redeploy or roll back; otherwise read the DAG's log |
+| `[ballistics staging] nightly run missed, Airflow down or disk full` (email and Slack) | at 02:30 the scheduler wasn't running, `fixture_update_dag` / `engine_predict` had no success in 26 h, or the root disk was 80% full or more | the alert lists which; a failed deploy leaves Airflow stopped, so redeploy or roll back; for disk see Disk below; otherwise read the DAG's log |
 
 The missed-run check runs from cron outside Airflow, so it still fires when
 the scheduler is stopped. Install or reinstall it with
 `/srv/ballistics/deploy/check_nightly.sh install-cron`; run it by hand with
 `deploy/check_nightly.sh` (`DRY_RUN=1` prints the alert instead of sending).
-It can't fire if the whole server is down; that needs the external uptime
-check below.
+It can't fire if the whole server is down; the external uptime check does.
+
+The uptime check is a GitHub Actions workflow (`.github/workflows/uptime.yml`)
+that every 15 minutes asks `/welcome` for 200 and `/api/account/profile` for
+401 through Cloudflare, three tries a minute apart. A failed run emails
+whoever last changed its schedule; run it by hand from the Actions tab
+(Uptime → Run workflow). GitHub turns scheduled workflows off after 60 days
+with no commits to the repository.
 
 ## Airflow and the dashboard
 
@@ -295,24 +301,30 @@ console's web terminal or detach the firewall there.
 
 ## Disk
 
-75 GB disk, 52% used on 2026-10-28; the largest parts are Docker build cache
-(about 14 GB, mostly reclaimable), images (12 GB) and the Postgres volume
-(7.2 GB). Deploys prune dangling images and build cache older than a week. To free space by
-hand:
+75 GB disk. It reached 81% on 2026-11-02, almost all of it Docker build
+cache (37 GB): daily deploys kept the cache under a week old, so the age
+filter never removed it. Capping the cache at 10 GB brought the disk to 49%;
+the rest is images (about 9.5 GB) and the Postgres volume (7.5 GB). Deploys
+now prune dangling images, build cache older than a week and any cache beyond
+10 GB. To free space by hand:
 
 ```bash
 df -h /
 docker system df
-docker builder prune -f --filter until=72h
+docker builder prune -f --max-used-space 10GB
 ```
 
-No disk alert yet (TODO).
+The 02:30 missed-run check also alerts when the root disk is 80% full or
+more (`DISK_ALERT_PCT`).
 
 ## Open operational items
 
-- Missed-run check: written (`deploy/check_nightly.sh`); install its cron
-  line on the server. It doesn't cover the backup or a fully down server.
-- External uptime check on `beta.ballistics.football`.
-- Disk alert at 80%.
+- Missed-run check: installed in cron 2026-10-30 (`deploy/check_nightly.sh`).
+  It doesn't cover the backup or a fully down server.
 - Hetzner weekly snapshots (owner, console).
-- `saved_snapshot_maintenance` is still paused.
+- `saved_snapshot_maintenance` is paused because it can't run where it is:
+  it imports the account API, which needs SQLAlchemy 2, and the Airflow image
+  has 1.4 (checked 2026-11-03). With no `SAVED_ARCHIVE_HOT_DAYS` set its only
+  job is creating Saved's monthly payload partitions, which exist through
+  January 2027; saves fail from 1 Feb 2027 without it. Fix: run it as a
+  DockerOperator on the account API image.

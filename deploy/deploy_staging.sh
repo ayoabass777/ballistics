@@ -304,8 +304,10 @@ psql_owner() {
 }
 
 # Removes ballistics-* images tagged with a release (b<sha>) that is
-# not among the last KEEP_RELEASES, then dangling images and week-old build
-# cache. Never touches :latest or other tags.
+# not among the last KEEP_RELEASES, then dangling images, week-old build
+# cache and any cache beyond 10 GB (daily deploys keep it all under a week
+# old, so the age filter alone let it reach 37 GB). Never touches :latest
+# or other tags.
 prune_images() {
   local keep
   keep="$(tail -n "$KEEP_RELEASES" "$1" | awk '{print $2}')"
@@ -316,6 +318,7 @@ prune_images() {
       done
   docker image prune -f >/dev/null
   docker builder prune -f --filter until=168h >/dev/null
+  docker builder prune -f --max-used-space 10GB >/dev/null
 }
 
 if [[ "${1:-}" == remote ]]; then

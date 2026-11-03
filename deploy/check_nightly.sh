@@ -6,9 +6,9 @@
 #   deploy/check_nightly.sh                 # check; alert and exit 1 on a problem
 #   deploy/check_nightly.sh install-cron    # 02:30 UTC daily, idempotent
 #
-# Problems: the Airflow scheduler is not running, Postgres is unreachable, or
+# Problems: the Airflow scheduler is not running, Postgres is unreachable,
 # a DAG in NIGHTLY_DAGS has no successful run that ended in the last
-# MAX_AGE_HOURS. Alerts go to Slack (ALERT_SLACK_WEBHOOK_URL) and email
+# MAX_AGE_HOURS, or the root disk is at DISK_ALERT_PCT or more. Alerts go to Slack (ALERT_SLACK_WEBHOOK_URL) and email
 # (ALERT_EMAIL_TO via the pipeline's SMTP settings), whichever are set.
 # DRY_RUN=1 prints the alert instead of sending it.
 set -Eeuo pipefail
@@ -17,6 +17,7 @@ ROOT="${BALLISTICS_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 ENV_FILE="$ROOT/deploy/.env.staging"
 NIGHTLY_DAGS=(fixture_update_dag engine_predict)
 MAX_AGE_HOURS="${MAX_AGE_HOURS:-26}"
+DISK_ALERT_PCT="${DISK_ALERT_PCT:-80}"
 
 set -a
 # shellcheck disable=SC1090
@@ -56,7 +57,13 @@ EOF
 }
 
 check() {
-  local problems=() pg hours dag
+  local problems=() pg hours dag disk
+  disk="$(df --output=pcent / | tail -1 | tr -dc '0-9')"
+  if (( disk >= DISK_ALERT_PCT )); then
+    problems+=("Root disk is ${disk}% full (limit ${DISK_ALERT_PCT}%); see Disk in the runbook.")
+  else
+    log "ok: root disk ${disk}% full"
+  fi
   [[ -n "$(compose ps -q --status running airflow-scheduler)" ]] \
     || problems+=("Airflow scheduler is not running (a failed deploy leaves it stopped).")
 
@@ -85,7 +92,7 @@ check() {
 Host: $(hostname)
 Runbook: docs/staging-runbook.md (deploy, rollback, Airflow)."
     log "PROBLEM"; printf '%s\n' "$body"
-    alert "[ballistics staging] nightly run missed or Airflow down" "$body"
+    alert "[ballistics staging] nightly run missed, Airflow down or disk full" "$body"
     return 1
   fi
   log "nightly check passed"

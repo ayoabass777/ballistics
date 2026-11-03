@@ -1,0 +1,47 @@
+# External uptime check for the beta. It runs on GitHub, off the server, so it
+# still fires when the whole server is down (the 02:30 missed-run check can't).
+# A failed scheduled run emails whoever last changed this schedule; that is
+# the alert. GitHub may start a scheduled run a few minutes late.
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  beta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BASE: https://beta.ballistics.football
+    steps:
+      - name: Check the beta through Cloudflare
+        run: |
+          failed=0
+          # check NAME EXPECTED_STATUS URL: three tries a minute apart so one
+          # slow answer isn't an outage.
+          check() {
+            local got=""
+            for try in 1 2 3; do
+              got="$(curl -sS -o /dev/null -m 20 -w '%{http_code}' "$3" 2>/dev/null || true)"
+              [[ "$got" == "$2" ]] && break
+              (( try < 3 )) && sleep 60
+            done
+            if [[ "$got" == "$2" ]]; then
+              echo "ok    $1 ($got)"
+            else
+              echo "::error::$1: got ${got:-no answer}, want $2"
+              failed=1
+            fi
+          }
+          check "welcome page" 200 "$BASE/welcome"
+          # 401 means the frontend reached the account API and it answered.
+          check "account API answers" 401 "$BASE/api/account/profile"
+          exit "$failed"

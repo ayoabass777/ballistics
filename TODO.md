@@ -42,9 +42,14 @@ path: each item gates the ones below it, except where marked parallel.
    `/welcome`). Operating guide: [docs/staging-runbook.md](docs/staging-runbook.md).
    Release `b5458bb24c0` deployed 2026-10-30 (pipeline failure alerts,
    post-deploy smoke check). Missed-run check (`deploy/check_nightly.sh`)
-   installed in cron 2026-10-30. Still open: Hetzner weekly snapshots (owner,
-   console), external uptime check, disk alert at 80%,
-   `saved_snapshot_maintenance` still paused.
+   installed in cron 2026-10-30. 2026-11-03: disk alert at 80% added to the
+   missed-run check; deploys cap Docker build cache at 10 GB (it had reached
+   37 GB, disk 81% → 49%); external uptime check every 15 min
+   (`.github/workflows/uptime.yml`). Still open: Hetzner weekly snapshots
+   (owner, console); `saved_snapshot_maintenance` can't run in the Airflow
+   image (SQLAlchemy 1.4 vs the account API's 2.x), so it stays paused; move
+   it to a DockerOperator on the account API image before Feb 2027, when the
+   last pre-made Saved partition runs out.
 4. [x] **Member journey gaps (checkpoint 2, parallel with 3).** Done by 2026-10-30.
    - Tester instructions for Google sign-in (D151): use the Google account the
      invitation went to; the 2026-10-21 "Last used" button signed in as another
