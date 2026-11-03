@@ -12,6 +12,8 @@ from sqlalchemy import text
 
 TUTORIALS = {"discover", "filters", "match", "saved", "settings", "record"}
 ROUTE = re.compile(r"^/[a-z0-9\-/\[\]]{0,99}$")
+# Same-origin API path as a template (ids replaced by [id]), never a query string.
+API_ROUTE = re.compile(r"^/api/[a-z0-9\-/\[\]]{1,90}$")
 
 
 def _enum(*values):
@@ -30,9 +32,21 @@ def _flag(v):
     return isinstance(v, bool)
 
 
+def _route(v):
+    return isinstance(v, str) and bool(ROUTE.match(v))
+
+
+def _api(v):
+    return isinstance(v, str) and bool(API_ROUTE.match(v))
+
+
+def _int_between(low, high):
+    return lambda v: isinstance(v, int) and not isinstance(v, bool) and low <= v <= high
+
+
 # Every allowed event and the only properties it may carry. Anything else is rejected.
 EVENTS: dict[str, dict[str, Any]] = {
-    "session_started": {"entry_route": lambda v: isinstance(v, str) and bool(ROUTE.match(v)), "device": _enum("mobile", "desktop")},
+    "session_started": {"entry_route": _route, "device": _enum("mobile", "desktop")},
     "onboarding_finished": {"outcome": _enum("completed", "skipped"), "league_count": _count},
     "discover_viewed": {"page": _enum("discover", "matches", "all"), "followed_league_count": _count},
     "match_opened": {"fixture_id": _fixture, "after_kickoff": _flag},
@@ -40,6 +54,20 @@ EVENTS: dict[str, dict[str, Any]] = {
     "tutorial_dismissed": {"tutorial_id": lambda v: v in TUTORIALS, "action": _enum("got_it", "done", "skip")},
     "tutorial_replayed": {"what": _enum("tips", "introduction")},
     "methodology_opened": {"from_section": _enum("match_guide", "match_header", "discover", "record")},
+    # Errors: a failed same-origin API call (status 0 = no response), an uncaught
+    # script error, and a Retry press. No messages: they can carry free text.
+    "request_failed": {"api": _api, "method": _enum("GET", "POST", "PUT", "PATCH", "DELETE"),
+                       "status": _int_between(0, 599), "reason": _enum("http", "network", "invalid")},
+    "client_error": {"route": _route, "kind": _enum("error", "unhandled_rejection")},
+    "retry_clicked": {"api": _api},
+    # Search and filters: outcomes only, never the search text.
+    "search_used": {"page": _enum("discover", "matches", "all"), "result_count": _count, "query_length": _count},
+    "filter_changed": {"page": _enum("discover", "matches", "all"),
+                       "filter": _enum("dates", "leagues", "finding", "category", "evidence_filter", "sort"),
+                       "result_count": _count},
+    # Speed: Core Web Vitals per route template.
+    "page_speed": {"route": _route, "metric": _enum("lcp", "inp", "ttfb", "fcp"),
+                   "value_ms": _int_between(0, 120000), "rating": _enum("good", "needs-improvement", "poor")},
 }
 
 

@@ -20,7 +20,7 @@ sources:
             tests:
               - not_null
               - accepted_values:
-                  values: ['session_started', 'onboarding_finished', 'discover_viewed', 'match_opened', 'fixture_unsaved', 'tutorial_dismissed', 'tutorial_replayed', 'methodology_opened']
+                  values: ['session_started', 'onboarding_finished', 'discover_viewed', 'match_opened', 'fixture_unsaved', 'tutorial_dismissed', 'tutorial_replayed', 'methodology_opened', 'request_failed', 'client_error', 'retry_clicked', 'search_used', 'filter_changed', 'page_speed']
       - name: app_users
       - name: beta_invite_codes
       - name: user_followed_leagues
