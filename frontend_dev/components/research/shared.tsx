@@ -33,6 +33,16 @@ export function Shell({ children, active = 'Discover', mainMinHeight }: {
     });
     return <div className={s.page}><a href="#research-main" className={s.skip}>Skip to content</a><ProductHeader/><div className={`${s.workspace} ${collapsed ? s.workspaceCollapsed : ''}`}><nav className={s.sidebar} aria-label="Primary"><button type="button" className={s.sidebarToggle} onClick={toggleSidebar} aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!collapsed} title={collapsed ? 'Expand navigation' : 'Collapse navigation'}>{collapsed ? <PanelLeftOpen size={20} aria-hidden="true"/> : <PanelLeftClose size={20} aria-hidden="true"/>}<span className={s.srOnly}>{collapsed ? 'Expand menu' : 'Collapse menu'}</span></button>{nav.map(({ name, href, Icon }) => <Button asChild key={name} className={`${s.sidebarLink} ${active === name ? s.active : ''}`}><Link href={href} aria-label={collapsed ? name : undefined} aria-current={active === name ? 'page' : undefined} title={collapsed ? name : undefined}><Icon size={20} aria-hidden="true"/><span className={collapsed ? s.srOnly : ''}>{name}</span></Link></Button>)}</nav><main id="research-main" className={s.main} style={mainMinHeight ? { minHeight: mainMinHeight } : undefined}>{children}</main></div><nav className={s.bottomNav} aria-label="Mobile primary">{nav.map(({ name, href, mobileIcon }) => <Link key={name} href={href} aria-current={active === name ? 'page' : undefined}><span aria-hidden>{mobileIcon}</span>{name === 'Forecast record' ? 'Record' : name}</Link>)}</nav></div>;
 }
+// Research responses kept between page visits, so going back to a list shows it at
+// once. Older than FRESH_MS, it is still shown but refreshed in the background.
+// The data is the same for every signed-in account; a 401 clears it.
+const FRESH_MS = 120_000;
+const resources = new Map<string, { data: unknown; at: number }>();
+function remember(url: string, data: unknown) {
+    resources.delete(url);
+    resources.set(url, { data, at: Date.now() });
+    if (resources.size > 12) resources.delete(resources.keys().next().value!);
+}
 export function useResource<T>(url: string | null, schema: z.ZodType<T>) {
     const [state, setState] = useState<{
         url: string | null;
@@ -41,19 +51,34 @@ export function useResource<T>(url: string | null, schema: z.ZodType<T>) {
         busy: boolean;
     }>({ url: null, data: null, error: '', busy: true });
     const [revision, setRevision] = useState(0);
+    const forced = useRef(0);
     useEffect(() => {
         if (!url)
             return;
+        const kept = resources.get(url);
+        const force = forced.current !== revision;
+        forced.current = revision;
+        if (kept) {
+            setState({ url, data: kept.data as T, error: '', busy: false });
+            if (!force && Date.now() - kept.at < FRESH_MS)
+                return;
+        }
+        else
+            setState({ url, data: null, error: '', busy: true });
         const abort = new AbortController();
-        setState({ url, data: null, error: '', busy: true });
-        fetch(url, { cache: 'no-store', signal: abort.signal }).then(async (r) => { const body = await r.json(); if (!r.ok)
-            throw new Error(body.error || 'Unable to load match research.'); return schema.parse(body); }).then(data => { if (!abort.signal.aborted)
+        fetch(url, { cache: 'no-store', signal: abort.signal }).then(async (r) => { if (r.status === 401)
+            resources.clear(); const body = await r.json(); if (!r.ok)
+            throw new Error(body.error || 'Unable to load match research.'); return schema.parse(body); }).then(data => { remember(url, data); if (!abort.signal.aborted)
             setState({ url, data, error: '', busy: false }); }).catch(e => { if (!abort.signal.aborted && e instanceof z.ZodError)
-            trackRequestFailure(url, 'GET', 200, 'invalid'); if (!abort.signal.aborted)
-            setState({ url, data: null, error: e instanceof z.ZodError ? 'The response could not be verified.' : e.message, busy: false }); });
+            trackRequestFailure(url, 'GET', 200, 'invalid'); if (abort.signal.aborted)
+            return;
+            // A failed background refresh leaves the kept data on screen.
+            const still = resources.get(url);
+            setState(still ? { url, data: still.data as T, error: '', busy: false } : { url, data: null, error: e instanceof z.ZodError ? 'The response could not be verified.' : e.message, busy: false }); });
         return () => abort.abort();
     }, [url, schema, revision]);
-    return { ...(state.url === url ? state : { data: null, error: '', busy: true }), retry: () => { if (url) track('retry_clicked', { api: apiTemplate(url) }); setRevision(x => x + 1); } };
+    const kept = url && state.url !== url ? resources.get(url) : undefined;
+    return { ...(state.url === url ? state : kept ? { data: kept.data as T, error: '', busy: false } : { data: null, error: '', busy: true }), retry: () => { if (url) track('retry_clicked', { api: apiTemplate(url) }); setRevision(x => x + 1); } };
 }
 export function ResourceState({ busy, error, retry }: {
     busy: boolean;
