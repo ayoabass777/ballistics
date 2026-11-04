@@ -103,7 +103,8 @@ if (typeof window !== 'undefined' && !(window as { __ballisticsFetch?: boolean }
         const method = init?.method || (input instanceof Request ? input.method : 'GET');
         try {
             const response = await original(input, init);
-            if (!response.ok) trackRequestFailure(url, method, response.status, 'http');
+            // 401 means signed out, which the page already handles; it is not a failure.
+            if (!response.ok && response.status !== 401) trackRequestFailure(url, method, response.status, 'http');
             return response;
         } catch (error) {
             if (!(error instanceof DOMException && error.name === 'AbortError')) trackRequestFailure(url, method, 0, 'network');
