@@ -356,7 +356,8 @@ models:
       Latest standings refresh per league season, one row per group and team,
       warehouse ids. Match page position row and league table page
       (match-detail-contract.md §3.2). Show a team's group where
-      is_team_current_group; hide the table when ranks_repeat.
+      is_team_current_group (the team's latest phase: a played table, then
+      the smallest, then the provider's later one); hide the table when ranks_repeat.
     columns:
       - name: league_season_id
         tests: [not_null]
