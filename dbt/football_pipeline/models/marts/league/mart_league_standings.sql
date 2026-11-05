@@ -79,7 +79,9 @@ group_stats as (
     select
         league_season_id,
         group_name,
-        count(*) <> count(distinct rank) as ranks_repeat
+        count(*) <> count(distinct rank) as ranks_repeat,
+        count(distinct api_team_id) as n_teams,
+        coalesce(max(games_played), 0) > 0 as has_games
     from fresh_rows
     group by league_season_id, group_name
 ),
@@ -113,9 +115,18 @@ with_context as (
         coalesce(st.has_unprocessed_rows, false) as standings_incomplete,
         st.unprocessed_rows,
         st.unprocessed_since,
-        max(c.group_order) over (
+        -- A team's current table is its latest phase, not the provider's last
+        -- table: the provider orders Belgium's and Denmark's championship
+        -- round before the regular season, and may add aggregate tables
+        -- (Argentina's annual table, promedios) after the phase tables.
+        --   1. a table someone has played in (not a round that hasn't started)
+        --   2. the smallest such table: a later round is a subset of the
+        --      regular season; a Clausura zone is a subset of the annual table
+        --   3. the provider's later table (Clausura after Apertura)
+        row_number() over (
             partition by c.league_season_id, c.api_team_id
-        ) as team_last_group_order
+            order by gs.has_games desc, gs.n_teams, c.group_order desc nulls last
+        ) as team_group_pick
     from current_rows c
     join season_stats ss on ss.league_season_id = c.league_season_id
     join group_stats gs
@@ -157,7 +168,6 @@ select
     unprocessed_since,
     is_stale_row,           -- kept from an earlier refresh: the API's latest row for this team was unprocessable
     -- The table to show for this team: its only group, or in a split season
-    -- the latest round it appears in (last table in the API response).
-    (group_order = team_last_group_order
-        or team_last_group_order is null) as is_team_current_group
+    -- its latest phase (team_group_pick above).
+    team_group_pick = 1 as is_team_current_group
 from with_context

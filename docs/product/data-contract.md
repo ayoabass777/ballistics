@@ -1,5 +1,7 @@
 # UI data contract
 
+2026-11-05 — Match context standings show only the table(s) holding the two teams' current position (`table.groups`); earlier phases and aggregate tables are dropped (Argentina: Clausura zone, not Apertura or an annual/promedios table). Teams in different conferences or rounds each get their own table; with neither team in the standings, the tables some team is currently in. `is_team_current_group` in `mart_league_standings` now means the team's latest phase: a table someone has played in, then the smallest (a later round is a subset of the regular season), then the provider's later table. This fixes Belgium/Denmark championship and relegation rounds, which the provider lists before the regular season. No payload fields added or removed.
+
 2026-10-29 — Match navigation adds a client-only `returnTo` query parameter. Only `/discover`, `/matches`, `/standouts` and `/saved` are accepted, with query parameters retained and fragments discarded; other destinations fall back to `/discover`. This does not change research API payloads. List expansion/position remain tab-session storage; a new browser session or cleared storage can reset position.
 
 

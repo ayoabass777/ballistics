@@ -96,6 +96,19 @@ def team_position(rows, team_id):
     }
 
 
+def table_groups(rows, home_id, away_id):
+    """The tables the page shows: the ones holding the two teams' current position.
+
+    Earlier phases and aggregate tables (Apertura once the Clausura is on,
+    the regular season after the split, an annual table) are left out; teams
+    in different conferences or rounds each get theirs. With neither team in
+    the standings, the tables some team is currently in.
+    """
+    mine = {r["group_name"] for r in rows if r["is_team_current_group"]
+            and r["team_id"] is not None and r["team_id"] in (home_id, away_id)}
+    return mine or {r["group_name"] for r in rows if r["is_team_current_group"]}
+
+
 def calculated_overall_positions(rows, fixtures, home_id, away_id):
     """Fixture-derived fallback only when the provider has one unambiguous table."""
     if not rows or any(r["standings_format"] != "single" or r["ranks_repeat"] for r in rows):
@@ -292,6 +305,8 @@ def build_context(cur, fixture_id):
     same_group = bool(home_pos and away_pos and home_pos["group_name"] == away_pos["group_name"]
                       and home_pos.get("source") == away_pos.get("source"))
     hidden = {r["group_name"] for r in rows if r["ranks_repeat"]}
+    current = table_groups(rows, home_id, away_id)
+    shown = [r for r in rows if r["group_name"] in current and r["group_name"] not in hidden]
     return {
         "fixture": {"fixture_id": fx["fixture_id"], "league_id": fx["league_id"],
                     "league": fx["league_name"], "country": fx["country_name"],
@@ -306,13 +321,13 @@ def build_context(cur, fixture_id):
         "position": {"home": home_pos, "away": away_pos,
                      "venue": venue,
                      "points_gap": abs(home_pos["points"] - away_pos["points"]) if same_group and home_pos["points"] is not None and away_pos["points"] is not None else None},
-        "table": {"available": any(r["group_name"] not in hidden for r in rows),
+        "table": {"available": bool(shown),
                   "standings_format": rows[0]["standings_format"] if rows else None,
                   # D147: the API sent rows we couldn't load; they wait in the DLQ
                   # and the table may be out of date until a clean refresh.
                   "incomplete": any(r.get("standings_incomplete") for r in rows),
                   "unprocessed_rows": max((r.get("unprocessed_rows") or 0 for r in rows), default=0),
-                  "groups": _groups([r for r in rows if r["group_name"] not in hidden])},
+                  "groups": _groups(shown)},
         "h2h": h2h,
         "recent": recent,
     }
