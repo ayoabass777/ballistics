@@ -1,5 +1,23 @@
 # Decision log
 
+2026-11-04 — Owner found six Match sections excessive and requested the three-section proposal as a prototype. New review uses Overview / Goals / Form. Strength belongs in Overview; scoring patterns accompany Goals while retaining historical labels; recent results, other patterns and expandable standings belong in Form. This supersedes the six-tab exploration as the current review direction, not as a production implementation decision. Prior drafts and full research designs remain preserved.
+
+2026-11-04 — Owner requested applying Match details simplicity proposal, keeping core functionality. Separate Figma review now exposes Overview, Strength, Goals, Patterns, Standings and Past results, with compact identity/Save and explicit estimate-versus-historical labels. Deeper sections and How it works are clickable sample destinations. Existing full research designs remain preserved; this is a bounded layout review, not removal of markets, evidence controls or product features. See prototype-links.md for sample and navigation limits.
+
+2026-11-04 — Owner approved applying Discover simplicity recommendations in the prototype. Compact Standouts retain lime styling, team identity and evidence; date action now says Choose date; desktop search and contextual filters share a row. Categories remain visible. Forecast record and Saved remain primary desktop navigation destinations, using existing screens rather than removing core functionality. Applied to compact Discover and Matches sidebar reviews only; destination-page redesign and frontend changes are not delivered.
+
+2026-11-04 — Owner requested Discover sidebar correction. Desktop compact Discover review now shares Matches' left navigation placement across all desktop states, with Discover selected. Figma-only delivery; no frontend change. Further density/date-label recommendations remain proposals.
+
+2026-11-04 — Discover simplicity review: owner requested team search. Added a search field directly below the category tabs in the compact mobile/desktop Figma flow, with category-only scope, result count, Clear and empty-state recovery. Standouts retain separate scope. Preset Arsenal query states retain the query across category/date/order navigation; this is a Figma demonstration, not arbitrary typing. Existing local frontend search contract is unchanged. Design remains under review.
+
+2026-11-03 — Matches league grouping (owner requested; Figma review applied). Matches uses league headings with competition logos and kickoff ordering within each league. Multi-day review uses day → league → fixtures. This supersedes global kickoff-only ordering in the current simplicity proposal; existing frontend behavior has not changed. Populated mobile/desktop date/search states updated with row actions retained.
+
+2026-11-03 — Matches simplicity review (prototype requested; design pending). Keep Matches focused on team search and chronological browsing, with visible dates, league scope, optional finding filter, compact crest rows and fixture Save. Preserve fixtures without qualifying findings and the research-snapshot coverage limitation. Separate Figma sample demonstrates date/search/recovery/open/back; no production change authorized. See prototype-links.md.
+
+2026-11-03 — Compact Discover evidence extension (prototype requested; approval pending). Separate Figma review adds Goals estimates and Patterns observed records to compact crest rows, Recommended as the initial example order, optional league grouping, fixture Save toggles and finding-specific detail entry. Prototype-only variables and fictional fixtures demonstrate interaction; no API/engine semantics or frontend behavior changed. See prototype-links.md for links, scope and verification limits.
+
+2026-11-03 — Compact Discover (prototype authorized; design pending review). Owner requested a day-window date menu, one league selector, compact Standouts, and league-grouped fixture rows. Separate mobile/desktop Figma click-through variants demonstrate week/Today/tomorrow selection and fixture open/return using explicitly fictional sample content. See prototype-links.md for exact interaction scope and verification. Existing seven-day default and forecast semantics remain authoritative; no frontend implementation authorized.
+
 2026-10-30 — **Discover team search (proposal; prototype authorized).** One team/match search below the category tabs, beside existing evidence filter and sort controls, scopes to category results without changing Standouts. Proposed implementation retains query across categories, filters before pagination and offers counts/Clear search. Figma Goals examples demonstrate placement and recovery only; frontend implementation remains pending approval.
 
 
@@ -590,3 +608,6 @@ When changing direction, add a dated entry and identify which decision it supers
 
 
 2026-10-30 — Match details follow-up after UX review (owner: “fix it and do 2 and 3”). Consolidate account-profile and timezone-preference failures into one inline, dismissible member-page notice with Retry for both requests. In Match context, retain the immediate reading guidance and update times, while moving rank derivation and provider detail into a disclosure. Add match-scoped scroll padding so keyboard focus stays visible between the sticky match header and mobile primary navigation. No data calculation, Figma, or deployment decision changes.
+
+
+2026-11-02 — **Simpler first-use flow (proposal; Figma review only).** Owner asked to see a less sophisticated, more scannable experience. A separate mobile Discover and Match comparison was added in Figma, preserving the current screens. The proposal leads Discover with match identity and one plain-language finding, places filters/sort behind a secondary control, and presents Match evidence as three disclosure sections. Sample copy and controls are illustrative. No redesign approval, live interaction, or frontend implementation is inferred. See [prototype links](prototype-links.md).
