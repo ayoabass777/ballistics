@@ -1,4 +1,5 @@
 'use client';
+import { betaHome } from '@/lib/beta-navigation';
 import Link from 'next/link';
 import { ProductHeader } from '@/components/account/ProductHeader';
 import { useUser } from '@clerk/nextjs';
@@ -11,7 +12,7 @@ import { z } from 'zod';
 import s from './research.module.css';
 import { Bookmark, CalendarDays, ChartNoAxesCombined, Compass, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 export function Button(props: ComponentProps<typeof GlassButton>) { return <GlassButton variant="outline" {...props} className={`${s.button} ${props.className || ''}`}/>; }
-const nav = [
+const primaryNav = [
     { name: 'Discover', href: '/discover', mobileIcon: '◎', Icon: Compass },
     { name: 'Matches', href: '/matches', mobileIcon: '☰', Icon: CalendarDays },
     { name: 'Forecast record', href: '/forecast-record', mobileIcon: '◷', Icon: ChartNoAxesCombined },
@@ -22,6 +23,9 @@ export function Shell({ children, active = 'Discover', mainMinHeight }: {
     active?: string;
     mainMinHeight?: number;
 }) {
+    const { user } = useUser();
+    const nav = betaHome(user?.publicMetadata) === '/matches'
+        ? [primaryNav[1], primaryNav[0], primaryNav[3], primaryNav[2]] : primaryNav;
     const [collapsed, setCollapsed] = useState(false);
     useEffect(() => {
         try { setCollapsed(localStorage.getItem('ballistics:sidebar:collapsed') === 'true'); } catch { /* Use expanded default. */ }

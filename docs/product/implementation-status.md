@@ -1,5 +1,7 @@
 # Implementation status
 
+2026-11-05 — Matches-first beta rollout candidate. Clerk public metadata boolean `matches_first_beta` selects the landing route, navigation order, and league-grouped Matches rows. Today uses the account timezone. Search, Save and return URLs use the existing research and account services. Deployment and owner review are separate rollout gates.
+
 2026-10-29 — Match return fixes implemented locally: explicit validated list return URLs, in-page Back uses route replacement, and detail fragment links replace history. Discover list restoration removes the loading placeholder before observing real layout, responds to resize/font readiness, yields to user scroll input and freezes position writes when leaving by link. Signed-in browser check: expanded Goals from 12 to 24, opened a match, clicked Context then Patterns, and one browser Back returned directly to Goals with 24 cards and nonzero scroll (2037px). A second visit began at verified 2037px; detail reload and in-page Back were attempted, but the session subsequently reached sign-in, so full reauthentication and post-reload scroll verification remain pending. Research TypeScript (`--types node,react,react-dom`), contract tests including return URL allowlisting, and whitespace checks pass. No deployment or commit claimed.
 
 

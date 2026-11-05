@@ -1,0 +1,9 @@
+.groups { display: grid; gap: 16px; }
+.group { border: 1px solid #dce5dd; border-radius: 10px; overflow: hidden; background: white; }
+.group h4 { display: flex; align-items: center; gap: 8px; background: #eaf3e8; padding: 10px 12px; margin: 0; }
+.row { display: flex; align-items: center; gap: 8px; padding-right: 8px; border-top: 1px solid #e1e8e2; }
+.fixture { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; padding: 10px 12px; color: inherit; text-decoration: none; }
+.fixture:focus-visible { outline-offset: -3px; }
+.fixture time { font-variant-numeric: tabular-nums; font-size: .85rem; }
+.teams { display: grid; gap: 4px; }
+.teams > span { display: flex; align-items: center; gap: 8px; font-weight: 600; }
