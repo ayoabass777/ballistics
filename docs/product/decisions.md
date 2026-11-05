@@ -1,5 +1,9 @@
 # Decision log
 
+2026-11-04 — Owner found six Match sections excessive and requested the three-section proposal as a prototype. New review uses Overview / Goals / Form. Strength belongs in Overview; scoring patterns accompany Goals while retaining historical labels; recent results, other patterns and expandable standings belong in Form. This supersedes the six-tab exploration as the current review direction, not as a production implementation decision. Prior drafts and full research designs remain preserved.
+
+2026-11-04 — Owner requested applying Match details simplicity proposal, keeping core functionality. Separate Figma review now exposes Overview, Strength, Goals, Patterns, Standings and Past results, with compact identity/Save and explicit estimate-versus-historical labels. Deeper sections and How it works are clickable sample destinations. Existing full research designs remain preserved; this is a bounded layout review, not removal of markets, evidence controls or product features. See prototype-links.md for sample and navigation limits.
+
 2026-11-04 — Owner approved applying Discover simplicity recommendations in the prototype. Compact Standouts retain lime styling, team identity and evidence; date action now says Choose date; desktop search and contextual filters share a row. Categories remain visible. Forecast record and Saved remain primary desktop navigation destinations, using existing screens rather than removing core functionality. Applied to compact Discover and Matches sidebar reviews only; destination-page redesign and frontend changes are not delivered.
 
 2026-11-04 — Owner requested Discover sidebar correction. Desktop compact Discover review now shares Matches' left navigation placement across all desktop states, with Discover selected. Figma-only delivery; no frontend change. Further density/date-label recommendations remain proposals.
