@@ -11,12 +11,11 @@ import { directorySchema, historySchema, recordSchema, reasonLabel, score, statu
 import type { Fixture, Forecast, ForecastRecord, History } from "@/lib/forecast-record"
 import styles from "./forecast-record.module.css"
 import { FunctionalityTip } from "@/components/research/FunctionalityTip"
-import { Bookmark, CalendarDays, ChartNoAxesCombined, Compass, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { Bookmark, CalendarDays, Compass, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 
 const navigation = [
   { name: "Discover", href: "/discover", Icon: Compass, mobileIcon: "◎" },
   { name: "Matches", href: "/matches", Icon: CalendarDays, mobileIcon: "☰" },
-  { name: "Forecast record", href: "/forecast-record", Icon: ChartNoAxesCombined, mobileIcon: "◷" },
   { name: "Saved", href: "/saved", Icon: Bookmark, mobileIcon: "☆" },
 ]
 

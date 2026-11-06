@@ -22,6 +22,7 @@
     "typecheck:research": "tsc --project tsconfig.research.json --noEmit",
     "test:research:contracts": "node scripts/test-research-contract.cjs",
     "test:research:proxy": "node scripts/test-research-proxy.cjs",
+    "test:live": "node scripts/test-live.cjs",
     "preview:research": "node scripts/research-preview.cjs",
     "test:preferences": "node scripts/test-preferences.cjs",
     "test:account:proxy": "node scripts/test-account-proxy.cjs"
