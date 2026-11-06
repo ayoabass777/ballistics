@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, Query, Response
 import psycopg2
 
 from engine.api import forecast_records as records
+from engine.api import live
 from engine.api import match_context
 from engine.api import match_detail
 
@@ -77,6 +78,27 @@ def match_view(response: Response, fixture_id: int):
     if result is None:
         raise HTTPException(404, "Fixture not found")
     return result
+
+
+@app.get("/api/live")
+def live_view(response: Response):
+    """Live and just-finished tracked fixtures (docs/live_scores.md)."""
+    return read(live.live_list, response)
+
+
+@app.get("/api/live/{fixture_id}")
+def live_fixture_view(response: Response, fixture_id: int):
+    """One fixture's live score and events; state is null before it is seen live."""
+    if fixture_id < 1:
+        raise HTTPException(422, "fixture_id must be positive")
+    return read(live.live_fixture, response, fixture_id=fixture_id)
+
+
+@app.get("/api/results")
+def results_view(response: Response, zone: str = Query("UTC", max_length=100), day: date | None = None):
+    """One local day of played games, newest day with results by default."""
+    from engine.api.results import results
+    return read(results, response, zone=zone, day=day)
 
 
 @app.get("/api/discover")
