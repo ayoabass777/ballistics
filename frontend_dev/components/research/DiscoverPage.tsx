@@ -1,4 +1,8 @@
 'use client';
+import { useUser } from '@clerk/nextjs';
+import { betaHome } from '@/lib/beta-navigation';
+import rows from './LeagueFixtureRows.module.css';
+import { LeagueFixtureRows } from './LeagueFixtureRows';
 import Link from 'next/link';
 import { usePreferences, useStamp } from './PreferencesProvider';
 import { DiscoverDates } from './DiscoverDates';
@@ -10,7 +14,7 @@ import { Button, Crest, FixtureIdentity, Shell, ResourceState, useResource, useS
 import s from './research.module.css';
 import { DiscoverLeagues } from './DiscoverLeagues';
 import { EvidenceFilter, EvidenceSort } from './EvidenceControls';
-import { categoryResults, evidenceOptions, filterMatches, matchEvidence } from '@/lib/evidence-controls';
+import { variedStandouts, categoryResults, evidenceOptions, filterMatches, matchEvidence } from '@/lib/evidence-controls';
 import { track } from '@/lib/usage-events';
 import { MatchesControls } from './MatchesControls';
 import { useFollowedLeagues } from './useFollowedLeagues';
@@ -38,6 +42,13 @@ function FixtureCard({ card, featured, matchPreview, matchingFinding, returnTo, 
  <div className={featured ? s.actions : s.compactActions}>{featured ? <Button asChild className={s.active}><Link href={matchHref(card, true, returnTo)}>Explore match</Link></Button> : <Link className={s.link} href={matchingFinding && card.preview ? matchHref({ ...card, pick: card.preview }, true, returnTo) : matchHref(card, !matchPreview, returnTo)}>View match →</Link>}<Button aria-pressed={saved} onClick={onSave}>{saved ? '✓ Saved' : '+ Save fixture'}</Button></div>
  </article>;
 }
+function discoveryFinding(item: Card, featured: boolean) {
+    const pick = item.pick;
+    if (pick?.list === 'strength' && pick.favourite) {
+        return featured ? `${pick.favourite} have a clear strength advantage.` : `${pick.favourite} favoured`;
+    }
+    return featured ? reason(item) : headline(item);
+}
 function OnboardingSaveTip() {
     const [visible, setVisible] = useState(false);
     useEffect(() => { setVisible(sessionStorage.getItem('ballistics:onboarding:save-tip') === '1'); }, []);
@@ -47,26 +58,30 @@ function OnboardingSaveTip() {
 // URL parameters behind each filter_changed value (the team search q is search_used).
 const FILTER_GROUPS: Record<string, string[]> = {
     dates: ['scope', 'day', 'end_day'], leagues: ['leagues'], finding: ['finding'], category: ['category'],
-    evidence_filter: ['goals_filter', 'patterns_filter'], sort: ['goals_sort', 'patterns_sort'],
+    evidence_filter: ['goals_filter', 'patterns_filter'], sort: ['strength_sort', 'goals_sort', 'patterns_sort'], grouping: ['group'],
 };
 export function DiscoverPage({ all = false, matches = false }: {
     matches?: boolean;
     all?: boolean;
 }) {
     const search = useSearchParams(), router = useRouter(), path = usePathname();
+    const { user, isLoaded } = useUser();
+    const preview = betaHome(user?.publicMetadata) === '/matches';
+    const leagueRows = matches && preview;
     const query = search.toString();
     const { zone } = usePreferences();
     const stamp = useStamp();
-    const scope = ['week', 'today', 'tomorrow', 'date', 'range'].includes(search.get('scope') || '') ? search.get('scope')! : 'week';
+    const scope = ['week', 'today', 'tomorrow', 'date', 'range'].includes(search.get('scope') || '') ? search.get('scope')! : leagueRows ? 'today' : 'week';
     const selected = search.get('leagues')?.split(',').filter(Boolean) || [];
     const category = (['strength', 'goals', 'patterns'].includes(search.get('category') || '') ? search.get('category') : 'strength') as Kind;
     const params = new URLSearchParams(query);
+    if (leagueRows) params.set('scope', scope);
     params.delete('category');
     params.delete('q');
-    for (const key of ['goals_filter', 'patterns_filter', 'goals_sort', 'patterns_sort', 'finding']) params.delete(key);
+    for (const key of ['goals_filter', 'patterns_filter', 'goals_sort', 'patterns_sort', 'strength_sort', 'finding', 'group']) params.delete(key);
     if (zone)
         params.set('zone', zone);
-    const { data, busy, error, retry } = useResource(zone ? `/api/research/discover?${params}` : null, discoverSchema);
+    const { data, busy, error, retry } = useResource(zone && (!matches || isLoaded) ? `/api/research/discover?${params}` : null, discoverSchema);
     const positionQuery = new URLSearchParams(query);
     if (!all && !matches) positionQuery.set('category', category);
     // The preference zone arrives asynchronously; it must not change the
@@ -90,7 +105,7 @@ export function DiscoverPage({ all = false, matches = false }: {
     function change(key: string, value: string) {
         const next = new URLSearchParams(query); value ? next.set(key, value) : next.delete(key);
         // Refilter at the current controls, rather than jumping back above Standouts.
-        if (key.endsWith('_filter') || key.endsWith('_sort') || key === 'finding') {
+        if (key.endsWith('_filter') || key.endsWith('_sort') || key === 'finding' || key === 'group') {
             const positionParams = new URLSearchParams(next);
             if (!all && !matches) positionParams.set('category', category);
             positionParams.delete('q');
@@ -101,17 +116,60 @@ export function DiscoverPage({ all = false, matches = false }: {
     }
     const scopeText = scope === 'week' ? 'Next 7 days' : scope === 'today' ? 'Today' : scope === 'tomorrow' ? 'Tomorrow' : scope === 'range' ? `${search.get('day') || 'Start'} to ${search.get('end_day') || 'end'}` : search.get('day') || 'Choose a date';
     const card = (item: Card, i: number, featured = false) => <FixtureCard key={item.fixture_id} card={item} returnTo={`${path}?${positionQuery}`} featured={featured} matchPreview={matches} matchingFinding={matches && Boolean(search.get('finding'))} rank={i + 1} total={all ? data?.lists.standouts.length : Math.min(5, data?.lists.standouts.length || 0)} saved={saved.isSaved(item.fixture_id)} onSave={() => saved.toggle(item, data?.run_ds || null)}/>;
+    function findingRows(items: Card[], featured = false, grouped = false) {
+        return <ol className={rows.findings}>
+            {items.map(item => <li key={item.fixture_id} className={rows.row}>
+                <Link href={matchHref(item, true, `${path}?${positionQuery}`)} className={rows.finding}>
+                    {!grouped && <span className={rows.competition}><Crest name={item.league} url={item.league_logo_url} league/>{item.country || 'International / other'} · {item.league}</span>}
+                    <span className={rows.identity}>
+                        <FixtureIdentity card={item}/>
+                    </span>
+                    <span className={rows.detail}>
+                        <span>{featured && item.pick && <small>{labels[item.pick.list]}</small>}{discoveryFinding(item, featured)}</span>
+                        <small><time dateTime={item.kickoff}>{stamp(item.kickoff)}</time></small>
+                    </span>
+                </Link>
+                <Button aria-label={`Save ${item.home} vs ${item.away}`} aria-pressed={saved.isSaved(item.fixture_id)} onClick={() => saved.toggle(item, data?.run_ds || null)}>{saved.isSaved(item.fixture_id) ? '✓ Saved' : 'Save'}</Button>
+            </li>)}
+        </ol>;
+    }
+    function countryRows(items: Card[]) {
+        const countries = new Map<string, Map<string, Card[]>>();
+        for (const item of items) {
+            const country = item.country || 'International / other';
+            const leagues = countries.get(country) || new Map<string, Card[]>();
+            const key = String(item.league_id ?? item.league);
+            const fixtures = leagues.get(key) || [];
+            fixtures.push(item);
+            leagues.set(key, fixtures);
+            countries.set(country, leagues);
+        }
+        return <div className={rows.groups}>{[...countries].map(([country, leagues]) =>
+            <section key={country} className={rows.country}>
+                <h4>{country}</h4>
+                {[...leagues].map(([key, fixtures]) => <section key={key} className={rows.league}>
+                    <h5><Crest name={fixtures[0].league} url={fixtures[0].league_logo_url} league/>{fixtures[0].league}</h5>
+                    {findingRows(fixtures, false, true)}
+                </section>)}
+            </section>
+        )}</div>;
+    }
     // Deferred so refiltering the cards never blocks the controls.
     const teamQuery = useDeferredValue((search.get('q') || '').trim().toLocaleLowerCase());
     const teamMatches = (data?.matches || []).filter(f => !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
     const availableEvidence = matchEvidence(data, teamMatches);
-    const findingKey = search.get('finding') || '';
+    const findingKey = leagueRows ? '' : search.get('finding') || '';
     const matchResults = filterMatches(teamMatches, availableEvidence, findingKey);
     const filterKey = search.get(`${category}_filter`) || '';
     const sortKey = search.get(`${category}_sort`) || '';
     const categoryTeams = (data?.lists[category] || []).filter(f => !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
-    const categoryCards = categoryResults(categoryTeams, category === 'strength' ? '' : filterKey, category !== 'strength' && sortKey === 'highest');
-    const standoutResults = (data?.lists.standouts || []).filter(f => !all || !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
+    const filteredCategoryCards = categoryResults(categoryTeams, category === 'strength' ? '' : filterKey, category !== 'strength' && sortKey === 'highest');
+    const sortedCategoryCards = preview && sortKey === 'soonest' ? [...filteredCategoryCards].sort((a, b) => Date.parse(a.kickoff) - Date.parse(b.kickoff)) : filteredCategoryCards;
+    const groupByCountry = preview && search.get('group') === 'country';
+    const categoryCards = groupByCountry ? [...sortedCategoryCards].sort((a, b) =>
+        (a.country || 'International / other').localeCompare(b.country || 'International / other') ||
+        a.league.localeCompare(b.league) || (a.league_id || 0) - (b.league_id || 0)) : sortedCategoryCards;
+    const standoutResults = (data ? preview ? variedStandouts(data.lists, teamQuery) : data.lists.standouts : []).filter(f => (!preview && !all) || !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
     const page = matches ? 'matches' : all ? 'all' : 'discover';
     const resultCount = Math.min(200, matches ? matchResults.length : all ? standoutResults.length : categoryCards.length);
     // One search_used per settled search, not one per pause in typing, and not again
@@ -148,7 +206,7 @@ export function DiscoverPage({ all = false, matches = false }: {
     const dateLabel = (day: string) => new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${day}T12:00:00Z`));
     const matchScope = scope === 'range' ? 'Custom date range' : scopeText;
     const leagueScope = selected.length ? `${selected.length} ${selected.length === 1 ? 'league' : 'leagues'} selected` : 'All leagues';
-    return <Shell active={matches ? 'Matches' : 'Discover'} mainMinHeight={position.restoringHeight}>{!all && !matches && <><OnboardingSaveTip/><FunctionalityTip id="discover" title="Explore the evidence" suppressIfOnboardingSaveTip moreHref="#discover-methodology"><p>Strength, Goals and Patterns are separate ways to find matches worth researching. Open a card to see its supporting evidence.</p></FunctionalityTip></>}{matches && <FunctionalityTip id="filters" title="Narrow the fixtures"><p>Choose dates and leagues above. Your leagues uses the leagues you follow in Settings; All leagues broadens the view. Matches lists fixtures in the current research snapshot.</p></FunctionalityTip>}<div className={s.controls}>{matches ? <MatchesControls data={data} zone={zone} follows={follows}/> : <>{matches && <><h1>Matches</h1><p className={s.caption}>Upcoming fixtures in the current engine snapshot, ordered by kickoff.</p></>}{all && <><Link className={s.link} href={`/discover?${query}`}>← Discover</Link><h1>All standouts</h1></>}<p>{scopeText}</p><details><summary>Help with dates and leagues</summary><p className={s.caption}>Choose a date and leagues to narrow this snapshot. Your leagues uses the leagues saved in Settings; All leagues broadens the view.</p></details><DiscoverDates zone={zone}/>{all && <TeamSearch className={s.leagueSearch}/>}<div className={s.row}><Button className={!selected.length ? s.active : ''} onClick={() => change('leagues', '')}>All leagues</Button>{follows.signedIn && follows.ready && !follows.error && follows.ids.length > 0 && <Button className={selected.length === follows.ids.length && follows.ids.every(id => selected.includes(String(id))) ? s.active : ''} disabled={!follows.ready} onClick={() => change('leagues', follows.ids.join(','))}>Your leagues · {follows.ids.length}</Button>}<DiscoverLeagues leagues={data?.leagues} selected={selected} onApply={value => change('leagues', value)}/>{follows.signedIn && follows.ready && !follows.error && !follows.ids.length && <Link className={s.link} href="/settings">Set your leagues →</Link>}</div><p className={s.caption}>{data?.run_finished_at ? `Engine updated ${stamp(data.run_finished_at)}` : 'Engine snapshot'} · {zone || 'Detecting timezone…'}</p></>}</div>
- {follows.error && <p className={s.notice} role="alert">Could not load your leagues. <Button onClick={follows.reload}>Retry leagues</Button></p>}{follows.signedIn && follows.ids.length > 0 && <Link className={s.link} href="/settings">Manage followed leagues →</Link>}<ResourceState busy={busy} error={error} retry={retry}/>{data && <>{data.coverage === 'needs_refresh' && <p className={s.notice}>Discover needs a refreshed engine snapshot. Rankings from older snapshots are not substituted.</p>}{matches ? <section className={s.section}><div className={s.row}><EvidenceFilter label="Finding" allLabel="All findings" options={evidenceOptions(availableEvidence)} value={findingKey} onChange={value => change('finding', value)} total={teamMatches.length}/><span className={s.caption}>Ordered by kickoff</span></div><p className={s.caption}>Filters use qualifying findings available in this snapshot.</p><h2 aria-live="polite">{matchResults.length} {matchResults.length === 1 ? 'fixture' : 'fixtures'}</h2><p className={s.caption}>{matchScope} · {zone || 'UTC'} · {leagueScope}{teamQuery ? ` · Teams: ${search.get('q')}` : ''} · Engine updated {data.run_finished_at ? stamp(data.run_finished_at) : 'unavailable'}</p>{data.matches === undefined ? <p role="alert">Restart the research API to load the Matches list.</p> : matchResults.length ? <>{[...matchDays].map(([day, fixtures]) => <div className={s.matchDay} key={day}><h3>{dateLabel(day)}</h3><div className={s.grid}>{fixtures.map((f, i) => card(f, i))}</div></div>)}{position.count < matchResults.length && <Button onClick={position.more}>Show more matches</Button>}</> : <p className={s.empty}>{findingKey ? 'No fixtures have this qualifying finding in the selected dates, leagues and team search. Clear the finding filter to broaden the results.' : teamQuery ? 'No teams match this search in the selected dates and leagues.' : 'No fixtures for these dates and leagues.'}</p>}</section> : <><section className={s.section} aria-label="Standouts">{!all && <div className={s.between}><h1>Standouts</h1><div className={s.row}><Link className={s.link} href={`/standouts?${query}`}>All standouts →</Link><div className={`${s.row} ${s.arrows}`}><Button className={s.active} aria-label="Previous standouts" disabled={edges.start} onClick={() => move(-1)}>← Previous</Button><Button className={s.active} aria-label="Next standouts" disabled={edges.end} onClick={() => move(1)}>Next →</Button></div></div></div>}<p className={s.caption}>{scopeText}</p>{all && <p className={s.caption}>{standoutResults.length} {standoutResults.length === 1 ? 'standout' : 'standouts'}{teamQuery ? ` matching “${search.get('q')}”` : ''}</p>}{standoutResults.length ? <div className={all ? s.grid : s.carousel} ref={all ? undefined : carousel} onScroll={updateEdges}>{(all ? standoutResults.slice(0, position.count) : standoutResults.slice(0, 5)).map((f, i) => card(f, all ? data.lists.standouts.indexOf(f) : i, true))}</div> : <p className={s.empty}>{all && teamQuery ? 'No teams match this search in the selected dates and leagues.' : 'No standouts for these dates and leagues. Try a wider selection.'}</p>}{all && position.count < standoutResults.length && <Button onClick={position.more}>Show more standouts</Button>}</section>{!all && <section id="discover-categories" className={s.section}><h2 className={s.sectionTitle}>Explore by category</h2><div className={s.tabs} aria-label="Discover category">{(Object.keys(labels) as Kind[]).map(kind => <Button key={kind} className={category === kind ? s.active : ''} aria-pressed={category === kind} onClick={() => change('category', kind)}>{labels[kind]}</Button>)}</div><div className={s.categorySearch}><TeamSearch className={s.leagueSearch} label="Find a team or match" placeholder="Search team names" clearable/></div>{category !== 'strength' && <div className={s.row}><EvidenceFilter label={category === 'goals' ? 'Market' : 'Pattern'} allLabel={category === 'goals' ? 'All markets' : 'All patterns'} options={evidenceOptions(categoryTeams)} value={filterKey} onChange={value => change(`${category}_filter`, value)} total={categoryTeams.length}/><EvidenceSort kind={category} value={sortKey} onChange={value => change(`${category}_sort`, value)}/></div>}<h3 aria-live="polite">{labels[category]} · {categoryCards.length} {categoryCards.length === 1 ? 'fixture' : 'fixtures'}{teamQuery ? ` matching “${search.get('q')}”` : ''}</h3>{categoryCards.length ? <div className={s.grid}>{categoryCards.slice(0, position.count).map((f, i) => card(f, i))}</div> : <p className={s.empty}>{teamQuery ? 'No matching fixtures in this category. Clear your search or try another team name.' : filterKey ? 'No fixtures match this filter. Clear it or choose other dates and leagues.' : 'No fixtures in this category for the selected dates and leagues.'}</p>}{position.count < categoryCards.length && <Button onClick={position.more}>Show more {labels[category].toLowerCase()}</Button>}</section>}</>}</>}
+    return <Shell active={matches ? 'Matches' : 'Discover'} mainMinHeight={position.restoringHeight}>{!all && !matches && <><OnboardingSaveTip/><FunctionalityTip id="discover" title="Explore the evidence" suppressIfOnboardingSaveTip moreHref="#discover-methodology"><p>Strength, Goals and Patterns are separate ways to find matches worth researching. Open a match to see its supporting evidence.</p></FunctionalityTip></>}{matches && !leagueRows && <FunctionalityTip id="filters" title="Narrow the fixtures"><p>Choose dates and leagues above. Your leagues uses the leagues you follow in Settings; All leagues broadens the view. Matches lists fixtures in the current research snapshot.</p></FunctionalityTip>}<div className={s.controls}>{matches ? <MatchesControls leagueRows={leagueRows} data={data} zone={zone} follows={follows}/> : <>{matches && <><h1>Matches</h1><p className={s.caption}>Upcoming fixtures in the current engine snapshot, ordered by kickoff.</p></>}{all && <><Link className={s.link} href={`/discover?${query}`}>← Discover</Link><h1>All standouts</h1></>}<p>{scopeText}{preview && ` · ${selected.length ? selected.length + " leagues selected" : "All leagues"}`}</p><details><summary>Help with dates and leagues</summary><p className={s.caption}>Choose a date and leagues to narrow this snapshot. Your leagues uses the leagues saved in Settings; All leagues broadens the view.</p></details>{preview && <TeamSearch className={s.leagueSearch} label="Find a team or match" placeholder="Search team names" clearable/>}<div className={preview ? rows.controls : undefined}><DiscoverDates zone={zone}/>{all && !preview && <TeamSearch className={s.leagueSearch}/>}<div className={s.row}><Button className={!selected.length ? s.active : ''} onClick={() => change('leagues', '')}>All leagues</Button>{follows.signedIn && follows.ready && !follows.error && follows.ids.length > 0 && <Button className={selected.length === follows.ids.length && follows.ids.every(id => selected.includes(String(id))) ? s.active : ''} disabled={!follows.ready} onClick={() => change('leagues', follows.ids.join(','))}>Your leagues · {follows.ids.length}</Button>}<DiscoverLeagues leagues={data?.leagues} selected={selected} onApply={value => change('leagues', value)}/>{follows.signedIn && follows.ready && !follows.error && !follows.ids.length && <Link className={s.link} href="/settings">Set your leagues →</Link>}</div></div><p className={s.caption}>{data?.run_finished_at ? `Engine updated ${stamp(data.run_finished_at)}` : 'Engine snapshot'} · {zone || 'Detecting timezone…'}</p></>}</div>
+ {follows.error && <p className={s.notice} role="alert">Could not load your leagues. <Button onClick={follows.reload}>Retry leagues</Button></p>}{follows.signedIn && follows.ids.length > 0 && <Link className={s.link} href="/settings">Manage followed leagues →</Link>}<ResourceState busy={busy} error={error} retry={retry}/>{data && <>{data.coverage === 'needs_refresh' && <p className={s.notice}>Discover needs a refreshed engine snapshot. Rankings from older snapshots are not substituted.</p>}{matches ? <section className={s.section}>{!leagueRows && <><div className={s.row}><EvidenceFilter label="Finding" allLabel="All findings" options={evidenceOptions(availableEvidence)} value={findingKey} onChange={value => change('finding', value)} total={teamMatches.length}/><span className={s.caption}>Ordered by kickoff</span></div><p className={s.caption}>Filters use qualifying findings available in this snapshot.</p></>}<h2 aria-live="polite">{matchResults.length} {matchResults.length === 1 ? 'fixture' : 'fixtures'}</h2><p className={s.caption}>{matchScope} · {zone || 'UTC'} · {leagueScope}{teamQuery ? ` · Teams: ${search.get('q')}` : ''} · Engine updated {data.run_finished_at ? stamp(data.run_finished_at) : 'unavailable'}</p>{data.matches === undefined ? <p role="alert">Restart the research API to load the Matches list.</p> : matchResults.length ? <>{[...matchDays].map(([day, fixtures]) => <div className={s.matchDay} key={day}><h3>{dateLabel(day)}</h3>{leagueRows ? <LeagueFixtureRows fixtures={fixtures} zone={zone || 'UTC'} returnTo={`${path}?${positionQuery}`} isSaved={saved.isSaved} onSave={f => saved.toggle(f, data.run_ds)}/> : <div className={s.grid}>{fixtures.map((f, i) => card(f, i))}</div>}</div>)}{position.count < matchResults.length && <Button onClick={position.more}>Show more matches</Button>}</> : <p className={s.empty}>{findingKey ? 'No fixtures have this qualifying finding in the selected dates, leagues and team search. Clear the finding filter to broaden the results.' : teamQuery ? 'No teams match this search in the selected dates and leagues.' : 'No fixtures for these dates and leagues.'}</p>}</section> : <><section className={s.section} aria-label="Standouts">{!all && <div className={s.between}><h1>Standouts</h1><div className={s.row}><Link className={s.link} href={`/standouts?${query}`}>All standouts →</Link>{!preview && <div className={`${s.row} ${s.arrows}`}><Button className={s.active} aria-label="Previous standouts" disabled={edges.start} onClick={() => move(-1)}>← Previous</Button><Button className={s.active} aria-label="Next standouts" disabled={edges.end} onClick={() => move(1)}>Next →</Button></div>}</div></div>}<p className={s.caption}>{scopeText}</p>{all && <p className={s.caption}>{standoutResults.length} {standoutResults.length === 1 ? 'standout' : 'standouts'}{teamQuery ? ` matching “${search.get('q')}”` : ''}</p>}{standoutResults.length ? preview ? findingRows(standoutResults.slice(0, all ? position.count : 3), true) : <div className={all ? s.grid : s.carousel} ref={all ? undefined : carousel} onScroll={updateEdges}>{(all ? standoutResults.slice(0, position.count) : standoutResults.slice(0, 5)).map((f, i) => card(f, all ? data.lists.standouts.indexOf(f) : i, true))}</div> : <p className={s.empty}>{teamQuery ? 'No teams match this search in the selected dates and leagues.' : 'No standouts for these dates and leagues. Try a wider selection.'}</p>}{all && position.count < standoutResults.length && <Button onClick={position.more}>Show more standouts</Button>}</section>{!all && <section id="discover-categories" className={s.section}><h2 className={s.sectionTitle}>Explore by category</h2><div className={s.tabs} aria-label="Discover category">{(Object.keys(labels) as Kind[]).map(kind => <Button key={kind} className={category === kind ? s.active : ''} aria-pressed={category === kind} onClick={() => change('category', kind)}>{labels[kind]}</Button>)}</div>{!preview && <div className={s.categorySearch}><TeamSearch className={s.leagueSearch} label="Find a team or match" placeholder="Search team names" clearable/></div>}{category !== 'strength' && <div className={s.row}><EvidenceFilter label={category === 'goals' ? 'Market' : 'Pattern'} allLabel={category === 'goals' ? 'All markets' : 'All patterns'} options={evidenceOptions(categoryTeams)} value={filterKey} onChange={value => change(`${category}_filter`, value)} total={categoryTeams.length}/><EvidenceSort soonest={preview} kind={category} value={sortKey} onChange={value => change(`${category}_sort`, value)}/></div>}{preview && category === 'strength' && <EvidenceSort soonest kind={category} value={sortKey} onChange={value => change(`${category}_sort`, value)}/>}{preview && <label className={rows.groupControl}><input type="checkbox" checked={groupByCountry} onChange={event => change('group', event.target.checked ? 'country' : '')}/>Group by country</label>}<h3 aria-live="polite">{labels[category]} · {categoryCards.length} {categoryCards.length === 1 ? 'fixture' : 'fixtures'}{teamQuery ? ` matching “${search.get('q')}”` : ''}</h3>{categoryCards.length ? preview ? groupByCountry ? countryRows(categoryCards.slice(0, position.count)) : findingRows(categoryCards.slice(0, position.count)) : <div className={s.grid}>{categoryCards.slice(0, position.count).map((f, i) => card(f, i))}</div> : <p className={s.empty}>{teamQuery ? 'No matching fixtures in this category. Clear your search or try another team name.' : filterKey ? 'No fixtures match this filter. Clear it or choose other dates and leagues.' : 'No fixtures in this category for the selected dates and leagues.'}</p>}{position.count < categoryCards.length && <Button onClick={position.more}>Show more {labels[category].toLowerCase()}</Button>}</section>}</>}</>}
  <details id="discover-methodology"><summary>How it works</summary><p className={s.caption}>Standouts show each fixture’s strongest qualifying reason. Categories are ranked separately, so a fixture can appear in more than one category. Team patterns are historical records; goals outlook values are estimates.</p></details><Toast message={saved.message}/></Shell>;
 }
