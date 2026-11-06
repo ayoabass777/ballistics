@@ -42,6 +42,13 @@ function FixtureCard({ card, featured, matchPreview, matchingFinding, returnTo, 
  <div className={featured ? s.actions : s.compactActions}>{featured ? <Button asChild className={s.active}><Link href={matchHref(card, true, returnTo)}>Explore match</Link></Button> : <Link className={s.link} href={matchingFinding && card.preview ? matchHref({ ...card, pick: card.preview }, true, returnTo) : matchHref(card, !matchPreview, returnTo)}>View match →</Link>}<Button aria-pressed={saved} onClick={onSave}>{saved ? '✓ Saved' : '+ Save fixture'}</Button></div>
  </article>;
 }
+function discoveryFinding(item: Card, featured: boolean) {
+    const pick = item.pick;
+    if (pick?.list === 'strength' && pick.favourite) {
+        return featured ? `${pick.favourite} have a clear strength advantage.` : `${pick.favourite} favoured`;
+    }
+    return featured ? reason(item) : headline(item);
+}
 function OnboardingSaveTip() {
     const [visible, setVisible] = useState(false);
     useEffect(() => { setVisible(sessionStorage.getItem('ballistics:onboarding:save-tip') === '1'); }, []);
@@ -118,7 +125,7 @@ export function DiscoverPage({ all = false, matches = false }: {
                         <FixtureIdentity card={item}/>
                     </span>
                     <span className={rows.detail}>
-                        <span>{featured ? reason(item) : headline(item)}</span>
+                        <span>{discoveryFinding(item, featured)}</span>
                         <small><Crest name={item.league} url={item.league_logo_url} league/>{[item.country, item.league, stamp(item.kickoff)].filter(Boolean).join(' · ')}</small>
                     </span>
                 </Link>
