@@ -20,3 +20,4 @@
 @media (max-width: 680px) {
     .finding { grid-template-columns: minmax(0, 1fr); gap: 8px; }
 }
+.controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; }
