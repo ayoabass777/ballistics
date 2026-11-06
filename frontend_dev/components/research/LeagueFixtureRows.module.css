@@ -14,10 +14,17 @@
 .finding:hover { background: #f4f8f3; }
 .finding:focus-visible { outline-offset: -3px; }
 .identity { display: flex; gap: 10px; align-items: center; font-weight: 600; }
-.number { color: #245a36; font-size: .85rem; font-variant-numeric: tabular-nums; }
+
 .detail { display: grid; gap: 5px; }
 .detail small { display: flex; gap: 6px; align-items: center; color: #4d6352; }
 @media (max-width: 680px) {
     .finding { grid-template-columns: minmax(0, 1fr); gap: 8px; }
 }
 .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; }
+
+.competition { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 600; color: #245a36; }
+.country > h4 { margin: 0 0 8px; font-size: 1rem; }
+.league + .league { margin-top: 12px; }
+.league > h5 { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 12px; background: #eaf3e8; border: 1px solid #dce5dd; border-radius: 10px 10px 0 0; font-size: .9rem; }
+.league .findings { border-top: 0; border-radius: 0 0 10px 10px; }
+.groupControl { display: flex; gap: 8px; align-items: center; margin: 12px 0; min-height: 44px; }
