@@ -2,7 +2,7 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-10-30 (member journey done, Wave 1 invites sent).
+Updated 2026-11-05 (beta speed and retention items added, stale entries closed).
 
 ## Beta blockers (critical path)
 
@@ -86,6 +86,25 @@ path: each item gates the ones below it, except where marked parallel.
    mobile, data freshness, failure alert and rollback, all exercised on
    staging. Then send the first invites. Wave 1 invites sent by 2026-10-30.
 
+## Beta usage (from the 5 Nov report)
+
+Source: [docs/product/beta-activity-2026-11-05.md](docs/product/beta-activity-2026-11-05.md).
+Returning to Standouts became instant on 2026-11-04 (PR #21); retention is now
+the bigger problem.
+
+- [ ] **Retention.** Only 2 of 6 testers have come back since 2 Nov. Ask the
+  quieter testers to try again and what stopped them; interview tester A (most
+  engaged) about what keeps them coming back. Feeds the wave 1 interviews in
+  [docs/product/distribution-plan.md](docs/product/distribution-plan.md).
+- [ ] **Re-run the activity queries** after a few days of post-fix use, to
+  confirm the `/standouts` LCP improvement with tester readings, not owner ones.
+- [ ] **First visit speed** (~4 s cold before cards appear):
+  - Make the Discover response smaller (1.1 MB raw, ~170 KB gzipped, 522 matches).
+  - Run the account calls (`/me`, saved, saved ids, leagues, preferences) in parallel.
+  - Record redirect time separately from server time in `page_speed`.
+- [ ] Optional: record the source page on `match_opened`, so opens no longer
+  have to be credited to the last list viewed.
+
 ## Now
 
 - [x] **Check Port Vale v Northampton picked up its new date** (confirmed
@@ -94,7 +113,9 @@ path: each item gates the ones below it, except where marked parallel.
   row for api_fixture_id 1563773 (fixture 107511) should read kickoff
   2026-11-24 19:45 UTC, NS. If it still says 26 Sep, check that night's
   `extract_updates` payload in `incremental/2026-10-28/fixtures.json`.
-- [ ] **Check tonight's engine run** (run_ds 2026-10-20, ~00:40 UTC), the first
+- [x] **Check tonight's engine run** — closed 2026-11-05 without a recorded
+  check: superseded by staging's nightly runs (since 2026-10-28); daily
+  reliability is tracked in beta blocker 6. Original item: (run_ds 2026-10-20, ~00:40 UTC), the first
   with everything from today: dbt is no longer blocked by xG/standings; model
   reuse (`raw.model_processing_state` fills, run starts cold); `raw.card_versions`
   gains rows beyond the 5,265 backfilled (team-name fix makes ~330 teams' cards
@@ -156,7 +177,8 @@ Details: [docs/product/implementation-status.md](docs/product/implementation-sta
   (deferred, D152).
 - [ ] D146 evidence-depth bar (Focused / More context / Full view): deferred
   past beta (D152).
-- [ ] Deployment: nothing is deployed; frontend is on `codex/frontend-redesign`.
+- [x] Deployment: frontend live on staging (`beta.ballistics.football`) since
+  2026-10-27; see beta blocker 3.
 - [ ] Desktop Match details: production implementation; sidebar and H2H
   prototype navigation regression
   ([docs/product/desktop-match-details-todo.md](docs/product/desktop-match-details-todo.md)).

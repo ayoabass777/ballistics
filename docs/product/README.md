@@ -1,5 +1,9 @@
 # Ballistics product memory
 
+2026-11-05 — Beta activity and speed report. Returning to Standouts is now instant (PR #21), and there have been no tester errors since the deploy, though post-fix readings are still few. One tester (A) accounts for most use; only two of six testers have returned since 2 Nov, so retention is now the main problem rather than speed. See [beta activity report](beta-activity-2026-11-05.md).
+
+2026-11-05 — Distribution plan proposed for the two-week international break: learn from wave 1 (retention numbers, 5 interviews, fix top 1–2 friction points), turn wave 1 into referrals and a waitlist, then open wave 2 on the return weekend. X and Reddit are the primary channels. No paid ads until retention is proven. See [distribution plan](distribution-plan.md).
+
 2026-10-22 — The account API source and Saved maintenance scripts have moved into this repository alongside the frontend and research API. The old checkout is retained for rollback while local service and staging deployment checks complete. See [implementation status](implementation-status.md) and the [staging plan](../staging-deployment-plan.md).
 
 2026-10-22 — Ballistics 2.0 frontend source is moving into this repository at [`frontend_dev`](../../frontend_dev). The account API remains in the sibling `football_stats_project` repository. See [implementation status](implementation-status.md) for verification and deployment state.
