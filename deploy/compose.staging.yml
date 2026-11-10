@@ -126,6 +126,21 @@ services:
         condition: service_completed_successfully
     networks: [ballistics]
 
+  # Live scores (docs/live_scores.md): polls API-Football every 15 s while a
+  # tracked fixture is live and writes raw.live_fixture_state / raw.live_events
+  # only. Same image and env as Airflow (API key, DB owner, alert channels).
+  live-poller:
+    <<: *airflow
+    command: python -m etl.src.live_poller
+    environment:
+      <<: *airflow-env
+      CONNECTION_CHECK_MAX_COUNT: "0"   # no Airflow metadata DB needed
+      LIVE_POLL_SECONDS: "15"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [ballistics]
+
   research-api:
     image: ballistics-research-api:${RELEASE:-latest}
     build:

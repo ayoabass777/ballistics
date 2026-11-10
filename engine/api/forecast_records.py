@@ -53,6 +53,7 @@ WITH eligible AS MATERIALIZED (
  SELECT e.*, s.recorded_at
  FROM forecast.entries e JOIN forecast.snapshots s ON s.id=e.snapshot_id
  WHERE e.policy=%(policy)s AND e.eligible AND s.recorded_at <= %(as_of)s
+   AND (%(fixture_id)s::bigint IS NULL OR e.fixture_id = %(fixture_id)s)
 ), selected AS (
  SELECT DISTINCT ON (fixture_id,event_key) * FROM eligible
  ORDER BY fixture_id,event_key,recorded_at DESC,snapshot_id DESC,id DESC
@@ -82,6 +83,7 @@ WITH eligible AS MATERIALIZED (
                      OR strpos(lower(COALESCE(m.fixture->>'away','')),lower(%(team)s)) > 0)
    AND (%(league)s::text IS NULL OR m.fixture->>'league' = %(league)s)
    AND (%(country)s::text IS NULL OR m.fixture->>'country' = %(country)s)
+   AND (%(fixture_id)s::bigint IS NULL OR e.fixture_id = %(fixture_id)s)
 ), matching AS MATERIALIZED (
  SELECT * FROM cohort WHERE status = ANY(%(statuses)s)
 ), page AS (
@@ -108,14 +110,14 @@ SELECT
 
 
 def list_records(cur, *, as_of=None, date_from=None, date_to=None, team="", league=None,
-                 country=None, outcome="all", limit=25, offset=0):
+                 country=None, outcome="all", limit=25, offset=0, fixture_id=None):
     as_of = observation_time(cur, as_of)
     if date_from and date_to and date_from > date_to:
         raise ValueError("date_from must not be after date_to")
     if outcome not in OUTCOMES or not 1 <= limit <= 100 or not 0 <= offset <= 100000:
         raise ValueError("invalid outcome or pagination")
     params = dict(policy=POLICY, as_of=as_of, date_from=date_from, date_to=date_to,
-                  team=team.strip(), league=league, country=country,
+                  team=team.strip(), league=league, country=country, fixture_id=fixture_id,
                   statuses=OUTCOMES[outcome], limit=limit, offset=offset)
     cur.execute(LIST_QUERY, params)
     result = dict(cur.fetchone())
