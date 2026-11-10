@@ -323,7 +323,7 @@ def _groups(rows):
     for r in rows:
         g = groups.setdefault(r["group_name"], {"group_name": r["group_name"],
                                                 "group_order": r["group_order"], "rows": []})
-        g["rows"].append({**{k: r[k] for k in ("rank", "team_id", "team_name", "games_played",
+        g["rows"].append({**{k: r.get(k) for k in ("rank", "team_id", "team_name", "games_played",
                                                "wins", "draws", "losses", "goals_for", "goals_against", "goal_diff", "points", "form", "description")},
                           "stale": bool(r.get("is_stale_row"))})
     for g in groups.values():
