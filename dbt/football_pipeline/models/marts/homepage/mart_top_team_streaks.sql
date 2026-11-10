@@ -43,6 +43,7 @@ current_streaks AS (
 SELECT
   ROW_NUMBER() OVER (ORDER BY team_id, league_season_id, event_name, streak_type) as streak_id,
   team_id,
+  league_season_id,
   league_name,
   team_name,
   next_opponent_name,
