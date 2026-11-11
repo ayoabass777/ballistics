@@ -106,14 +106,7 @@ export function DiscoverPage({ all = false, matches = false, liveMatches = false
         el.scrollBy({ left: direction * ((el.firstElementChild as HTMLElement)?.offsetWidth + 16 || el.clientWidth), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); }
     function change(key: string, value: string) {
         const next = new URLSearchParams(query); value ? next.set(key, value) : next.delete(key);
-        // Refilter at the current controls, rather than jumping back above Standouts.
-        if (key.endsWith('_filter') || key.endsWith('_sort') || key === 'finding' || key === 'group') {
-            const positionParams = new URLSearchParams(next);
-            if (!all && !matches) positionParams.set('category', category);
-            positionParams.delete('q');
-            positionParams.sort();
-            try { sessionStorage.setItem(`ballistics:list:${path}?${positionParams}`, JSON.stringify({ count: 12, y: window.scrollY, height: window.scrollY + window.innerHeight })); } catch { /* Optional position memory. */ }
-        }
+        // useListPosition keeps the scroll position when a control changes the list.
         router.replace(`${path}?${next}`, { scroll: false });
     }
     const scopeText = scope === 'week' ? 'Next 7 days' : scope === 'today' ? 'Today' : scope === 'tomorrow' ? 'Tomorrow' : scope === 'range' ? `${search.get('day') || 'Start'} to ${search.get('end_day') || 'end'}` : search.get('day') || 'Choose a date';
