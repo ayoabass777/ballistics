@@ -34,6 +34,11 @@ export function MatchesControls({ data, zone, follows, leagueRows = false }: { l
         d.setUTCDate(d.getUTCDate() + offset);
         update({ scope: 'date', day: d.toISOString().slice(0, 10), end_day: '' });
     }
+    const dateWindow = [-2, -1, 0, 1, 2].map(offset => {
+        const date = new Date(`${day}T12:00:00Z`);
+        date.setUTCDate(date.getUTCDate() + offset);
+        return date.toISOString().slice(0, 10);
+    });
     const groups = new Map<string, Discover['leagues']>();
     for (const league of data?.leagues || []) {
         if (!`${league.league} ${league.country || ''}`.toLocaleLowerCase().includes(term.trim().toLocaleLowerCase())) continue;
@@ -41,12 +46,28 @@ export function MatchesControls({ data, zone, follows, leagueRows = false }: { l
         groups.set(country, [...(groups.get(country) || []), league]);
     }
     return <>
-        <h1>Matches</h1><p className={s.caption}>{leagueRows ? 'Upcoming fixtures covered by Ballistics research.' : 'Browse upcoming matches by date and league.'}</p>
+        <h1>Matches</h1><p className={s.caption}>{leagueRows ? 'Fixtures and results by date and league.' : 'Browse upcoming matches by date and league.'}</p>
         {leagueRows && <TeamSearch className={s.leagueSearch} clearable/>}
-        <div className={s.dateTabs} aria-label="Match dates">{[['week', 'Next 7 days'], ['today', 'Today'], ['tomorrow', 'Tomorrow'], ['range', leagueRows ? 'Calendar' : 'Date range']].map(([key, label]) => <Button key={key} className={scope === key || (key === 'range' && scope === 'date') ? s.active : ''} aria-pressed={scope === key || (key === 'range' && scope === 'date')} onClick={() => { if (key === 'range') { setRangeStart(search.get('day') || localDay()); setRangeEnd(search.get('end_day') || dayInZone(zone || 'UTC', 6)); setRangeOpen(true); } else { setRangeOpen(false); update({ scope: key, day: '', end_day: '' }); } }}>{label}</Button>)}</div>
+        {leagueRows && <div className={s.matchDayStrip} aria-label="Match dates">
+            <Button aria-label="Previous day" onClick={() => moveDay(-1)}>←</Button>
+            <div className={s.matchDayWindow}>
+                {dateWindow.map(value => <Button key={value} aria-pressed={scope !== 'week' && scope !== 'range' && day === value} className={scope !== 'week' && scope !== 'range' && day === value ? s.active : ''} onClick={() => update({ scope: 'date', day: value, end_day: '' })}>
+                    <span>{value === localDay() ? 'Today' : new Date(`${value}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' })}</span>
+                    <small>{new Date(`${value}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })}</small>
+                </Button>)}
+            </div>
+            <Button aria-label="Next day" onClick={() => moveDay(1)}>→</Button>
+        </div>}
+        {!leagueRows && <div className={s.dateTabs} aria-label="Match dates">{[['week', 'Next 7 days'], ['today', 'Today'], ['tomorrow', 'Tomorrow'], ['range', leagueRows ? 'Calendar' : 'Date range']].map(([key, label]) => <Button key={key} className={scope === key || (key === 'range' && scope === 'date') ? s.active : ''} aria-pressed={scope === key || (key === 'range' && scope === 'date')} onClick={() => { if (key === 'range') { setRangeStart(search.get('day') || localDay()); setRangeEnd(search.get('end_day') || dayInZone(zone || 'UTC', 6)); setRangeOpen(true); } else { setRangeOpen(false); update({ scope: key, day: '', end_day: '' }); } }}>{label}</Button>)}</div>}
+        {leagueRows && <div className={s.matchDateRow}>
+            <label>Choose date<input aria-label="Choose match date" type="date" value={day} onChange={e => { if (e.target.value) update({ scope: 'date', day: e.target.value, end_day: '' }); }}/></label>
+            <Button onClick={() => update({ scope: 'today', day: '', end_day: '' })}>Today</Button>
+            <Button aria-pressed={scope === 'week'} onClick={() => update({ scope: 'week', day: '', end_day: '' })}>Next 7 days</Button>
+            <Button aria-expanded={rangeOpen} onClick={() => setRangeOpen(!rangeOpen)}>Date range</Button>
+        </div>}
         {rangeOpen && <div className={s.matchDateRow}><label>From<input type="date" value={rangeStart} onChange={e => setRangeStart(e.target.value)}/></label><label>To<input type="date" value={rangeEnd} min={rangeStart} onChange={e => setRangeEnd(e.target.value)}/></label><Button onClick={() => setRangeOpen(false)}>Cancel</Button><Button className={s.active} disabled={!validRange} onClick={() => { update({ scope: 'range', day: rangeStart, end_day: rangeEnd }); setRangeOpen(false); }}>Apply</Button>{!validRange && <span role="alert">End date must be on or after start date.</span>}</div>}
         {!leagueRows && (scope === 'today' || scope === 'tomorrow' || scope === 'date') && <div className={s.matchDateRow}><Button aria-label="Previous day" onClick={() => moveDay(-1)}>←</Button><label>Match date<input aria-label="Match date" type="date" value={day} onChange={e => { if (e.target.value) update({ scope: 'date', day: e.target.value, end_day: '' }); }}/></label><Button aria-label="Next day" onClick={() => moveDay(1)}>→</Button></div>}
-        <p className={s.caption}>{windowText || (scope === 'week' ? 'Next 7 days' : scope === 'range' ? `${search.get('day')} to ${search.get('end_day')}` : new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}))} · {zone || 'Detecting timezone…'}</p>
+        <p className={s.caption}>{((scope === 'week' || scope === 'range') && windowText) || (scope === 'week' ? 'Next 7 days' : scope === 'range' ? `${search.get('day')} to ${search.get('end_day')}` : new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', {weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}))} · {zone || 'Detecting timezone…'}</p>
         {!leagueRows && <TeamSearch className={s.leagueSearch}/>}
         <div className={s.row}><Button aria-expanded={open} aria-controls="matches-leagues" onClick={() => { if (open) setOpen(false); else { setDraft(selected); setTerm(''); setOpen(true); } }}>{selected.length ? `${selected.length} ${selected.length === 1 ? 'league' : 'leagues'} selected` : 'All leagues'} · {open ? 'Close' : 'Choose leagues'}</Button>{follows.signedIn && follows.ready && !follows.error && follows.ids.length > 0 && <Button disabled={!follows.ready} onClick={() => update({ leagues: follows.ids.join(',') })}>Your leagues · {follows.ids.length}</Button>}{follows.signedIn && follows.ready && !follows.error && !follows.ids.length && <Link className={s.link} href="/settings">Set your leagues →</Link>}{selected.length > 0 && <Button onClick={() => { update({leagues:''}); setDraft([]); }}>Clear leagues</Button>}</div>
         {open && <section id="matches-leagues" className={s.leaguePicker} aria-label="Choose leagues"><label className={s.leagueSearch}>Search leagues or countries<input type="search" value={term} onChange={e => setTerm(e.target.value)} placeholder="League or country" /></label><div className={s.leagueOptions}>{[...groups].map(([country, leagues]) => <details key={`${country}:${Boolean(term)}`} open={term ? true : undefined}><summary>{country} <span className={s.caption}>{leagues.filter(l => draft.includes(String(l.league_id))).length || ''}</span></summary>{leagues.map(l => <label key={l.league_id}><input type="checkbox" checked={draft.includes(String(l.league_id))} onChange={e => setDraft(current => e.target.checked ? [...current, String(l.league_id)] : current.filter(id => id !== String(l.league_id)))}/><Crest name={l.league} url={l.league_logo_url} league/>{l.league}</label>)}</details>)}{!groups.size && <p>{data ? 'No leagues match your search.' : 'Loading leagues…'}</p>}</div><div className={s.leaguePickerActions}><span className={s.caption}>{draft.length ? `${draft.length} selected` : 'All leagues'}</span><Button onClick={() => setDraft([])}>Clear</Button><Button onClick={() => setOpen(false)}>Cancel</Button><Button className={s.active} onClick={() => { update({ leagues: draft.join(',') }); setOpen(false); }}>Apply</Button></div></section>}
