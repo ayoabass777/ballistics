@@ -11,6 +11,8 @@ from pathlib import Path
 ENGINE = Path("engine")
 VIEWS = Path("dbt/football_pipeline/models/facts")
 FULL_H2H_ALLOWED = {"engine/api/match_context.py"}
+# Display APIs that list every played fixture, cup games included. Not modelling.
+FULL_FIXTURES_ALLOWED = FULL_H2H_ALLOWED | {"engine/api/results.py"}
 
 
 def _sources():
@@ -35,7 +37,7 @@ def test_full_fixtures_only_for_id_lookups():
     for p, src in _sources():
         for m in re.finditer(r"FROM raw\.fact_fixtures\b(?P<rest>[^\"]{0,200})", src):
             rest = m.group("rest")
-            if p in FULL_H2H_ALLOWED:
+            if p in FULL_FIXTURES_ALLOWED:
                 continue
             assert "fixture_id = ANY" in rest or "fixture_id = %(fixture_id)s" in rest \
                 or "is_played AND league_name" in rest \

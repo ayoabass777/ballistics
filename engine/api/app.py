@@ -7,6 +7,7 @@ from fastapi import FastAPI, HTTPException, Query, Response
 import psycopg2
 
 from engine.api import forecast_records as records
+from engine.api import live
 from engine.api import match_context
 from engine.api import match_detail
 
@@ -28,7 +29,7 @@ def read(operation, response, **kwargs):
 
 
 @app.get("/api/forecast-record")
-def forecast_record(response: Response, date_from: date | None = None, date_to: date | None = None,
+def forecast_record(response: Response, fixture_id: int | None = Query(None, ge=1), date_from: date | None = None, date_to: date | None = None,
                     team: str = Query("", max_length=100),
                     league: str | None = Query(None, max_length=150),
                     country: str | None = Query(None, max_length=100),
@@ -36,7 +37,7 @@ def forecast_record(response: Response, date_from: date | None = None, date_to: 
                                      "unavailable","excluded"] = "all",
                     limit: int = Query(25, ge=1, le=100),
                     offset: int = Query(0, ge=0, le=100000), as_of: datetime | None = None):
-    return read(records.list_records, response, date_from=date_from,date_to=date_to,team=team,
+    return read(records.list_records, response, fixture_id=fixture_id, date_from=date_from,date_to=date_to,team=team,
                 league=league,country=country,outcome=outcome,limit=limit,offset=offset,as_of=as_of)
 
 
@@ -79,6 +80,27 @@ def match_view(response: Response, fixture_id: int):
     return result
 
 
+@app.get("/api/live")
+def live_view(response: Response):
+    """Live and just-finished tracked fixtures (docs/live_scores.md)."""
+    return read(live.live_list, response)
+
+
+@app.get("/api/live/{fixture_id}")
+def live_fixture_view(response: Response, fixture_id: int):
+    """One fixture's live score and events; state is null before it is seen live."""
+    if fixture_id < 1:
+        raise HTTPException(422, "fixture_id must be positive")
+    return read(live.live_fixture, response, fixture_id=fixture_id)
+
+
+@app.get("/api/results")
+def results_view(response: Response, zone: str = Query("UTC", max_length=100), day: date | None = None):
+    """One local day of played games, newest day with results by default."""
+    from engine.api.results import results
+    return read(results, response, zone=zone, day=day)
+
+
 @app.get("/api/discover")
 def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
                   scope: Literal["week", "today", "tomorrow", "date", "range"] = "week",
@@ -95,3 +117,10 @@ def discover_view(response: Response, zone: str = Query("UTC", max_length=100),
     # Cached, already-encoded JSON: skips re-querying and re-encoding ~1 MB per request.
     body = read(discover_json, response, zone=zone, scope=scope, day=day, end_day=end_day, leagues=ids)
     return Response(content=body, media_type="application/json", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/api/fixtures")
+def fixtures_view(response: Response, date_from: date, date_to: date,
+                  zone: str = Query("UTC", max_length=100)):
+    from engine.api.results import fixtures
+    return read(fixtures, response, zone=zone, date_from=date_from, date_to=date_to)

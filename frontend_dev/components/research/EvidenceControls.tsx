@@ -31,6 +31,6 @@ export function EvidenceFilter({ label, allLabel, options, value, onChange, tota
         </dialog>
     </div>;
 }
-export function EvidenceSort({ kind, value, onChange }: { kind: 'goals' | 'patterns'; value: string; onChange: (value: string) => void }) {
-    return <label className={s.sort}>Sort <select aria-label={`Sort ${kind === 'goals' ? 'Goals outlook' : 'Team patterns'}`} value={value === 'highest' ? 'highest' : ''} onChange={e => onChange(e.target.value)}><option value="">Recommended</option><option value="highest">{kind === 'goals' ? 'Highest % first' : 'Highest hit rate first'}</option></select></label>;
+export function EvidenceSort({ kind, value, onChange, soonest = false }: { soonest?: boolean; kind: 'strength' | 'goals' | 'patterns'; value: string; onChange: (value: string) => void }) {
+    return <label className={s.sort}>Sort <select aria-label={`Sort ${kind === 'strength' ? 'Team strength' : kind === 'goals' ? 'Goals outlook' : 'Team patterns'}`} value={value === 'highest' || (soonest && value === 'soonest') ? value : ''} onChange={e => onChange(e.target.value)}><option value="">Recommended</option>{kind !== 'strength' && <option value="highest">{kind === 'goals' ? 'Highest % first' : 'Highest hit rate first'}</option>}{soonest && <option value="soonest">Soonest kickoff</option>}</select></label>;
 }

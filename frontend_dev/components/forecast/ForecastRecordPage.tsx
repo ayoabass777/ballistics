@@ -72,8 +72,8 @@ function CorrectionHistory({ forecast, asOf, zone }: { forecast: Forecast; asOf:
   </div>
 }
 
-function FixtureRow({ fixture, asOf, zone }: { fixture: Fixture; asOf: string; zone: string }) {
-  const [open, setOpen] = useState(false)
+export function FixtureRow({ fixture, asOf, zone, initiallyOpen = false }: { fixture: Fixture; asOf: string; zone: string; initiallyOpen?: boolean }) {
+  const [open, setOpen] = useState(initiallyOpen)
   const settled = fixture.forecasts.filter(f => f.status === "hit" || f.status === "miss").length
   const pending = fixture.forecasts.filter(f => f.status === "pending").length
   const other = fixture.forecasts.length - settled - pending

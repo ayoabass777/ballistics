@@ -7,7 +7,7 @@ import s from './ProductHeader.module.css';
 
 export function ProductHeader({ publicPage = false }: { publicPage?: boolean }) {
   return <header className={s.header}><div className={s.inner}>
-    <Link href={publicPage ? '/welcome' : '/discover'} className={s.brand} aria-label="Ballistics home"><span aria-hidden="true">b.</span>ballistics</Link>
+    <Link href={publicPage ? '/welcome' : '/beta-home'} className={s.brand} aria-label="Ballistics home"><span aria-hidden="true">b.</span>ballistics</Link>
     <p className={s.tagline}>FOOTBALL, WITH CONTEXT</p>
     <nav className={s.actions} aria-label="Account">
       <SignedIn>

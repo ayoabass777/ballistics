@@ -1,5 +1,6 @@
 'use client';
 
+import { betaHome } from '@/lib/beta-navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
@@ -8,7 +9,7 @@ import { ProductHeader } from '@/components/account/ProductHeader';
 import s from './welcome.module.css';
 
 export default function WelcomePage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [signedOut, setSignedOut] = useState(false);
   const [code, setCode] = useState('');
   const [email, setEmail] = useState('');
@@ -51,7 +52,7 @@ export default function WelcomePage() {
       <h1>See the match.<br/>Understand the context.</h1>
       <p className={s.intro}>Explore team strength, goal outlooks and patterns, with the evidence behind each insight.</p>
       <div className={s.actions}>
-        <SignedIn><Link className={s.primary} href="/discover">Go to Discover →</Link></SignedIn>
+        <SignedIn><Link className={s.primary} href={betaHome(user?.publicMetadata)}>Go to {betaHome(user?.publicMetadata) === '/matches' ? 'Matches' : 'Discover'} →</Link></SignedIn>
       </div>
       <SignedOut>
         <section className={s.invite} aria-labelledby="invite-title">

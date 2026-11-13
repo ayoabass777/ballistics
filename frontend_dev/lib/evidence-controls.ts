@@ -59,3 +59,22 @@ export function filterMatches(matches: Card[], evidence: Card[], key: string): C
     const picks = new Map(evidence.filter(card => finding(card)?.key === key).map(card => [card.fixture_id, card.pick]));
     return matches.filter(card => picks.has(card.fixture_id)).map(card => ({ ...card, preview: picks.get(card.fixture_id)! }));
 }
+
+/** Keep each category's API ranking, with one distinct fixture per category first. */
+export function variedStandouts(lists: Discover['lists'], teamQuery = ''): Card[] {
+    const matchesTeam = (card: Card) => !teamQuery || `${card.home} ${card.away}`.toLocaleLowerCase().includes(teamQuery);
+    const selected: Card[] = [];
+    const ids = new Set<number>();
+    const add = (card: Card) => {
+        if (matchesTeam(card) && !ids.has(card.fixture_id)) {
+            selected.push(card);
+            ids.add(card.fixture_id);
+        }
+    };
+    for (const category of [lists.strength, lists.goals, lists.patterns]) {
+        const first = category.find(card => card.pick && matchesTeam(card) && !ids.has(card.fixture_id));
+        if (first) add(first);
+    }
+    for (const card of lists.standouts) add(card);
+    return selected;
+}

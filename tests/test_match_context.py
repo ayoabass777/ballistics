@@ -170,6 +170,39 @@ class BuildTests(unittest.TestCase):
         self.assertFalse(p["table"]["available"])
         self.assertEqual(p["table"]["groups"], [])
 
+    @staticmethod
+    def split(team_id, group, order, current, fmt="split"):
+        return dict(row(team_id, 1, 10, group, order, current, n_groups=3), standings_format=fmt)
+
+    def groups_shown(self, rows, home=1, away=2):
+        fx = dict(self.FX, home_team_id=home, away_team_id=away)
+        p = mc.build_context(FakeCursor([fx, rows, []]), 90863)
+        return [g["group_name"] for g in p["table"]["groups"]]
+
+    def test_only_the_current_phase_table_is_shown(self):
+        # Argentina: Apertura is over, Clausura is on; an annual table spans both zones.
+        rows = [self.split(t, g, o, cur) for t in (1, 2, 3) for g, o, cur in (
+                    ("Apertura - Group A", 0, False), ("Clausura - Group A", 2, True),
+                    ("Annual table", 4, False))]
+        rows += [self.split(4, "Apertura - Group B", 1, False), self.split(4, "Clausura - Group B", 3, True),
+                 self.split(4, "Annual table", 4, False)]
+        self.assertEqual(self.groups_shown(rows), ["Clausura - Group A"])
+
+    def test_teams_in_different_tables_each_get_theirs(self):
+        # MLS conferences, or a championship v relegation round after the split.
+        rows = [self.split(1, "Western Conference", 0, True, "conferences"),
+                self.split(2, "Eastern Conference", 1, True, "conferences"),
+                self.split(3, "Eastern Conference", 1, True, "conferences")]
+        self.assertEqual(self.groups_shown(rows), ["Western Conference", "Eastern Conference"])
+        rows = [self.split(1, "Pro League", 2, False), self.split(1, "Championship Round", 0, True),
+                self.split(2, "Pro League", 2, False), self.split(2, "Relegation Round", 1, True)]
+        self.assertEqual(self.groups_shown(rows), ["Championship Round", "Relegation Round"])
+
+    def test_teams_missing_from_standings_see_the_current_tables(self):
+        rows = [self.split(3, "Apertura - Group A", 0, False), self.split(3, "Clausura - Group A", 2, True),
+                self.split(4, "Apertura - Group B", 1, False), self.split(4, "Clausura - Group B", 3, True)]
+        self.assertEqual(self.groups_shown(rows, home=8, away=9), ["Clausura - Group A", "Clausura - Group B"])
+
     def test_recent_results_use_each_team_perspective(self):
         game = {"fixture_id": 99, "kickoff_utc": datetime(2026, 10, 1, tzinfo=timezone.utc),
                 "league_name": "Czech Liga", "home_team_id": 2, "away_team_id": 1,
