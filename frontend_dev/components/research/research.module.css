@@ -291,3 +291,6 @@
 .iconSearch > svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
 .iconSearch > input { width:100%; padding-left:38px; }
 .liveDot { color:#b53b32; flex-shrink:0; }
+
+.page .button:has(> svg) { gap:6px; }
+.page .button > svg { flex-shrink:0; }
