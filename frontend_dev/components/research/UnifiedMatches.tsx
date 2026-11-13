@@ -1,5 +1,8 @@
 'use client';
 import { Bookmark, ChevronDown, Circle } from 'lucide-react';
+import { useState } from 'react';
+import { MatchesControls } from './MatchesControls';
+import { useFollowedLeagues } from './useFollowedLeagues';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { type Discover, headline } from '@/lib/research';
@@ -16,13 +19,14 @@ import l from './live.module.css';
 // Country is part of the key because several leagues share a name.
 const priorityLeagues = ['England:Premier League', 'Spain:La Liga', 'Italy:Serie A', 'Germany:Bundesliga', 'France:Ligue 1'];
 
-export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: { zone: string; leagues: string[]; team: string; data: Discover | null; followedLeagues: number[] }) {
+export function UnifiedMatches({ zone, leagues, team, data, followedLeagues, follows }: { follows: ReturnType<typeof useFollowedLeagues>; zone: string; leagues: string[]; team: string; data: Discover | null; followedLeagues: number[] }) {
     const search = useSearchParams(), router = useRouter(), path = usePathname();
     const scope = search.get('scope') || 'today';
     const today = dayInZone(zone);
     const start = scope === 'date' || scope === 'range' ? search.get('day') || today : dayInZone(zone, scope === 'tomorrow' ? 1 : 0);
     const end = scope === 'range' ? search.get('end_day') || start : scope === 'week' ? dayInZone(zone, 6) : start;
     const saved = useSaved();
+    const [filtersOpen, setFiltersOpen] = useState(false);
     const cards = data?.matches || [];
     const cardsById = new Map(cards.map(card => [card.fixture_id, card]));
     const findings = matchEvidence(data, cards);
@@ -69,24 +73,21 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: {
         groups.get(key)!.push(m);
     }
     const returnTo = `${path}?${search}`;
-    return <section className={`${s.section} ${l.live}`} aria-label="Fixtures">
-        <div className={s.segment} role="group" aria-label="Fixture status">
-            {[['all', 'All'], ['live', 'Live']].map(([value, label]) => <Button key={value} aria-pressed={onlyLive === (value === 'live')} className={onlyLive === (value === 'live') ? s.active : ''} onClick={() => {
-                const next = new URLSearchParams(search.toString());
-                if (value === 'live') next.set('status', 'live'); else next.delete('status');
-                router.replace(`${path}?${next}`, { scroll: false });
-            }}>{value === 'live' && <Circle size={8} fill="currentColor" className={s.liveDot} aria-hidden="true"/>}{label}</Button>)}
-        </div>
+    return <>
+        <div className={s.controls}><MatchesControls leagueRows data={data} zone={zone} follows={follows} secondaryFilters={<Button aria-expanded={filtersOpen} aria-controls="match-extra-filters" onClick={() => setFiltersOpen(!filtersOpen)}>Filters{finding ? ' · 1' : ''}</Button>}/></div>
+        <section className={`${s.section} ${l.live}`} aria-label="Fixtures">
+        {filtersOpen && <div id="match-extra-filters" className={s.leaguePicker}>
         <EvidenceFilter label="Finding" allLabel="All findings" options={evidenceOptions(findings)} value={finding} total={merged.size} onChange={value => {
             const next = new URLSearchParams(search.toString());
             if (value) next.set('finding', value); else next.delete('finding');
             router.replace(`${path}?${next}`, { scroll: false });
         }}/>
+        </div>}
         <ResourceState busy={fixtures.busy} error={fixtures.error} retry={fixtures.retry}/>
         {live.failed && <p role="status">Live updates are temporarily unavailable. Retrying.</p>}
         <h2 aria-live="polite">{shown.length} {onlyLive ? 'live matches' : 'fixtures'}</h2>
         {[...days].map(([day, groups]) => <div key={day} className={l.block}>
-            <h3>{day}</h3>
+            {start !== end && <h3>{new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'})}</h3>}
             {[...groups].map(([key, matches]) => <details key={key} className={l.league} open>
                 <summary className={l.leagueToggle}><span className={s.competition}><Crest name={matches[0].league} url={matches[0].league_logo_url} league/><span>{matches[0].country} · {matches[0].league}</span></span><span className={l.fixtureCount}>{matches.length}</span><ChevronDown size={16} className={l.leagueChevron} aria-hidden="true"/></summary>
                 <ul>{matches.map(m => {
@@ -107,5 +108,5 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: {
         </div>)}
         {!fixtures.busy && !fixtures.error && !shown.length && <p className={s.empty}>{onlyLive ? 'No live matches for these dates, leagues and team search.' : 'No fixtures for these dates, leagues and team search.'}</p>}
         <Toast message={saved.message}/>
-    </section>;
+    </section></>;
 }
