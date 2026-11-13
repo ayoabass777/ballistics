@@ -54,3 +54,13 @@
 .fixtureCount { font-variant-numeric:tabular-nums; font-weight:400; }
 .leagueChevron { transform:rotate(-90deg); }
 .league[open] > .leagueToggle .leagueChevron { transform:rotate(0); }
+
+/* Keep Save beside the fixture, not on a separate row. */
+.fixtureItem { display:grid; grid-template-columns:minmax(0,1fr) 44px; padding-right:6px; }
+.fixtureItem > .liveRow { grid-column:1; grid-row:1; }
+.fixtureItem .saveBookmark { grid-column:2; grid-row:1; align-self:center; width:44px; height:44px; min-height:44px; padding:0; border:0; background:transparent; color:var(--muted); }
+.fixtureItem .saveBookmark[aria-pressed="true"] { color:var(--green); }
+.fixtureItem .saveBookmark:hover { background:#eff4eb; }
+.fixtureItem .saveBookmark:focus-visible { outline:2px solid var(--green); outline-offset:-3px; }
+.fixtureItem .fixtureEvidence { grid-column:1 / -1; margin:0; padding:0 14px 10px 90px; font-size:12px; }
+@media(max-width:700px) { .fixtureItem .fixtureEvidence { padding-left:72px; } }

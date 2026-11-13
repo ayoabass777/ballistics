@@ -94,13 +94,13 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: {
                     const state = liveById.get(m.fixture_id);
                     const time = new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit' }).format(new Date(m.kickoff));
                     const label = state ? clockLabel(state) : ['NS', 'TBD'].includes(m.status) ? time : m.status;
-                    return <li key={m.fixture_id}><Link className={l.liveRow} href={`/match/${m.fixture_id}?returnTo=${encodeURIComponent(returnTo)}`}>
+                    return <li key={m.fixture_id} className={l.fixtureItem}><Link className={l.liveRow} href={`/match/${m.fixture_id}?returnTo=${encodeURIComponent(returnTo)}`}>
                         <span className={l.clock}>{label}</span>
                         <span className={l.teams}><span className={l.team}><Crest name={m.home} url={m.home_crest_url}/>{m.home}</span><span className={l.team}><Crest name={m.away} url={m.away_crest_url}/>{m.away}</span></span>
                         {!['NS', 'TBD'].includes(m.status) && <strong className={l.score}><span>{m.home_goals ?? '–'}</span><span>{m.away_goals ?? '–'}</span></strong>}
                     </Link>
-                    {card?.preview && <p className={s.caption}>{headline({ ...card, pick: card.preview })}</p>}
-                    {card && <Button aria-pressed={saved.isSaved(m.fixture_id)} onClick={() => saved.toggle(card, data?.run_ds || null)}><Bookmark size={16} fill={saved.isSaved(m.fixture_id) ? 'currentColor' : 'none'} aria-hidden="true"/>{saved.isSaved(m.fixture_id) ? 'Saved' : 'Save fixture'}</Button>}
+                    {card?.preview && <p className={`${s.caption} ${l.fixtureEvidence}`}>{headline({ ...card, pick: card.preview })}</p>}
+                    {card && <Button className={l.saveBookmark} aria-label={`${saved.isSaved(m.fixture_id) ? 'Unsave' : 'Save'} ${m.home} vs ${m.away}`} title={saved.isSaved(m.fixture_id) ? 'Remove from Saved' : 'Save fixture'} aria-pressed={saved.isSaved(m.fixture_id)} onClick={() => saved.toggle(card, data?.run_ds || null)}><Bookmark size={19} fill={saved.isSaved(m.fixture_id) ? 'currentColor' : 'none'} aria-hidden="true"/></Button>}
                     </li>;
                 })}</ul>
             </details>)}
