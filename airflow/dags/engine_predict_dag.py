@@ -5,19 +5,20 @@ Each model runs as an independent DockerOperator task (ballistics-engine image),
 writing its picks to raw.model_picks and a readiness marker to raw.model_runs.
 Bayesian additionally persists its full fixture-analysis audit to
 raw.model_analysis; consensus picks remain filtered in raw.model_picks.
-A reschedule-mode quorum sensor gates consensus: it fires when >= QUORUM models
-are ready, OR all four have finished, OR a grace window has passed since the first
-finished — so a slow/failed model never blocks the feed. Consensus then builds
-from raw.model_picks (--from-picks) and writes raw.consensus_pool + the JSON feed.
+A reschedule-mode quorum sensor gates consensus. It starts alongside the
+models (it is not downstream of them, so a failed model can't skip it) and
+opens when every model has finished without an error, or when QUORUM models
+are ready and GRACE has passed since the first finished — so a slow or failed
+model costs at most the grace window (engine.eval.picks_store.gate_open).
+Consensus then builds from raw.model_picks (--from-picks) and writes
+raw.consensus_pool + the JSON feed.
 
 Task graph:
     wait_for_dbt_refresh
-            ├──► refresh_elo ──► mismatch
-            └──► [bayesian] [dixon_coles]
-                                  wait_for_quorum  ──►  consensus
-                                                            │
-                                                            ▼
-                                                  verify_daily_shortlists
+            ├──► refresh_elo ──► mismatch        (models write raw.model_runs)
+            ├──► [bayesian] [dixon_coles]
+            └──► wait_for_quorum ──► consensus ──► verify_daily_shortlists
+                 (polls raw.model_runs)
 See docs/engine_orchestration.md.
 """
 
@@ -39,8 +40,8 @@ from etl.src.data_detector import (
 
 # Poisson GLM retired 2026-10-11 (not used by the product; slips retired).
 MODELS = ("mismatch", "bayesian", "dixon_coles")
-QUORUM = 2                          # proceed once this many models are ready
-GRACE = timedelta(minutes=30)       # ...or this long after the first finishes
+QUORUM = 2                          # without all models, need this many ready
+GRACE = timedelta(minutes=30)       # ...this long after the first finishes
 DAYS_AHEAD = int(os.getenv("ENGINE_PREDICT_DAYS", "10"))
 
 PROJECT_ROOT = os.getenv("PROJECT_ROOT")
@@ -132,15 +133,16 @@ def engine_predict_dag():
         for m in MODELS
     }
 
-    @task.sensor(task_id="wait_for_quorum", poke_interval=60, timeout=60 * 60,
+    # Models usually finish 10-15 minutes after dbt; the timeout leaves room
+    # for Elo, the grace window and a model retry. Timing out fails the gate,
+    # so consensus is skipped and the failure alert fires.
+    @task.sensor(task_id="wait_for_quorum", poke_interval=60, timeout=90 * 60,
                  mode="reschedule")
     def wait_for_quorum(**ctx) -> PokeReturnValue:
         # Native task (engine/ is mounted into Airflow; needs only psycopg2).
-        from engine.eval.picks_store import quorum_state
+        from engine.eval.picks_store import gate_open, quorum_state
         st = quorum_state(ctx["ds"])
-        done = len(st["ready"]) >= QUORUM or st["n_finished"] >= len(MODELS)
-        if not done and st["first_finished"] is not None:
-            done = datetime.now(timezone.utc) - st["first_finished"] >= GRACE
+        done = gate_open(st, len(MODELS), QUORUM, GRACE, datetime.now(timezone.utc))
         return PokeReturnValue(is_done=done, xcom_value=st["ready"])
 
     consensus = DockerOperator(
@@ -175,7 +177,10 @@ def engine_predict_dag():
         model_tasks["dixon_coles"],
     ]
     wait_for_dbt_refresh >> refresh_elo >> model_tasks["mismatch"]
-    list(model_tasks.values()) >> gate >> consensus >> verify_daily_shortlists
+    # The gate is not downstream of the models: with the default all_success
+    # rule a failed model would mark it upstream_failed and skip consensus.
+    # It reads the models' raw.model_runs markers instead.
+    wait_for_dbt_refresh >> gate >> consensus >> verify_daily_shortlists
 
 
 engine_predict_dag()
