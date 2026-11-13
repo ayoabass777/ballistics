@@ -12,7 +12,7 @@ function read(key: string): Position {
     return { count: BATCH, y: 0, height: 0 };
 }
 /** Restore only after async cards and their expanded height are rendered. */
-export function useListPosition(url: string, ready: boolean) {
+export function useListPosition(url: string, ready: boolean, enabled = true) {
     const key = `ballistics:list:${url}`;
     const [state, setState] = useState({ key: '', count: BATCH, y: 0, height: 0 });
     const restored = useRef(false);
@@ -26,13 +26,15 @@ export function useListPosition(url: string, ready: boolean) {
     const [restorationDone, setRestorationDone] = useState(false);
     const count = state.key === key ? state.count : BATCH;
     useEffect(() => {
+        if (!enabled) return;
         const track = () => { lastY.current = window.scrollY; };
         track();
         window.addEventListener('scroll', track, { passive: true });
         document.addEventListener('click', track, true);
         return () => { window.removeEventListener('scroll', track); document.removeEventListener('click', track, true); };
-    }, []);
+    }, [enabled]);
     useLayoutEffect(() => {
+        if (!enabled) return;
         // Next's history restoration can run after the cards render and undo
         // our saved position on browser Back. Keep list restoration authoritative.
         window.history.scrollRestoration = 'manual';
@@ -46,13 +48,13 @@ export function useListPosition(url: string, ready: boolean) {
         previousKey.current = key;
         const here = { count: BATCH, y: lastY.current, height: lastY.current + window.innerHeight };
         setState({ key, ...(inPage ? here : read(key)) });
-    }, [key]);
+    }, [key, enabled]);
     useEffect(() => {
-        if (ready || state.key !== key || !state.y) return;
+        if (!enabled || ready || state.key !== key || !state.y) return;
         window.scrollTo({ top: state.y, behavior: 'instant' });
-    }, [key, ready, state.key, state.y, state.height]);
+    }, [key, ready, state.key, state.y, state.height, enabled]);
     useEffect(() => {
-        if (!ready || state.key !== key) return;
+        if (!enabled || !ready || state.key !== key) return;
         let frame = 0;
         let quietTimer: ReturnType<typeof setTimeout> | undefined;
         let deadline: ReturnType<typeof setTimeout> | undefined;
@@ -120,7 +122,7 @@ export function useListPosition(url: string, ready: boolean) {
             window.removeEventListener('pagehide', save);
             document.removeEventListener('click', beforeNavigate, true);
         };
-    }, [key, ready, state.key, count]);
+    }, [key, ready, state.key, count, enabled]);
     return { count, restoringHeight: state.key === key && !restorationDone ? state.height : 0, more: () => {
         const next = count + BATCH;
         const position = { key, count: next, y: window.scrollY, height: window.scrollY + window.innerHeight };

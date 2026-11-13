@@ -92,7 +92,7 @@ export function DiscoverPage({ all = false, matches = false, liveMatches = false
     // The team search narrows the same list, so it keeps the list's position.
     const positionKey = new URLSearchParams(positionQuery);
     positionKey.delete('q');
-    const position = useListPosition(`${path}?${positionKey}`, !!data);
+    const position = useListPosition(`${path}?${positionKey}`, !!data, !(liveMatches && matches));
     const saved = useSaved();
     const follows = useFollowedLeagues();
     useEffect(() => { if (follows.ready) track('discover_viewed', { page: matches ? 'matches' : all ? 'all' : 'discover', followed_league_count: follows.ids.length }); }, [follows.ready, matches, all]);
