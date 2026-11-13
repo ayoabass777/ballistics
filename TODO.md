@@ -2,7 +2,8 @@
 
 One list for open work across the pipeline, engine and product. Detailed
 history stays where it was recorded (linked); this file is the index.
-Updated 2026-11-05 (beta speed and retention items added, stale entries closed).
+Updated 2026-11-13 (main deployed to staging, owner-live Matches and current
+standings tables merged, engine quorum fix in PR #27, audit follow-ups added).
 
 ## Beta blockers (critical path)
 
@@ -50,6 +51,17 @@ path: each item gates the ones below it, except where marked parallel.
    image (SQLAlchemy 1.4 vs the account API's 2.x), so it stays paused; move
    it to a DockerOperator on the account API image before Feb 2027, when the
    last pre-made Saved partition runs out.
+   Release `b140d03c091` deployed 2026-11-13 (main at PR #26): owner-live
+   Matches with live scores and Results (poller running, `/api/live` and
+   `/api/results` answer), current standings tables only on Match details,
+   `mart_top_team_streaks.league_season_id` (dbt build: 373 pass, 0 errors).
+   This replaces the hand-built owner preview (`deploy/OWNER_PREVIEW_RELEASES`);
+   staging deploys from main again. The deploy's forced checkout reverts the
+   engine's runtime calibration files (`engine/eval/calibration_maps.json`,
+   `calibration_report.json`, `watch/*.csv`, rewritten by the weekly refit);
+   they were copied to `~sage/runtime-backup-2026-11-13` and put back by hand.
+   - [ ] Stop deploys reverting runtime engine output: move those files out of
+     git (or out of the checkout) or have the deploy keep them.
 4. [x] **Member journey gaps (checkpoint 2, parallel with 3).** Done by 2026-10-30.
    - Tester instructions for Google sign-in (D151): use the Google account the
      invitation went to; the 2026-10-21 "Last used" button signed in as another
@@ -102,6 +114,10 @@ the bigger problem.
   - Make the Discover response smaller (1.1 MB raw, ~170 KB gzipped, 522 matches).
   - Run the account calls (`/me`, saved, saved ids, leagues, preferences) in parallel.
   - Record redirect time separately from server time in `page_speed`.
+- [ ] `/home/streaks` and `/explore/streaks` return 503 on staging: they read
+  `public.team_form`, an old-project table staging never had. Only the old
+  `/explore` and `/redesign` pages call them, not the beta pages. Drop the
+  endpoints or build `team_form` in dbt if those pages come back.
 - [ ] Optional: record the source page on `match_opened`, so opens no longer
   have to be credited to the last list viewed.
 
@@ -140,6 +156,18 @@ links to macOS `/usr/share/zoneinfo` (2026c); the old folder is kept at
 
 ## Engine
 
+- [ ] **Merge PR #27, then deploy** (engine consensus gate, codebase audit P0,
+  units 5.2 and 6.1). `wait_for_quorum` sat behind all three models with
+  `all_success`, so one failed model skipped consensus. The fix starts the gate
+  alongside the models: open when all finished without an error, or 2 ready +
+  30 min since the first finished. New CI job `dag-tests` loads the DAG in
+  Airflow 2.9.3. CI green 2026-11-13; not merged or deployed yet. After
+  deploying, check the first night's `wait_for_quorum` opens right after the
+  last model, with all three models in `raw.consensus_pool`.
+- [ ] Codebase audit P1–P3 follow-ups (data correctness, operational and API
+  bounds, cleanup): triage and owners in
+  [docs/codebase-audit-map.md](docs/codebase-audit-map.md), "Unit 6.4" (that
+  entry was still uncommitted on `match-preview-and-docs` on 2026-11-13).
 - [ ] Decide whether to drop the dead betting data: `raw.sportybet_odds` and the
   `est_odds/real_odds/odds/ev/has_odds` columns of `raw.consensus_pool` (kept, D149).
 - [ ] Rename `sportybet_market` / `sportybet_selection` to neutral market names
