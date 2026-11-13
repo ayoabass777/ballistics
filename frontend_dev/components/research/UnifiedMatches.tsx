@@ -1,4 +1,5 @@
 'use client';
+import { Bookmark, ChevronDown, Circle } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { type Discover, headline } from '@/lib/research';
@@ -74,7 +75,7 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: {
                 const next = new URLSearchParams(search.toString());
                 if (value === 'live') next.set('status', 'live'); else next.delete('status');
                 router.replace(`${path}?${next}`, { scroll: false });
-            }}>{label}</Button>)}
+            }}>{value === 'live' && <Circle size={8} fill="currentColor" className={s.liveDot} aria-hidden="true"/>}{label}</Button>)}
         </div>
         <EvidenceFilter label="Finding" allLabel="All findings" options={evidenceOptions(findings)} value={finding} total={merged.size} onChange={value => {
             const next = new URLSearchParams(search.toString());
@@ -87,7 +88,7 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: {
         {[...days].map(([day, groups]) => <div key={day} className={l.block}>
             <h3>{day}</h3>
             {[...groups].map(([key, matches]) => <details key={key} className={l.league} open>
-                <summary className={l.leagueToggle}><span className={s.competition}><Crest name={matches[0].league} url={matches[0].league_logo_url} league/><span>{matches[0].country} · {matches[0].league}</span></span><span className={l.fixtureCount}>{matches.length}</span><span className={l.leagueChevron} aria-hidden="true">⌄</span></summary>
+                <summary className={l.leagueToggle}><span className={s.competition}><Crest name={matches[0].league} url={matches[0].league_logo_url} league/><span>{matches[0].country} · {matches[0].league}</span></span><span className={l.fixtureCount}>{matches.length}</span><ChevronDown size={16} className={l.leagueChevron} aria-hidden="true"/></summary>
                 <ul>{matches.map(m => {
                     const card = cardsById.get(m.fixture_id);
                     const state = liveById.get(m.fixture_id);
@@ -99,7 +100,7 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues }: {
                         {!['NS', 'TBD'].includes(m.status) && <strong className={l.score}><span>{m.home_goals ?? '–'}</span><span>{m.away_goals ?? '–'}</span></strong>}
                     </Link>
                     {card?.preview && <p className={s.caption}>{headline({ ...card, pick: card.preview })}</p>}
-                    {card && <Button aria-pressed={saved.isSaved(m.fixture_id)} onClick={() => saved.toggle(card, data?.run_ds || null)}>{saved.isSaved(m.fixture_id) ? '✓ Saved' : '+ Save fixture'}</Button>}
+                    {card && <Button aria-pressed={saved.isSaved(m.fixture_id)} onClick={() => saved.toggle(card, data?.run_ds || null)}><Bookmark size={16} fill={saved.isSaved(m.fixture_id) ? 'currentColor' : 'none'} aria-hidden="true"/>{saved.isSaved(m.fixture_id) ? 'Saved' : 'Save fixture'}</Button>}
                     </li>;
                 })}</ul>
             </details>)}

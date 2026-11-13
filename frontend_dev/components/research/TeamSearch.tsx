@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { Search } from 'lucide-react';
+import s from './research.module.css';
 import { useSearchParams } from 'next/navigation';
 
 // Typing stays in local state so each key shows at once. The URL, and the list
@@ -7,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 // useSearchParams in sync without router.replace's server round trip.
 const PAUSE_MS = 200;
 
-export function TeamSearch({ className, label = 'Search teams', placeholder = 'Enter a team name', clearable = false }: { className?: string; label?: string; placeholder?: string; clearable?: boolean }) {
+export function TeamSearch({ className, label = 'Search teams', placeholder = 'Enter a team name', clearable = false, icon = false }: { className?: string; label?: string; placeholder?: string; clearable?: boolean; icon?: boolean }) {
     const urlValue = useSearchParams().get('q') || '';
     const [text, setText] = useState(urlValue);
     const pending = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -24,5 +26,5 @@ export function TeamSearch({ className, label = 'Search teams', placeholder = 'E
             window.history.replaceState(null, '', `${window.location.pathname}${next.size ? `?${next}` : ''}`);
         }, PAUSE_MS);
     }
-    return <div className={className}><label>{label}<input type="search" value={text} onChange={e => change(e.target.value)} placeholder={placeholder}/></label>{clearable && text && <button type="button" onClick={() => change('')}>Clear search</button>}</div>;
+    return <div className={className}><label>{label}<span className={icon ? s.iconSearch : undefined}>{icon && <Search size={18} aria-hidden="true"/>}<input type="search" value={text} onChange={e => change(e.target.value)} placeholder={placeholder}/></span></label>{clearable && text && <button type="button" onClick={() => change('')}>Clear search</button>}</div>;
 }

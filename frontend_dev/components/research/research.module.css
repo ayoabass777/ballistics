@@ -285,3 +285,9 @@
 .matchDayWindow .button { flex:1 0 44px; flex-direction:column; gap:2px; padding:8px 6px; white-space:nowrap; }
 .matchDayWindow small { font-size:11px; font-weight:400; }
 .matchDayStrip > .button { flex:0 0 36px; padding:8px; }
+
+/* Labelled SVG controls in the owner Matches preview. */
+.iconSearch { position:relative; display:block; }
+.iconSearch > svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+.iconSearch > input { width:100%; padding-left:38px; }
+.liveDot { color:#b53b32; flex-shrink:0; }
