@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const BATCH = 12;
 type Position = { count: number; y: number; height: number };
@@ -16,16 +16,36 @@ export function useListPosition(url: string, ready: boolean) {
     const key = `ballistics:list:${url}`;
     const [state, setState] = useState({ key: '', count: BATCH, y: 0, height: 0 });
     const restored = useRef(false);
+    const previousKey = useRef('');
+    // Last position the reader chose. Read instead of window.scrollY on a key
+    // change, because the loading state may already have shortened the page
+    // and clamped the scroll before this hook runs. Recorded on scroll and,
+    // synchronously, on the click that changes the list (scroll events wait
+    // for the next frame).
+    const lastY = useRef(0);
     const [restorationDone, setRestorationDone] = useState(false);
     const count = state.key === key ? state.count : BATCH;
     useEffect(() => {
+        const track = () => { lastY.current = window.scrollY; };
+        track();
+        window.addEventListener('scroll', track, { passive: true });
+        document.addEventListener('click', track, true);
+        return () => { window.removeEventListener('scroll', track); document.removeEventListener('click', track, true); };
+    }, []);
+    useLayoutEffect(() => {
         // Next's history restoration can run after the cards render and undo
         // our saved position on browser Back. Keep list restoration authoritative.
         window.history.scrollRestoration = 'manual';
         restored.current = false;
         setRestorationDone(false);
-        const stored = read(key);
-        setState({ key, ...stored });
+        // A key change on a mounted page is an in-page control (category, filter,
+        // league, date): stay where the reader is instead of jumping to the top.
+        // Only arriving on the page (first key) restores a saved position.
+        // (React may re-run this effect for the same key, e.g. in Strict Mode.)
+        const inPage = previousKey.current !== '' && previousKey.current !== key;
+        previousKey.current = key;
+        const here = { count: BATCH, y: lastY.current, height: lastY.current + window.innerHeight };
+        setState({ key, ...(inPage ? here : read(key)) });
     }, [key]);
     useEffect(() => {
         if (ready || state.key !== key || !state.y) return;

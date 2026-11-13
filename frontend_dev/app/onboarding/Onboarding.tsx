@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import { betaHome } from '@/lib/beta-navigation';
 import Link from 'next/link';
 import { leagueDirectorySchema } from '@/lib/account';
 import { track } from '@/lib/usage-events';
@@ -12,6 +14,8 @@ type League = { league_id: number; league: string; country: string | null; leagu
 
 export function Onboarding() {
   const router = useRouter();
+  const { user, isLoaded } = useUser();
+  const home = betaHome(user?.publicMetadata);
   const [step, setStep] = useState<'explain' | 'leagues'>('explain');
   const [leagues, setLeagues] = useState<League[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
@@ -22,6 +26,7 @@ export function Onboarding() {
   const [replay, setReplay] = useState(false);
 
   useEffect(() => {
+    if (!isLoaded) return;
     let active = true;
     const reviewing = new URLSearchParams(window.location.search).has('replay');
     setReplay(reviewing);
@@ -30,7 +35,7 @@ export function Onboarding() {
         if (!response.ok) throw new Error('Could not load your account. Try again.');
         return response.json();
       }).then(profile => {
-        if (active && profile?.data?.onboardingCompleted === true && !reviewing) router.replace('/discover');
+        if (active && profile?.data?.onboardingCompleted === true && !reviewing) router.replace(home);
       }).catch(() => { if (active) setError('Could not load your account. Try again.'); });
     fetch('/api/account/leagues/directory', { cache: 'no-store' })
       .then(async response => {
@@ -40,7 +45,7 @@ export function Onboarding() {
       .catch(() => { if (active) setError('League choices are temporarily unavailable. You can skip and choose them later in Settings.'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [router]);
+  }, [router, home, isLoaded]);
 
   async function finish(leagueIds: number[], outcome: 'completed' | 'skipped') {
     setSaving(true); setError('');
@@ -52,7 +57,7 @@ export function Onboarding() {
       if (!response.ok) throw new Error('Could not save your setup. Try again.');
       track('onboarding_finished', { outcome, league_count: leagueIds.length });
       sessionStorage.setItem('ballistics:onboarding:save-tip', '1');
-      router.replace(leagueIds.length ? `/discover?leagues=${leagueIds.join(',')}` : '/discover');
+      router.replace(leagueIds.length ? `${home}?leagues=${leagueIds.join(',')}` : home);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not save your setup. Try again.');
       setSaving(false);
@@ -74,7 +79,7 @@ export function Onboarding() {
           <section><span>03 · COMPARISON</span><h2>What stands out</h2><p>Strength and patterns help compare teams and leagues.</p></section>
         </div>
         <p className={s.caution}>If you bet, only risk what you can afford to lose.</p>
-        <div className={s.actions}>{replay ? <Link className={s.primary} href="/discover">Back to Discover →</Link> : <><button className={s.primary} onClick={() => setStep('leagues')}>Choose my leagues →</button><button className={s.textButton} disabled={saving} onClick={() => finish([], 'skipped')}>Skip setup</button></>}</div>
+        <div className={s.actions}>{replay ? <Link className={s.primary} href={home}>Back to {home === '/matches' ? 'Matches' : 'Discover'} →</Link> : <><button className={s.primary} onClick={() => setStep('leagues')}>Choose my leagues →</button><button className={s.textButton} disabled={saving} onClick={() => finish([], 'skipped')}>Skip setup</button></>}</div>
       </> : <>
         <h1>Pick the leagues you follow.</h1>
         <p className={s.lead}>Your choices sync with your account. You can change them in Settings or switch to All leagues anytime.</p>

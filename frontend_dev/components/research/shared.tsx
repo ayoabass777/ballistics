@@ -1,4 +1,5 @@
 'use client';
+import { betaHome } from '@/lib/beta-navigation';
 import Link from 'next/link';
 import { ProductHeader } from '@/components/account/ProductHeader';
 import { useUser } from '@clerk/nextjs';
@@ -11,7 +12,7 @@ import { z } from 'zod';
 import s from './research.module.css';
 import { Bookmark, CalendarDays, ChartNoAxesCombined, Compass, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 export function Button(props: ComponentProps<typeof GlassButton>) { return <GlassButton variant="outline" {...props} className={`${s.button} ${props.className || ''}`}/>; }
-const nav = [
+const primaryNav = [
     { name: 'Discover', href: '/discover', mobileIcon: '◎', Icon: Compass },
     { name: 'Matches', href: '/matches', mobileIcon: '☰', Icon: CalendarDays },
     { name: 'Forecast record', href: '/forecast-record', mobileIcon: '◷', Icon: ChartNoAxesCombined },
@@ -22,6 +23,9 @@ export function Shell({ children, active = 'Discover', mainMinHeight }: {
     active?: string;
     mainMinHeight?: number;
 }) {
+    const { user } = useUser();
+    const nav = betaHome(user?.publicMetadata) === '/matches'
+        ? [primaryNav[1], primaryNav[0], primaryNav[3], primaryNav[2]] : primaryNav;
     const [collapsed, setCollapsed] = useState(false);
     useEffect(() => {
         try { setCollapsed(localStorage.getItem('ballistics:sidebar:collapsed') === 'true'); } catch { /* Use expanded default. */ }
@@ -31,7 +35,7 @@ export function Shell({ children, active = 'Discover', mainMinHeight }: {
         try { localStorage.setItem('ballistics:sidebar:collapsed', String(next)); } catch { /* Navigation still works. */ }
         return next;
     });
-    return <div className={s.page}><a href="#research-main" className={s.skip}>Skip to content</a><ProductHeader/><div className={`${s.workspace} ${collapsed ? s.workspaceCollapsed : ''}`}><nav className={s.sidebar} aria-label="Primary"><button type="button" className={s.sidebarToggle} onClick={toggleSidebar} aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!collapsed} title={collapsed ? 'Expand navigation' : 'Collapse navigation'}>{collapsed ? <PanelLeftOpen size={20} aria-hidden="true"/> : <PanelLeftClose size={20} aria-hidden="true"/>}<span className={s.srOnly}>{collapsed ? 'Expand menu' : 'Collapse menu'}</span></button>{nav.map(({ name, href, Icon }) => <Button asChild key={name} className={`${s.sidebarLink} ${active === name ? s.active : ''}`}><Link href={href} aria-label={collapsed ? name : undefined} aria-current={active === name ? 'page' : undefined} title={collapsed ? name : undefined}><Icon size={20} aria-hidden="true"/><span className={collapsed ? s.srOnly : ''}>{name}</span></Link></Button>)}</nav><main id="research-main" className={s.main} style={mainMinHeight ? { minHeight: mainMinHeight } : undefined}>{children}</main></div><nav className={s.bottomNav} aria-label="Mobile primary">{nav.map(({ name, href, mobileIcon }) => <Link key={name} href={href} aria-current={active === name ? 'page' : undefined}><span aria-hidden>{mobileIcon}</span>{name === 'Forecast record' ? 'Record' : name}</Link>)}</nav></div>;
+    return <div className={s.page}><a href="#research-main" className={s.skip}>Skip to content</a><ProductHeader/><div className={`${s.workspace} ${collapsed ? s.workspaceCollapsed : ''}`}><nav className={s.sidebar} aria-label="Primary"><button type="button" className={s.sidebarToggle} onClick={toggleSidebar} aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'} aria-expanded={!collapsed} title={collapsed ? 'Expand navigation' : 'Collapse navigation'}>{collapsed ? <PanelLeftOpen size={20} aria-hidden="true"/> : <PanelLeftClose size={20} aria-hidden="true"/>}<span className={s.srOnly}>{collapsed ? 'Expand menu' : 'Collapse menu'}</span></button>{nav.map(({ name, href, Icon }) => <Button asChild key={name} className={`${s.sidebarLink} ${active === name ? s.active : ''}`}><Link href={href} aria-label={collapsed ? name : undefined} aria-current={active === name ? 'page' : undefined} title={collapsed ? name : undefined}><Icon size={20} aria-hidden="true"/><span className={collapsed ? s.srOnly : ''}>{name}</span></Link></Button>)}</nav><main id="research-main" className={s.main} style={mainMinHeight ? { minHeight: mainMinHeight } : undefined}>{children}</main></div><nav className={s.bottomNav} aria-label="Mobile primary">{nav.map(({ name, href, mobileIcon, Icon }) => <Link key={name} href={href} aria-current={active === name ? 'page' : undefined}>{user?.publicMetadata?.live_matches_preview === true ? <Icon size={20} strokeWidth={1.8} aria-hidden="true"/> : <span aria-hidden>{mobileIcon}</span>}{name === 'Forecast record' ? 'Record' : name}</Link>)}</nav></div>;
 }
 // Research responses kept between page visits, so going back to a list shows it at
 // once. Older than FRESH_MS, it is still shown but refreshed in the background.
