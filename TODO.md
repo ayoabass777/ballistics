@@ -1,178 +1,106 @@
 # To-do
 
-One list for open work across the pipeline, engine and product. Detailed
-history stays where it was recorded (linked); this file is the index.
-Updated 2026-11-13 (main deployed to staging, owner-live Matches and current
-standings tables merged, engine quorum fix in PR #27, audit follow-ups added).
+Open work only, most urgent first. Rewritten 2026-11-13; the earlier list,
+with its dated history (beta blockers, staging setup, engine review), is in
+[docs/todo-archive-2026-11-13.md](docs/todo-archive-2026-11-13.md). Mark items
+done here with a date, and move them to the archive when a section gets long.
 
-## Beta blockers (critical path)
+Where things stand (2026-11-13): staging (`beta.ballistics.football`) deploys
+from main again and runs owner-live Matches with live scores, current
+standings tables on Match details, and the engine consensus gate fix (PR #27),
+release `bac3aba0650`.
+The nightly pipeline has run clean for 12 nights in a row (2–13 Nov, every
+`fixture_update_dag` and `engine_predict` task succeeded). Beta target window:
+10–24 Nov ([ship checkpoints](docs/product/ship-checkpoints.md)).
 
-What stands between today and the invite-only beta (target 10–24 Nov 2026,
-[ship checkpoints](docs/product/ship-checkpoints.md)). Ordered by critical
-path: each item gates the ones below it, except where marked parallel.
+## This week
 
-1. [x] **Commit the open working tree.** Done 2026-10-21 (`974e83d`, `f138422`). DLQ, fixture extraction, standings and
-   match-detail changes plus their tests are uncommitted; a deploy needs a
-   known commit to build from.
-2. [x] **Freeze beta scope (checkpoint 1).** Reached 2026-10-21: cohort
-   (D157), 10–15 testers in two waves (D150), Google and email sign-in (D151),
-   pages = Welcome, Discover, Matches, Match details, Saved, Settings (D152).
-   Deferred: D146 evidence depth, forecast record, forecast retention.
-3. [ ] **Stand up staging (checkpoint 3, longest item).** Frontend (merge or
-   deploy `codex/frontend-redesign`), account API, research API, Postgres,
-   Clerk, Airflow jobs, secrets and S3. Includes a repeatable schema migration
-   step: on 2026-10-20 a mart missing new standings columns made Match details
-   return 503 until a manual refresh. Plan (2026-10-21, decisions in D153, revised
-   2026-10-22: new Hetzner CAX21 (ARM, 8 GB, Helsinki; CX43 out of stock), frontend on it, Clerk production instance,
-   beta at `beta.ballistics.football`): [docs/staging-deployment-plan.md](docs/staging-deployment-plan.md).
-   v1 server inspected 2026-10-21 (too small to share). ARM build check passed
-   2026-10-22. Server `ballistics-v2` created
-   2026-10-22 (CAX21, Helsinki, 2.29.118.240, Ubuntu 24.04; SSH as root with
-   `~/.ssh/ballistics_v2_ed25519`, alias `ballistics-v2`, user `sage`). Base
-   setup done 2026-10-22 (swap, Docker, SSH hardening, UFW, fail2ban). Migration runner,
-   baseline and deploy files (compose, Caddyfile, roles, grants) done and
-   checked 2026-10-22. **Deployed 2026-10-27** (release `b5ed5b3f505`): seeded
-   from local, all services up at `beta.ballistics.football`, Clerk production
-   sign-in renders, crests copied to the staging bucket. Local DAGs paused and
-   local Airflow stopped; staging's DAGs unpaused (except
-   `saved_snapshot_maintenance`), first nightly cycle 2026-10-28 00:00 UTC.
-   Nightly backup built and restore-tested 2026-10-27
-   (`deploy/backup_postgres.sh`, 03:30 UTC cron). Hetzner Cloud Firewall
-   2026-10-28 (`deploy/hetzner_firewall.sh`): web traffic only through
-   Cloudflare. Release `ba7fbc77773` deployed 2026-10-28 (privacy page, `/` →
-   `/welcome`). Operating guide: [docs/staging-runbook.md](docs/staging-runbook.md).
-   Release `b5458bb24c0` deployed 2026-10-30 (pipeline failure alerts,
-   post-deploy smoke check). Missed-run check (`deploy/check_nightly.sh`)
-   installed in cron 2026-10-30. 2026-11-03: disk alert at 80% added to the
-   missed-run check; deploys cap Docker build cache at 10 GB (it had reached
-   37 GB, disk 81% → 49%); external uptime check every 15 min
-   (`.github/workflows/uptime.yml`). Still open: Hetzner weekly snapshots
-   (owner, console); `saved_snapshot_maintenance` can't run in the Airflow
-   image (SQLAlchemy 1.4 vs the account API's 2.x), so it stays paused; move
-   it to a DockerOperator on the account API image before Feb 2027, when the
-   last pre-made Saved partition runs out.
-   Release `b140d03c091` deployed 2026-11-13 (main at PR #26): owner-live
-   Matches with live scores and Results (poller running, `/api/live` and
-   `/api/results` answer), current standings tables only on Match details,
-   `mart_top_team_streaks.league_season_id` (dbt build: 373 pass, 0 errors).
-   This replaces the hand-built owner preview (`deploy/OWNER_PREVIEW_RELEASES`);
-   staging deploys from main again. The deploy's forced checkout reverts the
-   engine's runtime calibration files (`engine/eval/calibration_maps.json`,
-   `calibration_report.json`, `watch/*.csv`, rewritten by the weekly refit);
-   they were copied to `~sage/runtime-backup-2026-11-13` and put back by hand.
-   - [ ] Stop deploys reverting runtime engine output: move those files out of
-     git (or out of the checkout) or have the deploy keep them.
-4. [x] **Member journey gaps (checkpoint 2, parallel with 3).** Done by 2026-10-30.
-   - Tester instructions for Google sign-in (D151): use the Google account the
-     invitation went to; the 2026-10-21 "Last used" button signed in as another
-     account.
-   - Observe browser-triggered profile sync for a new account.
-   - Check Settings and Saved under the invited account.
-   - Minimal first-run onboarding (D152): in progress separately.
-   - [x] Privacy policy page (`/privacy`, contact
-     `privacy@ballistics.football` via Cloudflare Email Routing) deployed
-     2026-10-28; Google consent screen published the same day (home page and
-     privacy URLs set). Still to check: Google sign-in for an account that was
-     never a test user (part of the smoke test).
-5. [x] **Match details build items (D152, parallel with 3).** Done
-   2026-10-28; on staging since release `b5458bb24c0` (2026-10-30).
-   - After kickoff, show the last pre-kickoff forecast. API side done
-     2026-10-22: `/api/match` reads the fixture's most recent complete run and
-     sets `fixture.forecast_from_latest_run` (migration 0002 adds the index;
-     `engine_stale` skipped once kickoff passed). Frontend 2026-10-28: a "Made
-     before kickoff" notice above Strength, Patterns and Goals once kickoff has
-     passed and the run finished before it.
-   - Small `data_quality` badge from the API block (second D148): "Data check ·
-     N notes" under the match header, opening to the API messages.
-6. [ ] **Daily data reliability on staging.** Several clean daily
-   `fixture_update` + engine cycles with no lost days (Oct 15 and 17 were lost
-   to a standings failure) and an alert that fires on failure. Stuck NS
-   (checked 2026-10-28): none in current seasons on staging. The ~110 are
-   past-season rows outside every reader; the one current case (Port Vale v
-   Northampton, 1563773) was the provider keeping the 26 Sep date until it
-   moved the match to 24 Nov; the nightly by-ID update picked it up
-   (confirmed 2026-10-30). Three seasons never finished bootstrap (J1 2026/27,
-   Super League 2 2020, Capixaba B 2027): bootstrap asked the API for the
-   start year instead of the season; fixed 2026-10-30.
-7. [x] **Staging smoke test.** Fresh invited account end to end on desktop and
-   mobile, data freshness, failure alert and rollback, all exercised on
-   staging. Then send the first invites. Wave 1 invites sent by 2026-10-30.
+- [ ] **Check the first night with the new consensus gate** (run_ds
+  2026-11-13, ~00:10–00:20 UTC on 14 Nov). `wait_for_quorum` should open a
+  minute or so after the last model finishes, and all three models should be
+  in `raw.consensus_pool`. If it waits 30 minutes instead, a model wrote an
+  `error` marker: check that model's task log.
+- [ ] **Retention.** Only 2 of 6 testers came back after 2 Nov
+  ([5 Nov report](docs/product/beta-activity-2026-11-05.md)). Ask the quieter
+  testers what stopped them; interview tester A (most engaged). Feeds the
+  wave 1 interviews in [distribution-plan.md](docs/product/distribution-plan.md).
+- [ ] **Re-run the beta activity queries** to confirm the `/standouts` LCP
+  improvement from PR #21 with tester readings, not owner ones.
+- [ ] **Wave 2 invites** (D150: 10–15 testers in two waves; wave 1 sent by
+  2026-10-30). Decide after the retention answers.
 
-## Beta usage (from the 5 Nov report)
+## Live scores and Matches
 
-Source: [docs/product/beta-activity-2026-11-05.md](docs/product/beta-activity-2026-11-05.md).
-Returning to Standouts became instant on 2026-11-04 (PR #21); retention is now
-the bigger problem.
+- [ ] **Watch live scores on a full matchday on staging** (weekend of 14–15
+  Nov): the poller keeps up at peak (~95 concurrent fixtures), scores match
+  the final `raw_fixtures` result, and the Match details live card updates.
+  Design and numbers: `docs/live_scores.md`, only on branch
+  `live-scores-phase1` (copy it to main before retiring the branch).
+- [ ] **Decide who sees live Matches.** It is account-gated today (owner and
+  the `matches_first_beta` flag). Open it to all testers once the matchday
+  check passes.
+- [ ] Retire branch `live-scores-phase1`: PR #26 shipped its code through
+  `codex/owner-live-matches` (all but `docs/live_scores.md`). The `../ballistics-live` worktree still has
+  uncommitted owner changes; review them before deleting the branch.
 
-- [ ] **Retention.** Only 2 of 6 testers have come back since 2 Nov. Ask the
-  quieter testers to try again and what stopped them; interview tester A (most
-  engaged) about what keeps them coming back. Feeds the wave 1 interviews in
-  [docs/product/distribution-plan.md](docs/product/distribution-plan.md).
-- [ ] **Re-run the activity queries** after a few days of post-fix use, to
-  confirm the `/standouts` LCP improvement with tester readings, not owner ones.
-- [ ] **First visit speed** (~4 s cold before cards appear):
-  - Make the Discover response smaller (1.1 MB raw, ~170 KB gzipped, 522 matches).
-  - Run the account calls (`/me`, saved, saved ids, leagues, preferences) in parallel.
-  - Record redirect time separately from server time in `page_speed`.
-- [ ] `/home/streaks` and `/explore/streaks` return 503 on staging: they read
-  `public.team_form`, an old-project table staging never had. Only the old
-  `/explore` and `/redesign` pages call them, not the beta pages. Drop the
-  endpoints or build `team_form` in dbt if those pages come back.
-- [ ] Optional: record the source page on `match_opened`, so opens no longer
-  have to be credited to the last list viewed.
+## First visit speed
 
-## Now
+~4 s cold before Discover cards appear.
 
-- [x] **Check Port Vale v Northampton picked up its new date** (confirmed
-  2026-10-30: kickoff 2026-11-24 19:45 UTC, NS) after the
-  2026-10-29 nightly run (after ~00:10 UTC). On staging, `raw.raw_fixtures`
-  row for api_fixture_id 1563773 (fixture 107511) should read kickoff
-  2026-11-24 19:45 UTC, NS. If it still says 26 Sep, check that night's
-  `extract_updates` payload in `incremental/2026-10-28/fixtures.json`.
-- [x] **Check tonight's engine run** — closed 2026-11-05 without a recorded
-  check: superseded by staging's nightly runs (since 2026-10-28); daily
-  reliability is tracked in beta blocker 6. Original item: (run_ds 2026-10-20, ~00:40 UTC), the first
-  with everything from today: dbt is no longer blocked by xG/standings; model
-  reuse (`raw.model_processing_state` fills, run starts cold); `raw.card_versions`
-  gains rows beyond the 5,265 backfilled (team-name fix makes ~330 teams' cards
-  new versions once); no CANC/PST/ORPHAN fixtures in the feed; Discover shows
-  provider team names ("FC Copenhagen", not "Fc Copenhagen").
-- [x] **Match pages lose their forecast once a match starts.** Fixed (beta
-  blocker 5, deployed 2026-10-30). `/api/match` reads
-  only the latest engine run, and runs cover not-started fixtures, so a match
-  page shows no Strength/Goals/Patterns after kickoff (and for finished matches).
-  Decided (D152): keep the last pre-kickoff forecast; tracked in beta blocker 5.
+- [ ] Make the Discover response smaller (1.1 MB raw, ~170 KB gzipped, 522 matches).
+- [ ] Run the account calls (`/me`, saved, saved ids, leagues, preferences) in parallel.
+- [ ] Record redirect time separately from server time in `page_speed`.
+- [ ] Optional: record the source page on `match_opened`.
 
-Local tz data fixed 2026-10-20: Anaconda's stale `share/zoneinfo` (2025b) now
-links to macOS `/usr/share/zoneinfo` (2026c); the old folder is kept at
-`/opt/anaconda3/share/zoneinfo.2025b-backup`. The engine image was already right.
+## Staging operations
 
-## Pipeline (DLQ, D147/D148)
+- [ ] **Stop deploys reverting the engine's runtime files.** The deploy's
+  forced checkout resets `engine/eval/calibration_maps.json`,
+  `calibration_report.json` and `watch/*.csv`, which the weekly refit
+  rewrites on the server. On 13 Nov they were copied to
+  `~sage/runtime-backup-2026-11-13*` and restored by hand after each deploy.
+  Move them out of git (or out of the checkout), or have the deploy keep them.
+- [ ] Hetzner weekly snapshots (owner, Hetzner console).
+- [ ] `saved_snapshot_maintenance` can't run in the Airflow image (SQLAlchemy
+  1.4 vs the account API's 2.x), so it stays paused. Move it to a
+  DockerOperator on the account API image **before Feb 2027**, when the last
+  pre-made Saved partition runs out.
+- [ ] Remove the leftover `deploy/OWNER_PREVIEW_RELEASES` on the server (from
+  the hand-built owner preview; releases are in `deploy/RELEASES` again).
 
-- [ ] ~110 past-season fixtures still NS from postponements (Egyptian league,
-  USL Tormenta). Not shown anywhere (current-season readers only); clean up
-  or mark them if the old seasons are ever reloaded. Current seasons are
-  re-checked nightly by ID (`to_update_fixture_ids`).
+## Codebase audit follow-ups
+
+Triage (unit 6.4, 2026-11-11) and each finding's evidence and retest are in
+[docs/codebase-audit-map.md](docs/codebase-audit-map.md). The P0 (engine
+quorum gate and DAG test) is done: PR #27, release `bac3aba0650`, 2026-11-13.
+
+- [ ] Commit the audit map's 6.4 triage entry (uncommitted on
+  `match-preview-and-docs` on 2026-11-13).
+- [ ] **P1, data correctness:**
+  - bootstrap metadata validation (2.1)
+  - fixture response rate limiting (2.2)
+  - partial xG (2.4)
+  - replay errors and snapshot ordering (2.5)
+  - detector event scope (3.2)
+  - daily flow: latest-run status (3.3)
+  - staging late or equal-timestamp rows (4.1)
+  - intermediate and mart fixture coverage (4.2–4.3)
+  - Elo backfills and result corrections: replay from the earliest changed kickoff (5.1)
+  - forecast settlement for replaced snapshots (5.3)
+- [ ] **P2, operations and API bounds:**
+  - environment precedence and image/dependency pins (1.2–1.3)
+  - whether side-task failures should block dbt and the engine (3.1)
+  - a maximum range or pagination for Discover (5.4)
+  - dbt data tests in a controlled gate; CI only compiles (6.2)
+- [ ] **P3, cleanup:** the smaller follow-ups in units 1.2, 1.3, 2.1–2.2, 3.2,
+  5.5 and 6.2; do them alongside related work.
 
 ## Engine
 
-- [ ] **Merge PR #27, then deploy** (engine consensus gate, codebase audit P0,
-  units 5.2 and 6.1). `wait_for_quorum` sat behind all three models with
-  `all_success`, so one failed model skipped consensus. The fix starts the gate
-  alongside the models: open when all finished without an error, or 2 ready +
-  30 min since the first finished. New CI job `dag-tests` loads the DAG in
-  Airflow 2.9.3. CI green 2026-11-13; not merged or deployed yet. After
-  deploying, check the first night's `wait_for_quorum` opens right after the
-  last model, with all three models in `raw.consensus_pool`.
-- [ ] Codebase audit P1–P3 follow-ups (data correctness, operational and API
-  bounds, cleanup): triage and owners in
-  [docs/codebase-audit-map.md](docs/codebase-audit-map.md), "Unit 6.4" (that
-  entry was still uncommitted on `match-preview-and-docs` on 2026-11-13).
 - [ ] Decide whether to drop the dead betting data: `raw.sportybet_odds` and the
   `est_odds/real_odds/odds/ev/has_odds` columns of `raw.consensus_pool` (kept, D149).
 - [ ] Rename `sportybet_market` / `sportybet_selection` to neutral market names
   (pool rows, `raw.consensus_pool`, grading, dashboard, tests). Deferred in D149.
-
 - [ ] Smaller: unused `threshold` CLI param in `predict_upcoming`; `int(NaN)` on
   missing goals in calibration scripts; empty `IN ()` SQL edge cases.
 
@@ -181,34 +109,26 @@ learned stacker to replace tier voting (would also fix Bayesian signals counted
 twice in `avg_conf`); gating Bayesian picks on edge over the base rate;
 aligning backtest and live Bayesian base rates; Poisson bias rechecks.
 
-Done since July: Dixon-Coles feeds consensus; engine Airflow DAGs
-(`engine_predict`, `engine_calibration`); dependency-aware model result reuse
-(2026-10-19). SportyBet odds, EV and slips were built and then removed (D149).
+## Pipeline and API
 
-Done 2026-10-20 (engine review): Bayesian forecasts not-started fixtures only
-(18 cancelled/postponed/orphaned fixtures had been published on Oct 19) and
-consensus drops non-NS fixtures as a backstop; one team-name source in dbt
-(`stg_dim_teams`, no initcap; incremental facts full-refreshed); team markets
-labelled with the right team (88 mislabels since Oct 1); Mismatch skips teams
-with no Elo history; `fixture_update` runs dbt when side steps fail (Oct 15 and
-17 were lost to a standings failure). Forecast record checked: calibrated within
-noise in every market (4,860 settled). All database-backed tests pass on
-throwaway databases (438 + DB suites).
+- [ ] `/home/streaks` and `/explore/streaks` return 503 on staging: they read
+  `public.team_form`, an old-project table staging never had. Only the old
+  `/explore` and `/redesign` pages call them, not the beta pages. Drop the
+  endpoints, or build `team_form` in dbt if those pages come back.
+- [ ] ~110 past-season fixtures still NS from postponements (Egyptian league,
+  USL Tormenta). Not shown anywhere (current-season readers only); clean up
+  or mark them if the old seasons are ever reloaded.
 
-## Product and frontend
+## Product and design
 
 Details: [docs/product/implementation-status.md](docs/product/implementation-status.md).
 
-- [ ] Figma: Settings (timezone, followed leagues) not yet designed. Skipped
-  for beta (D152); Settings ships as implemented.
-- [ ] Fuller `data_quality` treatment on the match page beyond the beta badge
-  (deferred, D152).
-- [ ] D146 evidence-depth bar (Focused / More context / Full view): deferred
-  past beta (D152).
-- [x] Deployment: frontend live on staging (`beta.ballistics.football`) since
-  2026-10-27; see beta blocker 3.
 - [ ] Desktop Match details: production implementation; sidebar and H2H
   prototype navigation regression
-  ([docs/product/desktop-match-details-todo.md](docs/product/desktop-match-details-todo.md)).
+  ([desktop-match-details-todo.md](docs/product/desktop-match-details-todo.md)).
 - [ ] Design backlog: onboarding / first run; real Strength content (settle
   the Naples label and Big dog threshold rule first); consistent mock/live labels.
+- [ ] Figma: Settings (timezone, followed leagues) not designed; Settings
+  ships as implemented (D152).
+- [ ] After beta: fuller `data_quality` treatment on the match page; D146
+  evidence-depth bar (Focused / More context / Full view). Both deferred, D152.
