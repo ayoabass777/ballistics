@@ -318,3 +318,27 @@
 .ownerDetails .chips { overflow-x:auto; flex-wrap:nowrap; }
 .ownerDetails .chips > * { flex-shrink:0; }
 @media(max-width:380px) { .ownerDetails .stickyTitle .fixtureIdentity { font-size:12px; } .ownerDetails .evidence { gap:10px; } }
+
+/* Visual review: one overview group and consistent section rhythm. */
+.ownerDetails { max-width:920px; }
+.ownerDetails > .overviewGroup { max-width:none; gap:0; background:white; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.ownerDetails .overviewHeading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-bottom:1px solid var(--line); }
+.ownerDetails .overviewHeading h2 { margin:0; font-size:18px; }
+.ownerDetails .overviewHeading .button { padding:4px 8px; font-size:12px; background:transparent; border:0; }
+.ownerDetails .overviewGroup > .panel { border:0; border-radius:0; padding:18px 20px; }
+.ownerDetails .overviewHighlights { border-top:1px solid var(--line)!important; gap:0; padding-block:0!important; }
+.ownerDetails .overviewHighlights .evidence { border:0; border-radius:0; padding:16px 0; justify-content:space-between; }
+.ownerDetails .overviewHighlights .evidence + .evidence { border-top:1px solid var(--line); }
+.ownerDetails .overviewHighlights .evidence > span { flex:1; }
+.ownerDetails .overviewHighlights .evidence > strong { text-align:right; min-width:64px; }
+.ownerDetails .tierContext { margin-top:6px; padding-top:12px; }
+.ownerDetails .tierContext > summary { cursor:pointer; margin:0; font-size:12px; }
+.ownerDetails .tierContext[open] > summary { margin-bottom:12px; }
+.ownerDetails > div:has(> section[data-match-section]) { margin-top:24px; }
+.ownerDetails .matchMetadata { display:flex; align-items:center; flex-wrap:wrap; gap:6px 16px; }
+.ownerDetails .matchMetadata p { margin:0; }
+.ownerDetails .ownerHeaderCompact .matchMetadata { display:none; }
+.ownerDetails .chips a { border-radius:6px; }
+.ownerDetails > .panel .evidence { border:0; border-radius:0; border-bottom:1px solid var(--line); padding:14px 0; }
+.ownerDetails .tutorialTip { margin-top:12px; }
+@media(max-width:700px) { .ownerDetails .overviewHeading, .ownerDetails .overviewGroup > .panel { padding-inline:16px; } }
