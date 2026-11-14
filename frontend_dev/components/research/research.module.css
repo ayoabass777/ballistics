@@ -300,3 +300,21 @@
 .compactMatchFilters .segment { display:flex; width:auto; flex:0 0 auto; margin:0; }
 .compactMatchFilters .segment .button { min-width:58px; padding:8px 12px; }
 .quietUpdate { font-size:11px; color:var(--muted); margin:0; }
+
+/* Owner match detail hierarchy: one header and a research-first Overview. */
+.ownerDetails .headerBookmark { flex:0 0 44px; width:44px; padding:0; }
+.ownerDetails .headerBookmark[aria-pressed="true"] { color:var(--green); background:#eff4eb; }
+.ownerDetails .ownerHeaderCompact { gap:6px; padding-block:6px; }
+.ownerHeaderCompact .matchMetadata { display:none; }
+.ownerHeaderCompact .fixtureIdentity { font-size:12px; line-height:17px; gap:6px; }
+.ownerHeaderCompact .fixtureIdentity .crest, .ownerHeaderCompact .fixtureIdentity .crest img { width:18px; height:18px; }
+.overviewHighlights .evidence { color:inherit; text-decoration:none; gap:16px; }
+.overviewHighlights .evidence:hover { background:#f4f7f1; }
+.overviewHighlights .evidence > span { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.overviewHighlights .evidence > span strong { font-size:14px; }
+.overviewHighlights .evidence > strong { font-size:20px; white-space:nowrap; }
+.ownerDetails .evidence > div { min-width:0; }
+.ownerDetails .evidence > strong { flex-shrink:0; }
+.ownerDetails .chips { overflow-x:auto; flex-wrap:nowrap; }
+.ownerDetails .chips > * { flex-shrink:0; }
+@media(max-width:380px) { .ownerDetails .stickyTitle .fixtureIdentity { font-size:12px; } .ownerDetails .evidence { gap:10px; } }
