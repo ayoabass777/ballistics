@@ -1,4 +1,22 @@
-# Engine Orchestration — Design (not yet built)
+# Engine Orchestration
+
+> **Status (2026-11-13):** built. `engine_predict` runs on staging every night
+> (`airflow/dags/engine_predict_dag.py`); the July design below is kept as
+> history and differs from the DAG in places (no Poisson, no odds scraper,
+> dbt rather than xG gate). The DAG file and its test
+> (`tests/test_engine_predict_dag.py`) are the source of truth.
+
+2026-11-13 — **Consensus gate fixed.** The quorum sensor sat downstream of all
+three models with the default `all_success` rule, so one failed model skipped
+the sensor and consensus (codebase audit unit 5.2). It now starts after
+`wait_for_dbt_refresh`, alongside the models, and reads their `raw.model_runs`
+markers (`engine.eval.picks_store.gate_open`): open once every model has
+finished without an error, or once 2 models are ready and 30 minutes have
+passed since the first finished. Fewer than 2 ready never opens it; the sensor
+times out after 90 minutes and the failure alert fires. Not "2 ready → go":
+on staging all three finish within about two minutes of each other, mismatch
+last, so a plain quorum would drop mismatch every night. A CI job
+(`dag-tests`) loads the DAG in Airflow 2.9.3 and checks the graph.
 
 > **2026-10-20:** the SportyBet odds scraper (`odds_scrape` DAG), EV and betting
 > slips were removed. References to them below are historical.
@@ -164,18 +182,21 @@ calibration_wf  (DockerOperator: python -m engine.eval.calibration_wf)
 
 **`engine_predict`** — `schedule="@daily"`, catchup=False, `max_active_runs=1`:
 ```
-wait_for_xg_refresh ─┬─► refresh_elo ─► mismatch ─┐
-                     └─► [poisson] [bayesian] [dixon] ─► wait_for_quorum ─► consensus
-                                                                          │
-                                                                          ▼
-                                                               verify_daily_shortlists
+wait_for_dbt_refresh ─┬─► refresh_elo ─► mismatch      (models write raw.model_runs)
+                      ├─► [bayesian] [dixon_coles]
+                      └─► wait_for_quorum ─► consensus ─► verify_daily_shortlists
+                          (polls raw.model_runs; not downstream of the models)
 ```
+(As built, 2026-11-13. The July design had Poisson and an xG gate.)
 - `refresh_elo` processes newly landed completed fixtures before mismatch reads
   team ratings. The other three models remain parallel because they do not use Elo.
 - Each model task: `python -m engine.eval.<model> --write-picks --run-ds {{ ds }}` — writes
   `raw.model_picks` and a `raw.model_runs` marker.
-- `wait_for_quorum`: reschedule-mode sensor, `trigger_rule="all_done"` (runs even if some
-  model tasks failed). Fires on `ready_models >= QUORUM` **or** grace-window timeout.
+- `wait_for_quorum`: reschedule-mode sensor started alongside the models (upstream is
+  `wait_for_dbt_refresh` only, so a failed model can't skip it). Opens when all models
+  finished without an error, or `ready >= QUORUM` and the grace window has passed since
+  the first finished (`picks_store.gate_open`). The July design's `all_done` fan-in was
+  never built that way; see the 2026-11-13 note at the top.
 - `consensus`: `python -m engine.eval.consensus_slips --from-picks --run-ds {{ ds }}` —
   reads `raw.model_picks` for `run_ds`, joins latest `raw.sportybet_odds`, writes
   `raw.consensus_pool` + JSON.

@@ -231,8 +231,8 @@ def ready_models(run_ds: str, conn=None) -> list[str]:
 
 
 def quorum_state(run_ds: str, conn=None) -> dict:
-    """Snapshot for the consensus gate:
-    {ready: [models ok], n_finished: total markers, first_finished: datetime|None}.
+    """Snapshot for the consensus gate: {ready: [models ok], failed: [models
+    errored], n_finished: total markers, first_finished: datetime|None}.
     """
     own = conn is None
     conn = conn or get_conn()
@@ -242,17 +242,36 @@ def quorum_state(run_ds: str, conn=None) -> dict:
             cur.execute(
                 """SELECT
                        array_remove(array_agg(model) FILTER (WHERE status='ok'), NULL),
+                       array_remove(array_agg(model) FILTER (WHERE status='error'), NULL),
                        count(*),
                        min(finished_at)
                    FROM raw.model_runs WHERE run_ds = %s""",
                 (run_ds,),
             )
-            ready, n_finished, first = cur.fetchone()
-            return {"ready": list(ready or []), "n_finished": int(n_finished or 0),
-                    "first_finished": first}
+            ready, failed, n_finished, first = cur.fetchone()
+            return {"ready": list(ready or []), "failed": list(failed or []),
+                    "n_finished": int(n_finished or 0), "first_finished": first}
     finally:
         if own:
             conn.close()
+
+
+def gate_open(state: dict, n_models: int, quorum: int, grace, now: datetime) -> bool:
+    """The consensus gate's decision for one poke of the quorum sensor.
+
+    Open once every model has finished without an error (the usual night:
+    all three finish within a few minutes, and consensus gets all of them).
+    Otherwise open once `quorum` models are ready and `grace` has passed
+    since the first one finished, so a failed or slow model costs at most
+    the grace window and a failed model's Airflow retry still gets that long.
+    Fewer than `quorum` ready models never open the gate: the sensor times
+    out and the failure alert fires instead of a one-model consensus.
+    """
+    if state["n_finished"] >= n_models and not state.get("failed"):
+        return True
+    first = state["first_finished"]
+    return (len(state["ready"]) >= quorum and first is not None
+            and now - first >= grace)
 
 
 def read_model_picks(run_ds: str, conn=None) -> list[dict]:
