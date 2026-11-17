@@ -1,3 +1,4 @@
-export function betaHome(metadata?: Record<string, unknown> | null) {
-    return metadata?.matches_first_beta === true ? '/matches' : '/discover';
+// Matches-first navigation is the default for all beta members.
+export function betaHome(_metadata?: Record<string, unknown> | null) {
+    return '/matches';
 }
