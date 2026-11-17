@@ -1,6 +1,6 @@
 # To-do
 
-Open work only, most urgent first. Rewritten 2026-11-13; the earlier list,
+Open work only, most urgent first. Rewritten 2026-11-13 (v1 retirement added 2026-11-16); the earlier list,
 with its dated history (beta blockers, staging setup, engine review), is in
 [docs/todo-archive-2026-11-13.md](docs/todo-archive-2026-11-13.md). Mark items
 done here with a date, and move them to the archive when a section gets long.
@@ -28,6 +28,35 @@ The nightly pipeline has run clean for 12 nights in a row (2–13 Nov, every
   improvement from PR #21 with tester readings, not owner ones.
 - [ ] **Wave 2 invites** (D150: 10–15 testers in two waves; wave 1 sent by
   2026-10-30). Decide after the retention answers.
+
+## Retire the v1 server
+
+Planned in D153 (2026-10-22) for "after v2 is live"; v2 has been live since
+2026-10-27 and v1 still runs. Checked 2026-11-16 (read-only): Hetzner
+`vector-claw-01` (5.78.177.28, Hillsboro), ~$23/month, disk 91%, all six
+containers up (Postgres, Airflow, API, Redis, frontend). Its
+`fixture_update_dag` and `fixtures_etl_dag` are unpaused and ran every night,
+on the same API-Football key as staging (7,500 requests/day shared with the
+staging pipeline and live poller). `ballistics.football` still serves the v1
+site through Cloudflare; `api.ballistics.football` points straight at v1.
+Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-server-inspection-2026-10-21-read-only-as-sage).
+
+- [ ] **Pause v1's two DAGs** (`fixture_update_dag`, `fixtures_etl_dag`).
+  Frees the shared API quota at once; reversible.
+- [ ] **Back up v1's database** (`football_betting`, ~3.3 GB): `pg_dump` to
+  the staging S3 bucket or the Mac, and check it restores. Note anything in
+  it that v2 doesn't have (v2 was seeded from local, not v1).
+- [ ] **Decide what `ballistics.football` shows** once v1 is gone: v2 at the
+  root (D153 item 5, "the root domain once v1 is down"), or a redirect to
+  `beta.ballistics.football` until the beta ends.
+- [ ] **Move DNS** in Cloudflare: the root (and `www`) to the decision above;
+  remove the `api.` record (nothing in v2 calls it). Check the Clerk
+  production instance and Google OAuth still list the right URLs.
+- [ ] **Watch for a week:** no traffic or errors on the old URLs, staging's
+  API usage normal.
+- [ ] **Take it down** (owner, Hetzner console): a final snapshot, then delete
+  `vector-claw-01`. Remove its `~/.ssh/known_hosts` entry and archive the
+  `football-stats-frontend` deploy notes.
 
 ## Live scores and Matches
 
