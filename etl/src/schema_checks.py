@@ -95,8 +95,13 @@ def ensure_raw_fixtures_bootstrap_ready(cur: psycopg2.extensions.cursor) -> None
 
 def migrate_raw_fixtures_columns(cur: psycopg2.extensions.cursor) -> None:
     """Idempotent column additions, so loaders never write a column the table
-    lacks (2026-10-12: round)."""
-    cur.execute("ALTER TABLE raw.raw_fixtures ADD COLUMN IF NOT EXISTS round TEXT")
+    lacks (2026-10-12: round). Checked first: ALTER TABLE takes an exclusive
+    lock even when the column exists, and the live poller loads results
+    during matchdays while readers hold the table."""
+    cur.execute("""SELECT 1 FROM information_schema.columns
+                   WHERE table_schema = 'raw' AND table_name = 'raw_fixtures' AND column_name = 'round'""")
+    if cur.fetchone() is None:
+        cur.execute("ALTER TABLE raw.raw_fixtures ADD COLUMN IF NOT EXISTS round TEXT")
 
 
 def ensure_data_detector_ready(cur: psycopg2.extensions.cursor) -> None:

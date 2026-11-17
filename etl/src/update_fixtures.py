@@ -71,7 +71,14 @@ def to_update_fixture_ids() -> List[Tuple[Optional[int], str]]:
         """, (FIXTURE_CATCHUP_GRACE_DAYS,))
         rows = cur.fetchall()
         ids = [(row[0], str(row[1])) for row in rows]
-        logger.info(f"Identified {len(ids)} fixture IDs needing updates.")
+        # Results the live poller already wrote: the daily sweep re-checks them
+        # (etl/src/live_results.py). Only differing answers are rewritten.
+        from etl.src.live_results import unswept_fixture_ids
+        seen = {api for _, api in ids}
+        promoted = [pair for pair in unswept_fixture_ids(cur) if pair[1] not in seen]
+        ids += promoted
+        logger.info(f"Identified {len(ids)} fixture IDs needing updates "
+                    f"({len(promoted)} live results to sweep).")
         return ids
     except Exception as e:
         logger.error(f"Error querying fixture IDs needing updates: {e}", exc_info=True)
