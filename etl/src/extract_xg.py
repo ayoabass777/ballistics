@@ -61,6 +61,17 @@ XG_LEAGUES = {
     253,                     # USA: Major League Soccer
     345,                     # Czech Republic: Czech Liga
     357,                     # Ireland: Premier Division
+    # November 16 2026 probe: 20 FT fixtures spread over the last 120 days,
+    # added at >=80% complete. Provider xG for these mostly starts with the
+    # 2025-26 seasons; older fixtures return no xG and are retried monthly.
+    89,                      # Netherlands: Eerste Divisie (18/20)
+    98,                      # Japan: J1 League (16/20)
+    128,                     # Argentina: Liga Profesional (20/20)
+    197,                     # Greece: Super League 1 (18/20)
+    210,                     # Croatia: HNL (20/20)
+    218,                     # Austria: Bundesliga (20/20)
+    262,                     # Mexico: Liga MX (18/20)
+    283,                     # Romania: Liga I (19/20)
 }
 
 # Only recent seasons matter: Dixon-Coles time-decays history (half-life ~107 days),
