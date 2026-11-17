@@ -32,26 +32,36 @@ The nightly pipeline has run clean for 12 nights in a row (2–13 Nov, every
 ## Retire the v1 server
 
 Planned in D153 (2026-10-22) for "after v2 is live"; v2 has been live since
-2026-10-27 and v1 still runs. Checked 2026-11-16 (read-only): Hetzner
+2026-10-27. Owner decided 2026-11-17 to retire it now. Checked 2026-11-16 (read-only): Hetzner
 `vector-claw-01` (5.78.177.28, Hillsboro), ~$23/month, disk 91%, all six
 containers up (Postgres, Airflow, API, Redis, frontend). Its
-`fixture_update_dag` and `fixtures_etl_dag` are unpaused and ran every night,
+`fixture_update_dag` and `fixtures_etl_dag` were unpaused and ran every night,
 on the same API-Football key as staging (7,500 requests/day shared with the
 staging pipeline and live poller). `ballistics.football` still serves the v1
 site through Cloudflare; `api.ballistics.football` points straight at v1.
+Usage (v1 API log, 3–17 Nov): about 37 homepage data refreshes in two weeks;
+the rest was bot traffic.
 Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-server-inspection-2026-10-21-read-only-as-sage).
 
-- [ ] **Pause v1's two DAGs** (`fixture_update_dag`, `fixtures_etl_dag`).
-  Frees the shared API quota at once; reversible.
-- [ ] **Back up v1's database** (`football_betting`, ~3.3 GB): `pg_dump` to
-  the staging S3 bucket or the Mac, and check it restores. Note anything in
-  it that v2 doesn't have (v2 was seeded from local, not v1).
-- [ ] **Decide what `ballistics.football` shows** once v1 is gone: v2 at the
-  root (D153 item 5, "the root domain once v1 is down"), or a redirect to
-  `beta.ballistics.football` until the beta ends.
-- [ ] **Move DNS** in Cloudflare: the root (and `www`) to the decision above;
-  remove the `api.` record (nothing in v2 calls it). Check the Clerk
-  production instance and Google OAuth still list the right URLs.
+- [x] **Pause v1's two DAGs** (`fixture_update_dag`, `fixtures_etl_dag`):
+  done 2026-11-17; v1 no longer calls API-Football. Unpause to undo.
+- [x] **Back up v1's database:** done 2026-11-17 on the Mac,
+  `~/Backups/ballistics-v1/` (`football_betting_2026-11-17.dump`, 128 MB,
+  pg_dump custom format, plus roles in `globals_2026-11-17.sql` and
+  `SHA256SUMS`). Restored into a throwaway postgres:17: all 78 tables match
+  v1's row counts exactly (15.1M rows). Not yet copied off the Mac (S3 or
+  another disk). Not checked table by table against v2; v2 was seeded from
+  local, and v1's tables are the old project's.
+- [x] **Decide what `ballistics.football` shows:** redirect to
+  `beta.ballistics.football` (owner, 2026-11-17) until the beta ends.
+- [ ] **Cloudflare (owner, dashboard):** remove the v1 Worker's route or custom
+  domain on `ballistics.football` / `www` (deployed from
+  `frontend_dev/wrangler.jsonc`); make sure the root and `www` have proxied
+  DNS records; add a Redirect Rule (root and `www` → 301
+  `https://beta.ballistics.football`, keep the path). Then delete the `api.`
+  record (only the v1 Worker used it) and check the Clerk production instance
+  and Google OAuth URLs still work on `beta.`.
+- [ ] Stop v1's containers once the redirect is live, so nothing serves from v1.
 - [ ] **Watch for a week:** no traffic or errors on the old URLs, staging's
   API usage normal.
 - [ ] **Take it down** (owner, Hetzner console): a final snapshot, then delete
