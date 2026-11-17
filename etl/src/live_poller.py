@@ -9,6 +9,9 @@ overnight. It writes only changes and sends NOTIFY live_changed with the
 fixture_id for each.
 
 It never writes raw.raw_fixtures: the nightly pipeline owns results.
+Full-time match statistics (corners, shots, possession, cards, xG where
+covered) come with the by-id fetch at full time and go to
+raw.fixture_statistics (etl/src/live_stats.py), at no extra call.
 
 Run: python -m etl.src.live_poller
 """
@@ -24,6 +27,7 @@ import logging
 import requests
 
 from etl.src import live_scores as ls
+from etl.src import live_stats
 from etl.src.config import LOGS_PATH
 from etl.src.logger import get_logger
 
@@ -101,6 +105,15 @@ CORRECT_EVENT_SQL = """
         type = %(type)s, detail = %(detail)s, player = %(player)s, assist = %(assist)s,
         revoked_at = NULL
     WHERE fixture_id = %(fixture_id)s AND event_key = %(old_key)s
+"""
+UPSERT_STATS_SQL = """
+    INSERT INTO raw.fixture_statistics
+      (fixture_id, api_fixture_id, side, stat, value, raw_value, fixture_status, captured_at)
+    VALUES (%(fixture_id)s, %(api_fixture_id)s, %(side)s, %(stat)s, %(value)s, %(raw_value)s,
+            %(fixture_status)s, %(captured_at)s)
+    ON CONFLICT (fixture_id, side, stat) DO UPDATE SET
+      value = EXCLUDED.value, raw_value = EXCLUDED.raw_value,
+      fixture_status = EXCLUDED.fixture_status, captured_at = EXCLUDED.captured_at
 """
 REVOKE_SQL = """
     UPDATE raw.live_events SET revoked_at = %(now)s
@@ -230,6 +243,20 @@ class Store:
             raise
         return changed
 
+    def write_stats(self, rows: List[Dict[str, Any]]) -> int:
+        """Full-time statistics in one transaction (raw.fixture_statistics)."""
+        if not rows:
+            return 0
+        from psycopg2.extras import execute_batch
+        try:
+            with self._cur() as cur:
+                execute_batch(cur, UPSERT_STATS_SQL, rows)
+            self.conn.commit()
+        except Exception:
+            self._reset()
+            raise
+        return len(rows)
+
 
 class Poller:
     def __init__(self, provider: Provider, store: Store,
@@ -267,12 +294,17 @@ class Poller:
             # fetch them by id once for the final score and events.
             seen = {state["fixture_id"] for state, _ in parsed}
             gone = {fid: api for fid, api in open_live.items() if fid not in seen}
+            stats: List[Dict[str, Any]] = []
             if gone:
                 by_api = {api: fid for fid, api in gone.items()}
                 for item in self.provider.by_ids(sorted(by_api)):
                     api = (item.get("fixture") or {}).get("id")
                     if api in by_api:
                         parsed.append(ls.parse_fixture(item, by_api[api]))
+                        # The by-id response carries match statistics: keep
+                        # them for finished fixtures at no extra call.
+                        if ((item.get("fixture") or {}).get("status") or {}).get("short") in ls.FINAL:
+                            stats += live_stats.parse_statistics(item, by_api[api], now)
             changed = self.store.write_poll(parsed, now)
         except (requests.RequestException, ProviderError, ValueError, KeyError) as exc:
             self.failures += 1
@@ -284,6 +316,13 @@ class Poller:
                                  f"{type(exc).__name__}: {exc}. Live scores are stale.")
             return min(300.0, POLL_SECONDS * 2 ** min(self.failures, 4))
         self.failures = 0
+        if stats:
+            try:
+                n = self.store.write_stats(stats)
+                logger.info("Stored %d full-time statistics for %d fixtures",
+                            n, len({r["fixture_id"] for r in stats}))
+            except Exception as exc:  # scores matter more than statistics
+                logger.error("Storing full-time statistics failed (%s): %s", type(exc).__name__, exc)
         expected = ls.should_be_live(window, now)
         if not parsed and expected:
             self._alert_once("empty", "✗ Ballistics live scores: empty live feed",
