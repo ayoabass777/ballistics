@@ -88,6 +88,41 @@ Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-ser
   `codex/owner-live-matches` (all but `docs/live_scores.md`). The `../ballistics-live` worktree still has
   uncommitted owner changes; review them before deleting the branch.
 
+### Live data: three branches closed 2026-11-16, ready to reopen
+
+Built and tested 2026-11-16, then closed by the owner. Each branch is pushed
+and can be reopened as is. If more than one ships, renumber the later
+migration: both live branches add `0004` (the local DB has
+`0004_fixture_statistics` applied).
+
+- [ ] **Decide by Fri 20 Nov whether to reopen any**, so a deploy lands
+  before the weekend of 21–22 Nov and can be checked on a full matchday.
+  - `live-results-promotion` (PR #30): final results from the live poller go
+    straight into `raw_fixtures` at full time; the nightly update re-checks
+    each one and rewrites only those the provider changed (alert lists them).
+    Also: every load rejects a final status without a score, and the loader
+    no longer takes an exclusive lock on `raw_fixtures` each run.
+  - `live-fulltime-stats` (PR #31): full-time match stats (corners, shots,
+    possession, cards, xG) from the poller's existing by-id fetch into
+    `raw.fixture_statistics`, no extra calls. Local check: 394 of 499 finals
+    had stats.
+  - `xg-more-leagues` (PR #32): 8 leagues added to `XG_LEAGUES` (Argentina,
+    Austria, Croatia, Romania, Greece, Liga MX, Eerste Divisie, J1); 26 → 34.
+- [ ] **If #30 or #31 ships: check the first matchday after deploy** — poller
+  log `Promoted N live final results` and `Stored N full-time statistics`.
+- [ ] **If #30 ships: check the next morning** — `fixture_update_dag`
+  `load_updates` log `Swept N live results: … unchanged, … corrected`; any
+  correction alert names the matches.
+- [ ] **If #32 ships: three nights after deploy** — the 8 leagues' last 120
+  days (~710 fixtures) are in `raw.fixture_xg`; then re-run `calibration_wf`
+  before trusting their forecasts. **Fifteen nights after:** the two-season
+  backlog (~3,700 fixtures, 250 a night) is done.
+- [ ] **Wed 16 Dec: re-probe xG** for the leagues that only started having it
+  (Hungary NB I, Ligue 2, Finland Veikkausliiga, Latvia Virsliga) and the
+  partial ones (Superettan, Serbia, Slovakia 60–65%). Method: 20 FT fixtures
+  over the last 120 days, add at ≥80%. The 16 Nov results are in
+  `docs/xg_integration.md` on branch `xg-more-leagues` only.
+
 ## First visit speed
 
 ~4 s cold before Discover cards appear.
