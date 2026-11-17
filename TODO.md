@@ -32,7 +32,8 @@ The nightly pipeline has run clean for 12 nights in a row (2–13 Nov, every
 ## Retire the v1 server
 
 Planned in D153 (2026-10-22) for "after v2 is live"; v2 has been live since
-2026-10-27. Owner decided 2026-11-17 to retire it now. Checked 2026-11-16 (read-only): Hetzner
+2026-10-27. Owner decided 2026-11-17 to retire it now; v1 is offline since then
+(site redirects to beta, containers stopped). Left: watch, then delete. Checked 2026-11-16 (read-only): Hetzner
 `vector-claw-01` (5.78.177.28, Hillsboro), ~$23/month, disk 91%, all six
 containers up (Postgres, Airflow, API, Redis, frontend). Its
 `fixture_update_dag` and `fixtures_etl_dag` were unpaused and ran every night,
@@ -54,14 +55,19 @@ Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-ser
   local, and v1's tables are the old project's.
 - [x] **Decide what `ballistics.football` shows:** redirect to
   `beta.ballistics.football` (owner, 2026-11-17) until the beta ends.
-- [ ] **Cloudflare (owner, dashboard):** remove the v1 Worker's route or custom
-  domain on `ballistics.football` / `www` (deployed from
-  `frontend_dev/wrangler.jsonc`); make sure the root and `www` have proxied
-  DNS records; add a Redirect Rule (root and `www` → 301
-  `https://beta.ballistics.football`, keep the path). Then delete the `api.`
-  record (only the v1 Worker used it) and check the Clerk production instance
-  and Google OAuth URLs still work on `beta.`.
-- [ ] Stop v1's containers once the redirect is live, so nothing serves from v1.
+- [x] **Cloudflare:** done 2026-11-17. Redirect Rule "Root and www to beta
+  (v1 retired)": `http.host in {"ballistics.football" "www.ballistics.football"}`
+  → 301 `https://beta.ballistics.football/` (static: v1's paths don't exist on
+  beta). The `api` A record (→ 5.78.177.28) is deleted. Checked: root, `www`,
+  old paths and `http://` all 301 to beta; beta `/welcome`, `/sign-in` and
+  staging return 200; Clerk and email records untouched.
+- [x] **Stop v1's containers:** done 2026-11-17 (`docker stop`, restart
+  policy set to `no`; nothing removed, `docker start` undoes it).
+- [ ] The `ballistics-frontend` Worker still holds `ballistics.football` and
+  `www` as Custom Domains. It gets no traffic (the redirect runs first) but
+  its domains are what give the root and `www` DNS. To delete the Worker:
+  detach the domains, then at once add proxied `AAAA 100::` records for the
+  root and `www` so the redirect keeps working.
 - [ ] **Watch for a week:** no traffic or errors on the old URLs, staging's
   API usage normal.
 - [ ] **Take it down** (owner, Hetzner console): a final snapshot, then delete
