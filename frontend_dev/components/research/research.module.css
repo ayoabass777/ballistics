@@ -366,3 +366,12 @@
 .discoverControls .dateTabs { flex-wrap:wrap; gap:6px; }
 .discoverFeatured .link { display:inline-flex; align-items:center; gap:4px; }
 .tabs .button, .dateTabs .button { gap:6px; }
+
+.discoverDateWindow { display:grid; grid-template-columns:44px repeat(5,minmax(0,1fr)) 44px; align-items:stretch; gap:3px; min-width:0; }
+.page .discoverDateWindow .button { padding:8px 6px; min-width:0; }
+@media(max-width:700px) {
+ .discoverControls .dateTabs { width:100%; }
+ .discoverDateWindow { order:3; width:100%; }
+ .page .discoverDateWindow .button { font-size:11px; padding:8px 2px; }
+ .discoverDateWindow .dateDayNumber { font-size:10px; }
+}

@@ -1,6 +1,6 @@
 'use client';
-import { CalendarDays } from 'lucide-react';
-import { useState } from 'react';
+import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { dayInZone } from '@/lib/preferences';
 import { Button } from './shared';
@@ -11,6 +11,18 @@ export function DiscoverDates({ zone, dayWindow = false }: { zone: string | null
     const scope = search.get('scope') || 'week';
     const [open, setOpen] = useState(false);
     const [start, setStart] = useState(''), [end, setEnd] = useState('');
+    const today = dayInZone(zone || 'UTC');
+    const chosenDay = search.get('day');
+    const [windowStart, setWindowStart] = useState(today);
+    const shiftDay = (day: string, offset: number) => {
+        const date = new Date(`${day}T12:00:00Z`);
+        date.setUTCDate(date.getUTCDate() + offset);
+        return date.toISOString().slice(0, 10);
+    };
+    useEffect(() => {
+        const anchor = chosenDay && /^\d{4}-\d{2}-\d{2}$/.test(chosenDay) ? chosenDay : scope === 'tomorrow' ? shiftDay(today, 1) : today;
+        setWindowStart(current => anchor >= current && anchor <= shiftDay(current, 4) ? current : anchor);
+    }, [chosenDay, scope, today]);
     const valid = !!start && !!end && start <= end;
     function apply(nextScope: string, day = '', endDay = '') {
         const next = new URLSearchParams(search.toString());
@@ -26,14 +38,19 @@ export function DiscoverDates({ zone, dayWindow = false }: { zone: string | null
                 className={scope === key ? s.active : ''} aria-pressed={scope === key}
                 onClick={() => apply(key)}>{['Next 7 days', 'Today', 'Tomorrow'][i]}</Button>)}
             {dayWindow && <>
-                <Button className={scope === 'week' ? s.active : ''} aria-pressed={scope === 'week'} onClick={() => apply('week')}>Next 7 days</Button>
+                <Button className={scope === 'week' ? s.active : ''} aria-pressed={scope === 'week'} onClick={() => { setWindowStart(today); apply('week'); }}>Next 7 days</Button>
+                <div className={s.discoverDateWindow} role="group" aria-label="Browse dates">
+                <Button aria-label="Earlier dates" onClick={() => setWindowStart(shiftDay(windowStart, -5))}><ChevronLeft size={18} aria-hidden="true"/></Button>
                 {[0, 1, 2, 3, 4].map(offset => {
-                    const day = dayInZone(zone || 'UTC', offset);
-                    const selected = (scope === 'today' && offset === 0) || (scope === 'tomorrow' && offset === 1) || (scope === 'date' && search.get('day') === day);
+                    const day = shiftDay(windowStart, offset);
+                    const isToday = day === today, isTomorrow = day === shiftDay(today, 1);
+                    const selected = (scope === 'today' && isToday) || (scope === 'tomorrow' && isTomorrow) || (scope === 'date' && search.get('day') === day);
                     return <Button key={day} className={selected ? s.active : ''} aria-pressed={selected} onClick={() => apply('date', day)}>
-                        <span>{offset === 0 ? 'Today' : offset === 1 ? 'Tomorrow' : new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {weekday:'short',timeZone:'UTC'})}<small className={s.dateDayNumber}>{new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {day:'numeric',month:'short',timeZone:'UTC'})}</small></span>
+                        <span>{isToday ? 'Today' : isTomorrow ? 'Tomorrow' : new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {weekday:'short',timeZone:'UTC'})}<small className={s.dateDayNumber}>{new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {day:'numeric',month:'short',timeZone:'UTC'})}</small></span>
                     </Button>;
                 })}
+                <Button aria-label="Later dates" onClick={() => setWindowStart(shiftDay(windowStart, 5))}><ChevronRight size={18} aria-hidden="true"/></Button>
+                </div>
             </>}
             <Button className={scope === 'date' || scope === 'range' ? s.active : ''}
                 aria-expanded={open} aria-controls="discover-date-picker"
