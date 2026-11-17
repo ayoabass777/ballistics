@@ -1,6 +1,6 @@
 # To-do
 
-Open work only, most urgent first. Rewritten 2026-11-13; the earlier list,
+Open work only, most urgent first. Rewritten 2026-11-13 (v1 retirement added 2026-11-16); the earlier list,
 with its dated history (beta blockers, staging setup, engine review), is in
 [docs/todo-archive-2026-11-13.md](docs/todo-archive-2026-11-13.md). Mark items
 done here with a date, and move them to the archive when a section gets long.
@@ -28,6 +28,51 @@ The nightly pipeline has run clean for 12 nights in a row (2–13 Nov, every
   improvement from PR #21 with tester readings, not owner ones.
 - [ ] **Wave 2 invites** (D150: 10–15 testers in two waves; wave 1 sent by
   2026-10-30). Decide after the retention answers.
+
+## Retire the v1 server
+
+Planned in D153 (2026-10-22) for "after v2 is live"; v2 has been live since
+2026-10-27. Owner decided 2026-11-17 to retire it now; v1 is offline since then
+(site redirects to beta, containers stopped). Left: watch, then delete. Checked 2026-11-16 (read-only): Hetzner
+`vector-claw-01` (5.78.177.28, Hillsboro), ~$23/month, disk 91%, all six
+containers up (Postgres, Airflow, API, Redis, frontend). Its
+`fixture_update_dag` and `fixtures_etl_dag` were unpaused and ran every night,
+on the same API-Football key as staging (7,500 requests/day shared with the
+staging pipeline and live poller). `ballistics.football` still serves the v1
+site through Cloudflare; `api.ballistics.football` points straight at v1.
+Usage (v1 API log, 3–17 Nov): about 37 homepage data refreshes in two weeks;
+the rest was bot traffic.
+Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-server-inspection-2026-10-21-read-only-as-sage).
+
+- [x] **Pause v1's two DAGs** (`fixture_update_dag`, `fixtures_etl_dag`):
+  done 2026-11-17; v1 no longer calls API-Football. Unpause to undo.
+- [x] **Back up v1's database:** done 2026-11-17 on the Mac,
+  `~/Backups/ballistics-v1/` (`football_betting_2026-11-17.dump`, 128 MB,
+  pg_dump custom format, plus roles in `globals_2026-11-17.sql` and
+  `SHA256SUMS`). Restored into a throwaway postgres:17: all 78 tables match
+  v1's row counts exactly (15.1M rows). Not yet copied off the Mac (S3 or
+  another disk). Not checked table by table against v2; v2 was seeded from
+  local, and v1's tables are the old project's.
+- [x] **Decide what `ballistics.football` shows:** redirect to
+  `beta.ballistics.football` (owner, 2026-11-17) until the beta ends.
+- [x] **Cloudflare:** done 2026-11-17. Redirect Rule "Root and www to beta
+  (v1 retired)": `http.host in {"ballistics.football" "www.ballistics.football"}`
+  → 301 `https://beta.ballistics.football/` (static: v1's paths don't exist on
+  beta). The `api` A record (→ 5.78.177.28) is deleted. Checked: root, `www`,
+  old paths and `http://` all 301 to beta; beta `/welcome`, `/sign-in` and
+  staging return 200; Clerk and email records untouched.
+- [x] **Stop v1's containers:** done 2026-11-17 (`docker stop`, restart
+  policy set to `no`; nothing removed, `docker start` undoes it).
+- [ ] The `ballistics-frontend` Worker still holds `ballistics.football` and
+  `www` as Custom Domains. It gets no traffic (the redirect runs first) but
+  its domains are what give the root and `www` DNS. To delete the Worker:
+  detach the domains, then at once add proxied `AAAA 100::` records for the
+  root and `www` so the redirect keeps working.
+- [ ] **Watch for a week:** no traffic or errors on the old URLs, staging's
+  API usage normal.
+- [ ] **Take it down** (owner, Hetzner console): a final snapshot, then delete
+  `vector-claw-01`. Remove its `~/.ssh/known_hosts` entry and archive the
+  `football-stats-frontend` deploy notes.
 
 ## Live scores and Matches
 
