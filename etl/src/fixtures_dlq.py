@@ -87,6 +87,9 @@ def fixture_row_problem(row: Dict[str, Any]) -> Optional[str]:
         return "null_status"             # NOT NULL
     if row.get("home_team_id") is None or row.get("away_team_id") is None:
         return "null_team_id"            # joins to teams, Elo, patterns
+    if row.get("fixture_status") in ("FT", "AET", "PEN") and (
+            row.get("home_team_fulltime_goal") is None or row.get("away_team_fulltime_goal") is None):
+        return "final_without_score"     # is_played with a NULL score crashed Elo (2026-11-01)
     return None
 
 

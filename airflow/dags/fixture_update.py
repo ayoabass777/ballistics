@@ -190,7 +190,27 @@ def fixture_update_dag():
             logger.info("Empty updates file. Skipping.")
             return
 
-        count = apply_updates_to_db(updates)
+        # Daily sweep of results the live poller already wrote: rewrite only
+        # the ones the provider now answers differently (etl/src/live_results.py).
+        from etl.src.extract_metadata import get_db_connection
+        from etl.src.live_results import sweep, mark_swept
+        with get_db_connection() as conn, conn.cursor() as cur:
+            to_apply, stamps, changed = sweep(cur, updates)
+        count = apply_updates_to_db(to_apply) if to_apply else 0
+        if stamps:
+            with get_db_connection() as conn, conn.cursor() as cur:
+                mark_swept(cur, stamps)
+                conn.commit()
+            logger.info("Swept %d live results: %d unchanged, %d corrected",
+                        len(stamps), len(stamps) - len(changed), len(changed))
+        if changed:
+            from etl.src.data_detector.notify import send_alert
+            try:
+                send_alert(f"Ballistics: {len(changed)} live results corrected by the nightly sweep",
+                           "The provider's answer differed from what the live poller wrote; "
+                           "raw_fixtures now has the provider's answer.\n\n" + "\n".join(changed))
+            except Exception as exc:  # the load already succeeded
+                logger.warning("Sweep alert failed (%s)", type(exc).__name__)
         watermark_column, watermark_min, watermark_max = fixture_kickoff_watermark(updates)
         record_data_movement_from_context(
             context,
@@ -209,6 +229,8 @@ def fixture_update_dag():
             details={
                 "payload_rows": len(updates),
                 "applied_rows": count,
+                "live_results_swept": len(stamps),
+                "live_results_corrected": len(changed),
             },
         )
         record_table_snapshot_from_context(
