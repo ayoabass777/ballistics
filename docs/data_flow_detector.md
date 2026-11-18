@@ -280,7 +280,8 @@ The daily email ends with **Model watch**: shadow checks being tracked before a
 decision, never part of pass/fail (`etl/src/data_detector/model_watch.py`).
 
 - **Match Over 1.5 (D120)** — latest weekly refit from
-  `engine/eval/watch/match_over_1_5.csv` (written by `engine_calibration.market_watch`):
+  `raw.market_watch` (written by `engine_calibration.market_watch`; a CSV in
+  `engine/eval/watch/` until 2026-11-18):
   claimed vs hit for all models and Dixon–Coles alone, change since the previous refit, drift flag.
 - **Big dog Dixon–Coles cross-check (D136)** — `raw.big_dog_watch` holds each published
   Big dog (latest pre-kickoff values) with `dc_win_prob` (DC win chance for the Elo

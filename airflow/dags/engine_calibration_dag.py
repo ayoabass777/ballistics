@@ -64,7 +64,7 @@ def engine_calibration_dag():
     )
 
     # D120: log watched markets (Match Over 1.5, all vs Dixon-Coles alone) after
-    # every refit; appends engine/eval/watch/*.csv and prints FLAG lines on drift.
+    # every refit; adds rows to raw.market_watch and prints FLAG lines on drift.
     market_watch = DockerOperator(
         task_id="market_watch",
         image="ballistics-engine:latest",
