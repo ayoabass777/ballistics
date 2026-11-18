@@ -1,5 +1,7 @@
 # Match detail — data contract (v2)
 
+2026-11-17 — Implemented locally: Matches and Match details share the strongest-section highlight selector. For a historical-pattern highlight, details preserves its exact team/event/venue/count in the matching default view, promotes it from See all when needed, and avoids duplicates. Normal pattern eligibility and forecast thresholds are unchanged. Existing stored discovery snapshots supply this evidence; no engine refresh is required. Missing comparison/streak metadata stays null rather than invented. 43 focused tests pass, including retention, promotion, immutability and deduplication. API deployment and live browser verification pending.
+
 2026-10-22: Strength, Patterns and Goals now come from the fixture's most recent complete run, so a match keeps its last pre-kickoff forecast after kickoff (D152). New field `fixture.forecast_from_latest_run` (false for such a kept forecast; the frontend should label it "made before kickoff"). `engine_stale` is not raised for it once kickoff has passed. Migration `0002` adds the index this lookup uses.
 
 2026-10-12 latest owner correction: extra probability-above-league gate rejected. Use the Bayes display-eligible pool and separate Results / Attack-defence categories as described in data-contract.md. Earlier Beta exceedance thresholds and no-pairs rules below are superseded history, not active selection requirements.
