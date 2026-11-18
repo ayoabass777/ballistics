@@ -136,6 +136,9 @@ services:
       <<: *airflow-env
       CONNECTION_CHECK_MAX_COUNT: "0"   # no Airflow metadata DB needed
       LIVE_POLL_SECONDS: "15"
+      # Final results go to raw_fixtures at full time; the nightly sweep
+      # re-checks each one (etl/src/live_results.py). "0" turns it off.
+      LIVE_PROMOTE_RESULTS: "1"
     depends_on:
       postgres:
         condition: service_healthy

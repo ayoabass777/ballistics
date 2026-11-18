@@ -2,7 +2,7 @@
 
 2026-10-08 — **Lineage: the engine reads xG through dbt.** `raw.fixture_xg` (ETL, unchanged) is a dbt source → `stg_raw_fixture_xg` (view, rename/cast) → `fact_fixture_xg` (table in `raw`, fixture grain, played fixtures with both sides' xG, warehouse team ids from `int_fixtures`). `predict_dixon_coles.blend_xg` (also used by `calibration_wf`) reads `raw.fact_fixture_xg` (`XG_TABLE`). The fact is a full rebuild, not incremental: xG lands after the result without touching `raw_fixtures.updated_at`. Tests: unique/not-null `fixture_id`, relationship to `stg_raw_fixtures`, non-negative xG, source freshness warn at 72 h on `captured_at`. `engine_predict` now waits for `fixture_update_dag.run_dbt` (was `extract_xg_task`), so xG and all dbt facts are same-night. Switch check: `python -m engine.eval.diagnostics.xg_lineage_check`.
 
-Status: **scheduled** (updated August 6 2026). xG is ingested from API-Football after
+Status: **scheduled** (updated November 16 2026). xG is ingested from API-Football after
 the daily fixture-result update and blended into the Dixon-Coles goals model for the
 leagues that have verified coverage.
 
@@ -27,7 +27,25 @@ foundation. Non-covered fixtures are untouched and stay on actual goals.
 | Historical/intermittent | Allsvenskan and Chinese Super League retain useful 2025–2026 xG already in the warehouse, although the latest three-fixture probe returned none |
 | No xG in sample | Remaining 25 tracked leagues; they stay on actual goals |
 
-The 26 verified or historically useful league ids are the explicit `XG_LEAGUES`
+### Re-probe November 16 2026
+
+Full-time statistics from the live poller showed `expected_goals` on 347 of 499 tracked
+finals (Nov 6–9), against 206 in allowlisted leagues. Each off-list league with xG was
+then probed on 20 FT fixtures spread over the last 120 days (the window Dixon-Coles
+weights; half-life ~107 days):
+
+| Result (last 120 days) | Leagues |
+|---|---|
+| Added (≥80%) | Argentina LPF 20/20, Austria Bundesliga 20/20, Croatia HNL 20/20, Romania Liga I 19/20, Greece Super League 1 18/20, Liga MX 18/20, Eerste Divisie 18/20, J1 League 16/20 |
+| Partial, not added | Superettan 13/20, Serbia Super Liga 12/20, Slovakia Super Liga 12/20, Russia Premier League 9/20, Chile Primera 7/20, Turkey 1. Lig 6/20 |
+| Only just started | Hungary NB I (0/16 Jul–Sep, 4/4 Oct), Ligue 2, Finland Veikkausliiga and Latvia Virsliga (0/20 to October, every Nov 6–9 match covered); re-probe in a month |
+| Challenger Pro League | 2/20 |
+
+Over the job's two seasons the new leagues are patchier (Argentina 8/20, Greece 10/20,
+Eerste Divisie 12/20): most of their xG starts with the current seasons. Those older
+fixtures are recorded `missing` and retried every 30 days, as for every league.
+
+The 34 verified or historically useful league ids are the explicit `XG_LEAGUES`
 allowlist. A league is not promoted solely because the endpoint returns other match
 statistics.
 

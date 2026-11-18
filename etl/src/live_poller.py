@@ -8,7 +8,13 @@ fixture is in its live window, and sleeps otherwise, so it spends no calls
 overnight. It writes only changes and sends NOTIFY live_changed with the
 fixture_id for each.
 
-It never writes raw.raw_fixtures: the nightly pipeline owns results.
+Final results (FT, AET, PEN with both full-time goals) from the by-id fetch
+are written to raw.raw_fixtures through the nightly loader, landed in S3
+first (etl/src/live_results.py); the nightly sweep re-checks each one.
+LIVE_PROMOTE_RESULTS=0 turns this off. Live state stays in its own tables.
+Full-time match statistics (corners, shots, possession, cards, xG where
+covered) come with the same by-id fetch and go to raw.fixture_statistics
+(etl/src/live_stats.py), at no extra call.
 
 Run: python -m etl.src.live_poller
 """
@@ -24,6 +30,7 @@ import logging
 import requests
 
 from etl.src import live_scores as ls
+from etl.src import live_stats
 from etl.src.config import LOGS_PATH
 from etl.src.logger import get_logger
 
@@ -101,6 +108,15 @@ CORRECT_EVENT_SQL = """
         type = %(type)s, detail = %(detail)s, player = %(player)s, assist = %(assist)s,
         revoked_at = NULL
     WHERE fixture_id = %(fixture_id)s AND event_key = %(old_key)s
+"""
+UPSERT_STATS_SQL = """
+    INSERT INTO raw.fixture_statistics
+      (fixture_id, api_fixture_id, side, stat, value, raw_value, fixture_status, captured_at)
+    VALUES (%(fixture_id)s, %(api_fixture_id)s, %(side)s, %(stat)s, %(value)s, %(raw_value)s,
+            %(fixture_status)s, %(captured_at)s)
+    ON CONFLICT (fixture_id, side, stat) DO UPDATE SET
+      value = EXCLUDED.value, raw_value = EXCLUDED.raw_value,
+      fixture_status = EXCLUDED.fixture_status, captured_at = EXCLUDED.captured_at
 """
 REVOKE_SQL = """
     UPDATE raw.live_events SET revoked_at = %(now)s
@@ -230,12 +246,29 @@ class Store:
             raise
         return changed
 
+    def write_stats(self, rows: List[Dict[str, Any]]) -> int:
+        """Full-time statistics in one transaction (raw.fixture_statistics)."""
+        if not rows:
+            return 0
+        from psycopg2.extras import execute_batch
+        try:
+            with self._cur() as cur:
+                execute_batch(cur, UPSERT_STATS_SQL, rows)
+            self.conn.commit()
+        except Exception:
+            self._reset()
+            raise
+        return len(rows)
+
 
 class Poller:
     def __init__(self, provider: Provider, store: Store,
                  alert: Callable[[str, str], Any],
-                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc)):
+                 clock: Callable[[], datetime] = lambda: datetime.now(timezone.utc),
+                 promote: Optional[Callable[[List[Dict[str, Any]], datetime], int]] = None):
         self.provider, self.store, self.alert, self.clock = provider, store, alert, clock
+        # Writes final results into raw.raw_fixtures (etl/src/live_results.py).
+        self.promote = promote
         self.failures = 0
         self.last_alert: Dict[str, float] = {}
 
@@ -267,12 +300,20 @@ class Poller:
             # fetch them by id once for the final score and events.
             seen = {state["fixture_id"] for state, _ in parsed}
             gone = {fid: api for fid, api in open_live.items() if fid not in seen}
+            finals: List[Dict[str, Any]] = []
+            stats: List[Dict[str, Any]] = []
             if gone:
                 by_api = {api: fid for fid, api in gone.items()}
                 for item in self.provider.by_ids(sorted(by_api)):
                     api = (item.get("fixture") or {}).get("id")
                     if api in by_api:
                         parsed.append(ls.parse_fixture(item, by_api[api]))
+                        # The by-id response is final for finished fixtures:
+                        # promote the result and keep its match statistics,
+                        # both at no extra call.
+                        if ((item.get("fixture") or {}).get("status") or {}).get("short") in ls.FINAL:
+                            finals.append(item)
+                            stats += live_stats.parse_statistics(item, by_api[api], now)
             changed = self.store.write_poll(parsed, now)
         except (requests.RequestException, ProviderError, ValueError, KeyError) as exc:
             self.failures += 1
@@ -284,6 +325,24 @@ class Poller:
                                  f"{type(exc).__name__}: {exc}. Live scores are stale.")
             return min(300.0, POLL_SECONDS * 2 ** min(self.failures, 4))
         self.failures = 0
+        if finals and self.promote is not None:
+            # The by-id payload is the nightly update's own input; a failure
+            # here leaves the result to the nightly update, which still runs.
+            try:
+                self.promote(finals, now)
+            except Exception as exc:
+                logger.error("Promoting %d live results failed (%s): %s",
+                             len(finals), type(exc).__name__, exc)
+                self._alert_once("promote", "✗ Ballistics live scores: results not written",
+                                 f"Writing {len(finals)} live final results to raw_fixtures failed "
+                                 f"({type(exc).__name__}: {exc}). The nightly update will load them.")
+        if stats:
+            try:
+                n = self.store.write_stats(stats)
+                logger.info("Stored %d full-time statistics for %d fixtures",
+                            n, len({r["fixture_id"] for r in stats}))
+            except Exception as exc:  # scores matter more than statistics
+                logger.error("Storing full-time statistics failed (%s): %s", type(exc).__name__, exc)
         expected = ls.should_be_live(window, now)
         if not parsed and expected:
             self._alert_once("empty", "✗ Ballistics live scores: empty live feed",
@@ -316,7 +375,12 @@ def main() -> None:
 
     if not API.get("key") or not API.get("url"):
         raise SystemExit("API_KEY and API_URL are required")
-    poller = Poller(Provider(API["url"], API["key"]), Store(get_db_connection), send_alert)
+    promote = None
+    if os.getenv("LIVE_PROMOTE_RESULTS", "1") != "0":
+        from etl.src.live_results import Promoter
+        promote = Promoter(get_db_connection)
+    poller = Poller(Provider(API["url"], API["key"]), Store(get_db_connection), send_alert,
+                    promote=promote)
     stopping = {"now": False}
 
     def stop(*_):

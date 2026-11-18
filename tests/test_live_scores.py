@@ -148,6 +148,9 @@ class FakeStore:
         self.writes.append(parsed)
         return [s["fixture_id"] for s, _ in parsed]
 
+    def write_stats(self, rows):
+        return len(rows)
+
 
 def poller(provider, store):
     alerts = []
