@@ -1,5 +1,7 @@
 # Implementation status
 
+2026-11-18 — Beta branch reconciled with main `1890c82` without conflicts, preserving all-beta UI rollout and committing the historical-highlight retention change. Verified 69 focused tests across highlight selection, patterns/discovery, fixture correction, deployment runtime files and market watch; research TypeScript and whitespace checks pass. Frontend rollout `bd037463` was deployed on 17 Nov and All standouts browser verified on 18 Nov. This reconciliation itself is not deployed; research highlight retention remains pending deployment.
+
 2026-11-17 — Discover arrow date bar implemented locally: earlier/later arrows shift the five visible dates without changing the active filter; selecting a day applies it. Calendar selection brings its date into view, Next 7 days restores the current window, and date arithmetic uses UTC calendar days after deriving today in the account timezone. Mobile keeps the date window on one dedicated row. TypeScript and whitespace checks pass. Deployment/browser verification pending.
 
 2026-11-17 — Owner Discover icons and date window implemented locally: search icon, labelled category SVGs, 44px bookmark controls with saved state, league/all-standouts chevrons, and Today/next four dated days beside Next 7 days and Calendar. Calendar retains custom single-day/range input and shows applied dates. Dates use account timezone; Discover remains upcoming research. TypeScript and whitespace checks passed; browser verification/deployment pending.
