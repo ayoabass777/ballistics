@@ -272,6 +272,40 @@ def read_engine_sections(cur, fixture_id: int) -> tuple[dict | None, dict | None
     return run, row["payload"]
 
 
+def retain_matches_pattern(sections):
+    """Preserve one selected historical highlight, without broadening eligibility."""
+    from copy import deepcopy
+    from engine.api.discover import leading_pick
+    from engine.eval.team_patterns import label
+    pick = leading_pick(sections.get("discovery"))
+    if not pick or pick.get("list") != "patterns":
+        return sections.get("patterns")
+    fixture = (sections.get("discovery") or {}).get("fixture") or {}
+    team, event, context = (pick.get(k) for k in ("team", "event", "context"))
+    k, n = pick.get("k"), pick.get("n")
+    if (not event or context not in ("home", "away", "all")
+            or not isinstance(k, (int, float)) or not isinstance(n, (int, float))
+            or not 0 <= k <= n or n <= 0 or team not in (fixture.get("home"), fixture.get("away"))):
+        return sections.get("patterns")
+    side = "home" if team == fixture.get("home") else "away"
+    view_key = "all" if context == "all" else "venue"
+    patterns = deepcopy(sections.get("patterns")) or {"default_view": view_key, "all": None, "venue": None}
+    view = patterns.get(view_key) or {key: [] for key in ("top_results", "top_attack_defence", "also", "see_all")}
+    patterns[view_key] = view
+    patterns["default_view"] = view_key
+    match = lambda r: (r.get("team"), r.get("event"), r.get("context")) == (team, event, context)
+    if any(match(r) for key in ("top_results", "top_attack_defence", "also") for r in view[key]):
+        return patterns
+    existing = next((r for r in view["see_all"] if match(r)), None)
+    view["see_all"] = [r for r in view["see_all"] if not match(r)]
+    view["also"].insert(0, existing or {
+        "team": team, "side": side, "event": event, "label": label(event),
+        "context": context, "k": k, "n": n, "rate": k / n,
+        "league_rate": None, "league_comparison": None, "streak": None,
+    })
+    return patterns
+
+
 def build_match_core(cur, fixture_id: int) -> dict | None:
     """The match page without data-quality annotations (see build_match)."""
     ctx = match_context.build_context(cur, fixture_id)
@@ -295,7 +329,7 @@ def build_match_core(cur, fixture_id: int) -> dict | None:
         "fixture": fixture,
         "context": context,
         "strength": sec.get("strength"),
-        "patterns": sec.get("patterns"),
+        "patterns": retain_matches_pattern(sec),
         "goals": sec.get("goals"),
         "discover": sec.get("discover"),
     }
