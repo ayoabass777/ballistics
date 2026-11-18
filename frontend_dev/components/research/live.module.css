@@ -64,3 +64,15 @@
 .fixtureItem .saveBookmark:focus-visible { outline:2px solid var(--green); outline-offset:-3px; }
 .fixtureItem .fixtureEvidence { grid-column:1 / -1; margin:0; padding:0 14px 10px 90px; font-size:12px; }
 @media(max-width:700px) { .fixtureItem .fixtureEvidence { padding-left:72px; } }
+
+.matchesBrowser { display:flex; flex-direction:column; gap:20px; min-width:0; }
+.liveScore { color:#b3261e; }
+.teamName { min-width:0; overflow-wrap:anywhere; }
+.fixtureItem .team > :first-child { flex-shrink:0; }
+@media(max-width:380px) {
+  .fixtureItem > .liveRow { grid-template-columns:40px minmax(0,1fr) auto; column-gap:6px; padding:10px 6px; }
+  .fixtureItem .team { gap:5px; font-size:13px; }
+  .fixtureItem .fixtureEvidence { padding-left:52px; padding-right:8px; }
+  .fixtureItem .clock { font-size:11px; gap:3px; }
+  .fixtureItem .score { font-size:15px; }
+}

@@ -25,6 +25,14 @@ def snapshot(f):
     }
 
 
+def leading_pick(data):
+    """The shared Matches highlight; ties retain section order."""
+    sections = (data or {}).get('sections') or {}
+    candidates = [sections[k] for k in KINDS if sections.get(k)
+                  and isinstance(sections[k].get('score'), (int, float))]
+    return max(candidates, key=lambda p: p['score'], default=None)
+
+
 def window(zone, scope, day=None, now=None, end_day=None):
     now = now or datetime.now(timezone.utc)
     try:
@@ -69,9 +77,7 @@ def assemble(rows, *, zone='UTC', scope='week', day=None, end_day=None, leagues=
             continue
         # Matches stays chronological. Its optional preview uses the strongest
         # already-qualified section pick; private scores never leave the API.
-        sections = data.get('sections') or {}
-        candidates = [sections[k] for k in KINDS if sections.get(k) and isinstance(sections[k].get('score'), (int, float))]
-        leading = max(candidates, key=lambda p: p['score'], default=None)
+        leading = leading_pick(data)
         matches.append({**f, 'pick': None,
                         'preview': {k: leading.get(k) for k in PICK_FIELDS} if leading else None})
         for name, p in [('standouts', data.get('standout')), *data.get('sections', {}).items()]:

@@ -300,3 +300,78 @@
 .compactMatchFilters .segment { display:flex; width:auto; flex:0 0 auto; margin:0; }
 .compactMatchFilters .segment .button { min-width:58px; padding:8px 12px; }
 .quietUpdate { font-size:11px; color:var(--muted); margin:0; }
+
+/* Owner match detail hierarchy: one header and a research-first Overview. */
+.ownerDetails .headerBookmark { flex:0 0 44px; width:44px; padding:0; }
+.ownerDetails .headerBookmark[aria-pressed="true"] { color:var(--green); background:#eff4eb; }
+.ownerDetails .ownerHeaderCompact { gap:6px; padding-block:6px; }
+.ownerHeaderCompact .matchMetadata { display:none; }
+.ownerHeaderCompact .fixtureIdentity { font-size:12px; line-height:17px; gap:6px; }
+.ownerHeaderCompact .fixtureIdentity .crest, .ownerHeaderCompact .fixtureIdentity .crest img { width:18px; height:18px; }
+.overviewHighlights .evidence { color:inherit; text-decoration:none; gap:16px; }
+.overviewHighlights .evidence:hover { background:#f4f7f1; }
+.overviewHighlights .evidence > span { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.overviewHighlights .evidence > span strong { font-size:14px; }
+.overviewHighlights .evidence > strong { font-size:20px; white-space:nowrap; }
+.ownerDetails .evidence > div { min-width:0; }
+.ownerDetails .evidence > strong { flex-shrink:0; }
+.ownerDetails .chips { overflow-x:auto; flex-wrap:nowrap; }
+.ownerDetails .chips > * { flex-shrink:0; }
+@media(max-width:380px) { .ownerDetails .stickyTitle .fixtureIdentity { font-size:12px; } .ownerDetails .evidence { gap:10px; } }
+
+/* Visual review: one overview group and consistent section rhythm. */
+.ownerDetails { max-width:920px; }
+.ownerDetails > .overviewGroup { max-width:none; gap:0; background:white; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.ownerDetails .overviewHeading { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 20px; border-bottom:1px solid var(--line); }
+.ownerDetails .overviewHeading h2 { margin:0; font-size:18px; }
+.ownerDetails .overviewHeading .button { padding:4px 8px; font-size:12px; background:transparent; border:0; }
+.ownerDetails .overviewGroup > .panel { border:0; border-radius:0; padding:18px 20px; }
+.ownerDetails .overviewHighlights { border-top:1px solid var(--line)!important; gap:0; padding-block:0!important; }
+.ownerDetails .overviewHighlights .evidence { border:0; border-radius:0; padding:16px 0; justify-content:space-between; }
+.ownerDetails .overviewHighlights .evidence + .evidence { border-top:1px solid var(--line); }
+.ownerDetails .overviewHighlights .evidence > span { flex:1; }
+.ownerDetails .overviewHighlights .evidence > strong { text-align:right; min-width:64px; }
+.ownerDetails .tierContext { margin-top:6px; padding-top:12px; }
+.ownerDetails .tierContext > summary { cursor:pointer; margin:0; font-size:12px; }
+.ownerDetails .tierContext[open] > summary { margin-bottom:12px; }
+.ownerDetails > div:has(> section[data-match-section]) { margin-top:24px; }
+.ownerDetails .matchMetadata { display:flex; align-items:center; flex-wrap:wrap; gap:6px 16px; }
+.ownerDetails .matchMetadata p { margin:0; }
+.ownerDetails .ownerHeaderCompact .matchMetadata { display:none; }
+.ownerDetails .chips a { border-radius:6px; }
+.ownerDetails > .panel .evidence { border:0; border-radius:0; border-bottom:1px solid var(--line); padding:14px 0; }
+.ownerDetails .tutorialTip { margin-top:12px; }
+@media(max-width:700px) { .ownerDetails .overviewHeading, .ownerDetails .overviewGroup > .panel { padding-inline:16px; } }
+
+/* Discover: identity and scope, featured research, then category exploration. */
+.discoverControls { gap:12px; padding-bottom:20px; border-bottom:1px solid var(--line); }
+.discoverHeading { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
+.discoverHeading h1 { margin:0 0 4px; font-size:28px; line-height:1.2; }
+.discoverHeading > div { min-width:0; }
+.discoverHeading > :last-child { width:320px; max-width:100%; }
+.discoverHeading input { width:100%; }
+.discoverFeatured { padding:20px; border:1px solid #cbdcc2; border-radius:12px; background:#eef5e7; }
+.discoverFeatured h2 { font-size:22px; }
+@media(max-width:700px) {
+ .discoverHeading { flex-direction:column; align-items:stretch; gap:12px; }
+ .discoverHeading > :last-child { width:100%; }
+ .discoverFeatured { padding:14px; }
+}
+
+.discoverCategoryTools { display:flex; align-items:center; flex-wrap:wrap; gap:12px 20px; padding:12px 0; border-bottom:1px solid var(--line); }
+
+.page .discoverBookmark { width:44px; min-width:44px; height:44px; padding:0; border:0; background:transparent; color:var(--muted); }
+.page .discoverBookmark[aria-pressed="true"] { color:var(--green); }
+.dateDayNumber { display:block; font-size:11px; font-weight:400; margin-top:3px; }
+.discoverControls .dateTabs { flex-wrap:wrap; gap:6px; }
+.discoverFeatured .link { display:inline-flex; align-items:center; gap:4px; }
+.tabs .button, .dateTabs .button { gap:6px; }
+
+.discoverDateWindow { display:grid; grid-template-columns:44px repeat(5,minmax(0,1fr)) 44px; align-items:stretch; gap:3px; min-width:0; }
+.page .discoverDateWindow .button { padding:8px 6px; min-width:0; }
+@media(max-width:700px) {
+ .discoverControls .dateTabs { width:100%; }
+ .discoverDateWindow { order:3; width:100%; }
+ .page .discoverDateWindow .button { font-size:11px; padding:8px 2px; }
+ .discoverDateWindow .dateDayNumber { font-size:10px; }
+}

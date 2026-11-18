@@ -18,8 +18,8 @@
 .main { padding:32px; display:flex; flex-direction:column; gap:12px; min-width:0; }
 .subtitle { color:var(--muted); }
 .caption { font-size:12px; line-height:18px; color:var(--muted); }
-.page .button { min-height:44px; height:auto; border:1px solid var(--line); border-radius:7px; padding:10px 14px; background:white; color:var(--ink); font-size:13px; font-weight:500; white-space:normal; cursor:pointer; }
-.page .button:hover { background:#eef3ed; }
+.page .button, .embedded .button { min-height:44px; height:auto; border:1px solid var(--line); border-radius:7px; padding:10px 14px; background:white; color:var(--ink); font-size:13px; font-weight:500; white-space:normal; cursor:pointer; }
+.page .button:hover, .embedded .button:hover { background:#eef3ed; }
 .page .active,.page .active:hover { background:var(--green); color:white; border-color:var(--green); }
 .page :is(button,a,input,summary):focus-visible { outline:3px solid var(--blue); outline-offset:3px; }
 .page input { min-height:44px; border:1px solid var(--line); border-radius:7px; background:white; color:var(--ink); padding:9px 12px; width:100%; min-width:0; }
@@ -63,3 +63,7 @@
 .skip:focus { top:12px; }
 @media(max-width:1000px) { .workspace:not(.workspaceCollapsed) { grid-template-columns:180px minmax(0,1fr); } .filters { grid-template-columns:1fr 1fr; } .fixtureSummary { grid-template-columns:1fr auto; } .identity { grid-column:1/-1; } .main { padding:24px; } .sidebar { padding:24px 16px; } .workspaceCollapsed .sidebar { padding:20px 10px; } }
 @media(max-width:700px) { .header { padding:20px; min-height:76px; } .tagline { display:none; } .header>a:last-child { margin-left:auto; } .workspace { display:block; } .sidebar { display:none; } .main { padding:20px 20px 96px; } .filters { grid-template-columns:minmax(0,1fr) minmax(0,1fr); } .tools>.button { flex:1; } .leaguePicker { flex-basis:100%; max-width:none; } .tabs { gap:8px; } .tabs .button { flex:1; min-width:0; padding:10px 8px; } .fixtureSummary { gap:8px; } .identity { margin-bottom:0; } .fixtureSummary>.button { max-width:150px; } .eventTitle { gap:8px; } .eventTitle h3 { flex-basis:100%; } .bottomNav { display:flex; justify-content:space-around; position:fixed; bottom:0; left:0; right:0; z-index:20; padding:12px 8px calc(12px + env(safe-area-inset-bottom)); background:white; border-top:1px solid var(--line); font-size:12px; } .bottomNav a { min-width:64px; min-height:48px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:8px; color:var(--muted); } .bottomNav a span { font-size:18px; } .bottomNav a[aria-current] { color:var(--green); font-weight:700; } }
+
+/* Match details embeds record rows outside the standalone record page. */
+.embedded { --blue:#285aa4; --blue-tint:#edf3fc; color-scheme:light; }
+.embedded .button:focus-visible { outline:3px solid var(--blue); outline-offset:3px; }

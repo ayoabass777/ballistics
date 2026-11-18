@@ -1,4 +1,5 @@
 'use client';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { type Discover } from '@/lib/research';
 import { Button, Crest } from './shared';
@@ -20,7 +21,7 @@ export function DiscoverLeagues({ leagues, selected, onApply }: {
     return <div className={styles.root}>
         <Button aria-expanded={open} aria-controls="discover-leagues" onClick={() => {
             setDraft(selected); setTerm(''); setOpen(!open);
-        }}>{selected.length ? `${selected.length} selected leagues` : 'Choose leagues'}</Button>
+        }}>{selected.length ? `${selected.length} selected leagues` : 'Choose leagues'}<ChevronDown size={16} aria-hidden="true"/></Button>
         {open && <section id="discover-leagues" className={styles.panel} aria-label="Choose leagues">
             <label className={styles.search}>Search leagues or countries
                 <input autoFocus type="search" value={term} onChange={e => setTerm(e.target.value)} placeholder="League or country"/>
