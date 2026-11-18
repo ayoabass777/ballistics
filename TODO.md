@@ -1,19 +1,33 @@
 # To-do
 
-Open work only, most urgent first. Rewritten 2026-11-13 (v1 retirement added 2026-11-16); the earlier list,
+Open work only, most urgent first. Rewritten 2026-11-13 (v1 retirement added 2026-11-16, staging and live data updated 2026-11-18); the earlier list,
 with its dated history (beta blockers, staging setup, engine review), is in
 [docs/todo-archive-2026-11-13.md](docs/todo-archive-2026-11-13.md). Mark items
 done here with a date, and move them to the archive when a section gets long.
 
-Where things stand (2026-11-13): staging (`beta.ballistics.football`) deploys
-from main again and runs owner-live Matches with live scores, current
-standings tables on Match details, and the engine consensus gate fix (PR #27),
-release `bac3aba0650`.
+Where things stand (2026-11-18): staging (`beta.ballistics.football`) deploys
+from main again. The beta UI rollout from `codex/owner-live-matches` is merged
+(PR #38), and so are the home/away swap correction (#36), deploys keeping the
+engine's calibration files (#34), the market watch table (#35) and the research
+API scipy fix (#37). Main `701ae49` is deployed (release `b701ae49f66`,
+18 Nov 23:03 UTC).
 The nightly pipeline has run clean for 12 nights in a row (2–13 Nov, every
 `fixture_update_dag` and `engine_predict` task succeeded). Beta target window:
 10–24 Nov ([ship checkpoints](docs/product/ship-checkpoints.md)).
 
 ## This week
+
+- [ ] **Thu 19 Nov morning: check the home/away swaps were corrected** (#36).
+  The 00:00 UTC `fixture_update_dag` correction pass should flip three fixtures
+  before kickoff: Livyi Bereh v Shakhtar Donetsk (20 Nov, `fixture_id` 128098,
+  Shakhtar home), Hajduk Split v Lokomotiva Zagreb (21 Nov, 136811, Lokomotiva
+  home), Aluminij v Koper (23 Nov, 153016, Koper home). Still swapped on
+  18 Nov 23:00 UTC. Its log warns once per swap; dbt and the engine rebuild
+  them the same night. Check the Shakhtar match page shows Shakhtar at home.
+- [ ] **Sun 22 Nov: first weekly refit since #34/#35** (00:00 UTC). A one-time
+  read-only check is scheduled in the Claude app for ~01:00 UTC: refit
+  succeeded, `calibration_maps.json`/`calibration_report.json` rewritten,
+  `raw.market_watch` 14 → 16 rows, Monday's email shows the 22 Nov refit.
 
 - [ ] **Check the first night with the new consensus gate** (run_ds
   2026-11-13, ~00:10–00:20 UTC on 14 Nov). `wait_for_quorum` should open a
@@ -74,6 +88,37 @@ Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-ser
   `vector-claw-01`. Remove its `~/.ssh/known_hosts` entry and archive the
   `football-stats-frontend` deploy notes.
 
+## Live data: combined branch, ship before 21 Nov
+
+The three live-data branches closed on 16 Nov (#30, #31, #32) are combined
+on `live-data-combined`, **PR #39**, from main `701ae49` (2026-11-18). Their two
+`0004` migrations are one `0005_live_data.sql` (main's `0004` is
+`market_watch`); the `live_poller.py` conflict keeps both features. 576 tests
+pass; 0003 → 0005 applied twice on a throwaway Postgres.
+
+- [ ] **Merge and deploy PR #39 by Fri 20 Nov**, so the 21–22 Nov matchday
+  checks it. Local DB first: delete `schema_migrations` version `0004` (the
+  old `0004_fixture_statistics`), then `migrate.py up`.
+  - #30: live final results go to `raw_fixtures` at full time; the nightly
+    sweep re-checks each and rewrites only those the provider changed
+    (alert lists them). Loads reject a final status without a score; no
+    exclusive lock on `raw_fixtures`. `LIVE_PROMOTE_RESULTS=0` turns it off.
+  - #31: full-time stats (corners, shots, possession, cards, xG) from the
+    poller's by-id fetch into `raw.fixture_statistics`, no extra calls.
+  - #32: 8 leagues added to `XG_LEAGUES` (26 → 34).
+- [ ] **First matchday after deploy:** poller log `Promoted N live final
+  results` and `Stored N full-time statistics`.
+- [ ] **Next morning:** `fixture_update_dag` `load_updates` log `Swept N live
+  results: … unchanged, … corrected`; any correction alert names the matches.
+- [ ] **Three nights after:** the 8 leagues' last 120 days (~710 fixtures) are
+  in `raw.fixture_xg`; re-run `calibration_wf` before trusting their
+  forecasts. Fifteen nights after: the two-season backlog (~3,700) is done.
+- [ ] **Wed 16 Dec: re-probe xG** for Hungary NB I, Ligue 2, Veikkausliiga,
+  Virsliga, and the partial Superettan, Serbia, Slovakia (20 FT fixtures over
+  120 days, add at ≥80%); method in `docs/xg_integration.md` on PR #39.
+- [ ] After #39 merges, delete branches `live-results-promotion`,
+  `live-fulltime-stats`, `xg-more-leagues` and `todo-live-data-checkpoints`.
+
 ## Live scores and Matches
 
 - [ ] **Watch live scores on a full matchday on staging** (weekend of 14–15
@@ -85,7 +130,8 @@ Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-ser
   the `matches_first_beta` flag). Open it to all testers once the matchday
   check passes.
 - [ ] Retire branch `live-scores-phase1`: PR #26 shipped its code through
-  `codex/owner-live-matches` (all but `docs/live_scores.md`). The `../ballistics-live` worktree still has
+  `codex/owner-live-matches`, now on main (PR #38, 2026-11-18), all but
+  `docs/live_scores.md`. `codex/owner-live-matches` is fully merged and can go too. The `../ballistics-live` worktree still has
   uncommitted owner changes; review them before deleting the branch.
 
 ## First visit speed
@@ -100,12 +146,30 @@ Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-ser
 ## Staging operations
 
 - [x] **Stop deploys reverting the engine's runtime files.** Done 2026-11-17
-  in code: `deploy_staging.sh` now keeps the server's
-  `engine/eval/calibration_maps.json`, `calibration_report.json` and
-  `watch/` across its forced checkout (`RUNTIME_FILES`); the committed copies
-  only seed a fresh server. Owner, once: before the first deploy with it,
-  check the server's copies are the latest refit (PR description has the
-  steps); after it, delete `~sage/runtime-backup-2026-11-13*`.
+  (PR #34): `deploy_staging.sh` keeps the server's
+  `engine/eval/calibration_maps.json` and `calibration_report.json` across its
+  forced checkout (`RUNTIME_FILES`); the committed copies only seed a fresh
+  server. Verified 2026-11-18: unchanged through four deploys. The 13 Nov
+  backups are deleted.
+- [x] **Market watch log in Postgres.** Done 2026-11-18 (PR #35):
+  `raw.market_watch` (migration 0004) replaces `engine/eval/watch/*.csv`;
+  the server's 14 rows are imported.
+- [x] **Match research down 22:04–22:46 UTC, 18 Nov.** `/api/match/<id>` returned 500:
+  match details started importing `engine.eval.team_patterns` (scipy), which
+  the research API image lacked. Fixed in PR #37 (scipy/numpy in
+  `engine/api/requirements.txt`, plus a test that the API's imports are all
+  installed).
+- [ ] **Deploy only through `deploy_staging.sh`, one at a time.** On 18 Nov a
+  hand checkout landed 18 s into a scripted deploy (images and `RELEASES`
+  disagreed until a redeploy), and 15 hand-built frontend images (~23 GB,
+  tags the deploy's prune never matches) filled the disk to 81%. They are
+  deleted (disk 37%). Don't wipe the build cache to free space: the deploy
+  keeps it at ≤ 10 GB, and a cold rebuild slowed the 18 Nov hotfix.
+- [ ] **After the 22 Nov refit check passes:** on the server, delete
+  `~/runtime-backup-2026-11-18`, `~/runtime-before-deploy.sha256`,
+  `~/match_over_1_5-2026-11-18.csv` and `/srv/ballistics/engine/eval/watch/`.
+- [ ] Remove `engine/eval/watch` from `RUNTIME_FILES` in `deploy_staging.sh`
+  (nothing writes it since #35; harmless until then).
 - [ ] Hetzner weekly snapshots (owner, Hetzner console).
 - [ ] `saved_snapshot_maintenance` can't run in the Airflow image (SQLAlchemy
   1.4 vs the account API's 2.x), so it stays paused. Move it to a
