@@ -400,7 +400,10 @@ baseline 0001` then `up` applied 0002.
   Ballistics commit over SSH into `/srv/ballistics` (the server holds no
   GitHub credentials), then runs the script as committed at that SHA on the
   server: stop Airflow (it bind-mounts code from the
-  checkout) → check out → render `.dbt/profiles.yml` → build every image
+  checkout) → check out (keeping the server's own
+  `engine/eval/calibration_maps.json`, `calibration_report.json` and
+  `watch/`, which the weekly `engine_calibration` refit rewrites; added
+  2026-11-17) → render `.dbt/profiles.yml` → build every image
   tagged `b<sha>` → Postgres → `migrate.py up` → account bootstrap →
   `dbt build` → `grants.sql` → tag engine/dbt `:latest` (what the DAGs start)
   → `docker compose up -d --wait` → append to `deploy/RELEASES` → prune

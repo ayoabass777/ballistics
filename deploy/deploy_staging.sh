@@ -17,7 +17,8 @@
 #
 # Server side, in order; a failed step stops the deploy before the services
 # restart:
-#   stop Airflow → check out the commit → render .dbt/profiles.yml →
+#   stop Airflow → check out the commit (keeping the server's calibration
+#   files, RUNTIME_FILES) → render .dbt/profiles.yml →
 #   build images tagged with the release → start Postgres → migrate.py up →
 #   account bootstrap → dbt build → grants.sql → tag engine/dbt :latest →
 #   docker compose up -d → restart Caddy if the Caddyfile changed → record
@@ -36,6 +37,17 @@ KEEP_RELEASES=2
 # What dbt build depends on: models and seeds, the schema it builds on, the
 # app tables the analytics models read, and its profile.
 DBT_INPUTS=(dbt db/migrations API/sql deploy/dbt-profiles.yml.tmpl)
+# Engine files the weekly engine_calibration DAG rewrites on the server. They
+# are also committed, as the starting copies for a fresh server, so the
+# checkout keeps the server's versions (checkout_commit). Paths are relative
+# to the checkout; a directory is kept whole.
+RUNTIME_FILES=(
+  engine/eval/calibration_maps.json
+  engine/eval/calibration_report.json
+  engine/eval/watch
+)
+# Where checkout_commit holds them during the checkout (gitignored).
+RUNTIME_KEEP=deploy/runtime-keep
 # Where the post-deploy smoke checks look (through Cloudflare, like a tester).
 PUBLIC_URL="${DEPLOY_PUBLIC_URL:-https://beta.ballistics.football}"
 
@@ -122,9 +134,34 @@ local_main() {
 # Server side
 # ---------------------------------------------------------------------------
 
-# checkout_commit ROOT SHA
+# checkout_commit ROOT SHA. The forced checkout would reset RUNTIME_FILES to
+# their committed copies, so they are copied to RUNTIME_KEEP first and the
+# server's versions put back after. A fresh server has none to keep, so the
+# committed copies are its starting files.
 checkout_commit() {
+  local keep="$1/$RUNTIME_KEEP" path f
+  # RUNTIME_KEEP already there means an earlier deploy stopped between the
+  # copy and the restore. Its copies are the server's latest; the files in
+  # the checkout may already be reset, so don't copy them over it.
+  if [[ ! -d "$keep" ]]; then
+    rm -rf "$keep.tmp"
+    mkdir -p "$keep.tmp"
+    for path in "${RUNTIME_FILES[@]}"; do
+      [[ -e "$1/$path" ]] || continue
+      mkdir -p "$(dirname "$keep.tmp/$path")"
+      cp -R "$1/$path" "$keep.tmp/$path"
+    done
+    mv "$keep.tmp" "$keep"
+  fi
   git -C "$1" checkout --quiet --force --detach "$2"
+  # Copy back only what the checkout changed: files the checkout didn't touch
+  # may be owned by the engine containers' root user.
+  (cd "$keep" && find . -type f) | while read -r f; do
+    cmp -s "$keep/$f" "$1/$f" && continue
+    mkdir -p "$(dirname "$1/$f")"
+    cp "$keep/$f" "$1/$f"
+  done
+  rm -rf "$keep"
   # data/ is gitignored except the league config; the engine image copies
   # the folder and the bootstrap DAG reads the config.
   mkdir -p "$1/data"
@@ -321,7 +358,10 @@ prune_images() {
   docker builder prune -f --max-used-space 10GB >/dev/null
 }
 
-if [[ "${1:-}" == remote ]]; then
+# Sourced (tests/test_deploy_runtime_files.py): define the functions only.
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+  :
+elif [[ "${1:-}" == remote ]]; then
   shift
   remote_main "$@"
 else

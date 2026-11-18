@@ -99,12 +99,13 @@ Background: [staging plan, v1 inspection](docs/staging-deployment-plan.md#v1-ser
 
 ## Staging operations
 
-- [ ] **Stop deploys reverting the engine's runtime files.** The deploy's
-  forced checkout resets `engine/eval/calibration_maps.json`,
-  `calibration_report.json` and `watch/*.csv`, which the weekly refit
-  rewrites on the server. On 13 Nov they were copied to
-  `~sage/runtime-backup-2026-11-13*` and restored by hand after each deploy.
-  Move them out of git (or out of the checkout), or have the deploy keep them.
+- [x] **Stop deploys reverting the engine's runtime files.** Done 2026-11-17
+  in code: `deploy_staging.sh` now keeps the server's
+  `engine/eval/calibration_maps.json`, `calibration_report.json` and
+  `watch/` across its forced checkout (`RUNTIME_FILES`); the committed copies
+  only seed a fresh server. Owner, once: before the first deploy with it,
+  check the server's copies are the latest refit (PR description has the
+  steps); after it, delete `~sage/runtime-backup-2026-11-13*`.
 - [ ] Hetzner weekly snapshots (owner, Hetzner console).
 - [ ] `saved_snapshot_maintenance` can't run in the Airflow image (SQLAlchemy
   1.4 vs the account API's 2.x), so it stays paused. Move it to a
