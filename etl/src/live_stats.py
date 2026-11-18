@@ -4,7 +4,7 @@ API-Football's fixtures?ids= response carries `statistics` (corners, shots,
 possession, cards, fouls, offsides, saves, passes and, where covered,
 expected_goals). The poller makes that call once when a fixture leaves the
 live list, so the statistics of every final fixture it tracked are stored at
-no extra cost (raw.fixture_statistics, migration 0004).
+no extra cost (raw.fixture_statistics, migration 0005).
 
 Pure parsing here; etl/src/live_poller.py does the IO.
 """
