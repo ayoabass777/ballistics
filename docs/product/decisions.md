@@ -1,5 +1,7 @@
 # Decision log
 
+2026-11-18 — Owner requested removing Record from website main navigation. Remove Forecast record from desktop sidebar and mobile bottom navigation; retain direct archive route and finished-match forecast records.
+
 2026-11-17 — Discover arrow date bar implemented locally: earlier/later arrows shift the five visible dates without changing the active filter; selecting a day applies it. Calendar selection brings its date into view, Next 7 days restores the current window, and date arithmetic uses UTC calendar days after deriving today in the account timezone. Mobile keeps the date window on one dedicated row. TypeScript and whitespace checks pass. Deployment/browser verification pending.
 
 2026-11-17 — Owner Discover icons and date window implemented locally: search icon, labelled category SVGs, 44px bookmark controls with saved state, league/all-standouts chevrons, and Today/next four dated days beside Next 7 days and Calendar. Calendar retains custom single-day/range input and shows applied dates. Dates use account timezone; Discover remains upcoming research. TypeScript and whitespace checks passed; browser verification/deployment pending.
