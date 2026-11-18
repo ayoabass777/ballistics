@@ -2,21 +2,26 @@
 deciding on them. Monitoring only -- nothing here fails the data flow check.
 
   over_1_5   Match Over 1.5 calibration after each weekly refit (D120), read
-             from engine/eval/watch/match_over_1_5.csv (market_watch writes it)
+             from raw.market_watch (engine/eval/diagnostics/market_watch.py
+             writes it)
   big_dogs   Big dog Dixon-Coles cross-check (D136): settled Big dogs from
              raw.big_dog_watch, favourites DC backs at >= 65% vs the rest
 """
 from __future__ import annotations
 
-import csv
 import math
 from datetime import date
-from pathlib import Path
 
 from etl.src.data_detector.common import logger
 
-ROOT = Path(__file__).resolve().parents[3]           # repo root / /opt/airflow
-OVER_1_5_CSV = ROOT / "engine" / "eval" / "watch" / "match_over_1_5.csv"
+OVER_1_5_SQL = """
+SELECT report_stamp, source, n, avg_predicted, hit_rate, overconfidence, flag
+FROM raw.market_watch
+WHERE market = 'Match Over 1.5'
+ORDER BY id
+"""
+OVER_1_5_FIELDS = ("report_stamp", "source", "n", "avg_predicted", "hit_rate",
+                   "overconfidence", "flag")
 SOURCE_LABELS = {"all": "all models", "dixon_coles_only": "Dixon-Coles alone"}
 BIG_DOG_MIN_N = 100        # confirmed Big dogs needed before the comparison means anything
 Z = 1.645
@@ -41,12 +46,13 @@ def wilson(k: int, n: int) -> tuple[float, float]:
     return (centre - margin) / d, (centre + margin) / d
 
 
-def over_1_5(path: Path = OVER_1_5_CSV) -> dict | None:
+def over_1_5(cur) -> dict | None:
     """Latest refit per source, with the previous refit for comparison."""
-    try:
-        rows = list(csv.DictReader(path.open()))
-    except OSError:
+    cur.execute("SELECT to_regclass('raw.market_watch') IS NOT NULL")
+    if not cur.fetchone()[0]:
         return None
+    cur.execute(OVER_1_5_SQL)
+    rows = [dict(zip(OVER_1_5_FIELDS, r)) for r in cur.fetchall()]
     if not rows:
         return None
     stamps = list(dict.fromkeys(r["report_stamp"] for r in rows))
@@ -97,13 +103,14 @@ def big_dogs(cur, ds: date) -> dict | None:
 
 
 def collect(cur, ds: date) -> dict:
-    watch = {"over_1_5": over_1_5()}
-    cur.execute("SAVEPOINT model_watch")
-    try:
-        watch["big_dogs"] = big_dogs(cur, ds)
-        cur.execute("RELEASE SAVEPOINT model_watch")
-    except Exception as exc:
-        cur.execute("ROLLBACK TO SAVEPOINT model_watch")
-        logger.warning("model watch big dogs unavailable: %s", exc)
-        watch["big_dogs"] = None
+    watch = {}
+    for name, fn in (("over_1_5", lambda: over_1_5(cur)), ("big_dogs", lambda: big_dogs(cur, ds))):
+        cur.execute("SAVEPOINT model_watch")
+        try:
+            watch[name] = fn()
+            cur.execute("RELEASE SAVEPOINT model_watch")
+        except Exception as exc:
+            cur.execute("ROLLBACK TO SAVEPOINT model_watch")
+            logger.warning("model watch %s unavailable: %s", name, exc)
+            watch[name] = None
     return watch

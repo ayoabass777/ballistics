@@ -1,8 +1,10 @@
 """
-Utility functions to correct fixture kickoff times for missed and changed fixtures.
+Utility functions to correct unfinished fixtures against the provider.
 - correct_missed_fixtures: looks back at recently played fixtures ("last" N).
 - correct_changed_fixtures: looks ahead at upcoming fixtures ("next" N).
-Both compare API kickoff times to DB values and update mismatches.
+- reconcile_upcoming_fixtures: the stored upcoming window, plus orphans.
+All compare API kickoff, status and home/away teams to DB values and update
+mismatches (_process_fixtures).
 """
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
@@ -57,53 +59,37 @@ def get_league_seasons() -> List[Tuple[int, int]]:
         conn.close()
 
 
-def get_db_kickoff_utc(fixture_id: int) -> Tuple[Optional[Any], Optional[str]]:
-    """
-    Retrieve kickoff time and status for a fixture.
-    """
+TEAM_COLUMNS = ("home_team_id", "home_team_name", "away_team_id", "away_team_name")
+
+
+def get_db_fixture_state(api_fixture_id: int) -> Optional[Dict[str, Any]]:
+    """Kickoff, status and team sides stored for a fixture, or None if absent."""
     query = """
-        SELECT rf.kickoff_utc, rf.fixture_status
+        SELECT rf.kickoff_utc, rf.fixture_status,
+               rf.home_team_id, rf.home_team_name, rf.away_team_id, rf.away_team_name
         FROM raw.raw_fixtures as rf
         WHERE rf.api_fixture_id = %s
         """
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        cur.execute(query, (fixture_id,))
-        result = cur.fetchone()
-        if result:
-            return result[0], result[1]
-        return None, None
+        cur.execute(query, (api_fixture_id,))
+        row = cur.fetchone()
+        if not row:
+            return None
+        return dict(zip(("kickoff_utc", "fixture_status") + TEAM_COLUMNS, row))
     except Exception as e:
-        logger.error("Error fetching kickoff_utc for fixture_id %s: %s", fixture_id, e, exc_info=True)
-        return None, None
+        logger.error("Error fetching state for fixture %s: %s", api_fixture_id, e, exc_info=True)
+        return None
     finally:
         conn.close()
 
 
-def update_db_kickoff_utc(fixture_id: int, new_kickoff_utc: str) -> None:
-    """
-    Update kickoff time for a fixture.
-    """
-    query = """
-        UPDATE raw.raw_fixtures
-        SET kickoff_utc = %s, updated_at = NOW()
-        WHERE api_fixture_id = %s
-        """
-    conn = get_db_connection()
-    cur = conn.cursor()
-    try:
-        cur.execute(query, (new_kickoff_utc, fixture_id))
-        conn.commit()
-        logger.info("Successfully updated kickoff_utc for fixture_id %s to %s", fixture_id, new_kickoff_utc)
-    except Exception as e:
-        logger.error("Error updating kickoff_utc for fixture_id %s: %s", fixture_id, e, exc_info=True)
-    finally:
-        conn.close()
-
-
-def update_db_fixture_state(fixture_id: int, kickoff_utc: Optional[str], status: str) -> bool:
-    """Persist the provider's current kickoff and status together for an unfinished fixture."""
+def update_db_fixture_state(fixture_id: int, kickoff_utc: Optional[str], status: str,
+                            teams: Optional[Dict[str, Any]] = None) -> bool:
+    """Persist the provider's current kickoff and status together for an
+    unfinished fixture, and its team sides when `teams` is given."""
+    teams = teams or {}
     conn = get_db_connection()
     cur = conn.cursor()
     try:
@@ -111,10 +97,15 @@ def update_db_fixture_state(fixture_id: int, kickoff_utc: Optional[str], status:
             """
             UPDATE raw.raw_fixtures
             SET kickoff_utc = COALESCE(%s, kickoff_utc),
-                fixture_status = %s, updated_at = NOW()
+                fixture_status = %s,
+                home_team_id = COALESCE(%s, home_team_id),
+                home_team_name = COALESCE(%s, home_team_name),
+                away_team_id = COALESCE(%s, away_team_id),
+                away_team_name = COALESCE(%s, away_team_name),
+                updated_at = NOW()
             WHERE api_fixture_id = %s AND fixture_status <> 'FT'
             """,
-            (kickoff_utc, status, fixture_id),
+            (kickoff_utc, status, *(teams.get(c) for c in TEAM_COLUMNS), fixture_id),
         )
         conn.commit()
         return cur.rowcount > 0
@@ -126,20 +117,36 @@ def update_db_fixture_state(fixture_id: int, kickoff_utc: Optional[str], status:
         conn.close()
 
 
+def _api_teams(fixture: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """The provider's home and away teams, or None unless both ids are present."""
+    teams = fixture.get("teams") or {}
+    home, away = teams.get("home") or {}, teams.get("away") or {}
+    if home.get("id") is None or away.get("id") is None:
+        return None
+    return {"home_team_id": home["id"], "home_team_name": home.get("name"),
+            "away_team_id": away["id"], "away_team_name": away.get("name")}
+
+
 def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Compare API vs DB kickoff times and update DB where they differ.
-    Returns list of updated fixtures metadata.
+    Compare API vs DB kickoff, status and team sides, and update the DB where
+    they differ. Returns list of updated fixtures metadata.
+
+    Team sides matter before kickoff: the provider sometimes swaps home and
+    away after publishing a fixture (Livyi Bereh v Shakhtar Donetsk, 20 Nov
+    2026), and the by-ID score update only reaches a fixture after it is
+    played, so without this check the engine forecasts it the wrong way round.
     """
     updated: List[Dict[str, Any]] = []
     for fixture in fixtures:
         api_fixture_id = fixture.get("fixture", {}).get("id")
         api_kickoff_utc = fixture.get("fixture", {}).get("date")
         api_status = fixture.get("fixture", {}).get("status", {}).get("short")
-        db_kickoff_utc, db_status = get_db_kickoff_utc(api_fixture_id)
+        db = get_db_fixture_state(api_fixture_id)
 
         api_dt = _normalize_kickoff(api_kickoff_utc)
-        db_dt = _normalize_kickoff(db_kickoff_utc)
+        db_dt = _normalize_kickoff(db["kickoff_utc"]) if db else None
+        db_status = db["fixture_status"] if db else None
 
         if db_dt is None or db_status is None:
             logger.debug("Fixture %s not found in DB; skipping.", api_fixture_id)
@@ -151,22 +158,31 @@ def _process_fixtures(fixtures: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         # which breaks Elo. The score updater writes FT and goals together.
         if api_status == "FT":
             continue
-        if db_dt == api_dt and db_status == api_status:
+        api_teams = _api_teams(fixture)
+        teams_changed = api_teams is not None and (
+            (api_teams["home_team_id"], api_teams["away_team_id"])
+            != (db["home_team_id"], db["away_team_id"]))
+        if db_dt == api_dt and db_status == api_status and not teams_changed:
             continue
-        if not update_db_fixture_state(api_fixture_id, api_kickoff_utc if api_dt else None, api_status):
+        if not update_db_fixture_state(api_fixture_id, api_kickoff_utc if api_dt else None,
+                                       api_status, api_teams if teams_changed else None):
             continue
-        updated.append(
-            {
-                "fixture_id": api_fixture_id,
-                "old_kickoff_utc": db_kickoff_utc,
-                "new_kickoff_utc": api_kickoff_utc,
-                "old_status": db_status,
-                "new_status": api_status,
-            }
-        )
+        change = {
+            "fixture_id": api_fixture_id,
+            "old_kickoff_utc": db["kickoff_utc"],
+            "new_kickoff_utc": api_kickoff_utc,
+            "old_status": db_status,
+            "new_status": api_status,
+        }
+        if teams_changed:
+            change["old_teams"] = f"{db['home_team_name']} v {db['away_team_name']}"
+            change["new_teams"] = f"{api_teams['home_team_name']} v {api_teams['away_team_name']}"
+            logger.warning("Fixture %s teams changed from %s to %s.",
+                           api_fixture_id, change["old_teams"], change["new_teams"])
+        updated.append(change)
         logger.info(
             "Updated fixture %s kickoff/status from %s/%s to %s/%s.",
-            api_fixture_id, db_kickoff_utc, db_status, api_kickoff_utc, api_status,
+            api_fixture_id, db["kickoff_utc"], db_status, api_kickoff_utc, api_status,
         )
     return updated
 

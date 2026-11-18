@@ -1,8 +1,6 @@
 """Model watch (D136 Big dog DC cross-check, D120 Over 1.5) and its email block."""
-import tempfile
 import unittest
 from datetime import date, datetime, timezone
-from pathlib import Path
 
 from engine.eval.big_dog_watch import watch_rows
 from engine.eval.consensus_slips import BIG_DOG_DC_CONFIRM, dc_favourite_win
@@ -57,18 +55,16 @@ class DcWinTests(unittest.TestCase):
 
 class WatchTests(unittest.TestCase):
     def test_over_1_5_latest_and_previous(self):
-        with tempfile.TemporaryDirectory() as d:
-            p = Path(d) / "w.csv"
-            p.write_text("logged_at,report_stamp,market,source,n,avg_predicted,hit_rate,overconfidence,brier,flag\n"
-                         "x,r1,Match Over 1.5,all,100,0.77,0.78,-0.01,0.16,\n"
-                         "x,r2,Match Over 1.5,all,120,0.77,0.79,-0.02,0.16,\n"
-                         "x,r2,Match Over 1.5,dixon_coles_only,90,0.74,0.79,-0.05,0.17,overconfidence -4.7 pts\n")
-            o = mw.over_1_5(p)
+        rows = [("r1", "all", 100, 0.77, 0.78, -0.01, ""),
+                ("r2", "all", 120, 0.77, 0.79, -0.02, ""),
+                ("r2", "dixon_coles_only", 90, 0.74, 0.79, -0.05, "overconfidence -4.7 pts")]
+        o = mw.over_1_5(FakeCursor(rows))
         self.assertEqual(o["refit"], "r2")
         self.assertEqual(o["rows"][0]["previous_overconfidence"], -0.01)
         self.assertIsNone(o["rows"][1]["previous_overconfidence"])
         self.assertTrue(o["rows"][1]["flag"])
-        self.assertIsNone(mw.over_1_5(Path("/nonexistent.csv")))
+        self.assertIsNone(mw.over_1_5(FakeCursor([])))
+        self.assertIsNone(mw.over_1_5(FakeCursor(rows, exists=False)))
 
     def test_big_dogs_groups_and_day(self):
         rows = [(ko(17), "L", "A", "B", 300, 0.8, True, 2, 0),

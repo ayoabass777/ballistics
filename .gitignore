@@ -36,6 +36,8 @@ logs/
 .claude/worktrees/
 .claude/launch.json
 engine/eval/big_dog_leagues_state.json
+# Market watch CSVs, replaced by raw.market_watch (2026-11-18)
+engine/eval/watch/
 
 # Large experiment data: regenerate from each experiment's source query
 docs/product/experiments/**/*.gz
@@ -55,3 +57,5 @@ engine/eval/*-backup-*.json
 deploy/.env.staging
 deploy/certs/
 deploy/RELEASES
+deploy/runtime-keep/
+deploy/runtime-keep.tmp/
