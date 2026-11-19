@@ -28,7 +28,7 @@ export type Match = z.infer<typeof matchSchema>;
 export type Pattern = z.infer<typeof pattern>;
 export const savedSchema = z.array(z.object({ card: cardSchema, saved_at: z.string().datetime({ offset: true }), run_ds: z.string().nullable(), snapshot_id: z.number().optional(), status: z.enum(["upcoming", "live", "finished", "postponed", "cancelled", "abandoned", "suspended", "interrupted", "awarded", "walkover", "unknown"]).optional(), current_kickoff: z.string().nullable().optional(), card_version: z.number().nullable().optional(), latest_version: z.number().nullable().optional(), content_hash: z.string().optional(), updated_since_saved: z.boolean().optional() }));
 export type Saved = z.infer<typeof savedSchema>;
-export const eventLabels: Record<string, string> = { win: 'Won', loss: 'Lost', draw: 'Drew', unbeaten: 'Unbeaten', winless: 'Winless', goalless: 'Failed to score', clean_sheet: 'Clean sheet', score_1goal: 'Scored 1+', score_2goals: 'Scored 2+', concede_1: 'Conceded 1+', concede_2: 'Conceded 2+', BTTS: 'Both teams scored' };
+export const eventLabels: Record<string, string> = { win: 'Won', loss: 'Lost', draw: 'Drew', unbeaten: 'Unbeaten', winless: 'Winless', goalless: 'Failed to score', clean_sheet: 'Clean sheet', score_1goal: 'Scored 1+', score_2goals: 'Scored 2+', concede_1: 'Conceded 1+', concede_2: 'Conceded 2+', BTTS: 'Both teams scored', halftime_win: 'Led at half-time' };
 export function eventLabel(event: string) { return eventLabels[event] || event.replace(/^(Over|Under)_(\d)_(\d)$/, '$1 $2.$3 goals'); }
 export function headline(card: Card) { const p = card.pick; if (!p)
     return `${card.home} vs ${card.away}`; if (p.list === 'strength')
