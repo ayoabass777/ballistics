@@ -16,9 +16,13 @@ from typing import Any, Dict, List, Optional
 from engine.api.crests import crest_url
 from engine.api.discover import KINDS, PICK_FIELDS
 
-# Finished fixtures stay in the list this long, then the nightly update and
-# the Forecast record take over.
+# Finished fixtures stay in the list until Results has them: Results reads
+# raw.fact_fixtures, which only the nightly dbt run rebuilds, so a game that
+# ends in the afternoon would otherwise vanish from Matches for hours. Each
+# stays at least FINISHED_FOR, and never past KEEP_UNTIL_RESULTS_MAX (a stuck
+# nightly run must not pile up yesterday's games).
 FINISHED_FOR = "6 hours"
+KEEP_UNTIL_RESULTS_MAX = "48 hours"
 # The poller writes every 15 s; many members polling the list share one read.
 LIST_TTL = 5.0
 
@@ -42,6 +46,8 @@ LEFT JOIN LATERAL (
     ORDER BY m.run_ds DESC LIMIT 1) a ON true
 WHERE s.finished_at IS NULL AND s.polled_at > now() - interval '{FINISHED_FOR}'
    OR s.finished_at > now() - interval '{FINISHED_FOR}'
+   OR (s.finished_at > now() - interval '{KEEP_UNTIL_RESULTS_MAX}'
+       AND f.is_played IS NOT TRUE)
 ORDER BY f.kickoff_utc, s.fixture_id
 """
 
