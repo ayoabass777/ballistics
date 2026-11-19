@@ -49,7 +49,7 @@ function Clock({ state }: { state: Pick<LiveState, 'status' | 'minute' | 'extra'
 }
 function Reds({ n }: { n: number }) { return n > 0 ? <span className={l.red} aria-label={`${n} red ${n === 1 ? 'card' : 'cards'}`}>{n > 1 ? n : ''}</span> : null; }
 const chipClass: Record<TrackRow['status'], string> = { landed: l.landed, missed: l.missed, on_track: l.onTrack, off_track: l.offTrack };
-function Chip({ row }: { row: TrackRow }) { return <span className={`${l.chip} ${chipClass[row.status]}`}>{trackChip(row)}</span>; }
+export function Chip({ row }: { row: TrackRow }) { return <span className={`${l.chip} ${chipClass[row.status]}`}>{trackChip(row)}</span>; }
 
 function LiveRow({ m, returnTo, flash }: { m: LiveCard; returnTo: string; flash: boolean }) {
     const track = trackPick(m);

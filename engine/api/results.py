@@ -13,6 +13,7 @@ from typing import Any, Dict, Optional
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from engine.api.crests import crest_url
+from engine.api.live import leading_pick
 
 # The local date of a kickoff in the member's zone.
 LOCAL_DAY = "(f.kickoff_utc AT TIME ZONE %(zone)s)::date"
@@ -33,9 +34,19 @@ SELECT f.fixture_id, f.fixture_status, f.kickoff_utc,
        f.home_team_name, f.away_team_name, f.league_id, f.league_name, f.country_name,
        f.home_team_fulltime_goal, f.away_team_fulltime_goal,
        f.home_team_halftime_goal, f.away_team_halftime_goal,
-       f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id
+       f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id,
+       a.discovery
 FROM raw.fact_fixtures f
 LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id
+-- Kicked-off fixtures carry their pre-kickoff forecast (D152): the last
+-- complete run that analysed them, as on the live list. Upcoming ones get
+-- theirs from Discover, so their (large) payloads are not read here.
+LEFT JOIN LATERAL (
+    SELECT m.payload->'discovery' AS discovery
+    FROM raw.match_analysis m
+    JOIN raw.engine_runs r ON r.run_ds = m.run_ds AND r.status = 'complete'
+    WHERE m.fixture_id = f.fixture_id
+    ORDER BY m.run_ds DESC LIMIT 1) a ON f.kickoff_utc <= now()
 WHERE f.is_played AND {LOCAL_DAY} = %(day)s
 ORDER BY f.league_tier NULLS LAST, f.country_name, f.league_name, f.kickoff_utc, f.fixture_id
 """
@@ -64,6 +75,9 @@ def card(row: Dict[str, Any]) -> Dict[str, Any]:
         "home_crest_url": crest_url("teams", row.get("home_logo_file_id")),
         "away_crest_url": crest_url("teams", row.get("away_logo_file_id")),
         "league_logo_url": crest_url("leagues", row.get("league_logo_file_id")),
+        # The match's leading pre-kickoff finding, so a played game can show
+        # whether it landed (frontend lib/live.ts trackPick).
+        "pick": leading_pick(row.get("discovery")),
     }
 
 
