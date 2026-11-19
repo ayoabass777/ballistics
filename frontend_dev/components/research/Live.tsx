@@ -92,7 +92,7 @@ export function LiveNow({ returnTo, leagues }: { returnTo: string; leagues?: str
     return <section className={`${s.section} ${l.live}`} aria-label="Live scores">
         {playing.length > 0 && <div className={l.block}><h2 aria-live="polite">Live now · {playing.length}</h2>{leagues_(playing)}</div>}
         {/* Collapsed: on a busy day dozens of finished games would push the upcoming list far down. */}
-        {finished.length > 0 && <details className={`${l.block} ${l.finished}`}><summary><h2>Finished today · {finished.length}</h2></summary>{leagues_(finished)}</details>}
+        {finished.length > 0 && <details className={`${l.block} ${l.finished}`}><summary><h2>Finished · {finished.length}</h2></summary>{leagues_(finished)}</details>}
         <p className={s.caption}>Scores update about every 15 seconds{failed ? ' · Live updates paused, retrying' : ''}. The chip checks each match’s leading pre-match insight against the score; the forecast itself does not change.</p>
     </section>;
 }
