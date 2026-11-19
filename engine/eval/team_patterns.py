@@ -72,7 +72,9 @@ def label(event: str) -> str:
 
 
 def ladder(event: str) -> str | None:
-    """Rungs of the same ladder compete; at most one per team is kept."""
+    """Rungs of the same ladder compete; at most one per team is kept outside
+    the top slots. A top-slot rung lets another rung of its ladder show only
+    when that rung is further above the league."""
     if event in ("score_1goal", "score_2goals"):
         return "scored"
     if event in ("concede_1", "concede_2"):
@@ -213,9 +215,17 @@ def select_view(rows: list[dict]) -> dict:
 
     tops = top_results + top_ad
     used = {id(r) for r in tops}
-    used_ladders = {(r["side"], ladder(r["event"])) for r in tops if ladder(r["event"])}
-    rest = _dedupe_ladders([r for r in qualified if id(r) not in used
-                            and (r["side"], ladder(r["event"])) not in used_ladders])
+    # A ladder already in a top slot keeps its other rungs out of Also and
+    # See all, unless a rung sits further above the league than the top one
+    # (Naftan away: Conceded 1+ 13/14 vs 73% in the pair, Conceded 2+ 12/14
+    # vs 30% would otherwise be hidden).
+    top_ladder_gap = {(r["side"], ladder(r["event"])): _gap(r) for r in tops if ladder(r["event"])}
+
+    def _not_shadowed(r: dict) -> bool:
+        top_gap = top_ladder_gap.get((r["side"], ladder(r["event"])))
+        return top_gap is None or _gap(r) > top_gap
+
+    rest = _dedupe_ladders([r for r in qualified if id(r) not in used and _not_shadowed(r)])
     rest.sort(key=lambda r: (_rate(r), r["n"], _gap(r)), reverse=True)
     return {
         "top_results": [_public(r) for r in top_results],

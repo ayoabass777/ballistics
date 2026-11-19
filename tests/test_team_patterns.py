@@ -141,6 +141,21 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual([r["event"] for r in view["top_attack_defence"]], ["concede_1", "score_1goal"])
         self.assertNotIn("score_2goals", [r["event"] for r in view["also"] + view["see_all"]])
 
+    def test_stronger_rung_shows_beside_top_slot(self):
+        # Dinamo Brest (home) v Naftan (away), 21 Nov 2026: the pair holds Naftan's
+        # Conceded 1+ (13/14 vs 73%), but Conceded 2+ (12/14 vs 30%) is further
+        # above the league, so it still shows.
+        rows = [rec("home", "score_1goal", 12, 14, 0.73, team="Dinamo Brest"),
+                rec("home", "concede_2", 7, 14, 0.30, team="Dinamo Brest"),
+                rec("away", "concede_1", 13, 14, 0.73, team="Naftan"),
+                rec("away", "concede_2", 12, 14, 0.30, team="Naftan")]
+        view = tp.select_view(rows)
+        self.assertEqual([(r["side"], r["event"]) for r in view["top_attack_defence"]],
+                         [("home", "score_1goal"), ("away", "concede_1")])
+        self.assertEqual([(r["side"], r["event"]) for r in view["also"]][0], ("away", "concede_2"))
+        self.assertIn(("home", "concede_2"),
+                      [(r["side"], r["event"]) for r in view["also"] + view["see_all"]])
+
     def test_dropped_lines_never_shown(self):
         rows = [rec("home", "Over_4_5", 6, 6, 0.10), rec("home", "Under_1_5", 6, 6, 0.20)]
         view = tp.select_view(rows)
