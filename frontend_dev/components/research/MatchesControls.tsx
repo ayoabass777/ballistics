@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, CalendarDays, Circle } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type Discover } from '@/lib/research';
 import { Button, Crest } from './shared';
@@ -35,8 +35,13 @@ export function MatchesControls({ data, zone, follows, leagueRows = false, secon
         d.setUTCDate(d.getUTCDate() + offset);
         update({ scope: 'date', day: d.toISOString().slice(0, 10), end_day: '' });
     }
+    const [windowAnchor, setWindowAnchor] = useState(day);
+    useEffect(() => {
+        const distance = (Date.parse(`${day}T12:00:00Z`) - Date.parse(`${windowAnchor}T12:00:00Z`)) / 86400000;
+        if (Math.abs(distance) > 2) setWindowAnchor(day);
+    }, [day, windowAnchor]);
     const dateWindow = [-2, -1, 0, 1, 2].map(offset => {
-        const date = new Date(`${day}T12:00:00Z`);
+        const date = new Date(`${windowAnchor}T12:00:00Z`);
         date.setUTCDate(date.getUTCDate() + offset);
         return date.toISOString().slice(0, 10);
     });
