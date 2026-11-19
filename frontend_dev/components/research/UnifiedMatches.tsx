@@ -11,18 +11,18 @@ import { type Discover, type Card, headline } from '@/lib/research';
 import { matchEvidence, evidenceOptions, filterMatches } from '@/lib/evidence-controls';
 import { EvidenceFilter } from './EvidenceControls';
 import { resultsSchema, type Result } from '@/lib/results';
-import { IN_PLAY, clockLabel, liveListSchema } from '@/lib/live';
+import { IN_PLAY, FINAL, clockLabel, liveListSchema, trackPick } from '@/lib/live';
 import { dayInZone } from '@/lib/preferences';
-import { useLive } from './Live';
+import { useLive, Chip } from './Live';
 import { Button, Crest, ResourceState, useResource, useSaved, Toast } from './shared';
 import s from './research.module.css';
 import l from './live.module.css';
 
 // The adjacent team rows identify Home (top) and Away (bottom).
-function compactFinding(card: Card) {
+function compactFinding(card: Pick<Card, 'home' | 'away' | 'preview'>) {
     const pick = card.preview;
     if (!pick) return '';
-    let text = headline({...card,pick});
+    let text = headline({...card,pick} as Card);
     for (const [team, side] of [[card.home,'Home'],[card.away,'Away']]) {
         if (text.startsWith(`${team} · `)) { text = `${side} · ${text.slice(team.length + 3)}`; break; }
         if (text.startsWith(`${team} `)) { text = `${side} · ${text.slice(team.length + 1)}`; break; }
@@ -129,12 +129,16 @@ export function UnifiedMatches({ zone, leagues, team, data, followedLeagues, fol
                     const time = new Intl.DateTimeFormat('en-GB', { timeZone: zone, hour: '2-digit', minute: '2-digit' }).format(new Date(m.kickoff));
                     const inPlay = IN_PLAY.has(m.status);
                     const label = state ? clockLabel(state) : ['NS', 'TBD'].includes(m.status) ? time : m.status;
+                    // Discover covers upcoming fixtures; once a match kicks off its
+                    // pre-kickoff pick comes with the fixture (and the live list).
+                    const pick = card?.preview ?? m.pick ?? null;
+                    const track = pick && (inPlay || FINAL.has(m.status)) ? trackPick({ ...m, pick }) : null;
                     return <li key={m.fixture_id} className={l.fixtureItem}><Link className={l.liveRow} href={`/match/${m.fixture_id}?returnTo=${encodeURIComponent(returnTo)}`}>
                         <span className={`${l.clock} ${inPlay ? l.inPlay : ''}`} aria-label={inPlay ? `Live: ${label}` : undefined}>{inPlay && <span className={l.dot} aria-hidden="true"/>}{label}</span>
                         <span className={l.teams}><span className={l.team}><Crest name={m.home} url={m.home_crest_url}/><span className={l.teamName}>{m.home}</span></span><span className={l.team}><Crest name={m.away} url={m.away_crest_url}/><span className={l.teamName}>{m.away}</span></span></span>
                         {!['NS', 'TBD'].includes(m.status) && <strong className={`${l.score} ${inPlay ? l.liveScore : ''}`}><span>{m.home_goals ?? '–'}</span><span>{m.away_goals ?? '–'}</span></strong>}
                     </Link>
-                    {card?.preview && <p className={`${s.caption} ${l.fixtureEvidence}`}>{compactFinding(card)}</p>}
+                    {pick && <p className={`${s.caption} ${l.fixtureEvidence}`}>{compactFinding({ home: m.home, away: m.away, preview: pick })}{track && <> <Chip row={track}/></>}</p>}
                     {card && <Button className={l.saveBookmark} aria-label={`${saved.isSaved(m.fixture_id) ? 'Unsave' : 'Save'} ${m.home} vs ${m.away}`} title={saved.isSaved(m.fixture_id) ? 'Remove from Saved' : 'Save fixture'} aria-pressed={saved.isSaved(m.fixture_id)} onClick={() => saved.toggle(card, data?.run_ds || null)}><Bookmark size={19} fill={saved.isSaved(m.fixture_id) ? 'currentColor' : 'none'} aria-hidden="true"/></Button>}
                     </li>;
                 })}</ul>
