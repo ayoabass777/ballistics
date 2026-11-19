@@ -63,6 +63,20 @@ class FixturesApiTests(unittest.TestCase):
         self.assertIn("BETWEEN %(date_from)s AND %(date_to)s", query)
         self.assertEqual(params["zone"], "America/Vancouver")
 
+    def test_played_fixture_carries_pre_kickoff_pick(self):
+        discovery = {"sections": {
+            "patterns": {"list": "patterns", "team": "Santos", "event": "Over_2_5", "context": "away",
+                         "k": 14, "n": 17, "score": 0.7},
+            "goals": {"list": "goals", "market": "Match Over 1.5", "probability": 0.8, "score": 0.2}}}
+        cur = Mock()
+        cur.fetchall.return_value = [row(discovery=discovery), row(fixture_id=10, fixture_status="NS")]
+        body = results.fixtures(cur, "UTC", date(2026, 11, 5), date(2026, 11, 5))
+        played, upcoming = body["matches"]
+        self.assertEqual((played["pick"]["team"], played["pick"]["event"]), ("Santos", "Over_2_5"))
+        self.assertNotIn("score", played["pick"])
+        self.assertIsNone(upcoming["pick"])
+        self.assertIn("ON f.kickoff_utc <= now()", cur.execute.call_args.args[0])
+
     def test_reversed_range_rejected_before_query(self):
         cur = Mock()
         with self.assertRaises(ValueError):

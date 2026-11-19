@@ -110,7 +110,7 @@ export function trackPattern(event: string, gf: number, ga: number, final: boole
 }
 /** The pre-match research, checked against the live score. Goals markets are
  *  90-minute markets, so they are not graded once a match goes to extra time. */
-export function trackForecast(match: MatchLike, state: LiveState, patternLimit = 4): TrackRow[] {
+export function trackForecast(match: MatchLike, state: Pick<LiveState, 'status' | 'home_goals' | 'away_goals'>, patternLimit = 4): TrackRow[] {
     if (state.home_goals == null || state.away_goals == null || (!IN_PLAY.has(state.status) && !FINAL.has(state.status))) return [];
     const { home, away } = match.fixture;
     const final = FINAL.has(state.status);
@@ -142,7 +142,7 @@ export function trackForecast(match: MatchLike, state: LiveState, patternLimit =
 /** Short status for one forecast on a list card. */
 export function trackChip(row: TrackRow) { return row.status === 'landed' ? 'Landed' : row.status === 'missed' ? 'Missed' : row.status === 'on_track' ? 'On track' : 'Not yet'; }
 /** The list card's one forecast: the match's leading pre-kickoff insight, checked live. */
-export function trackPick(card: LiveCard): TrackRow | null {
+export function trackPick(card: Pick<LiveCard, 'pick' | 'home' | 'away' | 'status' | 'home_goals' | 'away_goals'>): TrackRow | null {
     const p = card.pick;
     if (!p) return null;
     const rows = trackForecast({
