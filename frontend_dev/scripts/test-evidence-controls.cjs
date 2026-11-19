@@ -21,5 +21,10 @@ assert.deepEqual(filtered.map(x=>x.fixture_id),[2,1]);
 assert.equal(filtered[0].preview.event,'clean_sheet');
 assert.equal(matches[0].preview.list,'strength');
 assert.equal(c.evidenceOptions(evidence).find(x=>x.key==='patterns:clean_sheet').count,2);
+// Standouts: a team search only filters; it never promotes a category's card.
+const team=(id, home, away, pick)=>({fixture_id:id,home,away,pick});
+const lists={strength:[team(10,'Bayern','Mainz',{list:'strength'})],goals:[team(11,'Lyon','Nice',{list:'goals'}),team(12,'Gladbach','Dortmund',{list:'goals'})],patterns:[team(13,'Roma','Lazio',{list:'patterns'})],standouts:[team(14,'PSV','Ajax',{list:'goals'})]};
+assert.deepEqual(c.variedStandouts(lists).map(x=>x.fixture_id),[10,11,13,14]);
+assert.equal(c.variedStandouts(lists).some(x=>x.home==='Gladbach'),false);
 require.extensions['.ts']=original;
 console.log('PASS: grouped team markets, unique counts, filter-before-sort, stable rates/ties/missing values, cross-category Matches findings and preserved kickoff order');
