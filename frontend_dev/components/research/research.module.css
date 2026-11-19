@@ -379,4 +379,5 @@
 /* Date selection must not resize the controls or shift surrounding filters. */
 .dateSelectionSummary { min-height:18px; margin:0; }
 .page .discoverDateWindow .button { white-space:nowrap; height:54px; }
-.page .matchDayWindow .button { height:54px; font-size:12px; }
+.page .matchDayWindow .button { height:54px; font-size:12px; padding:8px 2px; white-space:nowrap; }
+.page .matchDayStrip > .button { padding:8px; }
