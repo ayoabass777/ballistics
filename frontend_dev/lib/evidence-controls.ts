@@ -11,7 +11,7 @@ export function finding(card: Card, pick: Pick = card.pick!): Omit<EvidenceOptio
         const group = /^(win|loss|draw|unbeaten|winless|halftime_win)$/.test(event) ? 'Results'
             : /^(clean_sheet|concede_)/.test(event) ? 'Defending'
             : /^(score_|goalless)/.test(event) ? 'Scoring' : 'Match goals';
-        return { key: `patterns:${event}`, label: event === 'halftime_win' ? 'Led at half-time' : eventLabel(event), group: `Team patterns · ${group}` };
+        return { key: `patterns:${event}`, label: eventLabel(event), group: `Team patterns · ${group}` };
     }
     let label = (pick.market || '').trim();
     if (!label) return null;
