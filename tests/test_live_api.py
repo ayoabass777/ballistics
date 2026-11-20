@@ -48,6 +48,13 @@ class LiveApiTests(unittest.TestCase):
         self.assertNotIn("score", card["pick"])
         self.assertEqual(card["kickoff"], T.isoformat())
 
+    def test_pick_uses_top_goals_row_when_only_a_pattern_qualifies(self):
+        discovery = {"sections": {"patterns": {"list": "patterns", "team": "Brann", "event": "win",
+                                               "k": 7, "n": 9, "score": 0.8}}}
+        top = {"market": "Match Over 1.5", "probability": 0.77}
+        card = live.live_list(FakeCursor([row(discovery=discovery, top_goal=top)]), clock=lambda: 100.0)["matches"][0]
+        self.assertEqual((card["pick"]["list"], card["pick"]["market"]), ("goals", "Match Over 1.5"))
+
     def test_list_is_cached_briefly(self):
         cur = FakeCursor([row()], [row(fixture_id=8)])
         first = live.live_list(cur, clock=lambda: 100.0)
