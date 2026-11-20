@@ -166,7 +166,7 @@ export function DiscoverPage({ all = false, matches = false, liveMatches = false
     const categoryCards = groupByCountry ? [...sortedCategoryCards].sort((a, b) =>
         (a.country || 'International / other').localeCompare(b.country || 'International / other') ||
         a.league.localeCompare(b.league) || (a.league_id || 0) - (b.league_id || 0)) : sortedCategoryCards;
-    const standoutResults = (data ? preview ? variedStandouts(data.lists, teamQuery) : data.lists.standouts : []).filter(f => (!preview && !all) || !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
+    const standoutResults = (data ? preview ? variedStandouts(data.lists) : data.lists.standouts : []).filter(f => (!preview && !all) || !teamQuery || `${f.home} ${f.away}`.toLocaleLowerCase().includes(teamQuery));
     const page = matches ? 'matches' : all ? 'all' : 'discover';
     const resultCount = Math.min(200, matches ? matchResults.length : all ? standoutResults.length : categoryCards.length);
     // One search_used per settled search, not one per pause in typing, and not again
