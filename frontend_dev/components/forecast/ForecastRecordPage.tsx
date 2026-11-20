@@ -71,12 +71,17 @@ function CorrectionHistory({ forecast, asOf, zone }: { forecast: Forecast; asOf:
   </div>
 }
 
-export function FixtureRow({ fixture, asOf, zone, initiallyOpen = false }: { fixture: Fixture; asOf: string; zone: string; initiallyOpen?: boolean }) {
+/** A provisional grade for a still-pending forecast, e.g. from the live full-time score. */
+export type ProvisionalGrade = (forecast: Forecast) => { status: "hit" | "miss"; score: string } | null
+
+export function FixtureRow({ fixture, asOf, zone, initiallyOpen = false, provisional }: { fixture: Fixture; asOf: string; zone: string; initiallyOpen?: boolean; provisional?: ProvisionalGrade }) {
   const [open, setOpen] = useState(initiallyOpen)
+  const grade = (f: Forecast) => f.status === "pending" && provisional ? provisional(f) : null
   const settled = fixture.forecasts.filter(f => f.status === "hit" || f.status === "miss").length
-  const pending = fixture.forecasts.filter(f => f.status === "pending").length
-  const other = fixture.forecasts.length - settled - pending
-  const summary = [settled && `${settled} settled`, pending && `${pending} pending`, other && `${other} other`].filter(Boolean).join(" · ")
+  const early = fixture.forecasts.filter(f => grade(f)).length
+  const pending = fixture.forecasts.filter(f => f.status === "pending").length - early
+  const other = fixture.forecasts.length - settled - early - pending
+  const summary = [settled && `${settled} settled`, early && `${early} provisional`, pending && `${pending} pending`, other && `${other} other`].filter(Boolean).join(" · ")
   return <article className={styles.fixture}>
     <div className={styles.fixtureSummary}>
       <div className={styles.identity}><h2>{fixture.home || "Home team unavailable"} vs {fixture.away || "Away team unavailable"}</h2>
@@ -88,16 +93,17 @@ export function FixtureRow({ fixture, asOf, zone, initiallyOpen = false }: { fix
     {open && <div id={`fixture-${fixture.fixture_id}`} className={styles.events}>
       <p className={styles.eventHeading}>{fixture.selection_state === "provisional" ? "LATEST CAPTURED FORECASTS" : "LAST FORECASTS BEFORE KICKOFF"} · OUTCOMES</p>
       {fixture.selection_state === "provisional" && <p className={styles.caption}>Selection is still provisional and may change before the capture cutoff.</p>}
-      {fixture.forecasts.map(f => <section className={styles.event} key={f.entry_id}>
+      {fixture.forecasts.map(f => { const early = grade(f); return <section className={styles.event} key={f.entry_id}>
         <div className={styles.eventTitle}><h3>{f.event_label || f.event_key}</h3><strong>{(f.probability * 100).toFixed(1)}%</strong>
-          <span className={styles.badge} data-status={f.status}>{statusLabel[f.status]}</span></div>
+          <span className={styles.badge} data-status={early ? early.status : f.status}>{early ? `${statusLabel[early.status]} · provisional` : statusLabel[f.status]}</span></div>
         <p className={styles.caption}>Captured <time dateTime={f.captured_at}>{stamp(f.captured_at, zone)}</time></p>
-        <p>{score(f.evidence) ? `Recorded score ${score(f.evidence)}. ` : ""}{reasonLabel(f.reason)}</p>
+        <p>{early ? `Full-time score ${early.score}, from the live feed. The record confirms this after the nightly update.`
+          : <>{score(f.evidence) ? `Recorded score ${score(f.evidence)}. ` : ""}{reasonLabel(f.reason)}</>}</p>
         <p className={styles.caption}>{f.outcome_observed_at
           ? `Last changed outcome: ${stamp(f.outcome_observed_at, zone)}. This is not the last check time.`
           : "No result observation recorded yet."}</p>
         <CorrectionHistory forecast={f} asOf={asOf} zone={zone} />
-      </section>)}
+      </section> })}
     </div>}
   </article>
 }
