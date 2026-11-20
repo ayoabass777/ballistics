@@ -53,6 +53,22 @@ class DiscoverTests(unittest.TestCase):
         self.assertEqual((preview['list'], preview['market'], preview['probability']), ('goals', 'Match Over 1.5', .76))
         self.assertNotIn('score', preview)
 
+    def test_matches_preview_prefers_goals_outlook_over_patterns(self):
+        item = row()
+        item['payload']['discovery']['sections'] = {
+            'goals': {'list': 'goals', 'score': .1, 'market': 'Match Over 1.5', 'probability': .8},
+            'patterns': {'list': 'patterns', 'score': .9, 'team': 'Away', 'event': 'win', 'k': 8, 'n': 10}}
+        self.assertEqual(assemble([item], now=NOW)['matches'][0]['preview']['list'], 'goals')
+
+    def test_matches_preview_falls_back_to_top_goals_row_before_patterns(self):
+        item = row()
+        item['payload']['discovery']['sections'] = {
+            'patterns': {'list': 'patterns', 'score': .9, 'team': 'Away', 'event': 'win', 'k': 8, 'n': 10}}
+        item['payload']['top_goal'] = {'market': 'Match Goals 1-4', 'probability': .82, 'league_rate': .7}
+        preview = assemble([item], now=NOW)['matches'][0]['preview']
+        self.assertEqual((preview['list'], preview['market'], preview['probability']), ('goals', 'Match Goals 1-4', .82))
+        self.assertNotIn('league_rate', preview)
+
     def test_logo_urls_follow_fixture_assets_without_exposing_file_ids(self):
         item = row()
         item.update(home_logo_file_id='home-file', away_logo_file_id=None, league_logo_file_id='league-file')

@@ -72,7 +72,8 @@ class FixturesApiTests(unittest.TestCase):
         cur.fetchall.return_value = [row(discovery=discovery), row(fixture_id=10, fixture_status="NS")]
         body = results.fixtures(cur, "UTC", date(2026, 11, 5), date(2026, 11, 5))
         played, upcoming = body["matches"]
-        self.assertEqual((played["pick"]["team"], played["pick"]["event"]), ("Santos", "Over_2_5"))
+        # Matches leads with the Goals outlook even when a pattern scores higher.
+        self.assertEqual((played["pick"]["list"], played["pick"]["market"]), ("goals", "Match Over 1.5"))
         self.assertNotIn("score", played["pick"])
         self.assertIsNone(upcoming["pick"])
         self.assertIn("ON f.kickoff_utc <= now()", cur.execute.call_args.args[0])

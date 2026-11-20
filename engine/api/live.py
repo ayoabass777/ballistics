@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from engine.api.crests import crest_url
-from engine.api.discover import KINDS, PICK_FIELDS
+from engine.api.discover import PICK_FIELDS, leading_pick as _leading
 
 # Finished fixtures stay in the list until Results has them: Results reads
 # raw.fact_fixtures, which only the nightly dbt run rebuilds, so a game that
@@ -33,13 +33,13 @@ LIST_SQL = f"""
 SELECT {FIELDS},
        f.home_team_name, f.away_team_name, f.league_id, f.league_name, f.country_name,
        f.kickoff_utc, f.home_logo_file_id, f.away_logo_file_id,
-       l.logo_file_id AS league_logo_file_id, a.discovery
+       l.logo_file_id AS league_logo_file_id, a.discovery, a.top_goal
 FROM raw.live_fixture_state s
 JOIN raw.fact_fixtures f ON f.fixture_id = s.fixture_id
 LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id
 -- The fixture's last complete run, which is its pre-kickoff forecast (D152).
 LEFT JOIN LATERAL (
-    SELECT m.payload->'discovery' AS discovery
+    SELECT m.payload->'discovery' AS discovery, m.payload->'goals'->'rows'->0 AS top_goal
     FROM raw.match_analysis m
     JOIN raw.engine_runs r ON r.run_ds = m.run_ds AND r.status = 'complete'
     WHERE m.fixture_id = s.fixture_id
@@ -83,20 +83,18 @@ def state(row: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def leading_pick(discovery: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-    """The match's strongest pre-kickoff finding, chosen as Matches chooses its
-    preview (discover.assemble); private scores never leave the API."""
-    sections = (discovery or {}).get("sections") or {}
-    candidates = [sections[k] for k in KINDS
-                  if sections.get(k) and isinstance(sections[k].get("score"), (int, float))]
-    best = max(candidates, key=lambda p: p["score"], default=None)
+def leading_pick(discovery: Optional[Dict[str, Any]],
+                 top_goal: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """The match's pre-kickoff highlight, chosen as Matches chooses its
+    preview (discover.leading_pick); private scores never leave the API."""
+    best = _leading(discovery, top_goal)
     return {k: best.get(k) for k in PICK_FIELDS} if best else None
 
 
 def card(row: Dict[str, Any]) -> Dict[str, Any]:
     return {
         **state(row),
-        "pick": leading_pick(row.get("discovery")),
+        "pick": leading_pick(row.get("discovery"), row.get("top_goal")),
         "home": row["home_team_name"], "away": row["away_team_name"],
         "league_id": row["league_id"], "league": row["league_name"], "country": row["country_name"],
         "kickoff": _iso(row["kickoff_utc"]),

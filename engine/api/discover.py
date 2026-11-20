@@ -25,12 +25,23 @@ def snapshot(f):
     }
 
 
-def leading_pick(data):
-    """The shared Matches highlight; ties retain section order."""
+def _scored(p):
+    return bool(p) and isinstance(p.get('score'), (int, float))
+
+
+def leading_pick(data, top_goal=None):
+    """The shared Matches highlight: the stronger Strength or Goals finding,
+    else the match's top Goals outlook row (``payload.goals.rows[0]``), else
+    its pattern. Matches leads with the outlook, not patterns. Ties retain
+    section order."""
     sections = (data or {}).get('sections') or {}
-    candidates = [sections[k] for k in KINDS if sections.get(k)
-                  and isinstance(sections[k].get('score'), (int, float))]
-    return max(candidates, key=lambda p: p['score'], default=None)
+    candidates = [sections[k] for k in ('strength', 'goals') if _scored(sections.get(k))]
+    best = max(candidates, key=lambda p: p['score'], default=None)
+    if best:
+        return best
+    if top_goal and top_goal.get('market') and isinstance(top_goal.get('probability'), (int, float)):
+        return {'list': 'goals', 'market': top_goal['market'], 'probability': top_goal['probability']}
+    return sections['patterns'] if _scored(sections.get('patterns')) else None
 
 
 def window(zone, scope, day=None, now=None, end_day=None):
@@ -77,7 +88,7 @@ def assemble(rows, *, zone='UTC', scope='week', day=None, end_day=None, leagues=
             continue
         # Matches stays chronological. Its optional preview uses the strongest
         # already-qualified section pick; private scores never leave the API.
-        leading = leading_pick(data)
+        leading = leading_pick(data, row['payload'].get('top_goal'))
         matches.append({**f, 'pick': None,
                         'preview': {k: leading.get(k) for k in PICK_FIELDS} if leading else None})
         for name, p in [('standouts', data.get('standout')), *data.get('sections', {}).items()]:
@@ -92,11 +103,12 @@ def assemble(rows, *, zone='UTC', scope='week', day=None, end_day=None, leagues=
             'window': {'from': start.isoformat(), 'to': end.isoformat()}}
 
 
-# Only the payload's `discovery` part is read; the rest of match_analysis is
-# the match page's and is several times larger.
+# Only the payload's `discovery` part and top Goals outlook row are read; the
+# rest of match_analysis is the match page's and is several times larger.
 ROW_COLUMNS = """latest.run_ds, latest.finished_at,
                CASE WHEN m.payload IS NOT NULL
-                    THEN jsonb_build_object('discovery', m.payload->'discovery') END AS payload,
+                    THEN jsonb_build_object('discovery', m.payload->'discovery',
+                                            'top_goal', m.payload->'goals'->'rows'->0) END AS payload,
                f.fixture_status AS live_status,
                f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id"""
 ROW_JOINS = """LEFT JOIN raw.fact_fixtures f ON f.fixture_id = m.fixture_id
