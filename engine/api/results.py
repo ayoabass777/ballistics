@@ -35,14 +35,14 @@ SELECT f.fixture_id, f.fixture_status, f.kickoff_utc,
        f.home_team_fulltime_goal, f.away_team_fulltime_goal,
        f.home_team_halftime_goal, f.away_team_halftime_goal,
        f.home_logo_file_id, f.away_logo_file_id, l.logo_file_id AS league_logo_file_id,
-       a.discovery
+       a.discovery, a.top_goal
 FROM raw.fact_fixtures f
 LEFT JOIN dim.dim_leagues l ON l.league_id = f.league_id
 -- Kicked-off fixtures carry their pre-kickoff forecast (D152): the last
 -- complete run that analysed them, as on the live list. Upcoming ones get
 -- theirs from Discover, so their (large) payloads are not read here.
 LEFT JOIN LATERAL (
-    SELECT m.payload->'discovery' AS discovery
+    SELECT m.payload->'discovery' AS discovery, m.payload->'goals'->'rows'->0 AS top_goal
     FROM raw.match_analysis m
     JOIN raw.engine_runs r ON r.run_ds = m.run_ds AND r.status = 'complete'
     WHERE m.fixture_id = f.fixture_id
@@ -77,7 +77,7 @@ def card(row: Dict[str, Any]) -> Dict[str, Any]:
         "league_logo_url": crest_url("leagues", row.get("league_logo_file_id")),
         # The match's leading pre-kickoff finding, so a played game can show
         # whether it landed (frontend lib/live.ts trackPick).
-        "pick": leading_pick(row.get("discovery")),
+        "pick": leading_pick(row.get("discovery"), row.get("top_goal")),
     }
 
 
