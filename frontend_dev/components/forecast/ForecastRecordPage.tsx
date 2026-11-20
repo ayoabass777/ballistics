@@ -99,9 +99,9 @@ export function FixtureRow({ fixture, asOf, zone, initiallyOpen = false, provisi
         <p className={styles.caption}>Captured <time dateTime={f.captured_at}>{stamp(f.captured_at, zone)}</time></p>
         <p>{early ? `Full-time score ${early.score}, from the live feed. The record confirms this after the nightly update.`
           : <>{score(f.evidence) ? `Recorded score ${score(f.evidence)}. ` : ""}{reasonLabel(f.reason)}</>}</p>
-        <p className={styles.caption}>{f.outcome_observed_at
+        {!early && <p className={styles.caption}>{f.outcome_observed_at
           ? `Last changed outcome: ${stamp(f.outcome_observed_at, zone)}. This is not the last check time.`
-          : "No result observation recorded yet."}</p>
+          : "No result observation recorded yet."}</p>}
         <CorrectionHistory forecast={f} asOf={asOf} zone={zone} />
       </section> })}
     </div>}
