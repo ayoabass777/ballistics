@@ -200,7 +200,7 @@ function Details({ data }: {
  <p className={s.caption}>{f.run_finished_at && Date.parse(f.run_finished_at) <= kickoff ? 'These estimates were made before kickoff; they do not update with the live score.' : 'These estimates do not update with the live score. Pre-kickoff timing could not be confirmed.'}</p>
  {!live.data?.state && <p role="status">Live score unavailable. Retrying.</p>}
  </section></>}
- {finishedPreview && <div hidden={finishedSection !== 'forecast-record'}><MatchForecastRecord fixtureId={f.fixture_id}/></div>}
+ {finishedPreview && <div hidden={finishedSection !== 'forecast-record'}><MatchForecastRecord fixtureId={f.fixture_id} live={live.data?.state}/></div>}
  {showResearch && <>
  {f.fixture_status && !forecastStatuses.has(f.fixture_status) && <p className={s.notice} role="status">{statusNotices[f.fixture_status] || 'This match is not going ahead as scheduled.'} The pre-match forecast is not shown for this match.</p>}
  {unconfirmed && <p className={s.notice} role="status"><strong>Kickoff not confirmed.</strong> Our data provider still lists this match as not started, more than a day after its scheduled time. It may have been postponed; the date will update when the provider confirms it.{f.run_finished_at && ' Any forecast below was made before the original kickoff.'}</p>}
