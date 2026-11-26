@@ -7,7 +7,7 @@ import { PreferencesProvider } from "@/components/research/PreferencesProvider"
 import { Providers } from "@/components/Providers"
 import { AccountProfileSync } from "@/components/account/AccountProfileSync"
 
-const inter = localFont({ src: "./fonts/Inter-variable.ttf", weight: "100 900", style: "normal", display: "swap" })
+const inter = localFont({ src: "./fonts/Inter-variable-latin.woff2", weight: "100 900", style: "normal", display: "swap" })
 
 export const metadata: Metadata = {
   title: "Ballistics - Football Analytics",
