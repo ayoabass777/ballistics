@@ -45,6 +45,22 @@ export function matchReturnTo(value: string | null | undefined) {
         return `${url.pathname}${url.search}`;
     } catch { return '/discover'; }
 }
+/**
+ * The match page's back arrow. Reached from inside the app, it steps back through
+ * history like the browser button; replacing the entry instead left a duplicate list
+ * page behind, so the browser back button then seemed to do nothing. Opened directly
+ * (shared link, new tab, refresh), there is no app page behind it, so it replaces the
+ * entry with the return list.
+ */
+export function leaveMatch(router: { back(): void; replace(href: string, options?: { scroll?: boolean }): void }, returnTo: string | null) {
+    let inApp = false;
+    try {
+        const first = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+        inApp = Boolean(first) && new URL(first!.name).pathname !== window.location.pathname && window.history.length > 1;
+    } catch { /* Fall back to the return list. */ }
+    if (inApp) router.back();
+    else router.replace(matchReturnTo(returnTo), { scroll: false });
+}
 export function matchHref(card: Card, entry = true, returnTo?: string) {
     const p = card.pick;
     const params = new URLSearchParams(entry && p ? { section: p.list, team: p.team || '', event: p.event || p.market || '', context: p.context || '' } : {});
