@@ -46,7 +46,7 @@ export function DiscoverDates({ zone, dayWindow = false }: { zone: string | null
                     const isToday = day === today, isTomorrow = day === shiftDay(today, 1);
                     const selected = (scope === 'today' && isToday) || (scope === 'tomorrow' && isTomorrow) || (scope === 'date' && search.get('day') === day);
                     return <Button key={day} className={selected ? s.active : ''} aria-pressed={selected} onClick={() => apply('date', day)}>
-                        <span>{isToday ? 'Today' : isTomorrow ? 'Tomorrow' : new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {weekday:'short',timeZone:'UTC'})}<small className={s.dateDayNumber}>{new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {day:'numeric',month:'short',timeZone:'UTC'})}</small></span>
+                        <span>{isToday ? 'Today' : new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {weekday:'short',timeZone:'UTC'})}<small className={s.dateDayNumber}>{new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', {day:'numeric',month:'short',timeZone:'UTC'})}</small></span>
                     </Button>;
                 })}
                 <Button aria-label="Later dates" onClick={() => setWindowStart(shiftDay(windowStart, 5))}><ChevronRight size={18} aria-hidden="true"/></Button>
@@ -59,7 +59,7 @@ export function DiscoverDates({ zone, dayWindow = false }: { zone: string | null
                     setStart(day); setEnd(search.get('end_day') || day); setOpen(!open);
                 }}><CalendarDays size={17} aria-hidden="true"/>Calendar</Button>
         </div>
-        {(scope === 'date' || scope === 'range') && <p className={s.caption} aria-live="polite">{search.get('day')}{scope === 'range' && ` to ${search.get('end_day')}`}</p>}
+        <p className={`${s.caption} ${s.dateSelectionSummary}`} aria-live="polite">{scope === 'date' || scope === 'range' ? <>{search.get('day')}{scope === 'range' && ` to ${search.get('end_day')}`}</> : '\u00a0'}</p>
         {open && <div id="discover-date-picker" className={s.matchDateRow}>
             <label>From<input type="date" value={start} onChange={e => setStart(e.target.value)}/></label>
             <label>To<input type="date" min={start} value={end} onChange={e => setEnd(e.target.value)}/></label>
