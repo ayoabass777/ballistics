@@ -115,18 +115,18 @@ with_context as (
         coalesce(st.has_unprocessed_rows, false) as standings_incomplete,
         st.unprocessed_rows,
         st.unprocessed_since,
-        -- A team's current table is its latest phase, not the provider's last
-        -- table: the provider orders Belgium's and Denmark's championship
-        -- round before the regular season, and may add aggregate tables
-        -- (Argentina's annual table, promedios) after the phase tables.
-        --   1. a table someone has played in (not a round that hasn't started)
-        --   2. the smallest such table: a later round is a subset of the
-        --      regular season; a Clausura zone is a subset of the annual table
-        --   3. the provider's later table (Clausura after Apertura)
-        row_number() over (
-            partition by c.league_season_id, c.api_team_id
-            order by gs.has_games desc, gs.n_teams, c.group_order desc nulls last
-        ) as team_group_pick
+        gs.n_teams,
+        gs.has_games,
+        -- Period tables (Eerste Divisie: Period 1-4 beside the regular season)
+        -- list the same teams as the season table and split its games, so a
+        -- team's games in the season table equal the sum over the periods.
+        -- That table is flagged here, among a team's tables of one size
+        -- (three or more, so Apertura beside Clausura is never matched).
+        count(*) over team_same_size >= 3
+            and coalesce(c.games_played, 0) > 0
+            and 2 * coalesce(c.games_played, 0)
+                = sum(coalesce(c.games_played, 0)) over team_same_size
+            as is_period_parent
     from current_rows c
     join season_stats ss on ss.league_season_id = c.league_season_id
     join group_stats gs
@@ -136,6 +136,43 @@ with_context as (
       on lc.league_season_id = c.league_season_id
     left join teams t on t.api_team_id = c.api_team_id
     left join status st on st.league_season_id = c.league_season_id
+    window team_same_size as (
+        partition by c.league_season_id, c.api_team_id, gs.n_teams
+    )
+),
+
+picked as (
+    select
+        w.*,
+        -- A team's current table is its latest phase, not the provider's last
+        -- table: the provider orders Belgium's and Denmark's championship
+        -- round before the regular season, and may add aggregate tables
+        -- (Argentina's annual table, promedios) after the phase tables.
+        --   1. not a period table (one with a season table beside it)
+        --   2. a table someone has played in (not a round that hasn't started)
+        --   3. the smallest such table: a later round is a subset of the
+        --      regular season; a Clausura zone is a subset of the annual table
+        --   4. a season table first: before a second period starts, Period 1
+        --      equals the season table, and the provider lists the season first
+        --   5. the provider's later table (Clausura after Apertura)
+        row_number() over (
+            partition by w.league_season_id, w.api_team_id
+            order by
+                (w.has_period_parent and not w.is_period_parent),
+                w.has_games desc,
+                w.n_teams,
+                w.is_period_parent desc,
+                case when w.is_period_parent then w.group_order end nulls last,
+                w.group_order desc nulls last
+        ) as team_group_pick
+    from (
+        select
+            x.*,
+            bool_or(x.is_period_parent) over (
+                partition by x.league_season_id, x.api_team_id, x.n_teams
+            ) as has_period_parent
+        from with_context x
+    ) w
 )
 
 select
@@ -170,4 +207,4 @@ select
     -- The table to show for this team: its only group, or in a split season
     -- its latest phase (team_group_pick above).
     team_group_pick = 1 as is_team_current_group
-from with_context
+from picked
